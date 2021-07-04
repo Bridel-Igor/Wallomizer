@@ -4,17 +4,19 @@
 #include "Urlmon.h"
 #pragma comment(lib, "Urlmon.lib")
 
-bool setWallpaper(char* buffer, std::string wallpaperid, bool apiKeyUsed, std::string apiKey)
+#include "Settings.h"
+
+bool setWallpaper(char* buffer, std::string wallpaperid, Settings *settings)
 {
 	std::string wallpaperurl = "https://wallhaven.cc/api/v1/w/";
 	wallpaperurl.append(wallpaperid);
-	if (apiKeyUsed)
+	if (settings->apiKeyUsed)
 	{
 		wallpaperurl.append("?apikey=");
-		wallpaperurl.append(apiKey);
+		wallpaperurl.append(settings->apiKey);
 	}
 
-	char path[] = "D://Query.txt";
+	char path[] = "Query.txt";
 	URLDownloadToFileA(nullptr, wallpaperurl.c_str(), path, 0, nullptr);
 
 	FILE* pFile;
@@ -29,7 +31,7 @@ bool setWallpaper(char* buffer, std::string wallpaperid, bool apiKeyUsed, std::s
 	buffer = strstr(buffer, "path") + 7;
 
 	int i = 0, slide = 0;
-	while (buffer[i] != '\"')
+	while (buffer != nullptr && buffer[i] != '\"')
 	{
 		if (buffer[i] == 92)
 		{
@@ -42,10 +44,14 @@ bool setWallpaper(char* buffer, std::string wallpaperid, bool apiKeyUsed, std::s
 	}
 	imgurl[i - slide] = '\0';
 
-	char pathimg[] = "D://Current wallpaper.jpg";
-	URLDownloadToFileA(nullptr, imgurl, pathimg, 0, nullptr);
-
-	if (SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, pathimg, SPIF_UPDATEINIFILE))
+	std::string pathimg="";
+	char s[255]="Current wallpaper.jpg";
+	URLDownloadToFileA(nullptr, imgurl, s, 0, nullptr);
+	GetCurrentDirectoryA(255, s);
+	pathimg.append(s);
+	pathimg.append("\\Current wallpaper.jpg");
+	strcpy_s(s, pathimg.c_str());
+	if (SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, s, SPIF_UPDATEINIFILE))
 		return true;
 	else
 		return false;
@@ -58,7 +64,7 @@ struct Meta
 
 void getMeta(char* buffer, std::string url, Meta* meta)
 {
-	char path[] = "D://query.txt";
+	char path[] = "query.txt";
 	URLDownloadToFileA(nullptr, url.c_str(), path, 0, nullptr);
 
 	FILE* pFile;
@@ -73,7 +79,7 @@ void getMeta(char* buffer, std::string url, Meta* meta)
 	//per_page
 	buffer = strstr(buffer, "per_page") + 10;
 	int i = 0;
-	while (buffer[i] != ',')
+	while (buffer != nullptr && buffer[i] != ',')
 	{
 		search[i] = buffer[i];
 		i++;
@@ -82,9 +88,10 @@ void getMeta(char* buffer, std::string url, Meta* meta)
 	meta->per_page = atoi(search);
 
 	//total
-	buffer = strstr(buffer, "total") + 7;
+	if (buffer!=nullptr)
+		buffer = strstr(buffer, "total") + 7;
 	i = 0;
-	while (buffer[i] != '}')
+	while (buffer != nullptr && buffer[i] != '}')
 	{
 		search[i] = buffer[i];
 		i++;
@@ -93,18 +100,18 @@ void getMeta(char* buffer, std::string url, Meta* meta)
 	meta->total = atoi(search);
 }
 
-std::string getRandomWallpaperIDFromCollection(char* buffer, std::string username, std::string collectionID, bool apikeyused, std::string apikey)
+std::string getRandomWallpaperIDFromCollection(char* buffer, Settings *settings)
 {
 	int page = 1;
 	Meta meta;
 	std::string collectionurl = "https://wallhaven.cc/api/v1/collections/";
-	collectionurl.append(username);
+	collectionurl.append(settings->username);
 	collectionurl.append("/");
-	collectionurl.append(collectionID);
-	if (apikeyused)
+	collectionurl.append(settings->collectionID);
+	if (settings->apikeyused)
 	{
 		collectionurl.append("?apikey=");
-		collectionurl.append(apikey);
+		collectionurl.append(settings->apikey);
 	}
 	getMeta(buffer, collectionurl, &meta);
 	int randomWallpaper = rand() % meta.total;
@@ -117,7 +124,7 @@ std::string getRandomWallpaperIDFromCollection(char* buffer, std::string usernam
 	_itoa_s(randomPage, curpage, 10);
 	pageurl.append(curpage);
 
-	char path[] = "D://query.txt";
+	char path[] = "query.txt";
 	URLDownloadToFileA(nullptr, pageurl.c_str(), path, 0, nullptr);
 
 	FILE* pFile;
@@ -133,7 +140,7 @@ std::string getRandomWallpaperIDFromCollection(char* buffer, std::string usernam
 		buffer = strstr(buffer, "\"id\"") + 6;
 
 	int i = 0;
-	while (buffer[i] != '\"')
+	while (buffer!=nullptr && buffer[i] != '\"')
 	{
 		search[i] = buffer[i];
 		i++;
@@ -145,26 +152,14 @@ std::string getRandomWallpaperIDFromCollection(char* buffer, std::string usernam
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
-	std::string username = "Bridel";
-	std::string collectionID = "620737";
-	bool apikeyused = true;
-	std::string apikey = "TUbURreToynW00fI8niwFOuA0nynXvzG";
-
+	Settings *settings = new Settings;
 	char* buffer = new char[32768];
-
 	srand((unsigned int)time(NULL));
 	while (true)
 	{
-		setWallpaper(buffer, getRandomWallpaperIDFromCollection(buffer, username, collectionID, apikeyused, apikey), apikeyused, "TUbURreToynW00fI8niwFOuA0nynXvzG");
-		Sleep(5000);
+		setWallpaper(buffer, getRandomWallpaperIDFromCollection(buffer, settings), settings);
+		Sleep(settings->delay);
 	}
-
+	delete [] buffer;
 	return 0;
 }
-/*
-* 620706 - general
-* 620737 - woman
-* 620731 - art
-* 700018 - reserve
-* 735880 - phone
-*/
