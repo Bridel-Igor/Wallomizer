@@ -1,11 +1,11 @@
 #pragma once
 #include <string>
-#include "Settings.h"
+#include "UserCollectionSettings.h"
 
 class UserCollection
 {
 public:
-	UserCollection(Settings *_settings);
+	UserCollection();
 	~UserCollection();
 	bool setRandomWallpaper();
 
@@ -16,7 +16,8 @@ private:
 	}*meta;
 
 	char *buffer, *pBuffer;
-	Settings* settings;
+	UserCollectionSettings* settings;
 	FILE* pFile;
 	static char queryPath[];
+	std::string collectionUrl;
 };

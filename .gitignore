@@ -342,3 +342,4 @@ healthchecksdb
 /wallhaven/Query.txt
 /wallhaven/Current wallpaper.jpg
 /wallhaven/Query.json
+*.dat

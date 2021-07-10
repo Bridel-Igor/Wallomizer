@@ -5,25 +5,17 @@
 
 char UserCollection::queryPath[] = "Query.json";
 
-UserCollection::UserCollection(Settings* _settings)
+UserCollection::UserCollection()
 {
-	settings = _settings;
+	settings = new UserCollectionSettings;
 	buffer = new char[32768];
 	pBuffer = buffer;
 	meta = new Meta;
 	pFile = nullptr;
-}
+	settings->loadSettings();
 
-UserCollection::~UserCollection()
-{
-	delete meta;
-	delete[] buffer;
-}
-
-bool UserCollection::setRandomWallpaper()
-{
-	// Forming of collection URL
-	std::string collectionUrl = "https://wallhaven.cc/api/v1/collections/";
+	// Forming collection URL
+	collectionUrl = "https://wallhaven.cc/api/v1/collections/";
 	collectionUrl.append(settings->username);
 	collectionUrl.append("/");
 	collectionUrl.append(settings->collectionID);
@@ -37,11 +29,11 @@ bool UserCollection::setRandomWallpaper()
 	URLDownloadToFileA(nullptr, collectionUrl.c_str(), queryPath, 0, nullptr);
 	fopen_s(&pFile, queryPath, "r");
 	if (pFile == nullptr)
-		return false;
+		return;// rethink exceptions
 	pBuffer = buffer;
 	fgets(pBuffer, 32768, pFile);
 	if (fclose(pFile))
-		return false;
+		return;// same
 	char search[16] = "";
 	pBuffer = strstr(pBuffer, "per_page") + 10;
 	int i = 0;
@@ -62,8 +54,17 @@ bool UserCollection::setRandomWallpaper()
 	}
 	search[i] = '\0';
 	meta->total = atoi(search);
+}
 
-	// getting the URL of random wallpaper from collection
+UserCollection::~UserCollection()
+{
+	delete meta;
+	delete[] buffer;
+	delete settings;
+}
+
+bool UserCollection::setRandomWallpaper()
+{
 	int randomWallpaperNumber = rand() % meta->total;
 	int randomPageNum = int(randomWallpaperNumber / meta->per_page);
 	randomWallpaperNumber -= randomPageNum * meta->per_page;
@@ -81,37 +82,10 @@ bool UserCollection::setRandomWallpaper()
 	fgets(pBuffer, 32768, pFile);
 	if (fclose(pFile))
 		return false;
-	char wallpaperID[32] = "";
-	for (int i = 0; i < randomWallpaperNumber; i++)
-		pBuffer = strstr(pBuffer, "\"id\"") + 6;
-	i = 0;
-	while (pBuffer != nullptr && pBuffer[i] != '\"')
-	{
-		wallpaperID[i] = pBuffer[i];
-		i++;
-	}
-	wallpaperID[i] = '\0';
-
-	// downloading and setting wallpaper
-	std::string wallpaperurl = "https://wallhaven.cc/api/v1/w/";
-	wallpaperurl.append(wallpaperID);
-	if (settings->isApiKeyUsed)
-	{
-		wallpaperurl.append("?apikey=");
-		wallpaperurl.append(settings->apiKey);
-	}
-	URLDownloadToFileA(nullptr, wallpaperurl.c_str(), queryPath, 0, nullptr);
-	fopen_s(&pFile, queryPath, "r");
-	if (pFile == nullptr)
-		return false;
-	pBuffer = buffer;
-	fgets(pBuffer, 32768, pFile);
-	if (fclose(pFile))
-		return false;
 	char imgUrl[255] = "";
-	pBuffer = strstr(pBuffer, "path") + 7;
-	int  slide = 0; 
-	i = 0;
+	for (int i = 1; i <= randomWallpaperNumber; i++)
+		pBuffer = strstr(pBuffer, "path") + 7;
+	int  slide = 0, i = 0;
 	while (pBuffer != nullptr && pBuffer[i] != '\"')
 	{
 		if (pBuffer[i] == 92)

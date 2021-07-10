@@ -18,18 +18,39 @@
     <ClCompile Include="WinMain.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Settings.cpp">
+    <ClCompile Include="SetUserCollectionWindow.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="UserCollection.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="UserCollectionSettings.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Settings.h">
+    <ClInclude Include="UserCollection.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="UserCollection.h">
+    <ClInclude Include="BaseWindow.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Edit.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Static.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="CheckBox.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="SetUserCollectionWindow.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="UserCollectionSettings.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
