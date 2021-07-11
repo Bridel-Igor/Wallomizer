@@ -5,6 +5,9 @@
 #define BUTTON_CANCEL	2
 #define CHECKBOX_ISAPI	3
 
+//bool SetUserCollectionWindow::running = false;
+SetUserCollectionWindow *SetUserCollectionWindow::setUserCollectionWindow = nullptr;
+
 BOOL CALLBACK SetChildFont(HWND hwndChild, LPARAM lParam)
 {
 	HFONT hFont = (HFONT)lParam;
@@ -28,8 +31,8 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		cbIsApiKeyUsed = new CheckBox	(Window(), "",					120,	100,	20,		20, (HMENU)CHECKBOX_ISAPI, (HINSTANCE)GetWindowLongPtr(Window(), GWLP_HINSTANCE), true);
 		stApiKey = new Static			(Window(), "Api key:",			10,		130,	100,	20, SS_RIGHT);
 		edApiKey = new Edit				(Window(), "",					120,	130,	110,	20);
-		btnOk = new Button				(Window(), "Ok",				10,		160,	100,	20, (HMENU)BUTTON_OK);//, BS_OWNERDRAW);
-		btnCancel = new Button			(Window(), "Cancel",			120,	160,	110,	20, (HMENU)BUTTON_CANCEL);//, BS_OWNERDRAW);
+		btnOk = new Button				(Window(), "Ok",				10,		160,	100,	20, (HMENU)BUTTON_OK);
+		btnCancel = new Button			(Window(), "Cancel",			120,	160,	110,	20, (HMENU)BUTTON_CANCEL);
 		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)font);
 		bkBrush = CreateSolidBrush(RGB(26, 26, 26));
@@ -53,7 +56,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		DestroyWindow(hWnd);
 		return 0;
 	}
-	break;
+	return 0;
 
 	case WM_PAINT:
 	{
@@ -129,11 +132,34 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 	{
 		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 	}
+	return 0;
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
 	return TRUE;
+}
+
+void SetUserCollectionWindow::windowThread()
+{
+	if (setUserCollectionWindow)
+	{
+		SetForegroundWindow(setUserCollectionWindow->Window());
+		return;
+	}
+	setUserCollectionWindow = new SetUserCollectionWindow;
+	setUserCollectionWindow->Create("wallhaven", WS_OVERLAPPED | WS_SYSMENU, NULL, 100, 100, 256, 229, NULL, NULL);
+	ShowWindow(setUserCollectionWindow->Window(), SW_SHOWNORMAL);
+	MSG msg = { };
+	while (GetMessage(&msg, NULL, 0, 0) > 0)
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	ShowWindow(setUserCollectionWindow->Window(), SW_HIDE);
+	setUserCollectionWindow->Destroy();
+	delete setUserCollectionWindow;
+	setUserCollectionWindow = nullptr;
 }
 
 //#include <ShObjIdl.h>//

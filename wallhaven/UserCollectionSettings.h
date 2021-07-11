@@ -11,5 +11,4 @@ public:
 
 	bool saveSettings();
 	void loadSettings();
-	void showSettingsWindow();
 };

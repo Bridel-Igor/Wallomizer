@@ -52,24 +52,7 @@ void UserCollectionSettings::loadSettings()
 		success = false;
 	if (!success)
 	{
-		showSettingsWindow();
+		SetUserCollectionWindow::windowThread();
 		loadSettings();
 	}
-}
-
-void UserCollectionSettings::showSettingsWindow()
-{
-	SetUserCollectionWindow window;
-	if (!window.Create("wallhaven", WS_OVERLAPPED | WS_SYSMENU, NULL, 100, 100, 256, 229, NULL, NULL))
-		return;
-	ShowWindow(window.Window(), SW_SHOWNORMAL);
-
-	MSG msg = { };
-	while (GetMessage(&msg, NULL, 0, 0) > 0)
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-	ShowWindow(window.Window(), SW_HIDE);
-	window.Destroy();
 }

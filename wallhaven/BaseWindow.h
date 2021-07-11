@@ -79,3 +79,4 @@ protected:
 
 	HWND m_hWnd;
 };
+

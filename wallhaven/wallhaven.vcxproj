@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="TrayWindow.cpp" />
     <ClCompile Include="UserCollectionSettings.cpp" />
     <ClCompile Include="UserCollection.cpp" />
     <ClCompile Include="SetUserCollectionWindow.cpp" />
@@ -147,12 +148,20 @@
   <ItemGroup>
     <ClInclude Include="Button.h" />
     <ClInclude Include="Edit.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SetUserCollectionWindow.h" />
     <ClInclude Include="CheckBox.h" />
     <ClInclude Include="Static.h" />
+    <ClInclude Include="TrayWindow.h" />
     <ClInclude Include="UserCollection.h" />
     <ClInclude Include="UserCollectionSettings.h" />
     <ClInclude Include="BaseWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="wallhaven.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
