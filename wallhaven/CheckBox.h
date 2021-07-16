@@ -11,6 +11,10 @@ public:
 		if (isChecked)
 			check();
 	}
+	~CheckBox()
+	{
+		DestroyWindow(hWnd);
+	}
 	void check()
 	{
 		SendMessageA(hWnd, BM_SETCHECK, BST_CHECKED, NULL);

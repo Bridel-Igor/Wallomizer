@@ -13,54 +13,123 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{0bc62d84-50a4-4ac6-ad51-f1342a9522a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window classes">
+      <UniqueIdentifier>{db32fd3b-23ce-4aa2-8dea-d5a33b0901c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collections">
+      <UniqueIdentifier>{41ce3394-14ba-4285-8861-b5db2cfbff16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collections\Code">
+      <UniqueIdentifier>{16583726-6368-4035-a791-6403d15cde9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collections\Headers">
+      <UniqueIdentifier>{b144253c-3797-49c9-95a8-5a6923a66bf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window classes\Code">
+      <UniqueIdentifier>{b8085886-7aa0-4df9-b260-66c16a7f8ea9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window classes\Headers">
+      <UniqueIdentifier>{faf7b85c-53a3-4896-a28f-6897a8f22f9f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="SetUserCollectionWindow.cpp">
+    <ClCompile Include="Settings.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="HMenuGenerator.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="CollectionManager.cpp">
+      <Filter>Collections\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectoryCollection.cpp">
+      <Filter>Collections\Code</Filter>
     </ClCompile>
     <ClCompile Include="UserCollection.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Collections\Code</Filter>
     </ClCompile>
-    <ClCompile Include="UserCollectionSettings.cpp">
-      <Filter>Исходные файлы</Filter>
+    <ClCompile Include="AddCollectionWindow.cpp">
+      <Filter>Window classes\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="SetDirectoryCollectionWindow.cpp">
+      <Filter>Window classes\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="SetUserCollectionWindow.cpp">
+      <Filter>Window classes\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsWindow.cpp">
+      <Filter>Window classes\Code</Filter>
     </ClCompile>
     <ClCompile Include="TrayWindow.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Window classes\Code</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="UserCollection.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseWindow.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="Button.h">
+      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="Edit.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="Static.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Button.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="CheckBox.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Settings.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="SetUserCollectionWindow.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="ComboBox.h">
+      <Filter>Components</Filter>
     </ClInclude>
-    <ClInclude Include="UserCollectionSettings.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="UpDownEdit.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="CollectionItem.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="HMenuGenerator.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseCollection.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CollectionManager.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectoryCollection.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UserCollection.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="AddCollectionWindow.h">
+      <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseWindow.h">
+      <Filter>Window classes\Headers</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SetDirectoryCollectionWindow.h">
+      <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsWindow.h">
+      <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SetUserCollectionWindow.h">
+      <Filter>Window classes\Headers</Filter>
     </ClInclude>
     <ClInclude Include="TrayWindow.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Window classes\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

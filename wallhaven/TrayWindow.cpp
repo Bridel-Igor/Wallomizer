@@ -1,6 +1,7 @@
 #include "TrayWindow.h"
 #include "resource.h"
-#include "SetUserCollectionWindow.h"
+#include "SettingsWindow.h"
+#include "Settings.h"
 
 #define WM_NOTIFYICONMSG (WM_USER + 2)
 
@@ -87,13 +88,16 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			if (!slideshow->try_lock())
 				slideshow->unlock();
 			break;
+		case ID_WALLHAVEN_NEXTWALLPAPER:
+			Settings::abortDelay();
+			break;
 		case ID_WALLHAVEN_EXIT:
 			TrayMessage(hWnd, NIM_DELETE, 0, 0, 0);
 			DestroyWindow(hWnd);			
 			exit(0);
 			break;
 		case ID_WALLHAVEN_SETTINGS:
-			std::thread thr(SetUserCollectionWindow::windowThread);
+			std::thread thr(SettingsWindow::windowThread);
 			thr.detach();
 			break;
 		}

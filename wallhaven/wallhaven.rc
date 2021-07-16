@@ -55,6 +55,7 @@ BEGIN
     POPUP "wallhaven"
     BEGIN
         MENUITEM "Start/stop",                  ID_WALLHAVEN_START
+        MENUITEM "Next wallpaper",              ID_WALLHAVEN_NEXTWALLPAPER
         MENUITEM "Settings",                    ID_WALLHAVEN_SETTINGS
         MENUITEM SEPARATOR
         MENUITEM "Exit",                        ID_WALLHAVEN_EXIT

@@ -1,19 +1,11 @@
 #include "SetUserCollectionWindow.h"
-#include "UserCollectionSettings.h"
+#include "CollectionManager.h"
+#include "SettingsWindow.h"
 
-#define BUTTON_OK		1
-#define BUTTON_CANCEL	2
-#define CHECKBOX_ISAPI	3
+#define CHECKBOX_ISAPI	103
 
-//bool SetUserCollectionWindow::running = false;
 SetUserCollectionWindow *SetUserCollectionWindow::setUserCollectionWindow = nullptr;
-
-BOOL CALLBACK SetChildFont(HWND hwndChild, LPARAM lParam)
-{
-	HFONT hFont = (HFONT)lParam;
-	SendMessage(hwndChild, WM_SETFONT, (WPARAM)hFont, TRUE);
-	return TRUE;
-}
+UserCollection* SetUserCollectionWindow::currentUserCollection = nullptr;
 
 LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -21,18 +13,21 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 	{
 	case WM_CREATE:
 	{
-		stDelay = new Static			(Window(), "Delay (seconds):",	10,		10,		100,	20, SS_RIGHT);
-		edDelay = new Edit				(Window(), "",					120,	10,		110,	20, ES_NUMBER);
-		stUsername = new Static			(Window(), "Username:",			10,		40,		100,	20, SS_RIGHT);
-		edUsername = new Edit			(Window(), "",					120,	40,		110,	20);
-		stCollectionID = new Static		(Window(), "Collection ID:",	10,		70,		100,	20, SS_RIGHT);
-		edCollectionID = new Edit		(Window(), "",					120,	70,		110,	20, ES_NUMBER);
-		stIsApiKeyUsed = new Static		(Window(), "Use API key:",		10,		100,	100,	20, SS_RIGHT);
-		cbIsApiKeyUsed = new CheckBox	(Window(), "",					120,	100,	20,		20, (HMENU)CHECKBOX_ISAPI, (HINSTANCE)GetWindowLongPtr(Window(), GWLP_HINSTANCE), true);
-		stApiKey = new Static			(Window(), "Api key:",			10,		130,	100,	20, SS_RIGHT);
-		edApiKey = new Edit				(Window(), "",					120,	130,	110,	20);
-		btnOk = new Button				(Window(), "Ok",				10,		160,	100,	20, (HMENU)BUTTON_OK);
-		btnCancel = new Button			(Window(), "Cancel",			120,	160,	110,	20, (HMENU)BUTTON_CANCEL);
+		EnableWindow(SettingsWindow::settingsWindow->Window(), FALSE);
+
+		stUsername = new Static			(Window(), "Username:",			10,		10,		100,	20, SS_RIGHT);
+		edUsername = new Edit			(Window(), currentUserCollection ? currentUserCollection->settings->username : "",
+																		120,	10,		110,	20);
+		stCollectionID = new Static		(Window(), "Collection ID:",	10,		40,		100,	20, SS_RIGHT);
+		edCollectionID = new Edit		(Window(), currentUserCollection ? currentUserCollection->settings->collectionID : "",
+																		120,	40,		110,	20, ES_NUMBER);
+		stIsApiKeyUsed = new Static		(Window(), "Use API key:",		10,		70,		100,	20, SS_RIGHT);
+		cbIsApiKeyUsed = new CheckBox	(Window(), "",					120,	70,		20,		20, (HMENU)CHECKBOX_ISAPI, (HINSTANCE)GetWindowLongPtr(Window(), GWLP_HINSTANCE), currentUserCollection ? currentUserCollection->settings->isApiKeyUsed : true);
+		stApiKey = new Static			(Window(), "Api key:",			10,		100,	100,	20, SS_RIGHT);
+		edApiKey = new Edit				(Window(), currentUserCollection ? currentUserCollection->settings->apiKey : "",
+																		120,	100,	110,	20);
+		btnCancel = new Button			(Window(), "Cancel",			10,		130,	100,	20);
+		btnOk = new Button				(Window(), "Ok",				120,	130,	110,	20);
 		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)font);
 		bkBrush = CreateSolidBrush(RGB(26, 26, 26));
@@ -41,12 +36,15 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 
 	case WM_DESTROY:
 	{
-		delete stDelay, stUsername, stCollectionID, stApiKey, stIsApiKeyUsed;
-		delete edDelay, edUsername, edCollectionID, edApiKey;
+		currentUserCollection = nullptr;
+		delete stUsername, stCollectionID, stApiKey, stIsApiKeyUsed;
+		delete edUsername, edCollectionID, edApiKey;
 		delete cbIsApiKeyUsed;
 		delete btnOk, btnCancel;
 		DeleteObject(font);
 		DeleteObject(bkBrush);
+		EnableWindow(SettingsWindow::settingsWindow->Window(), TRUE);
+		SetForegroundWindow(SettingsWindow::settingsWindow->Window());
 		PostQuitMessage(0);
 	}
 	return 0;
@@ -69,41 +67,35 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 
 	case WM_COMMAND:
 	{
-		switch (wParam)
+		if (btnOk != nullptr && (HMENU)wParam == btnOk->hMenu)
 		{
-			case BUTTON_OK:
+			if (!strlen(edUsername->getTextA()) || !strlen(edCollectionID->getTextA()) || (cbIsApiKeyUsed->isChecked() && !strlen(edApiKey->getTextA())))
 			{
-				if (!strlen(edDelay->getText()) || !strlen(edUsername->getText()) || !strlen(edCollectionID->getText()) || (cbIsApiKeyUsed->isChecked() && !strlen(edApiKey->getText())))
-				{
-					MessageBoxA(nullptr, "Invalid data", "wallhaven", MB_OK);
-					return 0;
-				}
-				UserCollectionSettings* settings = new UserCollectionSettings;
-				settings->delay = atoi(edDelay->getText())*1000;
-				strcpy_s(settings->username, edUsername->getText());
-				strcpy_s(settings->collectionID, edCollectionID->getText());
-				settings->isApiKeyUsed = cbIsApiKeyUsed->isChecked();
-				if (cbIsApiKeyUsed->isChecked())
-					strcpy_s(settings->apiKey, edApiKey->getText());
-				settings->saveSettings();
-				delete settings;
-				SendMessageA(hWnd, WM_DESTROY, NULL, NULL);
+				MessageBoxA(nullptr, "Invalid data", "wallhaven", MB_OK);
+				return 0;
 			}
+			strcpy_s(currentUserCollection->settings->username, edUsername->getTextA());
+			strcpy_s(currentUserCollection->settings->collectionID, edCollectionID->getTextA());
+			currentUserCollection->settings->isApiKeyUsed = cbIsApiKeyUsed->isChecked();
+			if (cbIsApiKeyUsed->isChecked())
+				strcpy_s(currentUserCollection->settings->apiKey, edApiKey->getTextA());
+			DestroyWindow(hWnd);
+			CollectionManager::reloadSettings();
 			return 0;
-
-			case BUTTON_CANCEL:
-			{
-				exit(0);
-			}
+		}
+		
+		if (btnCancel != nullptr && (HMENU)wParam == btnCancel->hMenu)
+		{
+			DestroyWindow(hWnd);
 			return 0;
-
-			case CHECKBOX_ISAPI:
-			{
-				if (cbIsApiKeyUsed->isChecked())
-					EnableWindow(edApiKey->hWnd, TRUE);
-				else
-					EnableWindow(edApiKey->hWnd, FALSE);
-			}
+		}
+		
+		if (wParam == CHECKBOX_ISAPI)
+		{
+			if (cbIsApiKeyUsed->isChecked())
+				EnableWindow(edApiKey->hWnd, TRUE);
+			else
+				EnableWindow(edApiKey->hWnd, FALSE);
 			return 0;
 		}
 	}
@@ -140,15 +132,16 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 	return TRUE;
 }
 
-void SetUserCollectionWindow::windowThread()
+void SetUserCollectionWindow::windowThread(UserCollection* collection)
 {
 	if (setUserCollectionWindow)
 	{
 		SetForegroundWindow(setUserCollectionWindow->Window());
 		return;
 	}
+	currentUserCollection = collection;
 	setUserCollectionWindow = new SetUserCollectionWindow;
-	setUserCollectionWindow->Create("wallhaven", WS_OVERLAPPED | WS_SYSMENU, NULL, 100, 100, 256, 229, NULL, NULL);
+	setUserCollectionWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 240, 160, NULL, NULL);
 	ShowWindow(setUserCollectionWindow->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)
@@ -161,47 +154,3 @@ void SetUserCollectionWindow::windowThread()
 	delete setUserCollectionWindow;
 	setUserCollectionWindow = nullptr;
 }
-
-//#include <ShObjIdl.h>//
-//void OpenDlg()
-//{
-	//HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED |
-	//    COINIT_DISABLE_OLE1DDE);
-	//if (SUCCEEDED(hr))
-	//{
-	//    IFileOpenDialog* pFileOpen;
-
-	//    // Create the FileOpenDialog object.
-	//    hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
-	//        IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
-
-	//    if (SUCCEEDED(hr))
-	//    {
-	//        // Show the Open dialog box.
-	//        hr = pFileOpen->Show(NULL);
-
-	//        // Get the file name from the dialog box.
-	//        if (SUCCEEDED(hr))
-	//        {
-	//            IShellItem* pItem;
-	//            hr = pFileOpen->GetResult(&pItem);
-	//            if (SUCCEEDED(hr))
-	//            {
-	//                PWSTR pszFilePath;
-	//                hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-
-	//                // Display the file name to the user.
-	//                if (SUCCEEDED(hr))
-	//                {
-	//                    MessageBoxW(NULL, pszFilePath, L"File Path", MB_OK);
-	//                    CoTaskMemFree(pszFilePath);
-	//                }
-	//                pItem->Release();
-	//            }
-	//        }
-	//        pFileOpen->Release();
-	//    }
-	//    CoUninitialize();
-	//}
-	//return 0;
-//}

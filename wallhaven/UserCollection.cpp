@@ -1,4 +1,5 @@
 #include "UserCollection.h"
+#include "SetUserCollectionWindow.h"
 
 #include "Urlmon.h"
 #pragma comment(lib, "Urlmon.lib")
@@ -7,13 +8,59 @@ char UserCollection::queryPath[] = "Query.json";
 
 UserCollection::UserCollection()
 {
-	settings = new UserCollectionSettings;
+	number = 0;
 	buffer = new char[32768];
 	pBuffer = buffer;
-	meta = new Meta;
 	pFile = nullptr;
-	settings->loadSettings();
+	settings = new UserCollectionSettings;
+	settings->username[0] = '\0';
+	settings->collectionID[0] = '\0';
+	settings->apiKey[0] = '\0';
+	settings->isApiKeyUsed = true;
+}
 
+UserCollection::~UserCollection()
+{
+	delete[] buffer;
+	delete settings;
+}
+
+bool UserCollection::saveSettings(FILE* pFile)
+{
+	if (pFile != NULL)
+	{
+		fputs(collectionType(), pFile);
+		fputs("\n", pFile);
+		fputs(settings->username, pFile);
+		fputs("\n", pFile);
+		fputs(settings->collectionID, pFile);
+		fputs("\n", pFile);
+		fputs(settings->isApiKeyUsed?"true":"false", pFile);
+		fputs("\n", pFile);
+		fputs(settings->apiKey, pFile);
+		fputs("\n", pFile);
+		return true;
+	}
+	return false;
+}
+
+bool UserCollection::loadSettings(FILE* pFile)
+{
+	if (pFile != NULL)
+	{
+		fgets(settings->username, 64, pFile);
+		settings->username[strlen(settings->username) - 1] = '\0';
+		fgets(settings->collectionID, 16, pFile);
+		settings->collectionID[strlen(settings->collectionID) - 1] = '\0';
+		char buffer[10];
+		fgets(buffer, 10, pFile);
+		buffer[strlen(buffer) - 1] = '\0';
+		settings->isApiKeyUsed = strcmp(buffer, "true") == 0 ? true : false;
+		fgets(settings->apiKey, 64, pFile);
+		settings->apiKey[strlen(settings->apiKey) - 1] = '\0';
+	}
+	else
+		return false;
 	// Forming collection URL
 	collectionUrl = "https://wallhaven.cc/api/v1/collections/";
 	collectionUrl.append(settings->username);
@@ -29,11 +76,11 @@ UserCollection::UserCollection()
 	URLDownloadToFileA(nullptr, collectionUrl.c_str(), queryPath, 0, nullptr);
 	fopen_s(&pFile, queryPath, "r");
 	if (pFile == nullptr)
-		return;// rethink exceptions
+		return false;
 	pBuffer = buffer;
 	fgets(pBuffer, 32768, pFile);
 	if (fclose(pFile))
-		return;// same
+		return false;
 	char search[16] = "";
 	pBuffer = strstr(pBuffer, "per_page") + 10;
 	int i = 0;
@@ -43,7 +90,7 @@ UserCollection::UserCollection()
 		i++;
 	}
 	search[i] = '\0';
-	meta->per_page = atoi(search);
+	per_page = atoi(search);
 	if (pBuffer != nullptr)
 		pBuffer = strstr(pBuffer, "total") + 7;
 	i = 0;
@@ -53,21 +100,15 @@ UserCollection::UserCollection()
 		i++;
 	}
 	search[i] = '\0';
-	meta->total = atoi(search);
-}
-
-UserCollection::~UserCollection()
-{
-	delete meta;
-	delete[] buffer;
-	delete settings;
+	number = atoi(search);
+	return true;
 }
 
 bool UserCollection::setRandomWallpaper()
 {
-	int randomWallpaperNumber = rand() % meta->total;
-	int randomPageNum = int(randomWallpaperNumber / meta->per_page);
-	randomWallpaperNumber -= randomPageNum * meta->per_page;
+	int randomWallpaperNumber = rand() % number;
+	int randomPageNum = int(randomWallpaperNumber / per_page);
+	randomWallpaperNumber -= randomPageNum * per_page;
 	randomPageNum++;
 	std::string pageUrl = collectionUrl;
 	pageUrl.append("&page=");
@@ -84,7 +125,11 @@ bool UserCollection::setRandomWallpaper()
 		return false;
 	char imgUrl[255] = "";
 	for (int i = 1; i <= randomWallpaperNumber; i++)
+	{
+		if (pBuffer == nullptr)
+			return false;
 		pBuffer = strstr(pBuffer, "path") + 7;
+	}
 	int  slide = 0, i = 0;
 	while (pBuffer != nullptr && pBuffer[i] != '\"')
 	{
@@ -106,4 +151,14 @@ bool UserCollection::setRandomWallpaper()
 		return true;
 	else
 		return false;
+}
+
+LPCSTR UserCollection::collectionName() const
+{
+	return settings->collectionID;
+}
+
+void UserCollection::openCollectionSettingsWindow()
+{
+	SetUserCollectionWindow::windowThread(this);
 }

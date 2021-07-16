@@ -1,22 +1,34 @@
 #pragma once
 #include <string>
-#include "UserCollectionSettings.h"
+#include "BaseCollection.h"
 
-class UserCollection
+class UserCollection : public BaseCollection
 {
+private:
+	struct UserCollectionSettings
+	{
+		char username[64];
+		char collectionID[16];
+		bool isApiKeyUsed;
+		char apiKey[64];
+	};
 public:
 	UserCollection();
 	~UserCollection();
+	bool saveSettings(FILE* pFile);
+	bool loadSettings(FILE* pFile);
 	bool setRandomWallpaper();
+	LPCSTR collectionType() const { return "User collection"; }
+	LPCSTR collectionName() const;
+	unsigned int getNumber() { return number; }
+	void openCollectionSettingsWindow();
+
+	UserCollectionSettings* settings;
 
 private:
-	struct Meta
-	{
-		int per_page, total;
-	}*meta;
-
+	unsigned int number = 0;
+	int per_page;
 	char *buffer, *pBuffer;
-	UserCollectionSettings* settings;
 	FILE* pFile;
 	static char queryPath[];
 	std::string collectionUrl;

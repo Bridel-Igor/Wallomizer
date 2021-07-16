@@ -57,10 +57,17 @@ public:
 		wc.lpszClassName = ClassName();
 
 		RegisterClass(&wc);
+		
+		RECT rc;
+		rc.left = x;
+		rc.right = x + nWidth;
+		rc.top = y;
+		rc.bottom = y + nHeight;
+		AdjustWindowRect(&rc, dwStyle, FALSE);
 
 		m_hWnd = CreateWindowExA(
-			dwExStyle, ClassName(), lpWindowName, dwStyle, x, y,
-			nWidth, nHeight, hWndParent, hMenu, GetModuleHandle(NULL), this
+			dwExStyle, ClassName(), lpWindowName, dwStyle, rc.left, rc.top,
+			rc.right- rc.left, rc.bottom- rc.top, hWndParent, hMenu, GetModuleHandle(NULL), this
 			);
 
 		return (m_hWnd ? TRUE : FALSE);
@@ -76,7 +83,12 @@ protected:
 
 	virtual LPCSTR ClassName() const = 0;
 	virtual LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
+	static BOOL CALLBACK SetChildFont(HWND hwndChild, LPARAM lParam)
+	{
+		HFONT hFont = (HFONT)lParam;
+		SendMessage(hwndChild, WM_SETFONT, (WPARAM)hFont, TRUE);
+		return TRUE;
+	}
 
 	HWND m_hWnd;
 };
-

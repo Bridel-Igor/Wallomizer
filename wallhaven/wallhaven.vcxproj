@@ -139,22 +139,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AddCollectionWindow.cpp" />
+    <ClCompile Include="CollectionManager.cpp" />
+    <ClCompile Include="DirectoryCollection.cpp" />
+    <ClCompile Include="HMenuGenerator.cpp" />
+    <ClCompile Include="SetDirectoryCollectionWindow.cpp" />
+    <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="SettingsWindow.cpp" />
     <ClCompile Include="TrayWindow.cpp" />
-    <ClCompile Include="UserCollectionSettings.cpp" />
     <ClCompile Include="UserCollection.cpp" />
     <ClCompile Include="SetUserCollectionWindow.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddCollectionWindow.h" />
+    <ClInclude Include="BaseCollection.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="CollectionItem.h" />
+    <ClInclude Include="CollectionManager.h" />
+    <ClInclude Include="ComboBox.h" />
+    <ClInclude Include="DirectoryCollection.h" />
     <ClInclude Include="Edit.h" />
+    <ClInclude Include="HMenuGenerator.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SetDirectoryCollectionWindow.h" />
+    <ClInclude Include="Settings.h" />
+    <ClInclude Include="SettingsWindow.h" />
     <ClInclude Include="SetUserCollectionWindow.h" />
     <ClInclude Include="CheckBox.h" />
     <ClInclude Include="Static.h" />
     <ClInclude Include="TrayWindow.h" />
+    <ClInclude Include="UpDownEdit.h" />
     <ClInclude Include="UserCollection.h" />
-    <ClInclude Include="UserCollectionSettings.h" />
     <ClInclude Include="BaseWindow.h" />
   </ItemGroup>
   <ItemGroup>
