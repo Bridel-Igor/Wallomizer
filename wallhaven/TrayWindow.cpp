@@ -2,12 +2,13 @@
 #include "resource.h"
 #include "SettingsWindow.h"
 #include "Settings.h"
+#include "CollectionManager.h"
 
 #define WM_NOTIFYICONMSG (WM_USER + 2)
 
 TrayWindow *TrayWindow::trayWindow = nullptr;
 
-BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, PSTR pszTip)
+BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCSTR pszTip)
 {
 	NOTIFYICONDATA tnd;
 
@@ -19,58 +20,36 @@ BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, PSTR pszTip)
 	tnd.hIcon = hIcon;
 
 	if (pszTip)
-		lstrcpyn(tnd.szTip, pszTip, sizeof(tnd.szTip));
+		lstrcpynA(tnd.szTip, pszTip, sizeof(tnd.szTip));
 	else
 		tnd.szTip[0] = '\0';
 
 	return Shell_NotifyIconA(dwMessage, &tnd);
 }
 
-BOOL TrayWindow::ShowPopupMenu(HWND hWnd, HINSTANCE hInstance, WORD nResourceID)
-{
-	HMENU hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(nResourceID));
-	if (!hMenu)
-		return FALSE;
-	hPopup = GetSubMenu(hMenu, 0);
-	if (!hPopup)
-		return FALSE;
-
-	SetForegroundWindow(hWnd);
-
-	POINT pt;
-	GetCursorPos(&pt);
-	BOOL bOK = TrackPopupMenu(hPopup, 0, pt.x, pt.y, 0, hWnd, NULL);
-
-	DestroyMenu(hMenu);
-	return bOK;
-}
-
 LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (uMsg == WM_NOTIFYICONMSG && lParam == WM_RBUTTONDOWN)
+	if (uMsg == WM_NOTIFYICONMSG && (lParam == WM_RBUTTONDOWN || lParam == WM_LBUTTONDOWN))
 	{
-		ShowPopupMenu(hWnd, GetModuleHandleA(NULL), IDR_MENU1);
+		hPopup = GetSubMenu(hMenu, 0);
+		if (CollectionManager::isPrevious())
+			EnableMenuItem(hPopup, 3, MF_BYPOSITION | MF_ENABLED);
+		else
+			EnableMenuItem(hPopup, 3, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
+		SetForegroundWindow(hWnd);
+		POINT pt;
+		GetCursorPos(&pt);
+		TrackPopupMenu(hPopup, 0, pt.x, pt.y, 0, hWnd, NULL);
 	}
 
 	switch (uMsg)
 	{
 	case WM_CREATE:
 	{		
-		HICON hStatusIcon;
-		LPCSTR pszIDStatusIcon;
-		NOTIFYICONDATA tnd;
-
 		pszIDStatusIcon = MAKEINTRESOURCE(IDI_ICON1);
-
 		hStatusIcon = LoadIcon(GetModuleHandleA(NULL), pszIDStatusIcon);
-		tnd.cbSize = sizeof(NOTIFYICONDATA);
-		tnd.hWnd = m_hWnd;
-		tnd.uID = 1;
-		tnd.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-		tnd.uCallbackMessage = WM_NOTIFYICONMSG;
-		tnd.hIcon = hStatusIcon;
-		lstrcpyn(tnd.szTip, "wallhaven", sizeof(tnd.szTip));
-		Shell_NotifyIcon(NIM_ADD, &tnd);
+		TrayMessage(hWnd, NIM_ADD, 1, hStatusIcon, "wallhaven");
+		hMenu = LoadMenu(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDR_MENU1));
 	}
 	return 0;
 
@@ -85,20 +64,31 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		switch (wParam)
 		{
 		case ID_WALLHAVEN_START:
-			if (!slideshow->try_lock())
-				slideshow->unlock();
+			EnableMenuItem(hPopup, 0, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
+			EnableMenuItem(hPopup, 1, MF_BYPOSITION | MF_ENABLED);
+			Settings::slideshow.unlock();
+			break;
+		case ID_WALLHAVEN_PAUSE:
+			EnableMenuItem(hPopup, 0, MF_BYPOSITION | MF_ENABLED);
+			EnableMenuItem(hPopup, 1, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
+			Settings::slideshow.lock();
 			break;
 		case ID_WALLHAVEN_NEXTWALLPAPER:
-			Settings::abortDelay();
+			CollectionManager::setNextWallpaper();
 			break;
-		case ID_WALLHAVEN_EXIT:
-			TrayMessage(hWnd, NIM_DELETE, 0, 0, 0);
-			DestroyWindow(hWnd);			
-			exit(0);
+		case ID_WALLHAVEN_PREVIOUSWALLPAPER:
+			CollectionManager::setPreviousWallpaper();
 			break;
 		case ID_WALLHAVEN_SETTINGS:
+		{
 			std::thread thr(SettingsWindow::windowThread);
 			thr.detach();
+			break;
+		}
+		case ID_WALLHAVEN_EXIT:
+			TrayMessage(hWnd, NIM_DELETE, 1, hStatusIcon, "wallhaven");
+			DestroyMenu(hMenu);
+			DestroyWindow(hWnd);	
 			break;
 		}
 	}
@@ -110,12 +100,11 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	return TRUE;
 }
 
-void TrayWindow::windowThread(std::mutex *slideshow)
+void TrayWindow::windowThread()
 {
 	if (trayWindow)
 		return;
 	trayWindow = new TrayWindow;
-	trayWindow->slideshow = slideshow;
 	trayWindow->Create("wallhaven", NULL, NULL, 0, 0, 0, 0, NULL, NULL);
 	ShowWindow(trayWindow->Window(), SW_HIDE);
 	MSG msg = { };
@@ -127,4 +116,5 @@ void TrayWindow::windowThread(std::mutex *slideshow)
 	trayWindow->Destroy();
 	delete trayWindow;
 	trayWindow = nullptr;
+	Settings::abortDelay();
 }

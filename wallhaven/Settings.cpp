@@ -1,8 +1,17 @@
 #include "Settings.h"
 #include <string>
 
+// external variables
+unsigned int Settings::prevCount = 5;
 unsigned long Settings::delay = 60000;
-bool Settings::runDelay = true;
+std::mutex Settings::slideshow;
+
+// internal variables
+namespace Settings
+{
+	bool bAbortDelay = true;
+	bool bReplayDelay = false;
+}
 
 void Settings::saveSettings()
 {
@@ -30,17 +39,35 @@ void Settings::loadSettings()
 	MessageBoxA(nullptr, "Can't load settings.", "wallhaven", MB_OK);
 }
 
+void Settings::Delay()
+{
+	unsigned long delayed = 0;
+	while (delayed < Settings::delay)
+	{
+		if (bAbortDelay)
+		{
+			bAbortDelay = false;
+			return;
+		}
+		if (bReplayDelay)
+		{
+			bReplayDelay = false;
+			delayed = 0;
+			continue;
+		}
+		Sleep(100);
+		delayed += 100;
+		slideshow.lock();
+		slideshow.unlock();
+	}
+}
+
 void Settings::abortDelay()
 {
-	runDelay = false;
+	bAbortDelay = true;
 }
 
-void Settings::delayAborted()
+void Settings::replayDelay()
 {
-	runDelay = true;
-}
-
-bool Settings::canRunDelay()
-{
-	return runDelay;
+	bReplayDelay = true;
 }

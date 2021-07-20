@@ -54,8 +54,10 @@ IDR_MENU1 MENU
 BEGIN
     POPUP "wallhaven"
     BEGIN
-        MENUITEM "Start/stop",                  ID_WALLHAVEN_START
+        MENUITEM "Start",                       ID_WALLHAVEN_START, GRAYED
+        MENUITEM "Pause",                       ID_WALLHAVEN_PAUSE
         MENUITEM "Next wallpaper",              ID_WALLHAVEN_NEXTWALLPAPER
+        MENUITEM "Previous wallpaper",          ID_WALLHAVEN_PREVIOUSWALLPAPER
         MENUITEM "Settings",                    ID_WALLHAVEN_SETTINGS
         MENUITEM SEPARATOR
         MENUITEM "Exit",                        ID_WALLHAVEN_EXIT

@@ -49,18 +49,18 @@ bool DirectoryCollection::loadSettings(FILE* pFile)
 	return false;
 }
 
-bool DirectoryCollection::setRandomWallpaper()
+bool DirectoryCollection::setWallpaper(unsigned int index)
 {
 	if (directoryPath == "")
 		return false;
 	if (number <= 0)
 		return false;
-	unsigned int randImg = rand() % number, i=0;
+	unsigned int i = 0;
 	std::experimental::filesystem::path p1{ directoryPath };
 	for (auto& p : std::experimental::filesystem::directory_iterator(p1))
 		if (isImage(p))
-		{	
-			if (i == randImg)
+		{
+			if (i == index)
 			{
 				char imgPath[255];
 				strcpy_s(imgPath, p.path().generic_string().c_str());

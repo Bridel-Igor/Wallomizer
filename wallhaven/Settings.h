@@ -1,20 +1,17 @@
 #pragma once
 
 #include <Windows.h>
+#include <mutex>
 
-class Settings
+namespace Settings
 {
-	static bool runDelay;
+	extern unsigned int prevCount;
+	extern unsigned long delay;
+	extern std::mutex slideshow;
 
-public:
-	Settings() = delete;
-	Settings(Settings&) = delete;
-	void operator=(const Settings&) = delete;
-	static void saveSettings();
-	static void loadSettings();
-	static void abortDelay();
-	static void delayAborted();
-	static bool canRunDelay();
-
-	static unsigned long delay;
-};
+	void saveSettings();
+	void loadSettings();
+	void Delay();
+	void abortDelay();
+	void replayDelay();
+}

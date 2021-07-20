@@ -8,13 +8,12 @@ class TrayWindow : public BaseWindow<TrayWindow>
 public:
 	LPCSTR ClassName() const { return "Tray Window Class"; }
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static void windowThread(std::mutex *slideshow);
+	static void windowThread();
 	
-	std::mutex *slideshow;
-	HMENU hPopup;
+	static TrayWindow *trayWindow;
 
 private:
-	BOOL ShowPopupMenu(HWND hWnd, HINSTANCE hInstance, WORD nResourceID);
-
-	static TrayWindow *trayWindow;
+	HMENU hPopup = nullptr, hMenu = nullptr;
+	HICON hStatusIcon = nullptr;
+	LPCSTR pszIDStatusIcon = nullptr;
 };

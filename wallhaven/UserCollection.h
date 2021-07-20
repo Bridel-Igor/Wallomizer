@@ -17,7 +17,7 @@ public:
 	~UserCollection();
 	bool saveSettings(FILE* pFile);
 	bool loadSettings(FILE* pFile);
-	bool setRandomWallpaper();
+	bool setWallpaper(unsigned int index);
 	LPCSTR collectionType() const { return "User collection"; }
 	LPCSTR collectionName() const;
 	unsigned int getNumber() { return number; }
@@ -27,9 +27,7 @@ public:
 
 private:
 	unsigned int number = 0;
-	int per_page;
-	char *buffer, *pBuffer;
-	FILE* pFile;
-	static char queryPath[];
+	int per_page = 24;
+	char* buffer, * pBuffer, queryPath[255] = "";
 	std::string collectionUrl;
 };
