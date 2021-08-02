@@ -20,7 +20,10 @@ BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCSTR pszTi
 	tnd.hIcon = hIcon;
 
 	if (pszTip)
-		lstrcpynA(tnd.szTip, pszTip, sizeof(tnd.szTip));
+	{
+		if (lstrcpynA(tnd.szTip, pszTip, sizeof(tnd.szTip))==nullptr)
+			return FALSE;
+	}
 	else
 		tnd.szTip[0] = '\0';
 
@@ -66,17 +69,19 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		case ID_WALLHAVEN_START:
 			EnableMenuItem(hPopup, 0, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
 			EnableMenuItem(hPopup, 1, MF_BYPOSITION | MF_ENABLED);
-			Settings::slideshow.unlock();
+			Settings::startSlideshow();
 			break;
 		case ID_WALLHAVEN_PAUSE:
 			EnableMenuItem(hPopup, 0, MF_BYPOSITION | MF_ENABLED);
 			EnableMenuItem(hPopup, 1, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
-			Settings::slideshow.lock();
+			Settings::pauseSlideshow();
 			break;
 		case ID_WALLHAVEN_NEXTWALLPAPER:
+			Settings::replayDelay();
 			CollectionManager::setNextWallpaper();
 			break;
 		case ID_WALLHAVEN_PREVIOUSWALLPAPER:
+			Settings::replayDelay();
 			CollectionManager::setPreviousWallpaper();
 			break;
 		case ID_WALLHAVEN_SETTINGS:
@@ -88,7 +93,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		case ID_WALLHAVEN_EXIT:
 			TrayMessage(hWnd, NIM_DELETE, 1, hStatusIcon, "wallhaven");
 			DestroyMenu(hMenu);
-			DestroyWindow(hWnd);	
+			DestroyWindow(hWnd);
 			break;
 		}
 	}
@@ -115,6 +120,7 @@ void TrayWindow::windowThread()
 	}
 	trayWindow->Destroy();
 	delete trayWindow;
-	trayWindow = nullptr;
+	Settings::exiting = true;
 	Settings::abortDelay();
+	trayWindow = nullptr;
 }

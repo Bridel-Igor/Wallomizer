@@ -4,8 +4,6 @@
 #include <string>
 
 #include "BaseCollection.h"
-#include "UserCollection.h"
-#include "DirectoryCollection.h"
 
 class CollectionManager : public BaseCollection
 {
@@ -16,30 +14,25 @@ public:
 	static bool saveSettings();
 	static bool loadSettings();
 	static void reloadSettings();
-	template <typename T>
-	static void addCollection()
-	{
-		BaseCollection *col =  new T;
-		collections.push_back(col);
-		col->openCollectionSettingsWindow();
-		if (strcmp(collections.back()->collectionName(), "") == 0)
-			collections.pop_back();
-	}
+	static void updateNumber();
+	template <typename T> static void addCollection();
 	static void eraseCollection(int index);
 	static void clear();
-	static bool setRandomWallpaper();
-	static bool setWallpaper(int index, bool setPrevious = false);
-	static LPCSTR collectionType() { return "Collection manager. You shouldn't see this"; }
-	static unsigned int getNumber() { return number; }
-	static void openCollectionSettingsWindow() { return; }
+	static void loadRandomWallpaper();
+	static bool loadWallpaper(int index);
+	static void loadNextWallpaper();
+	static void setLoadedWallpaper(bool setPrevious = false);
 	static void setNextWallpaper();
 	static void setPreviousWallpaper();
 	static bool isPrevious();
 	//void openWallpaperLocation();
+	static LPCSTR collectionType() { return "Collection manager. You shouldn't see this"; }
+	static unsigned int getNumber() { return number; }
+	static void openCollectionSettingsWindow() { return; }
 
 	static std::vector<BaseCollection*> collections;
 
 private:
 	static unsigned int number;
-	static int *previous;
+	static int *previous, indexOfLoaded;
 };

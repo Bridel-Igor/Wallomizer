@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+
 #include "BaseCollection.h"
 
 class UserCollection : public BaseCollection
@@ -12,12 +12,13 @@ private:
 		bool isApiKeyUsed;
 		char apiKey[64];
 	};
+
 public:
 	UserCollection();
 	~UserCollection();
 	bool saveSettings(FILE* pFile);
 	bool loadSettings(FILE* pFile);
-	bool setWallpaper(unsigned int index);
+	bool loadWallpaper(unsigned int index);
 	LPCSTR collectionType() const { return "User collection"; }
 	LPCSTR collectionName() const;
 	unsigned int getNumber() { return number; }
@@ -28,6 +29,7 @@ public:
 private:
 	unsigned int number = 0;
 	int per_page = 24;
-	char* buffer, * pBuffer, queryPath[255] = "";
-	std::string collectionUrl;
+	char collectionUrl[255] = "";
+	static constexpr DWORD bufferSize = 32768;
+	static char buffer[bufferSize], *pBuffer;
 };

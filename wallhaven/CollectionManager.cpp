@@ -1,14 +1,19 @@
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+
 #include <experimental/filesystem>
+#include <string>
+#include <time.h>
+
 #include "CollectionManager.h"
 #include "Settings.h"
-#include <string>
-#include "time.h"
 #include "SettingsWindow.h"
+#include "UserCollection.h"
+#include "DirectoryCollection.h"
 
 std::vector<BaseCollection*> CollectionManager::collections;
 unsigned int CollectionManager::number=0;
 int *CollectionManager::previous = nullptr;
+int CollectionManager::indexOfLoaded = 0;
 
 bool CollectionManager::saveSettings()
 {
@@ -64,27 +69,47 @@ bool CollectionManager::loadSettings()
 		}
 		fclose(pFile);
 	}
-	number = 0;
-	for (unsigned int i = 0; i < collections.size(); i++)
-		number += collections[i]->getNumber();
+	updateNumber();
 	if (SettingsWindow::settingsWindow != nullptr)
-		SettingsWindow::settingsWindow->updateCollectionItems();
+		SettingsWindow::collectionItemsFrame->updateCollectionItems();
 	Settings::abortDelay();
+	srand((unsigned int)time(NULL));
 	return true;
 }
 
 void CollectionManager::reloadSettings()
 {
+	Settings::loadingImage.lock();
 	saveSettings();
 	loadSettings();
+	Settings::loadingImage.unlock();
 }
+
+void CollectionManager::updateNumber()
+{
+	number = 0;
+	for (unsigned int i = 0; i < collections.size(); i++)
+		number += collections[i]->isEnabled ? collections[i]->getNumber() : 0;
+}
+
+template <typename T> void CollectionManager::addCollection()
+{
+	BaseCollection* col = new T;
+	collections.push_back(col);
+	col->openCollectionSettingsWindow();
+	if (strcmp(collections.back()->collectionName(), "") == 0) // erase new collection if it's empty
+		collections.pop_back();
+}
+template void CollectionManager::addCollection<DirectoryCollection>();
+template void CollectionManager::addCollection<UserCollection>();
 
 void CollectionManager::eraseCollection(int index)
 {
 	if (collections[index]!=nullptr)
 		delete collections[index];
 	collections.erase(CollectionManager::collections.begin() + index);
-	reloadSettings();
+	saveSettings();
+	updateNumber();
 }
 
 void CollectionManager::clear()
@@ -97,59 +122,83 @@ void CollectionManager::clear()
 	for (auto p : collections)
 		delete p;
 	collections.clear();
-	for (const auto& entry : std::experimental::filesystem::directory_iterator("Resources"))
-		std::experimental::filesystem::remove_all(entry.path());
 }
 
-bool CollectionManager::setRandomWallpaper()
+void CollectionManager::loadRandomWallpaper()
 {
-	srand((unsigned int)time(NULL));
 	if (number <= 0)
-		return false;
+		return;
+	Settings::loadingImage.lock();
 	int randomFromAll = rand() % number;
-	if (!setWallpaper(randomFromAll))
-		return setWallpaper(randomFromAll);
-	return true;
+	if (!loadWallpaper(randomFromAll))
+		loadWallpaper(randomFromAll);
+	Settings::loadingImage.unlock();
 }
 
-bool CollectionManager::setWallpaper(int index, bool setPrevious)
+bool CollectionManager::loadWallpaper(int index)
 {
 	int tmpIndex = index;
+	indexOfLoaded = index;
 	for (unsigned int i = 0; i < collections.size(); i++)
 	{
+		if (!collections[i]->isEnabled)
+			continue;
 		index -= collections[i]->getNumber();
 		if (index < 0)
 		{
 			if (collections[i] == nullptr || i >= collections.size() || collections[i]->getNumber() <= (index + collections[i]->getNumber()))
 				return false;
-			if (!setPrevious)
-			{
-				if (previous != nullptr)
-				{
-					for (int i = Settings::prevCount; i > 0; i--)
-						previous[i] = previous[i - 1];
-					previous[0] = tmpIndex;
-				}
-			}
-			return collections[i]->setWallpaper(index + collections[i]->getNumber());
+			return collections[i]->loadWallpaper(index + collections[i]->getNumber());
 		}
 	}
 	return false;
 }
 
+void CollectionManager::loadNextWallpaper()
+{
+	loadRandomWallpaper();
+}
+
+void CollectionManager::setLoadedWallpaper(bool setPrevious)
+{
+	if (!std::experimental::filesystem::exists("Resources/Loaded wallpaper.dat"))
+	{
+		Settings::abortDelay();
+		return;
+	}
+	Settings::loadingImage.lock();
+	if (!setPrevious && previous != nullptr)
+	{
+		for (int i = Settings::prevCount; i > 0; i--)
+			previous[i] = previous[i - 1];
+		previous[0] = indexOfLoaded;
+	}
+	remove("Resources/Current wallpaper.jpg");
+	if (rename("Resources/Loaded wallpaper.dat", "Resources/Current wallpaper.jpg"))
+	{
+		Settings::loadingImage.unlock();
+		return;
+	}
+	char imgPath[255];
+	GetCurrentDirectoryA(255, imgPath);
+	strcat_s(imgPath, "\\Resources\\Current wallpaper.jpg");
+	SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, imgPath, SPIF_UPDATEINIFILE);
+	Settings::loadingImage.unlock();
+}
+
 void CollectionManager::setNextWallpaper()
 {
-	Settings::replayDelay();
-	setRandomWallpaper();
+	setLoadedWallpaper();
+	loadNextWallpaper();
 }
 
 void CollectionManager::setPreviousWallpaper()
 {
-	Settings::replayDelay();
-	if (previous == nullptr)
+	if (previous == nullptr || previous[1] == -1)
 		return;
-	if (previous[1]!=-1)
-		setWallpaper(previous[1], true);
+	loadWallpaper(previous[1]);
+	setLoadedWallpaper(true);
+	loadNextWallpaper();
 	for (unsigned int i = 0; i < Settings::prevCount; i++)
 		previous[i] = previous[i + 1];
 	previous[Settings::prevCount] = -1;

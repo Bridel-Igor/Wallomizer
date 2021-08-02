@@ -1,5 +1,6 @@
-#include "SetDirectoryCollectionWindow.h"
 #include <ShObjIdl.h>
+
+#include "SetDirectoryCollectionWindow.h"
 #include "CollectionManager.h"
 #include "SettingsWindow.h"
 
@@ -58,7 +59,7 @@ LRESULT SetDirectoryCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM
 
 	case WM_COMMAND:
 	{
-		if (btnOk!=nullptr && (HMENU)wParam == btnOk->hMenu)
+		if COMMANDEVENT(btnOk)
 		{
 			if (!strlen(edPath->getTextA()))
 			{
@@ -71,13 +72,13 @@ LRESULT SetDirectoryCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM
 			return 0;
 		}
 
-		if (btnCancel != nullptr && (HMENU)wParam == btnCancel->hMenu)
+		if COMMANDEVENT(btnCancel)
 		{
 			DestroyWindow(hWnd);
 			return 0;
 		}
 
-		if (btnPath != nullptr && (HMENU)wParam == btnPath->hMenu)
+		if COMMANDEVENT(btnPath)
 		{
 			IFileDialog* pfd;
 			LPWSTR g_path;

@@ -1,8 +1,8 @@
 #include "AddCollectionWindow.h"
 #include "CollectionManager.h"
 #include "SettingsWindow.h"
-#include "SetDirectoryCollectionWindow.h"
-#include "SetUserCollectionWindow.h"
+#include "UserCollection.h"
+#include "DirectoryCollection.h"
 
 AddCollectionWindow* AddCollectionWindow::addCollectionWindow = nullptr;
 
@@ -53,21 +53,21 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
 	case WM_COMMAND:
 	{
-		if (btnAddUserCollection != nullptr && (HMENU)wParam == btnAddUserCollection->hMenu)
+		if COMMANDEVENT(btnAddUserCollection)
 		{
 			ShowWindow(Window(), SW_HIDE);
 			CollectionManager::addCollection<UserCollection>();
 			DestroyWindow(Window());
 			return 0;
 		}
-		if (btnAddDirectoryCollection != nullptr && (HMENU)wParam == btnAddDirectoryCollection->hMenu)
+		if COMMANDEVENT(btnAddDirectoryCollection)
 		{
 			ShowWindow(Window(), SW_HIDE);
 			CollectionManager::addCollection<DirectoryCollection>();
 			DestroyWindow(Window());
 			return 0;
 		}
-		if (btnCancel != nullptr && (HMENU)wParam == btnCancel->hMenu)
+		if COMMANDEVENT(btnCancel)
 		{
 			DestroyWindow(Window());
 			return 0;

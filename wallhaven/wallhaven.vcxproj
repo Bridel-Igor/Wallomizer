@@ -146,6 +146,7 @@
     <ClCompile Include="SetDirectoryCollectionWindow.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="SettingsWindow.cpp" />
+    <ClCompile Include="Internet.cpp" />
     <ClCompile Include="TrayWindow.cpp" />
     <ClCompile Include="UserCollection.cpp" />
     <ClCompile Include="SetUserCollectionWindow.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="DirectoryCollection.h" />
     <ClInclude Include="Edit.h" />
     <ClInclude Include="HMenuGenerator.h" />
+    <ClInclude Include="Internet.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SetDirectoryCollectionWindow.h" />
     <ClInclude Include="Settings.h" />

@@ -1,14 +1,17 @@
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+
 #include <experimental/filesystem>
 #include <string>
-#include <Windows.h>
+
 #include "DirectoryCollection.h"
 #include "SetDirectoryCollectionWindow.h"
+#include "Settings.h"
 
-const char* extensions[] = { ".jpg", ".jpeg", ".bmp", ".png" };
+const char* extensions[] = { ".jpg", ".jpeg", ".bmp", ".dib", ".png", ".jfif", ".jpe", ".gif", ".tif", ".tiff", 
+							 ".wdp", ".heic", ".heif", ".heics", ".heifs", ".avci", ".avcs", ".avif", ".avifs" };
 bool isImage(std::experimental::filesystem::v1::directory_entry path)
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 19; i++)
 		if (path.path().extension().compare((std::experimental::filesystem::path)extensions[i]) == 0)
 			return true;
 	return false;
@@ -26,6 +29,8 @@ bool DirectoryCollection::saveSettings(FILE* pFile)
 	{
 		fputs(collectionType(), pFile);
 		fputs("\n", pFile);
+		fputs(isEnabled ? "true" : "false", pFile);
+		fputs("\n", pFile);
 		fputs(directoryPath, pFile);
 		fputs("\n", pFile);
 		return true;
@@ -37,6 +42,10 @@ bool DirectoryCollection::loadSettings(FILE* pFile)
 {
 	if (pFile != NULL)
 	{
+		char tmpBuffer[10];
+		fgets(tmpBuffer, 10, pFile);
+		tmpBuffer[strlen(tmpBuffer) - 1] = '\0';
+		isEnabled = strcmp(tmpBuffer, "true") == 0 ? true : false;
 		fgets(directoryPath, 255, pFile);
 		directoryPath[strlen(directoryPath) - 1] = '\0';
 		std::experimental::filesystem::path p1{ directoryPath };
@@ -49,11 +58,9 @@ bool DirectoryCollection::loadSettings(FILE* pFile)
 	return false;
 }
 
-bool DirectoryCollection::setWallpaper(unsigned int index)
+bool DirectoryCollection::loadWallpaper(unsigned int index)
 {
-	if (directoryPath == "")
-		return false;
-	if (number <= 0)
+	if (directoryPath == "" || number <= 0)
 		return false;
 	unsigned int i = 0;
 	std::experimental::filesystem::path p1{ directoryPath };
@@ -62,12 +69,21 @@ bool DirectoryCollection::setWallpaper(unsigned int index)
 		{
 			if (i == index)
 			{
-				char imgPath[255];
-				strcpy_s(imgPath, p.path().generic_string().c_str());
-				if (SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, imgPath, SPIF_UPDATEINIFILE))
-					return true;
-				else
+				wchar_t imgPath[255];
+				wcscpy_s(imgPath, 255, p.path().generic_wstring().c_str());
+				imgPath[wcslen(imgPath)] = '\0';
+				char buf[BUFSIZ];
+				size_t size;
+				FILE *source=nullptr, *dest=nullptr;
+				_wfopen_s(&source, imgPath, L"rb");
+				_wfopen_s(&dest, L"Resources/Loaded wallpaper.dat", L"wb");
+				if (source == nullptr || dest == nullptr)
 					return false;
+				while (size = fread(buf, 1, BUFSIZ, source))
+					fwrite(buf, 1, size, dest);
+				fclose(source);
+				fclose(dest);
+				return true;
 			}
 			i++;
 		}

@@ -7,11 +7,14 @@ namespace Settings
 {
 	extern unsigned int prevCount;
 	extern unsigned long delay;
-	extern std::mutex slideshow;
+	extern bool exiting;
+	extern std::mutex loadingImage;
 
 	void saveSettings();
 	void loadSettings();
 	void Delay();
 	void abortDelay();
 	void replayDelay();
+	void startSlideshow();
+	void pauseSlideshow();
 }

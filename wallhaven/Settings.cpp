@@ -1,22 +1,21 @@
 #include "Settings.h"
-#include <string>
 
-// external variables
 unsigned int Settings::prevCount = 5;
 unsigned long Settings::delay = 60000;
-std::mutex Settings::slideshow;
+std::mutex Settings::loadingImage;
+bool Settings::exiting = false;
 
-// internal variables
 namespace Settings
 {
-	bool bAbortDelay = true;
+	bool bAbortDelay = false;
 	bool bReplayDelay = false;
+	bool bRunSlideshow = true;
 }
 
 void Settings::saveSettings()
 {
 	FILE* pFile;
-	fopen_s(&pFile, "Settings.dat", "wb");
+	fopen_s(&pFile, "Settings/Settings.dat", "wb");
 	if (pFile != NULL)
 	{
 		fwrite(&delay, sizeof(delay), 1, pFile);
@@ -29,7 +28,7 @@ void Settings::saveSettings()
 void Settings::loadSettings()
 {
 	FILE* pFile;
-	fopen_s(&pFile, "Settings.dat", "rb");
+	fopen_s(&pFile, "Settings/Settings.dat", "rb");
 	if (pFile != NULL)
 	{
 		fread(&delay, sizeof(delay), 1, pFile);
@@ -56,9 +55,8 @@ void Settings::Delay()
 			continue;
 		}
 		Sleep(100);
-		delayed += 100;
-		slideshow.lock();
-		slideshow.unlock();
+		if (bRunSlideshow)
+			delayed += 100;
 	}
 }
 
@@ -70,4 +68,14 @@ void Settings::abortDelay()
 void Settings::replayDelay()
 {
 	bReplayDelay = true;
+}
+
+void Settings::startSlideshow()
+{
+	bRunSlideshow = true;
+}
+
+void Settings::pauseSlideshow()
+{
+	bRunSlideshow = false;
 }

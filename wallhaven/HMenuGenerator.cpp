@@ -1,5 +1,6 @@
+#include <time.h>
+
 #include "HMenuGenerator.h"
-#include "time.h"
 
 namespace HMenuGenerator
 {

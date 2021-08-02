@@ -1,14 +1,15 @@
 #include "SettingsWindow.h"
-#include <CommCtrl.h>
 #include "Settings.h"
 #include "CollectionManager.h"
 #include "AddCollectionWindow.h"
 
 SettingsWindow* SettingsWindow::settingsWindow = nullptr;
+SettingsWindow::CollectionItemsFrame* SettingsWindow::collectionItemsFrame = nullptr;
 
-void SettingsWindow::updateCollectionItems()
-{	
-	for (size_t i = CollectionManager::collections.size(); i < collectionItems.size(); i++)		//deleting excess items
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////CollectionItemsFrame
+void SettingsWindow::CollectionItemsFrame::updateCollectionItems()
+{
+	for (size_t i = CollectionManager::collections.size(); i < collectionItems.size(); i++) //deleting excess items
 	{
 		delete collectionItems.back();
 		collectionItems.pop_back();
@@ -19,16 +20,164 @@ void SettingsWindow::updateCollectionItems()
 
 	for (size_t i = collectionItems.size(); i < CollectionManager::collections.size(); i++) // creation
 		if (CollectionManager::collections[i]!=nullptr)
-			collectionItems.push_back(new CollectionItem(SettingsWindow::settingsWindow->Window(), 10, 40 + (i * 20), 620, 20, CollectionManager::collections[i], font));
+			collectionItems.push_back(new CollectionItem(SettingsWindow::collectionItemsFrame->Window(), 0, (i * 20), SettingsWindow::width-20-18, 20, CollectionManager::collections[i], font));
+	
+	updateScroll();
+	for (auto p : collectionItems) // placing according to the scrollbar
+		p->scroll(yCurrentScroll);
 }
 
-void SettingsWindow::destroyCollectionItems()
+void SettingsWindow::CollectionItemsFrame::destroyCollectionItems()
 {
 	for (auto p : collectionItems)
 		delete p;
 	collectionItems.clear();
+	updateScroll();
 }
 
+void SettingsWindow::CollectionItemsFrame::updateScroll()
+{
+	int itemListHeight = (int)collectionItems.size() * 20;
+	yMaxScroll = max(itemListHeight - height, 0);
+	yCurrentScroll = min(yCurrentScroll, yMaxScroll);
+	yCurrentScroll = yCurrentScroll < 0 ? 0 : yCurrentScroll;
+	si.cbSize = sizeof(si);
+	si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
+	si.nMin = yMinScroll;
+	si.nMax = itemListHeight;
+	si.nPage = height;
+	si.nPos = yCurrentScroll;
+	
+	SetScrollInfo(Window(), SB_VERT, &si, TRUE);
+	ShowScrollBar(Window(), SB_VERT, TRUE);
+	EnableScrollBar(Window(), SB_VERT, itemListHeight <= height? ESB_DISABLE_BOTH : ESB_ENABLE_BOTH);
+}
+
+LRESULT SettingsWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_CREATE:
+	{
+		yMinScroll = 0;
+		yCurrentScroll = 0;
+		yMaxScroll = 0;
+		bkBrush = CreateSolidBrush(RGB(15, 15, 15));
+		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
+		updateCollectionItems();
+	}
+	return 0;
+
+	case WM_DESTROY:
+	{
+		destroyCollectionItems();
+		DeleteObject(font);
+		DeleteObject(bkBrush);
+	}
+	return 0;
+
+	case WM_PAINT:
+	{
+		hdc = BeginPaint(m_hWnd, &ps);
+		FillRect(hdc, &ps.rcPaint, bkBrush);
+		EndPaint(m_hWnd, &ps);
+	}
+	return 0;
+
+	case WM_COMMAND:
+	{
+		for (unsigned int i = 0; i < collectionItems.size(); i++)
+		{
+			if COMMANDEVENT(collectionItems[i]->btnSettings)
+			{
+				CollectionManager::collections[i]->openCollectionSettingsWindow();
+				return 0;
+			}
+			if COMMANDEVENT(collectionItems[i]->btnDelete)
+			{
+				CollectionManager::eraseCollection(i);
+				updateCollectionItems();
+				InvalidateRect(Window(), nullptr, TRUE);
+				return 0;
+			}
+			if COMMANDEVENT(collectionItems[i]->chboEnabled)
+			{
+				CollectionManager::collections[i]->isEnabled = collectionItems[i]->chboEnabled->isChecked();
+				CollectionManager::saveSettings();
+				CollectionManager::updateNumber();
+				return 0;
+			}
+		}
+	}
+	return 0;
+
+	case WM_MOUSEWHEEL:
+	{
+		if (GET_WHEEL_DELTA_WPARAM(wParam)>0)
+			SendMessage(Window(), WM_VSCROLL, SB_LINEUP, 0L);
+		else
+			SendMessage(Window(), WM_VSCROLL, SB_LINEDOWN, 0L);
+	}
+	return 0;
+
+	case WM_VSCROLL:
+	{
+		int yDelta;
+		int yNewPos;
+
+		switch (LOWORD(wParam))
+		{
+		case SB_PAGEUP:
+			yNewPos = yCurrentScroll - 60;
+			break;
+		case SB_PAGEDOWN:
+			yNewPos = yCurrentScroll + 60;
+			break;
+		case SB_LINEUP:
+			yNewPos = yCurrentScroll - 10;
+			break;
+		case SB_LINEDOWN:
+			yNewPos = yCurrentScroll + 10;
+			break;
+		case SB_THUMBTRACK:
+			yNewPos = HIWORD(wParam);
+			break;
+		default:
+			yNewPos = yCurrentScroll;
+		}
+
+		yNewPos = max(0, yNewPos);
+		yNewPos = min(yMaxScroll, yNewPos);
+
+		if (yNewPos == yCurrentScroll)
+			break;
+
+		yDelta = yNewPos - yCurrentScroll;
+		yCurrentScroll = yNewPos;
+
+		updateCollectionItems();
+		ScrollWindowEx(Window(), 0, -yDelta, (CONST RECT*) NULL, (CONST RECT*) NULL, (HRGN)NULL, (PRECT)NULL, SW_INVALIDATE);
+		UpdateWindow(Window());
+	}
+	return 0;
+
+	case WM_CTLCOLORSTATIC:
+	case WM_CTLCOLORBTN:
+	{
+		HWND hWndStatic = (HWND)lParam;
+		HDC hdcStatic = (HDC)wParam;
+		SetTextColor(hdcStatic, CollectionItem::fontColor);
+		SetBkColor(hdcStatic, CollectionItem::bkColor);
+		return (LRESULT)CreateSolidBrush(CollectionItem::bkColor);
+	}
+	return 0;
+
+	default:
+		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////SettingsWindow
 LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
@@ -37,8 +186,6 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	{
 		stCollections = new Static(Window(), "Collections:", 20,	10,		100,	20);
 		btnAdd = new Button(Window(), "Add..",				580,	10,		50,		20);
-		
-		updateCollectionItems();
 
 		stDelay = new Static(Window(), "Delay:",			10,		450,	50,		20);
 		stHours = new Static(Window(), "Hours",				60,		430,	60,		20, SS_CENTER);
@@ -57,7 +204,6 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 	case WM_DESTROY:
 	{
-		destroyCollectionItems();
 		delete btnOk, btnAdd;
 		delete stCollections, stHours, stMinutes, stSeconds, stDelay;
 		delete udeHours, udeMinutes, udeSeconds;
@@ -85,29 +231,16 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 	case WM_COMMAND:
 	{
-		if (btnOk!=nullptr && (HMENU)wParam == btnOk->hMenu)
+		if COMMANDEVENT(btnOk)
 		{
-			Settings::delay = (udeSeconds->getPos() + (udeMinutes->getPos()*60) + (udeHours->getPos()*3600)) * 1000;
+			Settings::delay = (udeSeconds->getPos() + (udeMinutes->getPos() * 60) + (udeHours->getPos() * 3600)) * 1000;
 			Settings::saveSettings();
 			return 0;
 		}
-		if (btnAdd != nullptr && (HMENU)wParam == btnAdd->hMenu)
+		if COMMANDEVENT(btnAdd)
 		{
 			AddCollectionWindow::windowThread();
 			return 0;
-		}
-		for (unsigned int i = 0; i < collectionItems.size(); i++)
-		{
-			if ((HMENU)wParam == collectionItems[i]->btnSettings->hMenu)
-			{
-				CollectionManager::collections[i]->openCollectionSettingsWindow();
-				return 0;
-			}
-			if ((HMENU)wParam == collectionItems[i]->btnDelete->hMenu)
-			{
-				CollectionManager::eraseCollection(i);
-				return 0;
-			}
 		}
 	}
 	return 0;
@@ -116,17 +249,9 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	{
 		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
-		for (auto p : collectionItems)
-			if (hWndStatic == p->stName->hWnd || hWndStatic == p->stNumber->hWnd)
-			{
-				SetTextColor(hdcStatic, CollectionItem::fontColor);
-				SetBkColor(hdcStatic, CollectionItem::bkColor);
-				return (LRESULT)CreateSolidBrush(CollectionItem::bkColor);
-			}
 		SetTextColor(hdcStatic, RGB(129, 193, 193));
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LRESULT)bkBrush;
-		
 	}
 	return 0;
 
@@ -160,8 +285,11 @@ void SettingsWindow::windowThread()
 		return;
 	}
 	settingsWindow = new SettingsWindow;
-	settingsWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 640, 480, NULL, NULL);
+	collectionItemsFrame = new CollectionItemsFrame;
+	settingsWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
+	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 40, width-20, CollectionItemsFrame::height, settingsWindow->Window(), NULL);
 	ShowWindow(settingsWindow->Window(), SW_SHOWNORMAL);
+	ShowWindow(collectionItemsFrame->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)
 	{
@@ -172,4 +300,7 @@ void SettingsWindow::windowThread()
 	settingsWindow->Destroy();
 	delete settingsWindow;
 	settingsWindow = nullptr;
+	collectionItemsFrame->Destroy();
+	delete collectionItemsFrame;
+	collectionItemsFrame = nullptr;
 }

@@ -23,8 +23,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	while (TrayWindow::trayWindow!=nullptr)
 	{
 		std::thread delayThread(Settings::Delay);
-		CollectionManager::setNextWallpaper(); //maybe divide into loadRandomWallpaper & setWallpaper to even delay
+		CollectionManager::loadNextWallpaper();
 		delayThread.join();
+		if (Settings::exiting)
+			break;
+		CollectionManager::setLoadedWallpaper();
 	}
 
 	CollectionManager::clear();

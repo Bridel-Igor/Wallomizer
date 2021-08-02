@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BaseWindow.h"
-#include <mutex>
 
 class TrayWindow : public BaseWindow<TrayWindow>
 {

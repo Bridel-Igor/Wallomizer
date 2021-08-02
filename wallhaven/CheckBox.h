@@ -1,19 +1,27 @@
 #pragma once
+
 #include <Windows.h>
+
+#include "HMenuGenerator.h"
 
 class CheckBox
 {
 public:
-	CheckBox(HWND hParent, LPCSTR text, int x, int y, int width, int height, HMENU _hMenu, HINSTANCE hInstance, bool isChecked = false)
+	CheckBox(HWND hParent, LPCSTR text, int x, int y, int width, int height, HINSTANCE hInstance, bool isChecked = false, DWORD additionalStyles = 0, DWORD additionalExStyles = 0)
 	{
-		hMenu = _hMenu;
-		hWnd = CreateWindowExA(NULL, TEXT("Button"), text, WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_LEFTTEXT, x, y, width, height, hParent, hMenu, hInstance, NULL);
+		hMenu = HMenuGenerator::getNewHMenu();
+		hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), text, WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | additionalStyles, x, y, width, height, hParent, hMenu, hInstance, NULL);
 		if (isChecked)
 			check();
 	}
 	~CheckBox()
 	{
 		DestroyWindow(hWnd);
+		HMenuGenerator::releaseHMenu(hMenu);
+	}
+	void setChecked(bool state)
+	{
+		SendMessageA(hWnd, BM_SETCHECK, (WPARAM)state, NULL);
 	}
 	void check()
 	{

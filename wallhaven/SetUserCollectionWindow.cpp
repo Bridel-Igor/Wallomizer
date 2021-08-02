@@ -2,8 +2,6 @@
 #include "CollectionManager.h"
 #include "SettingsWindow.h"
 
-#define CHECKBOX_ISAPI	103
-
 SetUserCollectionWindow *SetUserCollectionWindow::setUserCollectionWindow = nullptr;
 UserCollection* SetUserCollectionWindow::currentUserCollection = nullptr;
 
@@ -22,10 +20,11 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		edCollectionID = new Edit		(Window(), currentUserCollection ? currentUserCollection->settings->collectionID : "",
 																		120,	40,		110,	20, ES_NUMBER);
 		stIsApiKeyUsed = new Static		(Window(), "Use API key:",		10,		70,		100,	20, SS_RIGHT);
-		cbIsApiKeyUsed = new CheckBox	(Window(), "",					120,	70,		20,		20, (HMENU)CHECKBOX_ISAPI, (HINSTANCE)GetWindowLongPtr(Window(), GWLP_HINSTANCE), currentUserCollection ? currentUserCollection->settings->isApiKeyUsed : true);
+		cbIsApiKeyUsed = new CheckBox	(Window(), "",					120,	70,		20,		20, (HINSTANCE)GetWindowLongPtr(Window(), GWLP_HINSTANCE), currentUserCollection ? currentUserCollection->settings->isApiKeyUsed : true);
 		stApiKey = new Static			(Window(), "Api key:",			10,		100,	100,	20, SS_RIGHT);
 		edApiKey = new Edit				(Window(), currentUserCollection ? currentUserCollection->settings->apiKey : "",
 																		120,	100,	110,	20);
+		EnableWindow(edApiKey->hWnd, cbIsApiKeyUsed->isChecked());
 		btnCancel = new Button			(Window(), "Cancel",			10,		130,	100,	20);
 		btnOk = new Button				(Window(), "Ok",				120,	130,	110,	20);
 		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
@@ -67,7 +66,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 
 	case WM_COMMAND:
 	{
-		if (btnOk != nullptr && (HMENU)wParam == btnOk->hMenu)
+		if COMMANDEVENT(btnOk)
 		{
 			if (!strlen(edUsername->getTextA()) || !strlen(edCollectionID->getTextA()) || (cbIsApiKeyUsed->isChecked() && !strlen(edApiKey->getTextA())))
 			{
@@ -84,18 +83,15 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 			return 0;
 		}
 		
-		if (btnCancel != nullptr && (HMENU)wParam == btnCancel->hMenu)
+		if COMMANDEVENT(btnCancel)
 		{
 			DestroyWindow(hWnd);
 			return 0;
 		}
 		
-		if (wParam == CHECKBOX_ISAPI)
+		if COMMANDEVENT(cbIsApiKeyUsed)
 		{
-			if (cbIsApiKeyUsed->isChecked())
-				EnableWindow(edApiKey->hWnd, TRUE);
-			else
-				EnableWindow(edApiKey->hWnd, FALSE);
+			EnableWindow(edApiKey->hWnd, cbIsApiKeyUsed->isChecked());
 			return 0;
 		}
 	}
