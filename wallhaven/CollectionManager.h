@@ -25,7 +25,6 @@ public:
 	static void setNextWallpaper();
 	static void setPreviousWallpaper();
 	static bool isPrevious();
-	//void openWallpaperLocation();
 	static LPCSTR collectionType() { return "Collection manager. You shouldn't see this"; }
 	static unsigned int getNumber() { return number; }
 	static void openCollectionSettingsWindow() { return; }

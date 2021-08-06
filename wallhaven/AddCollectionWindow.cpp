@@ -3,6 +3,7 @@
 #include "SettingsWindow.h"
 #include "UserCollection.h"
 #include "DirectoryCollection.h"
+#include "SearchCollection.h"
 
 AddCollectionWindow* AddCollectionWindow::addCollectionWindow = nullptr;
 
@@ -16,7 +17,8 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
 		btnAddUserCollection = new Button(Window(), "Add user collection",				10, 10, 180, 20);
 		btnAddDirectoryCollection = new Button(Window(), "Add dirrectory collection",	10, 40, 180, 20);
-		btnCancel = new Button(Window(), "Cancel",										10, 80, 180, 20);
+		btnAddSearchCollection = new Button(Window(), "Add search collection",			10, 70, 180, 20);
+		btnCancel = new Button(Window(), "Cancel",										10, 110, 180, 20);
 
 		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)font);
@@ -26,7 +28,7 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
 	case WM_DESTROY:
 	{
-		delete btnAddUserCollection, btnAddDirectoryCollection, btnCancel;
+		delete btnAddUserCollection, btnAddDirectoryCollection, btnAddSearchCollection, btnCancel;
 		DeleteObject(font);
 		DeleteObject(bkBrush);
 		EnableWindow(SettingsWindow::settingsWindow->Window(), TRUE);
@@ -67,6 +69,13 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 			DestroyWindow(Window());
 			return 0;
 		}
+		if COMMANDEVENT(btnAddSearchCollection)
+		{
+			ShowWindow(Window(), SW_HIDE);
+			CollectionManager::addCollection<SearchCollection>();
+			DestroyWindow(Window());
+			return 0;
+		}
 		if COMMANDEVENT(btnCancel)
 		{
 			DestroyWindow(Window());
@@ -95,7 +104,7 @@ void AddCollectionWindow::windowThread()
 		return;
 	}
 	addCollectionWindow = new AddCollectionWindow;
-	addCollectionWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 200, 110, NULL, NULL);
+	addCollectionWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 200, 140, NULL, NULL);
 	ShowWindow(addCollectionWindow->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)

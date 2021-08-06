@@ -61,12 +61,12 @@ LRESULT SetDirectoryCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM
 	{
 		if COMMANDEVENT(btnOk)
 		{
-			if (!strlen(edPath->getTextA()))
+			if (edPath->isEmpty())
 			{
 				MessageBoxA(nullptr, "Invalid data", "wallhaven", MB_OK);
 				return 0;
 			}
-			strcpy_s(currentDirectoryCollection->directoryPath, edPath->getTextA());
+			edPath->getTextA(currentDirectoryCollection->directoryPath, 255);
 			DestroyWindow(hWnd);
 			CollectionManager::reloadSettings();
 			return 0;

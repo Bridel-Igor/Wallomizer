@@ -105,6 +105,10 @@ LRESULT SettingsWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg
 				CollectionManager::collections[i]->isEnabled = collectionItems[i]->chboEnabled->isChecked();
 				CollectionManager::saveSettings();
 				CollectionManager::updateNumber();
+				Settings::loadingImage.lock();
+				remove("Resources/Loaded wallpaper.dat");
+				Settings::loadingImage.unlock();
+				Settings::abortDelay();
 				return 0;
 			}
 		}
@@ -184,8 +188,17 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	{
 	case WM_CREATE:
 	{
-		stCollections = new Static(Window(), "Collections:", 20,	10,		100,	20);
-		btnAdd = new Button(Window(), "Add..",				580,	10,		50,		20);
+		stUsername = new Static(Window(), "Username:",		10,		10,		60,		20);
+		edUsername = new Edit(Window(), "",					80,		10,		100,	20);
+		stApiKey = new Static(Window(), "Api key:",			190,	10,		60,		20);
+		edApiKey = new Edit(Window(), "",					240,	10,		300,	20);
+		btnSetUserData = new Button(Window(), "Set",		550,	10,		80,		20);
+
+		edUsername->setTextA(Settings::username);
+		edApiKey->setTextA(Settings::apiKey);
+
+		stCollections = new Static(Window(), "Collections:",20,		40,		100,	20);
+		btnAdd = new Button(Window(), "Add..",				580,	40,		50,		20);
 
 		stDelay = new Static(Window(), "Delay:",			10,		450,	50,		20);
 		stHours = new Static(Window(), "Hours",				60,		430,	60,		20, SS_CENTER);
@@ -204,8 +217,9 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 	case WM_DESTROY:
 	{
-		delete btnOk, btnAdd;
-		delete stCollections, stHours, stMinutes, stSeconds, stDelay;
+		delete btnOk, btnAdd, btnSetUserData;
+		delete stCollections, stHours, stMinutes, stSeconds, stDelay, stApiKey, stUsername;
+		delete edApiKey, edUsername;
 		delete udeHours, udeMinutes, udeSeconds;
 		DeleteObject(font);
 		DeleteObject(bkBrush);
@@ -240,6 +254,13 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		if COMMANDEVENT(btnAdd)
 		{
 			AddCollectionWindow::windowThread();
+			return 0;
+		}
+		if COMMANDEVENT(btnSetUserData)
+		{
+			edUsername->getTextA(Settings::username, 64);
+			edApiKey->getTextA(Settings::apiKey, 128);
+			Settings::saveSettings();
 			return 0;
 		}
 	}
@@ -287,7 +308,7 @@ void SettingsWindow::windowThread()
 	settingsWindow = new SettingsWindow;
 	collectionItemsFrame = new CollectionItemsFrame;
 	settingsWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
-	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 40, width-20, CollectionItemsFrame::height, settingsWindow->Window(), NULL);
+	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 70, width-20, CollectionItemsFrame::height, settingsWindow->Window(), NULL);
 	ShowWindow(settingsWindow->Window(), SW_SHOWNORMAL);
 	ShowWindow(collectionItemsFrame->Window(), SW_SHOWNORMAL);
 	MSG msg = { };

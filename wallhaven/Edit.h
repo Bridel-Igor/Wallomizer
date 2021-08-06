@@ -13,10 +13,9 @@ public:
 	{
 		DestroyWindow(hWnd);
 	}
-	LPCSTR getTextA()
+	void getTextA(char* buffer, int size)
 	{
-		GetWindowTextA(hWnd, text, 100);
-		return text;
+		GetWindowTextA(hWnd, buffer, size);
 	}
 	void setTextW(LPWSTR text)
 	{
@@ -26,6 +25,12 @@ public:
 	{
 		SetWindowTextA(hWnd, text);
 	}
+	bool isEmpty()
+	{
+		char buf[10] = { 0 };
+		GetWindowTextA(hWnd, buf, 10);
+		return strlen(buf)?false:true;
+	}
+
 	HWND hWnd = NULL;
-	char text[100] = { };
 };

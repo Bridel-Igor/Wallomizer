@@ -20,9 +20,24 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	Settings::loadSettings();
 	CollectionManager::loadSettings();
 
+	unsigned int waitedForTrayWindow = 0;
+	while (TrayWindow::trayWindow == nullptr)
+	{
+		if (waitedForTrayWindow >= 5000)
+			break;
+		Sleep(10);
+		waitedForTrayWindow += 10;
+	}
+
 	while (TrayWindow::trayWindow!=nullptr)
 	{
 		std::thread delayThread(Settings::Delay);
+		if (CollectionManager::getNumber() == 0)
+		{
+			Sleep(100);
+			delayThread.detach();
+			continue;
+		}
 		CollectionManager::loadNextWallpaper();
 		delayThread.join();
 		if (Settings::exiting)

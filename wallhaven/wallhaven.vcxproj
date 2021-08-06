@@ -143,7 +143,9 @@
     <ClCompile Include="CollectionManager.cpp" />
     <ClCompile Include="DirectoryCollection.cpp" />
     <ClCompile Include="HMenuGenerator.cpp" />
+    <ClCompile Include="SearchCollection.cpp" />
     <ClCompile Include="SetDirectoryCollectionWindow.cpp" />
+    <ClCompile Include="SetSearchCollectionWindow.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="SettingsWindow.cpp" />
     <ClCompile Include="Internet.cpp" />
@@ -156,6 +158,7 @@
     <ClInclude Include="AddCollectionWindow.h" />
     <ClInclude Include="BaseCollection.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="CategoriesAndPurity.h" />
     <ClInclude Include="CollectionItem.h" />
     <ClInclude Include="CollectionManager.h" />
     <ClInclude Include="ComboBox.h" />
@@ -164,7 +167,9 @@
     <ClInclude Include="HMenuGenerator.h" />
     <ClInclude Include="Internet.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SearchCollection.h" />
     <ClInclude Include="SetDirectoryCollectionWindow.h" />
+    <ClInclude Include="SetSearchCollectionWindow.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="SettingsWindow.h" />
     <ClInclude Include="SetUserCollectionWindow.h" />

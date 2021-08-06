@@ -1,6 +1,9 @@
 #include "Internet.h"
 
-bool Internet::URLDownloadToBuffer(char* URL, char* buffer, DWORD bufferSize)
+char Internet::buffer[bufferSize];
+std::mutex Internet::bufferAccess;
+
+bool Internet::URLDownloadToBuffer(char* URL, char* _buffer, DWORD _bufferSize)
 {
 	HINTERNET hInternetSession;
 	HINTERNET hURL;
@@ -17,7 +20,7 @@ bool Internet::URLDownloadToBuffer(char* URL, char* buffer, DWORD bufferSize)
 		return false;
 	}
 
-	char* pBuffer = buffer;
+	char* pBuffer = _buffer;
 	DWORD tmpBufferSize = 1024;
 	bool result = false;
 	while (InternetReadFile(hURL, (LPSTR)pBuffer, tmpBufferSize, &dwBytesRead))
@@ -28,8 +31,8 @@ bool Internet::URLDownloadToBuffer(char* URL, char* buffer, DWORD bufferSize)
 			break;
 		}
 		pBuffer += dwBytesRead;
-		bufferSize -= dwBytesRead;
-		if (bufferSize < 0)
+		_bufferSize -= dwBytesRead;
+		if (_bufferSize < 0)
 			break;
 	}
 

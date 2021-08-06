@@ -72,6 +72,12 @@
     <ClCompile Include="Internet.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="SearchCollection.cpp">
+      <Filter>Collections\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="SetSearchCollectionWindow.cpp">
+      <Filter>Window classes\Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h">
@@ -135,6 +141,15 @@
       <Filter>Window classes\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Internet.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchCollection.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SetSearchCollectionWindow.h">
+      <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CategoriesAndPurity.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

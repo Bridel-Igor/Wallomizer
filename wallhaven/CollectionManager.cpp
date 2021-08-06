@@ -9,6 +9,7 @@
 #include "SettingsWindow.h"
 #include "UserCollection.h"
 #include "DirectoryCollection.h"
+#include "SearchCollection.h"
 
 std::vector<BaseCollection*> CollectionManager::collections;
 unsigned int CollectionManager::number=0;
@@ -66,6 +67,12 @@ bool CollectionManager::loadSettings()
 				tmpCollection->loadSettings(pFile);
 				collections.push_back(tmpCollection);
 			}
+			if (strcmp(buffer, "Search collection") == 0)
+			{
+				tmpCollection = new SearchCollection();
+				tmpCollection->loadSettings(pFile);
+				collections.push_back(tmpCollection);
+			}
 		}
 		fclose(pFile);
 	}
@@ -82,6 +89,7 @@ void CollectionManager::reloadSettings()
 	Settings::loadingImage.lock();
 	saveSettings();
 	loadSettings();
+	remove("Resources/Loaded wallpaper.dat");
 	Settings::loadingImage.unlock();
 }
 
@@ -96,12 +104,16 @@ template <typename T> void CollectionManager::addCollection()
 {
 	BaseCollection* col = new T;
 	collections.push_back(col);
-	col->openCollectionSettingsWindow();
-	if (strcmp(collections.back()->collectionName(), "") == 0) // erase new collection if it's empty
+	collections.back()->openCollectionSettingsWindow();
+	if (strlen(collections.back()->collectionName()) == 0) // RE DO
+	{
+		delete collections.back();
 		collections.pop_back();
+	}	
 }
 template void CollectionManager::addCollection<DirectoryCollection>();
 template void CollectionManager::addCollection<UserCollection>();
+template void CollectionManager::addCollection<SearchCollection>();
 
 void CollectionManager::eraseCollection(int index)
 {
@@ -110,6 +122,10 @@ void CollectionManager::eraseCollection(int index)
 	collections.erase(CollectionManager::collections.begin() + index);
 	saveSettings();
 	updateNumber();
+	Settings::loadingImage.lock();
+	remove("Resources/Loaded wallpaper.dat");
+	Settings::loadingImage.unlock();
+	Settings::abortDelay();
 }
 
 void CollectionManager::clear()

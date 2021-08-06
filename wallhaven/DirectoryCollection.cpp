@@ -92,7 +92,12 @@ bool DirectoryCollection::loadWallpaper(unsigned int index)
 
 LPCSTR DirectoryCollection::collectionName() const
 {
-	return directoryPath;
+	char name[255] = {0};
+
+	strcat_s(name, " Local: ");
+	strcat_s(name, directoryPath);
+
+	return name;
 }
 
 void DirectoryCollection::openCollectionSettingsWindow()

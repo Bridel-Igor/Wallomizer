@@ -338,9 +338,6 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
-/wallhaven/collections.txt
-/wallhaven/Query.txt
-/wallhaven/Current wallpaper.jpg
-/wallhaven/Query.json
+*.txt
 *.dat
-/wallhaven/Resources/Current wallpaper.jpg
+*.jpg

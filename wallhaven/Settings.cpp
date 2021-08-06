@@ -4,6 +4,8 @@ unsigned int Settings::prevCount = 5;
 unsigned long Settings::delay = 60000;
 std::mutex Settings::loadingImage;
 bool Settings::exiting = false;
+char Settings::username[64];
+char Settings::apiKey[128];
 
 namespace Settings
 {
@@ -15,10 +17,18 @@ namespace Settings
 void Settings::saveSettings()
 {
 	FILE* pFile;
-	fopen_s(&pFile, "Settings/Settings.dat", "wb");
+	fopen_s(&pFile, "Settings/Settings.dat", "w");
 	if (pFile != NULL)
 	{
-		fwrite(&delay, sizeof(delay), 1, pFile);
+		char cNumber[10];
+		_itoa_s(delay, cNumber, 10);
+		cNumber[9] = '\0';
+		fputs(cNumber, pFile);
+		fputs("\n", pFile);
+		fputs(username, pFile);
+		fputs("\n", pFile);
+		fputs(apiKey, pFile);
+		fputs("\n", pFile);
 		fclose(pFile);
 		return;
 	}
@@ -28,10 +38,17 @@ void Settings::saveSettings()
 void Settings::loadSettings()
 {
 	FILE* pFile;
-	fopen_s(&pFile, "Settings/Settings.dat", "rb");
+	fopen_s(&pFile, "Settings/Settings.dat", "r");
 	if (pFile != NULL)
 	{
-		fread(&delay, sizeof(delay), 1, pFile);
+		char buffer[10];
+		fgets(buffer, 10, pFile);
+		buffer[strlen(buffer) - 1] = '\0';
+		delay = atoi(buffer);
+		fgets(username, 64, pFile);
+		username[strlen(username) - 1] = '\0';
+		fgets(apiKey, 128, pFile);
+		apiKey[strlen(apiKey) -1] = '\0';
 		fclose(pFile);
 		return;
 	}
@@ -78,4 +95,19 @@ void Settings::startSlideshow()
 void Settings::pauseSlideshow()
 {
 	bRunSlideshow = false;
+}
+
+void Settings::setApiKey(char* _apiKey)
+{
+	strcpy_s(apiKey, 64, _apiKey);
+}
+
+char* Settings::getApiKey()
+{
+	return apiKey;
+}
+
+bool Settings::isApiKeyUsed()
+{
+	return strlen(apiKey);
 }

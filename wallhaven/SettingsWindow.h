@@ -7,6 +7,7 @@
 #include "Button.h"
 #include "UpDownEdit.h"
 #include "CollectionItem.h"
+#include "Edit.h"
 
 class SettingsWindow : public BaseWindow<SettingsWindow>
 {
@@ -33,12 +34,13 @@ private:
 		LPCSTR ClassName() const { return "CollectionItemsFrameClass"; }
 		LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-		static constexpr int height = 380;
+		static constexpr int height = 350;
 	};
 
 private:
-	Static *stCollections, *stHours, *stMinutes, *stSeconds, *stDelay;
-	Button *btnOk, *btnAdd;
+	Static *stCollections, *stHours, *stMinutes, *stSeconds, *stDelay, *stApiKey, *stUsername;
+	Edit* edApiKey, *edUsername;
+	Button *btnOk, *btnAdd, *btnSetUserData;
 	UpDownEdit *udeHours, *udeMinutes, *udeSeconds;
 	HFONT font;
 	HBRUSH bkBrush;

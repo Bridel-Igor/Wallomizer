@@ -9,6 +9,8 @@ namespace Settings
 	extern unsigned long delay;
 	extern bool exiting;
 	extern std::mutex loadingImage;
+	extern char username[64];
+	extern char apiKey[128];
 
 	void saveSettings();
 	void loadSettings();
@@ -17,4 +19,7 @@ namespace Settings
 	void replayDelay();
 	void startSlideshow();
 	void pauseSlideshow();
+	void setApiKey(char* apiKey);
+	char* getApiKey();
+	bool isApiKeyUsed();
 }

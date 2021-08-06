@@ -11,8 +11,11 @@ public:
 	virtual bool loadWallpaper(unsigned int index) = 0;
 	virtual LPCSTR collectionType() const = 0;
 	virtual LPCSTR collectionName() const = 0;
-	virtual unsigned int getNumber() = 0;
+	virtual unsigned int getNumber() { return number; }
 	virtual void openCollectionSettingsWindow() = 0;
 
-	bool isEnabled;
+	bool isEnabled = true;
+
+protected:
+	unsigned int number = 0;
 };

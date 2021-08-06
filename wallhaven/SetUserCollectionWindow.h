@@ -5,18 +5,20 @@
 #include "Edit.h"
 #include "Static.h"
 #include "Button.h"
-#include "CheckBox.h"
+#include "ComboBox.h"
 
 class SetUserCollectionWindow : public BaseWindow<SetUserCollectionWindow>
 {
-	Static	*stUsername, *stCollectionID, *stApiKey, *stIsApiKeyUsed;
-	Edit	*edUsername, *edCollectionID, *edApiKey;
-	Button *btnOk, *btnCancel;
-	CheckBox *cbIsApiKeyUsed;
+	Static	*stUsername, *stCollectionID, *stPurity;
+	Edit	*edUsername;
+	ComboBox* cbCollections;
+	Button *btnOk, *btnCancel, *btnPurSFW, *btnPurSketchy, *btnPurNSFW;
 	HFONT font;
 	HBRUSH bkBrush;
 	static SetUserCollectionWindow *setUserCollectionWindow;
 	static UserCollection* currentUserCollection;
+	std::vector<UserCollection::UserCollectionInfo> list;
+	bool validCollection = false;
 
 public:
 	LPCSTR ClassName() const { return "Set User Collection Window Class"; }
