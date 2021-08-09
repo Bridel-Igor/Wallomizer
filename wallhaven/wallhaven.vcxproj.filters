@@ -48,22 +48,13 @@
     <ClCompile Include="CollectionManager.cpp">
       <Filter>Collections\Code</Filter>
     </ClCompile>
-    <ClCompile Include="DirectoryCollection.cpp">
-      <Filter>Collections\Code</Filter>
-    </ClCompile>
     <ClCompile Include="UserCollection.cpp">
       <Filter>Collections\Code</Filter>
     </ClCompile>
     <ClCompile Include="AddCollectionWindow.cpp">
       <Filter>Window classes\Code</Filter>
     </ClCompile>
-    <ClCompile Include="SetDirectoryCollectionWindow.cpp">
-      <Filter>Window classes\Code</Filter>
-    </ClCompile>
     <ClCompile Include="SetUserCollectionWindow.cpp">
-      <Filter>Window classes\Code</Filter>
-    </ClCompile>
-    <ClCompile Include="SettingsWindow.cpp">
       <Filter>Window classes\Code</Filter>
     </ClCompile>
     <ClCompile Include="TrayWindow.cpp">
@@ -76,6 +67,15 @@
       <Filter>Collections\Code</Filter>
     </ClCompile>
     <ClCompile Include="SetSearchCollectionWindow.cpp">
+      <Filter>Window classes\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalCollection.cpp">
+      <Filter>Collections\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="SetLocalCollectionWindow.cpp">
+      <Filter>Window classes\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
       <Filter>Window classes\Code</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,9 +113,6 @@
     <ClInclude Include="CollectionManager.h">
       <Filter>Collections\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="DirectoryCollection.h">
-      <Filter>Collections\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="UserCollection.h">
       <Filter>Collections\Headers</Filter>
     </ClInclude>
@@ -126,12 +123,6 @@
       <Filter>Window classes\Headers</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Window classes\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="SetDirectoryCollectionWindow.h">
-      <Filter>Window classes\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="SettingsWindow.h">
       <Filter>Window classes\Headers</Filter>
     </ClInclude>
     <ClInclude Include="SetUserCollectionWindow.h">
@@ -151,6 +142,15 @@
     </ClInclude>
     <ClInclude Include="CategoriesAndPurity.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalCollection.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SetLocalCollectionWindow.h">
+      <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWindow.h">
+      <Filter>Window classes\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

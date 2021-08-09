@@ -3,8 +3,8 @@
 #include <experimental/filesystem>
 #include <string>
 
-#include "DirectoryCollection.h"
-#include "SetDirectoryCollectionWindow.h"
+#include "LocalCollection.h"
+#include "SetLocalCollectionWindow.h"
 #include "Settings.h"
 
 const char* extensions[] = { ".jpg", ".jpeg", ".bmp", ".dib", ".png", ".jfif", ".jpe", ".gif", ".tif", ".tiff", 
@@ -17,13 +17,13 @@ bool isImage(std::experimental::filesystem::v1::directory_entry path)
 	return false;
 }
 
-DirectoryCollection::DirectoryCollection()
+LocalCollection::LocalCollection()
 {
 	number = 0;
 	directoryPath[0] = '\0';
 }
 
-bool DirectoryCollection::saveSettings(FILE* pFile)
+bool LocalCollection::saveSettings(FILE* pFile)
 {
 	if (pFile != NULL)
 	{
@@ -38,7 +38,7 @@ bool DirectoryCollection::saveSettings(FILE* pFile)
 	return false;
 }
 
-bool DirectoryCollection::loadSettings(FILE* pFile)
+bool LocalCollection::loadSettings(FILE* pFile)
 {
 	if (pFile != NULL)
 	{
@@ -58,7 +58,7 @@ bool DirectoryCollection::loadSettings(FILE* pFile)
 	return false;
 }
 
-bool DirectoryCollection::loadWallpaper(unsigned int index)
+bool LocalCollection::loadWallpaper(unsigned int index)
 {
 	if (directoryPath == "" || number <= 0)
 		return false;
@@ -90,7 +90,7 @@ bool DirectoryCollection::loadWallpaper(unsigned int index)
 	return false;
 }
 
-LPCSTR DirectoryCollection::collectionName() const
+LPCSTR LocalCollection::collectionName() const
 {
 	char name[255] = {0};
 
@@ -100,7 +100,7 @@ LPCSTR DirectoryCollection::collectionName() const
 	return name;
 }
 
-void DirectoryCollection::openCollectionSettingsWindow()
+void LocalCollection::openCollectionSettingsWindow()
 {
-	SetDirectoryCollectionWindow::windowThread(this);
+	SetLocalCollectionWindow::windowThread(this);
 }

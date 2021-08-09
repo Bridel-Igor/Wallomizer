@@ -1,6 +1,6 @@
 #include "SetUserCollectionWindow.h"
 #include "CollectionManager.h"
-#include "SettingsWindow.h"
+#include "MainWindow.h"
 #include "Settings.h"
 
 SetUserCollectionWindow *SetUserCollectionWindow::setUserCollectionWindow = nullptr;
@@ -12,7 +12,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 	{
 	case WM_CREATE:
 	{
-		EnableWindow(SettingsWindow::settingsWindow->Window(), FALSE);
+		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
 
 		stUsername = new Static			(Window(), "Username:",			10,		10,		80,		20, SS_RIGHT);
 		edUsername = new Edit			(Window(), "",					100,	10,		150,	20);
@@ -66,8 +66,8 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		delete btnOk, btnCancel, btnPurSFW, btnPurSketchy, btnPurNSFW;
 		DeleteObject(font);
 		DeleteObject(bkBrush);
-		EnableWindow(SettingsWindow::settingsWindow->Window(), TRUE);
-		SetForegroundWindow(SettingsWindow::settingsWindow->Window());
+		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
+		SetForegroundWindow(MainWindow::mainWindow->Window());
 		PostQuitMessage(0);
 	}
 	return 0;

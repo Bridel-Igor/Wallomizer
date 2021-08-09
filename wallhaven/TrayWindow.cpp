@@ -1,6 +1,6 @@
 #include "TrayWindow.h"
 #include "resource.h"
-#include "SettingsWindow.h"
+#include "MainWindow.h"
 #include "Settings.h"
 #include "CollectionManager.h"
 
@@ -86,7 +86,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			break;
 		case ID_WALLHAVEN_SETTINGS:
 		{
-			std::thread thr(SettingsWindow::windowThread);
+			std::thread thr(MainWindow::windowThread);
 			thr.detach();
 			break;
 		}

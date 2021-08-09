@@ -1,13 +1,13 @@
-#include "SettingsWindow.h"
+#include "MainWindow.h"
 #include "Settings.h"
 #include "CollectionManager.h"
 #include "AddCollectionWindow.h"
 
-SettingsWindow* SettingsWindow::settingsWindow = nullptr;
-SettingsWindow::CollectionItemsFrame* SettingsWindow::collectionItemsFrame = nullptr;
+MainWindow* MainWindow::mainWindow = nullptr;
+MainWindow::CollectionItemsFrame* MainWindow::collectionItemsFrame = nullptr;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////CollectionItemsFrame
-void SettingsWindow::CollectionItemsFrame::updateCollectionItems()
+void MainWindow::CollectionItemsFrame::updateCollectionItems()
 {
 	for (size_t i = CollectionManager::collections.size(); i < collectionItems.size(); i++) //deleting excess items
 	{
@@ -20,14 +20,14 @@ void SettingsWindow::CollectionItemsFrame::updateCollectionItems()
 
 	for (size_t i = collectionItems.size(); i < CollectionManager::collections.size(); i++) // creation
 		if (CollectionManager::collections[i]!=nullptr)
-			collectionItems.push_back(new CollectionItem(SettingsWindow::collectionItemsFrame->Window(), 0, (i * 20), SettingsWindow::width-20-18, 20, CollectionManager::collections[i], font));
+			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->Window(), 0, (i * 20), MainWindow::width-20-18, 20, CollectionManager::collections[i], font));
 	
 	updateScroll();
 	for (auto p : collectionItems) // placing according to the scrollbar
 		p->scroll(yCurrentScroll);
 }
 
-void SettingsWindow::CollectionItemsFrame::destroyCollectionItems()
+void MainWindow::CollectionItemsFrame::destroyCollectionItems()
 {
 	for (auto p : collectionItems)
 		delete p;
@@ -35,7 +35,7 @@ void SettingsWindow::CollectionItemsFrame::destroyCollectionItems()
 	updateScroll();
 }
 
-void SettingsWindow::CollectionItemsFrame::updateScroll()
+void MainWindow::CollectionItemsFrame::updateScroll()
 {
 	int itemListHeight = (int)collectionItems.size() * 20;
 	yMaxScroll = max(itemListHeight - height, 0);
@@ -53,7 +53,7 @@ void SettingsWindow::CollectionItemsFrame::updateScroll()
 	EnableScrollBar(Window(), SB_VERT, itemListHeight <= height? ESB_DISABLE_BOTH : ESB_ENABLE_BOTH);
 }
 
-LRESULT SettingsWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -181,8 +181,8 @@ LRESULT SettingsWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////SettingsWindow
-LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////MainWindow
+LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -298,18 +298,18 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	return TRUE;
 }
 
-void SettingsWindow::windowThread()
+void MainWindow::windowThread()
 {
-	if (settingsWindow)
+	if (mainWindow)
 	{
-		SetForegroundWindow(settingsWindow->Window());
+		SetForegroundWindow(mainWindow->Window());
 		return;
 	}
-	settingsWindow = new SettingsWindow;
+	mainWindow = new MainWindow;
 	collectionItemsFrame = new CollectionItemsFrame;
-	settingsWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
-	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 70, width-20, CollectionItemsFrame::height, settingsWindow->Window(), NULL);
-	ShowWindow(settingsWindow->Window(), SW_SHOWNORMAL);
+	mainWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
+	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 70, width-20, CollectionItemsFrame::height, mainWindow->Window(), NULL);
+	ShowWindow(mainWindow->Window(), SW_SHOWNORMAL);
 	ShowWindow(collectionItemsFrame->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)
@@ -317,10 +317,10 @@ void SettingsWindow::windowThread()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-	ShowWindow(settingsWindow->Window(), SW_HIDE);
-	settingsWindow->Destroy();
-	delete settingsWindow;
-	settingsWindow = nullptr;
+	ShowWindow(mainWindow->Window(), SW_HIDE);
+	mainWindow->Destroy();
+	delete mainWindow;
+	mainWindow = nullptr;
 	collectionItemsFrame->Destroy();
 	delete collectionItemsFrame;
 	collectionItemsFrame = nullptr;

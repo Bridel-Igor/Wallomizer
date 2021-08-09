@@ -1,6 +1,6 @@
 #include "SetSearchCollectionWindow.h"
 #include "CollectionManager.h"
-#include "SettingsWindow.h"
+#include "MainWindow.h"
 
 SetSearchCollectionWindow* SetSearchCollectionWindow::setSearchCollectionWindow = nullptr;
 SearchCollection* SetSearchCollectionWindow::currentSearchCollection = nullptr;
@@ -11,7 +11,7 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 	{
 	case WM_CREATE:
 	{
-		EnableWindow(SettingsWindow::settingsWindow->Window(), FALSE);
+		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
 
 		stCategory = new Static(Window(), "Category:",	10,		10,		60,		20);
 		btnCatGeneral = new Button(Window(), "General",	80,		10,		50,		20, BS_AUTOCHECKBOX | BS_PUSHLIKE);
@@ -66,8 +66,8 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 				btnPurSFW, btnPurSketchy, btnPurNSFW;
 		DeleteObject(font);
 		DeleteObject(bkBrush);
-		EnableWindow(SettingsWindow::settingsWindow->Window(), TRUE);
-		SetForegroundWindow(SettingsWindow::settingsWindow->Window());
+		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
+		SetForegroundWindow(MainWindow::mainWindow->Window());
 		PostQuitMessage(0);
 	}
 	return 0;

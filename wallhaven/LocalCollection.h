@@ -2,14 +2,14 @@
 
 #include "BaseCollection.h"
 
-class DirectoryCollection : public BaseCollection
+class LocalCollection : public BaseCollection
 {
 public:
-	DirectoryCollection();
+	LocalCollection();
 	bool saveSettings(FILE* pFile);
 	bool loadSettings(FILE* pFile);
 	virtual bool loadWallpaper(unsigned int index);
-	LPCSTR collectionType() const { return "Directory collection"; };
+	LPCSTR collectionType() const { return "Local collection"; };
 	LPCSTR collectionName() const;
 	void openCollectionSettingsWindow();
 

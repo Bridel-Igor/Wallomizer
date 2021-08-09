@@ -1,22 +1,22 @@
 #include <ShObjIdl.h>
 
-#include "SetDirectoryCollectionWindow.h"
+#include "SetLocalCollectionWindow.h"
 #include "CollectionManager.h"
-#include "SettingsWindow.h"
+#include "MainWindow.h"
 
-SetDirectoryCollectionWindow* SetDirectoryCollectionWindow::setDirectoryCollectionWindow = nullptr;
-DirectoryCollection* SetDirectoryCollectionWindow::currentDirectoryCollection = nullptr;
+SetLocalCollectionWindow* SetLocalCollectionWindow::setLocalCollectionWindow = nullptr;
+LocalCollection* SetLocalCollectionWindow::currentLocalCollection = nullptr;
 
-LRESULT SetDirectoryCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
 	case WM_CREATE:
 	{
-		EnableWindow(SettingsWindow::settingsWindow->Window(), FALSE);
+		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
 
 		stPath = new Static(Window(), "Enter path to directory:",	10,		10,		390,	20);
-		edPath = new Edit(Window(), currentDirectoryCollection?currentDirectoryCollection->directoryPath:"",								
+		edPath = new Edit(Window(), currentLocalCollection?currentLocalCollection->directoryPath:"",								
 																	10,		30,		360,	20);
 		btnPath = new Button(Window(), "..",						370,	30,		20,		20);
 		btnCancel = new Button(Window(), "Cancel",					10,		60,		185,	20);
@@ -29,14 +29,14 @@ LRESULT SetDirectoryCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM
 
 	case WM_DESTROY:
 	{
-		currentDirectoryCollection = nullptr;
+		currentLocalCollection = nullptr;
 		delete stPath;
 		delete edPath;
 		delete btnOk, btnCancel, btnPath;
 		DeleteObject(font);
 		DeleteObject(bkBrush);
-		EnableWindow(SettingsWindow::settingsWindow->Window(), TRUE);
-		SetForegroundWindow(SettingsWindow::settingsWindow->Window());
+		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
+		SetForegroundWindow(MainWindow::mainWindow->Window());
 		PostQuitMessage(0);
 	}
 	return 0;
@@ -66,7 +66,7 @@ LRESULT SetDirectoryCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM
 				MessageBoxA(nullptr, "Invalid data", "wallhaven", MB_OK);
 				return 0;
 			}
-			edPath->getTextA(currentDirectoryCollection->directoryPath, 255);
+			edPath->getTextA(currentLocalCollection->directoryPath, 255);
 			DestroyWindow(hWnd);
 			CollectionManager::reloadSettings();
 			return 0;
@@ -142,25 +142,25 @@ LRESULT SetDirectoryCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM
 	return TRUE;
 }
 
-void SetDirectoryCollectionWindow::windowThread(DirectoryCollection *collection)
+void SetLocalCollectionWindow::windowThread(LocalCollection *collection)
 {
-	if (setDirectoryCollectionWindow)
+	if (setLocalCollectionWindow)
 	{
-		SetForegroundWindow(setDirectoryCollectionWindow->Window());
+		SetForegroundWindow(setLocalCollectionWindow->Window());
 		return;
 	}
-	currentDirectoryCollection = collection;
-	setDirectoryCollectionWindow = new SetDirectoryCollectionWindow;
-	setDirectoryCollectionWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90, NULL, NULL);
-	ShowWindow(setDirectoryCollectionWindow->Window(), SW_SHOWNORMAL);
+	currentLocalCollection = collection;
+	setLocalCollectionWindow = new SetLocalCollectionWindow;
+	setLocalCollectionWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90, NULL, NULL);
+	ShowWindow(setLocalCollectionWindow->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-	ShowWindow(setDirectoryCollectionWindow->Window(), SW_HIDE);
-	setDirectoryCollectionWindow->Destroy();
-	delete setDirectoryCollectionWindow;
-	setDirectoryCollectionWindow = nullptr;
+	ShowWindow(setLocalCollectionWindow->Window(), SW_HIDE);
+	setLocalCollectionWindow->Destroy();
+	delete setLocalCollectionWindow;
+	setLocalCollectionWindow = nullptr;
 }

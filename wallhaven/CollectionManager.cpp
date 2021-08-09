@@ -6,9 +6,9 @@
 
 #include "CollectionManager.h"
 #include "Settings.h"
-#include "SettingsWindow.h"
+#include "MainWindow.h"
 #include "UserCollection.h"
-#include "DirectoryCollection.h"
+#include "LocalCollection.h"
 #include "SearchCollection.h"
 
 std::vector<BaseCollection*> CollectionManager::collections;
@@ -55,9 +55,9 @@ bool CollectionManager::loadSettings()
 		{
 			fgets(buffer, 255, pFile);
 			buffer[strlen(buffer) - 1] = '\0';
-			if (strcmp(buffer, "Directory collection") == 0)
+			if (strcmp(buffer, "Local collection") == 0)
 			{
-				tmpCollection = new DirectoryCollection();
+				tmpCollection = new LocalCollection();
 				tmpCollection->loadSettings(pFile);
 				collections.push_back(tmpCollection);
 			}
@@ -77,8 +77,8 @@ bool CollectionManager::loadSettings()
 		fclose(pFile);
 	}
 	updateNumber();
-	if (SettingsWindow::settingsWindow != nullptr)
-		SettingsWindow::collectionItemsFrame->updateCollectionItems();
+	if (MainWindow::mainWindow != nullptr)
+		MainWindow::collectionItemsFrame->updateCollectionItems();
 	Settings::abortDelay();
 	srand((unsigned int)time(NULL));
 	return true;
@@ -111,7 +111,7 @@ template <typename T> void CollectionManager::addCollection()
 		collections.pop_back();
 	}	
 }
-template void CollectionManager::addCollection<DirectoryCollection>();
+template void CollectionManager::addCollection<LocalCollection>();
 template void CollectionManager::addCollection<UserCollection>();
 template void CollectionManager::addCollection<SearchCollection>();
 

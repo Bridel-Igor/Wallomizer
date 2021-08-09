@@ -9,7 +9,7 @@
 #include "CollectionItem.h"
 #include "Edit.h"
 
-class SettingsWindow : public BaseWindow<SettingsWindow>
+class MainWindow : public BaseWindow<MainWindow>
 {
 private:
 	class CollectionItemsFrame : public BaseWindow<CollectionItemsFrame>
@@ -52,6 +52,6 @@ public:
 
 	static constexpr int width = 640;
 	static constexpr int height = 480;
-	static SettingsWindow* settingsWindow;
+	static MainWindow* mainWindow;
 	static CollectionItemsFrame* collectionItemsFrame;
 };

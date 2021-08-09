@@ -5,7 +5,7 @@
 
 class AddCollectionWindow : public BaseWindow<AddCollectionWindow>
 {
-	Button *btnAddUserCollection, *btnAddDirectoryCollection, *btnAddSearchCollection, *btnCancel;
+	Button *btnAddUserCollection, *btnAddLocalCollection, *btnAddSearchCollection, *btnCancel;
 	static AddCollectionWindow* addCollectionWindow;
 	HFONT font;
 	HBRUSH bkBrush;

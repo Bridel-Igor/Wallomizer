@@ -141,13 +141,13 @@
   <ItemGroup>
     <ClCompile Include="AddCollectionWindow.cpp" />
     <ClCompile Include="CollectionManager.cpp" />
-    <ClCompile Include="DirectoryCollection.cpp" />
+    <ClCompile Include="LocalCollection.cpp" />
     <ClCompile Include="HMenuGenerator.cpp" />
     <ClCompile Include="SearchCollection.cpp" />
-    <ClCompile Include="SetDirectoryCollectionWindow.cpp" />
+    <ClCompile Include="SetLocalCollectionWindow.cpp" />
     <ClCompile Include="SetSearchCollectionWindow.cpp" />
     <ClCompile Include="Settings.cpp" />
-    <ClCompile Include="SettingsWindow.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Internet.cpp" />
     <ClCompile Include="TrayWindow.cpp" />
     <ClCompile Include="UserCollection.cpp" />
@@ -162,16 +162,16 @@
     <ClInclude Include="CollectionItem.h" />
     <ClInclude Include="CollectionManager.h" />
     <ClInclude Include="ComboBox.h" />
-    <ClInclude Include="DirectoryCollection.h" />
+    <ClInclude Include="LocalCollection.h" />
     <ClInclude Include="Edit.h" />
     <ClInclude Include="HMenuGenerator.h" />
     <ClInclude Include="Internet.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SearchCollection.h" />
-    <ClInclude Include="SetDirectoryCollectionWindow.h" />
+    <ClInclude Include="SetLocalCollectionWindow.h" />
     <ClInclude Include="SetSearchCollectionWindow.h" />
     <ClInclude Include="Settings.h" />
-    <ClInclude Include="SettingsWindow.h" />
+    <ClInclude Include="MainWindow.h" />
     <ClInclude Include="SetUserCollectionWindow.h" />
     <ClInclude Include="CheckBox.h" />
     <ClInclude Include="Static.h" />

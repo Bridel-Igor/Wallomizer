@@ -1,8 +1,8 @@
 #include "AddCollectionWindow.h"
 #include "CollectionManager.h"
-#include "SettingsWindow.h"
+#include "MainWindow.h"
 #include "UserCollection.h"
-#include "DirectoryCollection.h"
+#include "LocalCollection.h"
 #include "SearchCollection.h"
 
 AddCollectionWindow* AddCollectionWindow::addCollectionWindow = nullptr;
@@ -13,10 +13,10 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 	{
 	case WM_CREATE:
 	{
-		EnableWindow(SettingsWindow::settingsWindow->Window(), FALSE);
+		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
 
 		btnAddUserCollection = new Button(Window(), "Add user collection",				10, 10, 180, 20);
-		btnAddDirectoryCollection = new Button(Window(), "Add dirrectory collection",	10, 40, 180, 20);
+		btnAddLocalCollection = new Button(Window(), "Add local collection",			10, 40, 180, 20);
 		btnAddSearchCollection = new Button(Window(), "Add search collection",			10, 70, 180, 20);
 		btnCancel = new Button(Window(), "Cancel",										10, 110, 180, 20);
 
@@ -28,11 +28,11 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
 	case WM_DESTROY:
 	{
-		delete btnAddUserCollection, btnAddDirectoryCollection, btnAddSearchCollection, btnCancel;
+		delete btnAddUserCollection, btnAddLocalCollection, btnAddSearchCollection, btnCancel;
 		DeleteObject(font);
 		DeleteObject(bkBrush);
-		EnableWindow(SettingsWindow::settingsWindow->Window(), TRUE);
-		SetForegroundWindow(SettingsWindow::settingsWindow->Window());
+		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
+		SetForegroundWindow(MainWindow::mainWindow->Window());
 		PostQuitMessage(0);
 	}
 	return 0;
@@ -62,10 +62,10 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 			DestroyWindow(Window());
 			return 0;
 		}
-		if COMMANDEVENT(btnAddDirectoryCollection)
+		if COMMANDEVENT(btnAddLocalCollection)
 		{
 			ShowWindow(Window(), SW_HIDE);
-			CollectionManager::addCollection<DirectoryCollection>();
+			CollectionManager::addCollection<LocalCollection>();
 			DestroyWindow(Window());
 			return 0;
 		}
