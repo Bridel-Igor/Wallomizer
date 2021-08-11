@@ -34,6 +34,9 @@
     <Filter Include="Window classes\Headers">
       <UniqueIdentifier>{faf7b85c-53a3-4896-a28f-6897a8f22f9f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components\Code">
+      <UniqueIdentifier>{1a5c683a-3929-44e9-967f-0e5048addcb8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -41,9 +44,6 @@
     </ClCompile>
     <ClCompile Include="Settings.cpp">
       <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="HMenuGenerator.cpp">
-      <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="CollectionManager.cpp">
       <Filter>Collections\Code</Filter>
@@ -77,6 +77,15 @@
     </ClCompile>
     <ClCompile Include="MainWindow.cpp">
       <Filter>Window classes\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsWindow.cpp">
+      <Filter>Window classes\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="HMenuGenerator.cpp">
+      <Filter>Components\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="CategoriesAndPurity.cpp">
+      <Filter>Components\Code</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -140,9 +149,6 @@
     <ClInclude Include="SetSearchCollectionWindow.h">
       <Filter>Window classes\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="CategoriesAndPurity.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="LocalCollection.h">
       <Filter>Collections\Headers</Filter>
     </ClInclude>
@@ -151,6 +157,12 @@
     </ClInclude>
     <ClInclude Include="MainWindow.h">
       <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsWindow.h">
+      <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CategoriesAndPurity.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

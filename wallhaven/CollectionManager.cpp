@@ -15,6 +15,7 @@ std::vector<BaseCollection*> CollectionManager::collections;
 unsigned int CollectionManager::number=0;
 int *CollectionManager::previous = nullptr;
 int CollectionManager::indexOfLoaded = 0;
+bool CollectionManager::bIsReady = false;
 
 bool CollectionManager::saveSettings()
 {
@@ -37,6 +38,7 @@ bool CollectionManager::saveSettings()
 
 bool CollectionManager::loadSettings()
 {
+	bIsReady = false;
 	FILE* pFile;
 	fopen_s(&pFile, "Settings/CollectionManager.dat", "r");
 	if (pFile != NULL)
@@ -59,18 +61,21 @@ bool CollectionManager::loadSettings()
 			{
 				tmpCollection = new LocalCollection();
 				tmpCollection->loadSettings(pFile);
+				tmpCollection->isValid = true;
 				collections.push_back(tmpCollection);
 			}
 			if (strcmp(buffer, "User collection") == 0)
 			{
 				tmpCollection = new UserCollection();
 				tmpCollection->loadSettings(pFile);
+				tmpCollection->isValid = true;
 				collections.push_back(tmpCollection);
 			}
 			if (strcmp(buffer, "Search collection") == 0)
 			{
 				tmpCollection = new SearchCollection();
 				tmpCollection->loadSettings(pFile);
+				tmpCollection->isValid = true;
 				collections.push_back(tmpCollection);
 			}
 		}
@@ -79,6 +84,7 @@ bool CollectionManager::loadSettings()
 	updateNumber();
 	if (MainWindow::mainWindow != nullptr)
 		MainWindow::collectionItemsFrame->updateCollectionItems();
+	bIsReady = true;
 	Settings::abortDelay();
 	srand((unsigned int)time(NULL));
 	return true;
@@ -105,11 +111,13 @@ template <typename T> void CollectionManager::addCollection()
 	BaseCollection* col = new T;
 	collections.push_back(col);
 	collections.back()->openCollectionSettingsWindow();
-	if (strlen(collections.back()->collectionName()) == 0) // RE DO
+	if (!collections.back()->isValid)
 	{
 		delete collections.back();
 		collections.pop_back();
-	}	
+	}
+	else
+		reloadSettings();
 }
 template void CollectionManager::addCollection<LocalCollection>();
 template void CollectionManager::addCollection<UserCollection>();

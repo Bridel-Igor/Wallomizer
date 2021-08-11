@@ -31,13 +31,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	while (TrayWindow::trayWindow!=nullptr)
 	{
-		std::thread delayThread(Settings::Delay);
 		if (CollectionManager::getNumber() == 0)
 		{
 			Sleep(100);
-			delayThread.detach();
 			continue;
 		}
+		std::thread delayThread(Settings::Delay);
 		CollectionManager::loadNextWallpaper();
 		delayThread.join();
 		if (Settings::exiting)

@@ -104,7 +104,8 @@ void AddCollectionWindow::windowThread()
 		return;
 	}
 	addCollectionWindow = new AddCollectionWindow;
-	addCollectionWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 200, 140, NULL, NULL);
+	addCollectionWindow->Create("Add collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 200, 140, NULL, NULL);
+	addCollectionWindow->centerWindow(MainWindow::mainWindow->Window());
 	ShowWindow(addCollectionWindow->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)

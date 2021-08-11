@@ -76,8 +76,16 @@ public:
 	{
 		UnregisterClassA(ClassName(), GetModuleHandleA(NULL));
 	}
-
 	HWND Window() const { return m_hWnd; }
+	void centerWindow(HWND parentWindow)
+	{
+		RECT parentRect, rect;
+		GetWindowRect(parentWindow, &parentRect);
+		GetWindowRect(m_hWnd, &rect);
+		SetWindowPos(m_hWnd, NULL,	parentRect.left + ((parentRect.right - parentRect.left) / 2) - ((rect.right-rect.left) / 2),
+									parentRect.top + ((parentRect.bottom - parentRect.top) / 2) - ((rect.bottom-rect.top) / 2), 
+					0, 0, SWP_NOSIZE | SWP_NOZORDER);
+	}
 
 protected:
 

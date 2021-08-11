@@ -13,8 +13,9 @@ public:
 	virtual LPCSTR collectionName() const = 0;
 	virtual unsigned int getNumber() { return number; }
 	virtual void openCollectionSettingsWindow() = 0;
-
+	
 	bool isEnabled = true;
+	bool isValid = false;
 
 protected:
 	unsigned int number = 0;

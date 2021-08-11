@@ -15,22 +15,18 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
 
 		stUsername = new Static			(Window(), "Username:",			10,		10,		80,		20, SS_RIGHT);
-		edUsername = new Edit			(Window(), "",					100,	10,		150,	20);
+		edUsername = new Edit			(Window(), "",					100,	10,		240,	20);
 		stCollectionID = new Static		(Window(), "Collection ID:",	10,		40,		80,		20, SS_RIGHT);
-		cbCollections = new ComboBox	(Window(), "",					100,	40,		150,	20, 0, 0, nullptr);
+		cbCollections = new ComboBox	(Window(), "",					100,	40,		240,	20);
 
 		stPurity = new Static			(Window(), "Purity:",			10,		70,		80,		20, SS_RIGHT);
-		btnPurSFW = new Button			(Window(), "SFW",				100,	70,		50,		20, BS_AUTOCHECKBOX | BS_PUSHLIKE);
-		btnPurSketchy = new Button		(Window(), "Sketchy",			150,	70,		50,		20, BS_AUTOCHECKBOX | BS_PUSHLIKE);
-		btnPurNSFW = new Button			(Window(), "NSFW",				200,	70,		50,		20, BS_AUTOCHECKBOX | BS_PUSHLIKE);
+		purCom = new PurityComponent	(Window(),						100,	70,		240,	20);
 
 		btnCancel = new Button			(Window(), "Cancel",			10,		100,	80,		20);
-		btnOk = new Button				(Window(), "Ok",				100,	100,	150,	20);
+		btnOk = new Button				(Window(), "Ok",				100,	100,	240,	20);
 
 		edUsername->setTextA(currentUserCollection->settings->username);
-		SendMessageA(btnPurSFW->hWnd, BM_SETCHECK, (WPARAM)(currentUserCollection->settings->categoriesAndPurity & S_PURITY_SFW), NULL);
-		SendMessageA(btnPurSketchy->hWnd, BM_SETCHECK, (WPARAM)(currentUserCollection->settings->categoriesAndPurity & S_PURITY_SKETCHY), NULL);
-		SendMessageA(btnPurNSFW->hWnd, BM_SETCHECK, (WPARAM)(currentUserCollection->settings->categoriesAndPurity & S_PURITY_NSFW), NULL);
+		purCom->setPurity(currentUserCollection->settings->categoriesAndPurity);
 
 		if (edUsername->isEmpty())
 		{
@@ -63,7 +59,8 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		delete stUsername, stCollectionID, stPurity;
 		delete edUsername;
 		delete cbCollections;
-		delete btnOk, btnCancel, btnPurSFW, btnPurSketchy, btnPurNSFW;
+		delete btnOk, btnCancel;
+		delete purCom;
 		DeleteObject(font);
 		DeleteObject(bkBrush);
 		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
@@ -149,12 +146,9 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 			strcpy_s(currentUserCollection->settings->collectionID, cid);
 
 			edUsername->getTextA(currentUserCollection->settings->username, 64);
-			currentUserCollection->settings->categoriesAndPurity =
-				S_PURITY_SFW * SendMessageA(btnPurSFW->hWnd, BM_GETCHECK, NULL, NULL) |
-				S_PURITY_SKETCHY * SendMessageA(btnPurSketchy->hWnd, BM_GETCHECK, NULL, NULL) |
-				S_PURITY_NSFW * SendMessageA(btnPurNSFW->hWnd, BM_GETCHECK, NULL, NULL);
+			currentUserCollection->settings->categoriesAndPurity = purCom->getPurity();
+			currentUserCollection->isValid = true;
 			DestroyWindow(hWnd);
-			CollectionManager::reloadSettings();
 			return 0;
 		}
 		
@@ -208,7 +202,8 @@ void SetUserCollectionWindow::windowThread(UserCollection* collection)
 	}
 	currentUserCollection = collection;
 	setUserCollectionWindow = new SetUserCollectionWindow;
-	setUserCollectionWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 260, 130, NULL, NULL);
+	setUserCollectionWindow->Create("User collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
+	setUserCollectionWindow->centerWindow(MainWindow::mainWindow->Window());
 	ShowWindow(setUserCollectionWindow->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)

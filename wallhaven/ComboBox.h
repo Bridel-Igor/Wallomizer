@@ -5,9 +5,9 @@
 class ComboBox
 {
 public:
-	ComboBox(HWND hParent, LPCSTR text, int x, int y, int width, int height, int nOfItems, int lenOfItems, CHAR *items, int selectedItem = 0, DWORD additionalStyles = 0)
+	ComboBox(HWND hParent, LPCSTR text, int x, int y, int width, int height, int nOfItems = 0, int lenOfItems = 0, CHAR *items = nullptr, int selectedItem = 0, DWORD additionalStyles = 0)
 	{
-		hWnd = CreateWindowA("COMBOBOX", text, CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE, x, y, width, height, hParent, NULL, NULL, NULL);
+		hWnd = CreateWindowA("COMBOBOX", text, CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE | WS_VSCROLL | additionalStyles, x, y, width, height, hParent, NULL, NULL, NULL);
 
 		for (int i = 0; i < nOfItems; i++)
 		{

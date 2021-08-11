@@ -34,19 +34,17 @@ private:
 		LPCSTR ClassName() const { return "CollectionItemsFrameClass"; }
 		LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-		static constexpr int height = 350;
+		static constexpr int height = 400;
 	};
 
 private:
-	Static *stCollections, *stHours, *stMinutes, *stSeconds, *stDelay, *stApiKey, *stUsername;
-	Edit* edApiKey, *edUsername;
-	Button *btnOk, *btnAdd, *btnSetUserData;
-	UpDownEdit *udeHours, *udeMinutes, *udeSeconds;
+	Static *stCollections;
+	Button *btnAdd, *btnSetUserData;
 	HFONT font;
 	HBRUSH bkBrush;
 	
 public:
-	LPCSTR ClassName() const { return "Settings Window Class"; }
+	LPCSTR ClassName() const { return "Main Window Class"; }
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void windowThread();
 

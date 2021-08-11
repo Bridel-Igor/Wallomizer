@@ -110,7 +110,7 @@ void TrayWindow::windowThread()
 	if (trayWindow)
 		return;
 	trayWindow = new TrayWindow;
-	trayWindow->Create("wallhaven", NULL, NULL, 0, 0, 0, 0, NULL, NULL);
+	trayWindow->Create("Wallhaven", NULL, NULL, 0, 0, 0, 0, NULL, NULL);
 	ShowWindow(trayWindow->Window(), SW_HIDE);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)

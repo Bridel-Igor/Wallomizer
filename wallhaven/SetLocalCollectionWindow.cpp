@@ -63,12 +63,12 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 		{
 			if (edPath->isEmpty())
 			{
-				MessageBoxA(nullptr, "Invalid data", "wallhaven", MB_OK);
+				MessageBoxA(nullptr, "Path can't be empty.", "Wallhaven", MB_OK);
 				return 0;
 			}
 			edPath->getTextA(currentLocalCollection->directoryPath, 255);
+			currentLocalCollection->isValid = true;
 			DestroyWindow(hWnd);
-			CollectionManager::reloadSettings();
 			return 0;
 		}
 
@@ -151,7 +151,8 @@ void SetLocalCollectionWindow::windowThread(LocalCollection *collection)
 	}
 	currentLocalCollection = collection;
 	setLocalCollectionWindow = new SetLocalCollectionWindow;
-	setLocalCollectionWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90, NULL, NULL);
+	setLocalCollectionWindow->Create("Local collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90, NULL, NULL);
+	setLocalCollectionWindow->centerWindow(MainWindow::mainWindow->Window());
 	ShowWindow(setLocalCollectionWindow->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)

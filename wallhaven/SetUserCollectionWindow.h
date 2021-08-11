@@ -12,7 +12,8 @@ class SetUserCollectionWindow : public BaseWindow<SetUserCollectionWindow>
 	Static	*stUsername, *stCollectionID, *stPurity;
 	Edit	*edUsername;
 	ComboBox* cbCollections;
-	Button *btnOk, *btnCancel, *btnPurSFW, *btnPurSketchy, *btnPurNSFW;
+	Button* btnOk, * btnCancel;
+	PurityComponent* purCom;
 	HFONT font;
 	HBRUSH bkBrush;
 	static SetUserCollectionWindow *setUserCollectionWindow;
@@ -24,4 +25,7 @@ public:
 	LPCSTR ClassName() const { return "Set User Collection Window Class"; }
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void windowThread(UserCollection *collection);
+
+	static constexpr int width = 350;
+	static constexpr int height = 130;
 };

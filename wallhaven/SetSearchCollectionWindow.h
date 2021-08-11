@@ -10,9 +10,9 @@ class SetSearchCollectionWindow : public BaseWindow<SetSearchCollectionWindow>
 {
 	Static* stCategory, * stPurity, *stTag, *stTagInstruct[8];
 	Edit* edTag;
-	Button* btnCatGeneral, * btnCatAnime, * btnCatPeople,
-		* btnPurSFW, * btnPurSketchy, * btnPurNSFW,
-		* btnOk, * btnCancel;
+	Button* btnOk, * btnCancel;
+	CategoryComponent* catCom;
+	PurityComponent* purCom;
 	HFONT font;
 	HBRUSH bkBrush;
 	static SetSearchCollectionWindow* setSearchCollectionWindow;

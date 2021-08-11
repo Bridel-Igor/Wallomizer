@@ -2,6 +2,7 @@
 #include "Settings.h"
 #include "CollectionManager.h"
 #include "AddCollectionWindow.h"
+#include "SettingsWindow.h"
 
 MainWindow* MainWindow::mainWindow = nullptr;
 MainWindow::CollectionItemsFrame* MainWindow::collectionItemsFrame = nullptr;
@@ -188,26 +189,10 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 	case WM_CREATE:
 	{
-		stUsername = new Static(Window(), "Username:",		10,		10,		60,		20);
-		edUsername = new Edit(Window(), "",					80,		10,		100,	20);
-		stApiKey = new Static(Window(), "Api key:",			190,	10,		60,		20);
-		edApiKey = new Edit(Window(), "",					240,	10,		300,	20);
-		btnSetUserData = new Button(Window(), "Set",		550,	10,		80,		20);
+		stCollections = new Static(Window(), "Collections:",20,		10,		100,	20);
+		btnAdd = new Button(Window(), "Add collection..",	530,	10,		100,	20);
 
-		edUsername->setTextA(Settings::username);
-		edApiKey->setTextA(Settings::apiKey);
-
-		stCollections = new Static(Window(), "Collections:",20,		40,		100,	20);
-		btnAdd = new Button(Window(), "Add..",				580,	40,		50,		20);
-
-		stDelay = new Static(Window(), "Delay:",			10,		450,	50,		20);
-		stHours = new Static(Window(), "Hours",				60,		430,	60,		20, SS_CENTER);
-		stMinutes = new Static(Window(), "Minutes",			130,	430,	60,		20, SS_CENTER);
-		stSeconds = new Static(Window(), "Seconds",			200,	430,	60,		20, SS_CENTER);
-		udeHours = new UpDownEdit(Window(),					60,		450,	60,		20, 0, 999, int((Settings::delay / 1000) / 3600));
-		udeMinutes = new UpDownEdit(Window(),				130,	450,	60,		20, 0, 59,  int((Settings::delay / 1000) / 60) % 60);
-		udeSeconds = new UpDownEdit(Window(),				200,	450,	60,		20, 0, 59,  int (Settings::delay / 1000) % 60);
-		btnOk = new Button(Window(), "Set",					270,	450,	80,		20);
+		btnSetUserData = new Button(Window(), "Settings",	10,		450,	100,	20);
 
 		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)font);
@@ -217,10 +202,8 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_DESTROY:
 	{
-		delete btnOk, btnAdd, btnSetUserData;
-		delete stCollections, stHours, stMinutes, stSeconds, stDelay, stApiKey, stUsername;
-		delete edApiKey, edUsername;
-		delete udeHours, udeMinutes, udeSeconds;
+		delete btnAdd, btnSetUserData;
+		delete stCollections;
 		DeleteObject(font);
 		DeleteObject(bkBrush);
 		PostQuitMessage(0);
@@ -245,12 +228,6 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_COMMAND:
 	{
-		if COMMANDEVENT(btnOk)
-		{
-			Settings::delay = (udeSeconds->getPos() + (udeMinutes->getPos() * 60) + (udeHours->getPos() * 3600)) * 1000;
-			Settings::saveSettings();
-			return 0;
-		}
 		if COMMANDEVENT(btnAdd)
 		{
 			AddCollectionWindow::windowThread();
@@ -258,8 +235,7 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		}
 		if COMMANDEVENT(btnSetUserData)
 		{
-			edUsername->getTextA(Settings::username, 64);
-			edApiKey->getTextA(Settings::apiKey, 128);
+			SettingsWindow::windowThread();
 			Settings::saveSettings();
 			return 0;
 		}
@@ -305,10 +281,13 @@ void MainWindow::windowThread()
 		SetForegroundWindow(mainWindow->Window());
 		return;
 	}
+	while (!CollectionManager::isReady())
+		Sleep(50);
 	mainWindow = new MainWindow;
 	collectionItemsFrame = new CollectionItemsFrame;
-	mainWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
-	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 70, width-20, CollectionItemsFrame::height, mainWindow->Window(), NULL);
+	mainWindow->Create("Wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
+	mainWindow->centerWindow(GetDesktopWindow());
+	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 40, width-20, CollectionItemsFrame::height, mainWindow->Window(), NULL);
 	ShowWindow(mainWindow->Window(), SW_SHOWNORMAL);
 	ShowWindow(collectionItemsFrame->Window(), SW_SHOWNORMAL);
 	MSG msg = { };

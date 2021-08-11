@@ -28,10 +28,12 @@ public:
 	static LPCSTR collectionType() { return "Collection manager. You shouldn't see this"; }
 	static unsigned int getNumber() { return number; }
 	static void openCollectionSettingsWindow() { return; }
+	static bool isReady() { return bIsReady; }
 
 	static std::vector<BaseCollection*> collections;
 
 private:
 	static unsigned int number;
 	static int *previous, indexOfLoaded;
+	static bool bIsReady;
 };

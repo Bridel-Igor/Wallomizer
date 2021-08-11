@@ -14,14 +14,10 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
 
 		stCategory = new Static(Window(), "Category:",	10,		10,		60,		20);
-		btnCatGeneral = new Button(Window(), "General",	80,		10,		50,		20, BS_AUTOCHECKBOX | BS_PUSHLIKE);
-		btnCatAnime = new Button(Window(), "Anime",		130,	10,		50,		20, BS_AUTOCHECKBOX | BS_PUSHLIKE);
-		btnCatPeople = new Button(Window(), "People",	180,	10,		50,		20, BS_AUTOCHECKBOX | BS_PUSHLIKE);
+		catCom = new CategoryComponent(Window(),		80,		10,		150,	20);
 
 		stPurity = new Static(Window(), "Purity:",		240,	10,		60,		20);
-		btnPurSFW = new Button(Window(), "SFW",			310,	10,		50,		20, BS_AUTOCHECKBOX | BS_PUSHLIKE);
-		btnPurSketchy = new Button(Window(), "Sketchy",	360,	10,		50,		20, BS_AUTOCHECKBOX | BS_PUSHLIKE);
-		btnPurNSFW = new Button(Window(), "NSFW",		410,	10,		50,		20, BS_AUTOCHECKBOX | BS_PUSHLIKE);
+		purCom = new PurityComponent(Window(),			310,	10,		150,	20);
 
 		stTag = new Static(Window(), "Tags:",			10,		40,		60,		20);
 		edTag = new Edit(Window(), "",					80,		40,		380,	20);
@@ -39,12 +35,8 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 
 		if (currentSearchCollection)
 		{
-			SendMessageA(btnCatGeneral->hWnd,	BM_SETCHECK, (WPARAM)(currentSearchCollection->settings->categoriesAndPurity & S_CATEGORY_GENERAL), NULL);
-			SendMessageA(btnCatAnime->hWnd,		BM_SETCHECK, (WPARAM)(currentSearchCollection->settings->categoriesAndPurity & S_CATEGORY_ANIME), NULL);
-			SendMessageA(btnCatPeople->hWnd,	BM_SETCHECK, (WPARAM)(currentSearchCollection->settings->categoriesAndPurity & S_CATEGORY_PEOPLE), NULL);
-			SendMessageA(btnPurSFW->hWnd,		BM_SETCHECK, (WPARAM)(currentSearchCollection->settings->categoriesAndPurity & S_PURITY_SFW), NULL);
-			SendMessageA(btnPurSketchy->hWnd,	BM_SETCHECK, (WPARAM)(currentSearchCollection->settings->categoriesAndPurity & S_PURITY_SKETCHY), NULL);
-			SendMessageA(btnPurNSFW->hWnd,		BM_SETCHECK, (WPARAM)(currentSearchCollection->settings->categoriesAndPurity & S_PURITY_NSFW), NULL);
+			catCom->setCategory(currentSearchCollection->settings->categoriesAndPurity);
+			purCom->setPurity(currentSearchCollection->settings->categoriesAndPurity);
 			edTag->setTextA(currentSearchCollection->settings->tag);
 		}
 
@@ -61,9 +53,9 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 			delete stTagInstruct[i];
 		delete stCategory, stPurity, stTag;
 		delete edTag;
-		delete	btnOk, btnCancel,
-				btnCatGeneral, btnCatAnime, btnCatPeople,
-				btnPurSFW, btnPurSketchy, btnPurNSFW;
+		delete	btnOk, btnCancel;
+		delete catCom;
+		delete purCom;
 		DeleteObject(font);
 		DeleteObject(bkBrush);
 		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
@@ -93,16 +85,13 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 		if COMMANDEVENT(btnOk)
 		{
 			currentSearchCollection->settings->categoriesAndPurity = 0;
-			currentSearchCollection->settings->categoriesAndPurity =
-				S_CATEGORY_GENERAL * SendMessageA(btnCatGeneral->hWnd, BM_GETCHECK, NULL, NULL) |
-				S_CATEGORY_ANIME * SendMessageA(btnCatAnime->hWnd, BM_GETCHECK, NULL, NULL) |
-				S_CATEGORY_PEOPLE * SendMessageA(btnCatPeople->hWnd, BM_GETCHECK, NULL, NULL) |
-				S_PURITY_SFW * SendMessageA(btnPurSFW->hWnd, BM_GETCHECK, NULL, NULL) |
-				S_PURITY_SKETCHY * SendMessageA(btnPurSketchy->hWnd, BM_GETCHECK, NULL, NULL) |
-				S_PURITY_NSFW * SendMessageA(btnPurNSFW->hWnd, BM_GETCHECK, NULL, NULL);
+			currentSearchCollection->settings->categoriesAndPurity = catCom->getCategory() | purCom->getPurity();
 			edTag->getTextA(currentSearchCollection->settings->tag, 255);
+			if (currentSearchCollection->isValid == false)
+				currentSearchCollection->isValid = true;
+			else
+				CollectionManager::reloadSettings();
 			DestroyWindow(hWnd);
-			CollectionManager::reloadSettings();
 			return 0;
 		}
 
@@ -154,7 +143,8 @@ void SetSearchCollectionWindow::windowThread(SearchCollection* collection)
 	}
 	currentSearchCollection = collection;
 	setSearchCollectionWindow = new SetSearchCollectionWindow;
-	setSearchCollectionWindow->Create("wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 230, NULL, NULL);
+	setSearchCollectionWindow->Create("Search collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 230, NULL, NULL);
+	setSearchCollectionWindow->centerWindow(MainWindow::mainWindow->Window());
 	ShowWindow(setSearchCollectionWindow->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)

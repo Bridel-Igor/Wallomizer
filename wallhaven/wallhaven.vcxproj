@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AddCollectionWindow.cpp" />
+    <ClCompile Include="CategoriesAndPurity.cpp" />
     <ClCompile Include="CollectionManager.cpp" />
     <ClCompile Include="LocalCollection.cpp" />
     <ClCompile Include="HMenuGenerator.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Internet.cpp" />
+    <ClCompile Include="SettingsWindow.cpp" />
     <ClCompile Include="TrayWindow.cpp" />
     <ClCompile Include="UserCollection.cpp" />
     <ClCompile Include="SetUserCollectionWindow.cpp" />
@@ -172,6 +174,7 @@
     <ClInclude Include="SetSearchCollectionWindow.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="SettingsWindow.h" />
     <ClInclude Include="SetUserCollectionWindow.h" />
     <ClInclude Include="CheckBox.h" />
     <ClInclude Include="Static.h" />
