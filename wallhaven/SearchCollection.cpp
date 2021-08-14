@@ -10,6 +10,7 @@ SearchCollection::SearchCollection()
 	settings = new SearchCollectionSettings;
 	settings->categoriesAndPurity = S_CATEGORY_GENERAL | S_CATEGORY_ANIME | S_CATEGORY_PEOPLE | S_PURITY_SFW;
 	settings->tag[0] = '\0';
+	settings->resolution[0] = '\0';
 }
 
 SearchCollection::~SearchCollection()
@@ -27,6 +28,8 @@ bool SearchCollection::saveSettings(FILE* pFile)
 	fputs("\n", pFile);
 	fputs(settings->tag, pFile);
 	fputs("\n", pFile);
+	fputs(settings->resolution, pFile);
+	fputs("\n", pFile);
 	fputc(settings->categoriesAndPurity, pFile);
 	fputs("\n", pFile);
 	return true;
@@ -42,6 +45,8 @@ bool SearchCollection::loadSettings(FILE* pFile)
 	isEnabled = strcmp(tmpBuffer, "true\n") == 0 ? true : false;
 	fgets(settings->tag, 255, pFile);
 	settings->tag[strlen(settings->tag) - 1] = '\0';
+	fgets(settings->resolution, 255, pFile);
+	settings->resolution[strlen(settings->resolution) - 1] = '\0';
 	fgets(tmpBuffer, 9, pFile);
 	settings->categoriesAndPurity = tmpBuffer[0];
 
@@ -63,6 +68,8 @@ bool SearchCollection::loadSettings(FILE* pFile)
 	strcat_s(searchUrl, settings->categoriesAndPurity & S_PURITY_SFW ? "1" : "0");
 	strcat_s(searchUrl, settings->categoriesAndPurity & S_PURITY_SKETCHY ? "1" : "0");
 	strcat_s(searchUrl, settings->categoriesAndPurity & S_PURITY_NSFW ? "1" : "0");
+
+	strcat_s(searchUrl, settings->resolution);
 
 	if (Settings::isApiKeyUsed)
 	{
@@ -96,7 +103,7 @@ bool SearchCollection::loadWallpaper(unsigned int index)
 	int PageNum = int(index / per_page);
 	index -= PageNum * per_page;
 	PageNum++;
-	char pageUrl[255];
+	char pageUrl[1024];
 	strcpy_s(pageUrl, searchUrl);
 	strcat_s(pageUrl, "&page=");
 	char curPageNum[15] = "";

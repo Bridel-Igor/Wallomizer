@@ -10,6 +10,7 @@ private:
 	{
 		CategoriesAndPurity categoriesAndPurity;
 		char tag[255];
+		char resolution[255];
 	};
 
 public:
@@ -25,6 +26,6 @@ public:
 	SearchCollectionSettings* settings;
 
 private:
-	char searchUrl[255] = "";
+	char searchUrl[1024] = "";
 	int per_page = 24;
 };

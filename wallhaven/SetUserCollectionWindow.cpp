@@ -76,6 +76,14 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 	}
 	return 0;
 
+	case WM_DRAWITEM:
+	{
+		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
+		if (purCom->draw(pDIS))
+			return 0;
+	}
+	return 0;
+
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
@@ -87,6 +95,8 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 
 	case WM_COMMAND:
 	{
+		if (purCom->click(wParam))
+			return 0;
 		if ((HWND)lParam==edUsername->hWnd && HIWORD(wParam) == EN_CHANGE)
 		{
 			SendMessageA(cbCollections->hWnd, CB_RESETCONTENT, NULL, NULL);
@@ -147,7 +157,10 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 
 			edUsername->getTextA(currentUserCollection->settings->username, 64);
 			currentUserCollection->settings->categoriesAndPurity = purCom->getPurity();
-			currentUserCollection->isValid = true;
+			if (currentUserCollection->isValid == false)
+				currentUserCollection->isValid = true;
+			else
+				CollectionManager::reloadSettings();
 			DestroyWindow(hWnd);
 			return 0;
 		}

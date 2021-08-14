@@ -87,6 +87,9 @@
     <ClCompile Include="CategoriesAndPurity.cpp">
       <Filter>Components\Code</Filter>
     </ClCompile>
+    <ClCompile Include="ResPickerWindow.cpp">
+      <Filter>Window classes\Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h">
@@ -162,6 +165,12 @@
       <Filter>Window classes\Headers</Filter>
     </ClInclude>
     <ClInclude Include="CategoriesAndPurity.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="ResPickerWindow.h">
+      <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PushButton.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>

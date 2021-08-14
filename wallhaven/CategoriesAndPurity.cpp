@@ -1,71 +1,134 @@
 #include "CategoriesAndPurity.h"
+#include "HMenuGenerator.h"
 
 PurityComponent::PurityComponent(HWND hParent, int x, int y, int width, int height)
 {
-	hmSFW = HMenuGenerator::getNewHMenu();
-	hmSketchy = HMenuGenerator::getNewHMenu();
-	hmNSFW = HMenuGenerator::getNewHMenu();
-
-	hwSFW = CreateWindowExA(NULL, TEXT("Button"), "SFW", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE, x, y, width / 3, height, hParent, hmSFW, NULL, NULL);
-	hwSketchy = CreateWindowExA(NULL, TEXT("Button"), "Sketchy", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE, x + width / 3, y, width / 3, height, hParent, hmSketchy, NULL, NULL);
-	hwNSFW = CreateWindowExA(NULL, TEXT("Button"), "NSFW", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE, x + (2 * width / 3), y, width / 3, height, hParent, hmNSFW, NULL, NULL);
+	pbSFW = new PushButton(hParent, "SFW", x, y, width / 3 -1, height, 0, 0, RGB(85,150,85), RGB(55,88,55));
+	pbSketchy = new PushButton(hParent, "Sketchy", x + width / 3, y, width / 3, height, 0, 0, RGB(150,150,85), RGB(88,88,55));
+	pbNSFW = new PushButton(hParent, "NSFW", 1+x + (2 * width / 3), y, width / 3-1, height, 0, 0, RGB(150,85,85), RGB(88,55,55));
 }
 
 PurityComponent::~PurityComponent()
 {
-	DestroyWindow(hwSFW);
-	DestroyWindow(hwSketchy);
-	DestroyWindow(hwNSFW);
-	HMenuGenerator::releaseHMenu(hmSFW);
-	HMenuGenerator::releaseHMenu(hmSketchy);
-	HMenuGenerator::releaseHMenu(hmNSFW);
+	delete pbSFW, pbSketchy, pbNSFW;
 }
 
 void PurityComponent::setPurity(CategoriesAndPurity cap)
 {
-	SendMessageA(hwSFW, BM_SETCHECK, (WPARAM)(cap & S_PURITY_SFW), NULL);
-	SendMessageA(hwSketchy, BM_SETCHECK, (WPARAM)(cap & S_PURITY_SKETCHY), NULL);
-	SendMessageA(hwNSFW, BM_SETCHECK, (WPARAM)(cap & S_PURITY_NSFW), NULL);
+	pbSFW->check(cap & S_PURITY_SFW);
+	pbSketchy->check(cap & S_PURITY_SKETCHY);
+	pbNSFW->check(cap & S_PURITY_NSFW);
 }
 
 CategoriesAndPurity PurityComponent::getPurity()
 {
-	return	S_PURITY_SFW * SendMessageA(hwSFW, BM_GETCHECK, NULL, NULL) |
-		S_PURITY_SKETCHY * SendMessageA(hwSketchy, BM_GETCHECK, NULL, NULL) |
-		S_PURITY_NSFW * SendMessageA(hwNSFW, BM_GETCHECK, NULL, NULL);
+	return S_PURITY_SFW * pbSFW->isChecked() |
+		S_PURITY_SKETCHY * pbSketchy->isChecked() |
+		S_PURITY_NSFW * pbNSFW->isChecked();
+}
+
+bool PurityComponent::draw(LPDRAWITEMSTRUCT &pDIS)
+{
+	if (pDIS->hwndItem == pbSFW->hWnd)
+	{
+		pbSFW->draw(pDIS);
+		return true;
+	}
+	if (pDIS->hwndItem == pbSketchy->hWnd)
+	{
+		pbSketchy->draw(pDIS);
+		return true;
+	}
+	if (pDIS->hwndItem == pbNSFW->hWnd)
+	{
+		pbNSFW->draw(pDIS);
+		return true;
+	}
+	return false;
+}
+
+bool PurityComponent::click(WPARAM &wParam)
+{
+	if (COMMANDEVENT(pbSFW))
+	{
+		pbSFW->check(!pbSFW->isChecked());
+		return true;
+	}
+	if (COMMANDEVENT(pbSketchy))
+	{
+		pbSketchy->check(!pbSketchy->isChecked());
+		return true;
+	}
+	if (COMMANDEVENT(pbNSFW))
+	{
+		pbNSFW->check(!pbNSFW->isChecked());
+		return true;
+	}
+	return false;
 }
 
 CategoryComponent::CategoryComponent(HWND hParent, int x, int y, int width, int height)
 {
-	hmGeneral = HMenuGenerator::getNewHMenu();
-	hmAnime = HMenuGenerator::getNewHMenu();
-	hmPeople = HMenuGenerator::getNewHMenu();
-
-	hwGeneral = CreateWindowExA(NULL, TEXT("Button"), "General", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE, x, y, width / 3, height, hParent, hmGeneral, NULL, NULL);
-	hwAnime = CreateWindowExA(NULL, TEXT("Button"), "Anime", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE, x + width / 3, y, width / 3, height, hParent, hmAnime, NULL, NULL);
-	hwPeople = CreateWindowExA(NULL, TEXT("Button"), "People", WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE, x + (2 * width / 3), y, width / 3, height, hParent, hmPeople, NULL, NULL);
+	pbGeneral = new PushButton(hParent, "General", x, y, width / 3 - 1, height);
+	pbAnime = new PushButton(hParent, "Anime", x + width / 3, y, width / 3, height);
+	pbPeople = new PushButton(hParent, "People", 1+x + (2 * width / 3), y, width / 3-1, height);
 }
 
 CategoryComponent::~CategoryComponent()
 {
-	DestroyWindow(hwGeneral);
-	DestroyWindow(hwAnime);
-	DestroyWindow(hwPeople);
-	HMenuGenerator::releaseHMenu(hmGeneral);
-	HMenuGenerator::releaseHMenu(hmAnime);
-	HMenuGenerator::releaseHMenu(hmPeople);
+	delete pbGeneral, pbAnime, pbPeople;
 }
 
 void CategoryComponent::setCategory(CategoriesAndPurity cap)
 {
-	SendMessageA(hwGeneral, BM_SETCHECK, (WPARAM)(cap & S_CATEGORY_GENERAL), NULL);
-	SendMessageA(hwAnime, BM_SETCHECK, (WPARAM)(cap & S_CATEGORY_ANIME), NULL);
-	SendMessageA(hwPeople, BM_SETCHECK, (WPARAM)(cap & S_CATEGORY_PEOPLE), NULL);
+	pbGeneral->check(cap & S_CATEGORY_GENERAL);
+	pbAnime->check(cap & S_CATEGORY_ANIME);
+	pbPeople->check(cap & S_CATEGORY_PEOPLE);
 }
 
 CategoriesAndPurity CategoryComponent::getCategory()
 {
-	return	S_CATEGORY_GENERAL * SendMessageA(hwGeneral, BM_GETCHECK, NULL, NULL) |
-		S_CATEGORY_ANIME * SendMessageA(hwAnime, BM_GETCHECK, NULL, NULL) |
-		S_CATEGORY_PEOPLE * SendMessageA(hwPeople, BM_GETCHECK, NULL, NULL);
+	return S_CATEGORY_GENERAL * pbGeneral->isChecked() |
+		S_CATEGORY_ANIME * pbAnime->isChecked() |
+		S_CATEGORY_PEOPLE * pbPeople->isChecked();
+}
+
+bool CategoryComponent::draw(LPDRAWITEMSTRUCT& pDIS)
+{
+	if (pDIS->hwndItem == pbGeneral->hWnd)
+	{
+		pbGeneral->draw(pDIS);
+		return true;
+	}
+	if (pDIS->hwndItem == pbAnime->hWnd)
+	{
+		pbAnime->draw(pDIS);
+		return true;
+	}
+	if (pDIS->hwndItem == pbPeople->hWnd)
+	{
+		pbPeople->draw(pDIS);
+		return true;
+	}
+	return false;
+}
+
+bool CategoryComponent::click(WPARAM& wParam)
+{
+	if (COMMANDEVENT(pbGeneral))
+	{
+		pbGeneral->check(!pbGeneral->isChecked());
+		return true;
+	}
+	if (COMMANDEVENT(pbAnime))
+	{
+		pbAnime->check(!pbAnime->isChecked());
+		return true;
+	}
+	if (COMMANDEVENT(pbPeople))
+	{
+		pbPeople->check(!pbPeople->isChecked());
+		return true;
+	}
+	return false;
 }

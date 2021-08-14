@@ -144,6 +144,7 @@
     <ClCompile Include="CollectionManager.cpp" />
     <ClCompile Include="LocalCollection.cpp" />
     <ClCompile Include="HMenuGenerator.cpp" />
+    <ClCompile Include="ResPickerWindow.cpp" />
     <ClCompile Include="SearchCollection.cpp" />
     <ClCompile Include="SetLocalCollectionWindow.cpp" />
     <ClCompile Include="SetSearchCollectionWindow.cpp" />
@@ -168,7 +169,9 @@
     <ClInclude Include="Edit.h" />
     <ClInclude Include="HMenuGenerator.h" />
     <ClInclude Include="Internet.h" />
+    <ClInclude Include="PushButton.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ResPickerWindow.h" />
     <ClInclude Include="SearchCollection.h" />
     <ClInclude Include="SetLocalCollectionWindow.h" />
     <ClInclude Include="SetSearchCollectionWindow.h" />

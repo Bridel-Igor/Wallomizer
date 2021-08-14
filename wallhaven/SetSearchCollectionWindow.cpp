@@ -1,6 +1,7 @@
 #include "SetSearchCollectionWindow.h"
 #include "CollectionManager.h"
 #include "MainWindow.h"
+#include "ResPickerWindow.h"
 
 SetSearchCollectionWindow* SetSearchCollectionWindow::setSearchCollectionWindow = nullptr;
 SearchCollection* SetSearchCollectionWindow::currentSearchCollection = nullptr;
@@ -14,10 +15,10 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
 
 		stCategory = new Static(Window(), "Category:",	10,		10,		60,		20);
-		catCom = new CategoryComponent(Window(),		80,		10,		150,	20);
+		catCom = new CategoryComponent(Window(),		80,		10,		159,	20);
 
-		stPurity = new Static(Window(), "Purity:",		240,	10,		60,		20);
-		purCom = new PurityComponent(Window(),			310,	10,		150,	20);
+		stPurity = new Static(Window(), "Purity:",		254,	10,		40,		20);
+		purCom = new PurityComponent(Window(),			301,	10,		159,	20);
 
 		stTag = new Static(Window(), "Tags:",			10,		40,		60,		20);
 		edTag = new Edit(Window(), "",					80,		40,		380,	20);
@@ -30,14 +31,18 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 		stTagInstruct[6] = new Static(Window(), "type : {png / jpg} - Search for file type(jpg = jpeg)",	80,		160,	380,	15);
 		stTagInstruct[7] = new Static(Window(), "like : wallpaper ID - Find wallpapers with similar tags",	80,		175,	380,	15);
 
-		btnCancel = new Button(Window(), "Cancel",		80,		200,	185,	20);
-		btnOk = new Button(Window(), "Ok",				275,	200,	185,	20);
+		stRes = new Static(Window(), "Resolution:",		10,		200,	60,		20);
+		btnRes = new Button(Window(), "Pick resolution",80,		200,	380,	20);
+
+		btnCancel = new Button(Window(), "Cancel",		80,		230,	185,	20);
+		btnOk = new Button(Window(), "Ok",				275,	230,	185,	20);
 
 		if (currentSearchCollection)
 		{
 			catCom->setCategory(currentSearchCollection->settings->categoriesAndPurity);
 			purCom->setPurity(currentSearchCollection->settings->categoriesAndPurity);
 			edTag->setTextA(currentSearchCollection->settings->tag);
+			strcpy_s(tmpRes, currentSearchCollection->settings->resolution);
 		}
 
 		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
@@ -51,9 +56,9 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 		currentSearchCollection = nullptr;
 		for (int i = 0; i < 8; i++)
 			delete stTagInstruct[i];
-		delete stCategory, stPurity, stTag;
+		delete stCategory, stPurity, stTag, stRes;
 		delete edTag;
-		delete	btnOk, btnCancel;
+		delete btnOk, btnCancel, btnRes;
 		delete catCom;
 		delete purCom;
 		DeleteObject(font);
@@ -71,6 +76,16 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 	}
 	return 0;
 
+	case WM_DRAWITEM:
+	{
+		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
+		if (purCom->draw(pDIS))
+			return 0;
+		if (catCom->draw(pDIS))
+			return 0;
+	}
+	return 0;
+
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
@@ -82,11 +97,21 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 
 	case WM_COMMAND:
 	{
+		if (purCom->click(wParam))
+			return 0;
+		if (catCom->click(wParam))
+			return 0;
+		if COMMANDEVENT(btnRes)
+		{
+			ResPickerWindow::windowThread(tmpRes, Window());
+			return 0;
+		}
 		if COMMANDEVENT(btnOk)
 		{
 			currentSearchCollection->settings->categoriesAndPurity = 0;
 			currentSearchCollection->settings->categoriesAndPurity = catCom->getCategory() | purCom->getPurity();
 			edTag->getTextA(currentSearchCollection->settings->tag, 255);
+			strcpy_s(currentSearchCollection->settings->resolution, tmpRes);
 			if (currentSearchCollection->isValid == false)
 				currentSearchCollection->isValid = true;
 			else
@@ -94,7 +119,6 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 			DestroyWindow(hWnd);
 			return 0;
 		}
-
 		if COMMANDEVENT(btnCancel)
 		{
 			DestroyWindow(hWnd);
@@ -143,7 +167,7 @@ void SetSearchCollectionWindow::windowThread(SearchCollection* collection)
 	}
 	currentSearchCollection = collection;
 	setSearchCollectionWindow = new SetSearchCollectionWindow;
-	setSearchCollectionWindow->Create("Search collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 230, NULL, NULL);
+	setSearchCollectionWindow->Create("Search collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 260, NULL, NULL);
 	setSearchCollectionWindow->centerWindow(MainWindow::mainWindow->Window());
 	ShowWindow(setSearchCollectionWindow->Window(), SW_SHOWNORMAL);
 	MSG msg = { };

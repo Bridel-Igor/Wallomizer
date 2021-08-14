@@ -67,7 +67,10 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 				return 0;
 			}
 			edPath->getTextA(currentLocalCollection->directoryPath, 255);
-			currentLocalCollection->isValid = true;
+			if (currentLocalCollection->isValid == false)
+				currentLocalCollection->isValid = true;
+			else
+				CollectionManager::reloadSettings();
 			DestroyWindow(hWnd);
 			return 0;
 		}

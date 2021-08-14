@@ -2,7 +2,7 @@
 
 #include <Windows.h>
 
-#include "HMenuGenerator.h"
+#include "PushButton.h"
 
 typedef char CategoriesAndPurity;
 
@@ -19,11 +19,12 @@ public:
 	PurityComponent(HWND hParent, int x, int y, int width, int height);
 	~PurityComponent();
 	void setPurity(CategoriesAndPurity cap);
-	CategoriesAndPurity getPurity();
+	CategoriesAndPurity getPurity();	
+	bool draw(LPDRAWITEMSTRUCT &pDIS);
+	bool click(WPARAM &wParam);
 
 private:
-	HWND hwSFW, hwSketchy, hwNSFW;
-	HMENU hmSFW, hmSketchy, hmNSFW;
+	PushButton *pbSFW, *pbSketchy, *pbNSFW;
 };
 
 class CategoryComponent
@@ -33,8 +34,9 @@ public:
 	~CategoryComponent();
 	void setCategory(CategoriesAndPurity cap);
 	CategoriesAndPurity getCategory();
+	bool draw(LPDRAWITEMSTRUCT& pDIS);
+	bool click(WPARAM& wParam);
 
 private:
-	HWND hwGeneral, hwAnime, hwPeople;
-	HMENU hmGeneral, hmAnime, hmPeople;
+	PushButton* pbGeneral, * pbAnime, * pbPeople;
 };
