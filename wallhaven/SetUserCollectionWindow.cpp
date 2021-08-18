@@ -80,7 +80,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 	{
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
 		if (purCom->draw(pDIS))
-			return 0;
+			return TRUE;
 	}
 	return 0;
 
@@ -128,7 +128,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 				validCollection = false;
 				return 0;
 			}
-			for (int i=0;i<list.size(); i++)
+			for (size_t i=0;i<list.size(); i++)
 				SendMessageA(cbCollections->hWnd, CB_ADDSTRING, NULL, (LPARAM)list[i].label);
 
 			int index = 0;

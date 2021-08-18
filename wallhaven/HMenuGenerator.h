@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <vector>
 
-#define COMMANDEVENT(a) (a != nullptr && (HMENU)wParam == a->hMenu)
+#define COMMANDEVENT(a) (a != nullptr && (HMENU)LOWORD(wParam) == a->hMenu)
 
 namespace HMenuGenerator
 {

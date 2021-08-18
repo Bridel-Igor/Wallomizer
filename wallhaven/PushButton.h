@@ -7,7 +7,7 @@
 class PushButton
 {
 	bool checked = false;
-	COLORREF checked1=RGB(130, 130, 130), checked2=RGB(80, 80, 80);
+	COLORREF checked1, checked2;
 
 public:
 	PushButton(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0, DWORD additionalExStyles = 0, COLORREF color1= RGB(130, 130, 130), COLORREF color2= RGB(80, 80, 80))
@@ -34,12 +34,13 @@ public:
 	{
 		return checked;
 	}
-	void draw(LPDRAWITEMSTRUCT pDIS)
+	void draw(LPDRAWITEMSTRUCT &pDIS)
 	{
 		RECT temp;
 		HBRUSH color;
 		int r1 = 70, g1 = 70, b1 = 70;
 		int r2 = 40, g2 = 40, b2 = 40;
+
 		if (checked)
 		{
 			r1 = GetRValue(checked1), g1 = GetGValue(checked1), b1 = GetBValue(checked1);

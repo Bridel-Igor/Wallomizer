@@ -80,9 +80,9 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 	{
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
 		if (purCom->draw(pDIS))
-			return 0;
+			return TRUE;
 		if (catCom->draw(pDIS))
-			return 0;
+			return TRUE;
 	}
 	return 0;
 

@@ -92,10 +92,11 @@ bool LocalCollection::loadWallpaper(unsigned int index)
 
 LPCSTR LocalCollection::collectionName() const
 {
-	char name[255] = {0};
+	char* name;
+	name = new char[255]{ 0 };
 
-	strcat_s(name, " Local: ");
-	strcat_s(name, directoryPath);
+	strcat_s(name, 255, " Local: ");
+	strcat_s(name, 255, directoryPath);
 
 	return name;
 }

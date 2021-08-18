@@ -1,6 +1,7 @@
+#include <string>
+
 #include "ResPickerWindow.h"
 #include "MainWindow.h"
-#include <string>
 
 ResPickerWindow* ResPickerWindow::resPickerWindow = nullptr;
 char* ResPickerWindow::res = nullptr;
@@ -120,12 +121,21 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	{
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
 		if (pDIS->hwndItem == btnAtLeast->hWnd)
+		{
 			btnAtLeast->draw(pDIS);
+			return TRUE;
+		}
 		if (pDIS->hwndItem == btnExactly->hWnd)
+		{
 			btnExactly->draw(pDIS);
+			return TRUE;
+		}
 		for (int i = 0; i < 23; i++)
 			if (pDIS->hwndItem == btnRes[i]->hWnd)
+			{
 				btnRes[i]->draw(pDIS);
+				return TRUE;
+			}
 	}
 	return 0;
 
@@ -263,7 +273,6 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 	case WM_CTLCOLORSTATIC:
 	{
-		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, RGB(129, 193, 193));
 		SetBkMode(hdcStatic, TRANSPARENT);

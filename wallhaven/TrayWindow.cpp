@@ -7,6 +7,9 @@
 #define WM_NOTIFYICONMSG (WM_USER + 2)
 
 TrayWindow *TrayWindow::trayWindow = nullptr;
+#ifdef DEMO
+bool stopDemo = false;
+#endif
 
 BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCSTR pszTip)
 {
@@ -91,6 +94,9 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			break;
 		}
 		case ID_WALLHAVEN_EXIT:
+#ifdef DEMO
+			stopDemo = true;
+#endif
 			TrayMessage(hWnd, NIM_DELETE, 1, hStatusIcon, "wallhaven");
 			DestroyMenu(hMenu);
 			DestroyWindow(hWnd);
@@ -105,6 +111,23 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	return TRUE;
 }
 
+#ifdef DEMO
+void demoLimitation()
+{
+	int slept=0;
+	while (slept < 600000)
+	{
+		if (stopDemo)
+			return;
+		Sleep(1000);
+		slept += 1000;
+	}
+	SendMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_PAUSE, 0);
+	SendMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_EXIT, 0);
+	MessageBoxA(nullptr, "In demo version you can't run application for longer than 10 minutes.", "wallhaven - demo", MB_OK);
+}
+#endif
+
 void TrayWindow::windowThread()
 {
 	if (trayWindow)
@@ -112,15 +135,22 @@ void TrayWindow::windowThread()
 	trayWindow = new TrayWindow;
 	trayWindow->Create("Wallhaven", NULL, NULL, 0, 0, 0, 0, NULL, NULL);
 	ShowWindow(trayWindow->Window(), SW_HIDE);
+#ifdef DEMO
+	std::thread demoThread(demoLimitation);
+#endif
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+#ifdef DEMO
+	demoThread.join();
+#endif
 	trayWindow->Destroy();
 	delete trayWindow;
 	Settings::exiting = true;
 	Settings::abortDelay();
 	trayWindow = nullptr;
+	
 }

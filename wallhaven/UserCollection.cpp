@@ -180,16 +180,17 @@ std::vector<UserCollection::UserCollectionInfo> UserCollection::loadCollectionLi
 
 LPCSTR UserCollection::collectionName() const
 {
-	char name[255] = { 0 };
+	char* name;
+	name = new char[255] {0};
 
-	strcat_s(name, " ");
-	strcat_s(name, settings->username);
-	strcat_s(name, ": ");
-	strcat_s(name, settings->collectionName);
-	strcat_s(name, " | ");
-	strcat_s(name, settings->categoriesAndPurity & S_PURITY_SFW ? "SFW " : "");
-	strcat_s(name, settings->categoriesAndPurity & S_PURITY_SKETCHY ? "Sketchy " : "");
-	strcat_s(name, settings->categoriesAndPurity & S_PURITY_NSFW ? "NSFW " : "");
+	strcat_s(name, 255, " ");
+	strcat_s(name, 255, settings->username);
+	strcat_s(name, 255, ": ");
+	strcat_s(name, 255, settings->collectionName);
+	strcat_s(name, 255, " | ");
+	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_SFW ? "SFW " : "");
+	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_SKETCHY ? "Sketchy " : "");
+	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_NSFW ? "NSFW " : "");
 
 	return name;
 }

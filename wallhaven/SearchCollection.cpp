@@ -71,7 +71,7 @@ bool SearchCollection::loadSettings(FILE* pFile)
 
 	strcat_s(searchUrl, settings->resolution);
 
-	if (Settings::isApiKeyUsed)
+	if (Settings::isApiKeyUsed())
 	{
 		strcat_s(searchUrl, "&apikey=");
 		strcat_s(searchUrl, Settings::getApiKey());
@@ -139,25 +139,26 @@ bool SearchCollection::loadWallpaper(unsigned int index)
 
 LPCSTR SearchCollection::collectionName() const
 {
-	char name[255] = {0};
+	char* name;
+	name = new char[255]{ 0 };
 
-	strcat_s(name, " Search: ");
+	strcat_s(name, 255, " Search: ");
 
 	if (strlen(settings->tag))
 	{
-		strcat_s(name, settings->tag);
-		strcat_s(name, " | ");
+		strcat_s(name, 255, settings->tag);
+		strcat_s(name, 255, " | ");
 	}
 
-	strcat_s(name, settings->categoriesAndPurity & S_CATEGORY_GENERAL ? "General " : "");
-	strcat_s(name, settings->categoriesAndPurity & S_CATEGORY_ANIME ? "Anime " : "");
-	strcat_s(name, settings->categoriesAndPurity & S_CATEGORY_PEOPLE ? "People " : "");
+	strcat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_GENERAL ? "General " : "");
+	strcat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_ANIME ? "Anime " : "");
+	strcat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_PEOPLE ? "People " : "");
 	
-	strcat_s(name, "| ");
+	strcat_s(name, 255, "| ");
 
-	strcat_s(name, settings->categoriesAndPurity & S_PURITY_SFW ? "SFW " : "");
-	strcat_s(name, settings->categoriesAndPurity & S_PURITY_SKETCHY ? "Sketchy " : "");
-	strcat_s(name, settings->categoriesAndPurity & S_PURITY_NSFW ? "NSFW " : "");
+	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_SFW ? "SFW " : "");
+	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_SKETCHY ? "Sketchy " : "");
+	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_NSFW ? "NSFW " : "");
 
 	return name;
 }

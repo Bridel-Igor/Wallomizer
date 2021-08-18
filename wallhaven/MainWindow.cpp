@@ -180,6 +180,7 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
+	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////MainWindow
@@ -230,6 +231,13 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		if COMMANDEVENT(btnAdd)
 		{
+#ifdef DEMO
+			if (CollectionManager::collections.size() >= 3)
+			{
+				MessageBoxA(nullptr, "In demo version you can't add more than 3 collections.", "wallhaven - demo", MB_OK);
+				return 0;
+			}
+#endif
 			AddCollectionWindow::windowThread();
 			return 0;
 		}
@@ -285,7 +293,14 @@ void MainWindow::windowThread()
 		Sleep(50);
 	mainWindow = new MainWindow;
 	collectionItemsFrame = new CollectionItemsFrame;
-	mainWindow->Create("Wallhaven", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
+	mainWindow->Create(
+#ifdef DEMO 
+		"Wallhaven - demo"
+#endif, 
+#ifndef DEMO
+	"Wallhaven"
+#endif
+		, WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
 	mainWindow->centerWindow(GetDesktopWindow());
 	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 40, width-20, CollectionItemsFrame::height, mainWindow->Window(), NULL);
 	ShowWindow(mainWindow->Window(), SW_SHOWNORMAL);
