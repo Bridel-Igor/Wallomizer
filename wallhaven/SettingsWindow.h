@@ -14,8 +14,6 @@ private:
 	UpDownEdit* udeHours, * udeMinutes, * udeSeconds;
 	Button* btnOk, * btnCancel;// , * btnRes;
 	char tmpRes[255];
-	HFONT font;
-	HBRUSH bkBrush;
 
 public:
 	LPCSTR ClassName() const { return "Settings Window Class"; }

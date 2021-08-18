@@ -6,6 +6,8 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #include <Windows.h>
 
+#include "WindowStyles.h"
+
 template <class DERIVED_TYPE>
 class BaseWindow
 {
@@ -28,6 +30,37 @@ public:
 		}
 		if (pThis)
 		{
+			if (strcmp(pThis->ClassName(), "CollectionItemsFrameClass"))
+			{
+				switch (uMsg)
+				{
+				case WM_CTLCOLORSTATIC:
+				{
+					HWND hWndStatic = (HWND)lParam;
+					HDC hdcStatic = (HDC)wParam;
+					SetTextColor(hdcStatic, WindowStyles::mainFontColor);
+					SetBkMode(hdcStatic, TRANSPARENT);
+					return (LRESULT)WindowStyles::mainBkBrush;
+				}
+				return 0;
+
+				case WM_CTLCOLOREDIT:
+				{
+					HDC hdc = (HDC)wParam;
+					SetTextColor(hdc, RGB(0, 0, 0));
+					SetBkColor(hdc, RGB(200, 200, 200));
+					SetDCBrushColor(hdc, RGB(200, 200, 200));
+					return (LRESULT)GetStockObject(DC_BRUSH);
+				}
+				return 0;
+
+				case WM_CTLCOLORBTN:
+				{
+					return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
+				}
+				return 0;
+				}
+			}
 			return pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
 		}
 		else

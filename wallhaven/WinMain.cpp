@@ -4,6 +4,7 @@
 #include "TrayWindow.h"
 #include "CollectionManager.h"
 #include "Settings.h"
+#include "WindowStyles.h"
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
@@ -19,6 +20,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	thr.detach();
 	Settings::loadSettings();
 	CollectionManager::loadSettings();
+	WindowStyles::initialize();
 
 	unsigned int waitedForTrayWindow = 0;
 	while (TrayWindow::trayWindow == nullptr)
@@ -44,6 +46,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		CollectionManager::setLoadedWallpaper();
 	}
 
+	WindowStyles::clear();
 	CollectionManager::clear();
 	if (hMutex)
 	{

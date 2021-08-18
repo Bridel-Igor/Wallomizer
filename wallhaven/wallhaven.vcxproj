@@ -156,6 +156,7 @@
     <ClCompile Include="TrayWindow.cpp" />
     <ClCompile Include="UserCollection.cpp" />
     <ClCompile Include="SetUserCollectionWindow.cpp" />
+    <ClCompile Include="WindowStyles.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -187,6 +188,7 @@
     <ClInclude Include="UpDownEdit.h" />
     <ClInclude Include="UserCollection.h" />
     <ClInclude Include="BaseWindow.h" />
+    <ClInclude Include="WindowStyles.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="wallhaven.rc" />

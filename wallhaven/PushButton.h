@@ -8,6 +8,8 @@ class PushButton
 {
 	bool checked = false;
 	COLORREF checked1, checked2;
+	RECT temp;
+	HBRUSH color;
 
 public:
 	PushButton(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0, DWORD additionalExStyles = 0, COLORREF color1= RGB(130, 130, 130), COLORREF color2= RGB(80, 80, 80))
@@ -36,8 +38,6 @@ public:
 	}
 	void draw(LPDRAWITEMSTRUCT &pDIS)
 	{
-		RECT temp;
-		HBRUSH color;
 		int r1 = 70, g1 = 70, b1 = 70;
 		int r2 = 40, g2 = 40, b2 = 40;
 
@@ -60,13 +60,15 @@ public:
 
 			color = CreateSolidBrush(RGB(r, g, b));
 			FillRect(pDIS->hDC, &temp, color);
+			DeleteObject(color);
 		}
 
 		SetTextColor(pDIS->hDC, checked? RGB(255, 255, 255) : RGB(200, 200, 200));
 		SetBkMode(pDIS->hDC, TRANSPARENT);
 		SetTextAlign(pDIS->hDC, TA_CENTER);
-		char staticText[32];
-		int len = SendMessage(pDIS->hwndItem, WM_GETTEXT, ARRAYSIZE(staticText), (LPARAM)staticText);
+		char staticText[10];
+		staticText[9] = '\0';
+		int len = SendMessageA(pDIS->hwndItem, WM_GETTEXT, 9, (LPARAM)staticText);
 		TextOutA(pDIS->hDC, (pDIS->rcItem.right - pDIS->rcItem.left) / 2, pDIS->rcItem.left + 3, staticText, len);
 	}
 

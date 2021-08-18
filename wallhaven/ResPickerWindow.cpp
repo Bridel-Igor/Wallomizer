@@ -90,9 +90,7 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			edHeight->setTextA(custom.c_str());
 		}
 
-		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
-		EnumChildWindows(Window(), SetChildFont, (LPARAM)font);
-		bkBrush = CreateSolidBrush(RGB(26, 26, 26));
+		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	}
 	return 0;
 
@@ -104,8 +102,6 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		delete btnOk, btnCancel;
 		delete stUltrawide, st169, st1610, st43, st54, stCustom, stX;
 		delete edWidth, edHeight;
-		DeleteObject(font);
-		DeleteObject(bkBrush);
 		PostQuitMessage(0);
 	}
 	return 0;
@@ -143,7 +139,7 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, bkBrush);
+		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
 		EndPaint(m_hWnd, &ps);
 	}
 	return 0;
@@ -268,21 +264,6 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			DestroyWindow(Window());
 			return 0;
 		}
-	}
-	return 0;
-
-	case WM_CTLCOLORSTATIC:
-	{
-		HDC hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, RGB(129, 193, 193));
-		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)bkBrush;
-	}
-	return 0;
-
-	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 	}
 	return 0;
 

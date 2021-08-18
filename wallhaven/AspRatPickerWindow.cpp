@@ -51,9 +51,7 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 				btnAR[i]->check(true);
 		}
 
-		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
-		EnumChildWindows(Window(), SetChildFont, (LPARAM)font);
-		bkBrush = CreateSolidBrush(RGB(26, 26, 26));
+		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	}
 	return 0;
 
@@ -64,8 +62,6 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 		delete btnAllWide, btnAllPortrait;
 		delete btnOk, btnCancel;
 		delete stUltrawide, stWide, stPortrait, stSquare;
-		DeleteObject(font);
-		DeleteObject(bkBrush);
 		PostQuitMessage(0);
 	}
 	return 0;
@@ -103,7 +99,7 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, bkBrush);
+		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
 		EndPaint(m_hWnd, &ps);
 	}
 	return 0;
@@ -128,7 +124,7 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			}
 		if COMMANDEVENT(btnOk)
 		{
-			strcpy_s(aspRat, 255, "");
+			strcpy_s(aspRat, 128, "");
 			bool empty = true;
 			if (btnAllWide->isChecked() || btnAllPortrait->isChecked())
 				empty = false;
@@ -144,18 +140,18 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 				DestroyWindow(Window());
 				return 0;
 			}
-			strcpy_s(aspRat, 255, "&ratios=");
+			strcpy_s(aspRat, 128, "&ratios=");
 			if (btnAllWide->isChecked())
-				strcat_s(aspRat, 255, "landscape");
+				strcat_s(aspRat, 128, "landscape");
 			if (btnAllPortrait->isChecked())
-				strcat_s(aspRat, 255, ",portrait");
+				strcat_s(aspRat, 128, ",portrait");
 			for (int i = 0; i < 12; i++)
 				if (btnAR[i]->isChecked())
 				{
-					strcat_s(aspRat, 255, ",");
+					strcat_s(aspRat, 128, ",");
 					char buf[16] = { 0 };
 					GetWindowTextA(btnAR[i]->hWnd, buf, 15);
-					strcat_s(aspRat, 255, buf);
+					strcat_s(aspRat, 128, buf);
 				}
 			DestroyWindow(Window());
 			return 0;
@@ -165,21 +161,6 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			DestroyWindow(Window());
 			return 0;
 		}
-	}
-	return 0;
-
-	case WM_CTLCOLORSTATIC:
-	{
-		HDC hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, RGB(129, 193, 193));
-		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)bkBrush;
-	}
-	return 0;
-
-	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 	}
 	return 0;
 

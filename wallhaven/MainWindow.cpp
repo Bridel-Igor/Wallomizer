@@ -21,7 +21,7 @@ void MainWindow::CollectionItemsFrame::updateCollectionItems()
 
 	for (size_t i = collectionItems.size(); i < CollectionManager::collections.size(); i++) // creation
 		if (CollectionManager::collections[i]!=nullptr)
-			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->Window(), 0, (i * 20), MainWindow::width-20-18, 20, CollectionManager::collections[i], font));
+			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->Window(), 0, (i * 20), MainWindow::width-20-18, 20, CollectionManager::collections[i], WindowStyles::mainFont));
 	
 	updateScroll();
 	for (auto p : collectionItems) // placing according to the scrollbar
@@ -63,8 +63,6 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 		yMinScroll = 0;
 		yCurrentScroll = 0;
 		yMaxScroll = 0;
-		bkBrush = CreateSolidBrush(RGB(15, 15, 15));
-		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
 		updateCollectionItems();
 	}
 	return 0;
@@ -72,15 +70,13 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 	case WM_DESTROY:
 	{
 		destroyCollectionItems();
-		DeleteObject(font);
-		DeleteObject(bkBrush);
 	}
 	return 0;
 
 	case WM_PAINT:
 	{
 		hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, bkBrush);
+		FillRect(hdc, &ps.rcPaint, WindowStyles::collFrameBkBrush);
 		EndPaint(m_hWnd, &ps);
 	}
 	return 0;
@@ -171,9 +167,9 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 	{
 		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, CollectionItem::fontColor);
-		SetBkColor(hdcStatic, CollectionItem::bkColor);
-		return (LRESULT)CreateSolidBrush(CollectionItem::bkColor);
+		SetTextColor(hdcStatic, WindowStyles::collItemFontColor);
+		SetBkColor(hdcStatic, WindowStyles::collItemBkColor);
+		return (LRESULT)WindowStyles::collItemBkBrush;
 	}
 	return 0;
 
@@ -195,9 +191,7 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 		btnSetUserData = new Button(Window(), "Settings",	10,		450,	100,	20);
 
-		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
-		EnumChildWindows(Window(), SetChildFont, (LPARAM)font);
-		bkBrush = CreateSolidBrush(RGB(26, 26, 26));
+		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	}
 	return 0;
 
@@ -205,8 +199,6 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		delete btnAdd, btnSetUserData;
 		delete stCollections;
-		DeleteObject(font);
-		DeleteObject(bkBrush);
 		PostQuitMessage(0);
 	}
 	return 0;
@@ -222,7 +214,7 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, bkBrush);
+		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
 		EndPaint(m_hWnd, &ps);
 	}
 	return 0;
@@ -254,19 +246,9 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, RGB(129, 193, 193));
+		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
 		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)bkBrush;
-	}
-	return 0;
-
-	case WM_CTLCOLOREDIT:
-	{
-		HDC hdc = (HDC)wParam;
-		SetTextColor(hdc, RGB(0, 0, 0));
-		SetBkColor(hdc, RGB(200, 200, 200));
-		SetDCBrushColor(hdc, RGB(200, 200, 200));
-		return (LRESULT)GetStockObject(DC_BRUSH);
+		return (LRESULT)WindowStyles::mainBkBrush;
 	}
 	return 0;
 

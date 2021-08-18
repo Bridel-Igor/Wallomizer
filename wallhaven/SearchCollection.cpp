@@ -50,7 +50,7 @@ bool SearchCollection::loadSettings(FILE* pFile)
 	settings->tag[strlen(settings->tag) - 1] = '\0';
 	fgets(settings->resolution, 255, pFile);
 	settings->resolution[strlen(settings->resolution) - 1] = '\0';
-	fgets(settings->ratio, 255, pFile);
+	fgets(settings->ratio, 128, pFile);
 	settings->ratio[strlen(settings->ratio) - 1] = '\0';
 	fgets(tmpBuffer, 9, pFile);
 	settings->categoriesAndPurity = tmpBuffer[0];

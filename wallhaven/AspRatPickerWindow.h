@@ -13,8 +13,6 @@ class AspRatPickerWindow : public BaseWindow<AspRatPickerWindow>
 	Button* btnOk, * btnCancel;
 	static AspRatPickerWindow* aspRatPickerWindow;
 	static char* aspRat;
-	HFONT font;
-	HBRUSH bkBrush;
 
 public:
 	LPCSTR ClassName() const { return "Aspect ratio Picker Window Class"; }

@@ -47,9 +47,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 			validCollection = true;
 		}
 
-		font = CreateFont(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
-		EnumChildWindows(Window(), SetChildFont, (LPARAM)font);
-		bkBrush = CreateSolidBrush(RGB(26, 26, 26));
+		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	}
 	return 0;
 
@@ -61,8 +59,6 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		delete cbCollections;
 		delete btnOk, btnCancel;
 		delete purCom;
-		DeleteObject(font);
-		DeleteObject(bkBrush);
 		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
 		SetForegroundWindow(MainWindow::mainWindow->Window());
 		PostQuitMessage(0);
@@ -88,7 +84,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, bkBrush);
+		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
 		EndPaint(m_hWnd, &ps);
 	}
 	return 0;
@@ -170,31 +166,6 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 			DestroyWindow(hWnd);
 			return 0;
 		}
-	}
-	return 0;
-
-	case WM_CTLCOLORSTATIC:
-	{
-		HDC hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, RGB(129, 193, 193));
-		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)bkBrush;
-	}
-	return 0;
-
-	case WM_CTLCOLOREDIT:
-	{
-		HDC hdc = (HDC)wParam;
-		SetTextColor(hdc, RGB(0, 0, 0));
-		SetBkColor(hdc, RGB(200, 200, 200));
-		SetDCBrushColor(hdc, RGB(200, 200, 200));
-		return (LRESULT)GetStockObject(DC_BRUSH);
-	}
-	return 0;
-
-	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 	}
 	return 0;
 

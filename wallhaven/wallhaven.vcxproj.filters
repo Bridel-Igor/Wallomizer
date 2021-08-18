@@ -93,6 +93,9 @@
     <ClCompile Include="AspRatPickerWindow.cpp">
       <Filter>Window classes\Code</Filter>
     </ClCompile>
+    <ClCompile Include="WindowStyles.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h">
@@ -137,9 +140,6 @@
     <ClInclude Include="BaseWindow.h">
       <Filter>Window classes\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Window classes\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="SetUserCollectionWindow.h">
       <Filter>Window classes\Headers</Filter>
     </ClInclude>
@@ -178,6 +178,12 @@
     </ClInclude>
     <ClInclude Include="AspRatPickerWindow.h">
       <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowStyles.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -11,8 +11,6 @@ class SetLocalCollectionWindow : public BaseWindow<SetLocalCollectionWindow>
 	Static *stPath;
 	Button *btnOk, *btnCancel, *btnPath;
 	Edit *edPath;
-	HFONT font;
-	HBRUSH bkBrush;
 	static SetLocalCollectionWindow* setLocalCollectionWindow;
 	static LocalCollection *currentLocalCollection;
 

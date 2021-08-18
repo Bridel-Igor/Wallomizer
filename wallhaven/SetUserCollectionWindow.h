@@ -14,8 +14,6 @@ class SetUserCollectionWindow : public BaseWindow<SetUserCollectionWindow>
 	ComboBox* cbCollections;
 	Button* btnOk, * btnCancel;
 	PurityComponent* purCom;
-	HFONT font;
-	HBRUSH bkBrush;
 	static SetUserCollectionWindow *setUserCollectionWindow;
 	static UserCollection* currentUserCollection;
 	std::vector<UserCollection::UserCollectionInfo> list;

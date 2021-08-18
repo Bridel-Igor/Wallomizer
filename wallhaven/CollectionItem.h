@@ -61,6 +61,4 @@ public:
 	CheckBox* chboEnabled;
 	Static* stName, * stNumber;
 	Button *btnSettings, *btnDelete;
-	static const COLORREF fontColor = RGB(200, 200, 200);
-	static const COLORREF bkColor = RGB(36, 36, 36);
 };

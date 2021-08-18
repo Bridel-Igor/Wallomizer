@@ -14,8 +14,6 @@ class ResPickerWindow : public BaseWindow<ResPickerWindow>
 	Edit* edWidth, * edHeight;
 	static ResPickerWindow* resPickerWindow;
 	static char* res;
-	HFONT font;
-	HBRUSH bkBrush;
 
 public:
 	LPCSTR ClassName() const { return "Resolution Picker Window Class"; }

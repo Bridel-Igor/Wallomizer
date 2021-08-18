@@ -19,8 +19,6 @@ private:
 		void updateScroll();
 
 		std::vector<CollectionItem*> collectionItems;
-		HFONT font;
-		HBRUSH bkBrush;
 
 		HDC hdc;
 		PAINTSTRUCT ps;
@@ -40,8 +38,6 @@ private:
 private:
 	Static *stCollections;
 	Button *btnAdd, *btnSetUserData;
-	HFONT font;
-	HBRUSH bkBrush;
 	
 public:
 	LPCSTR ClassName() const { return "Main Window Class"; }

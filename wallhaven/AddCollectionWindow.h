@@ -7,8 +7,6 @@ class AddCollectionWindow : public BaseWindow<AddCollectionWindow>
 {
 	Button *btnAddUserCollection, *btnAddLocalCollection, *btnAddSearchCollection, *btnCancel;
 	static AddCollectionWindow* addCollectionWindow;
-	HFONT font;
-	HBRUSH bkBrush;
 
 public:
 	LPCSTR ClassName() const { return "Add Collection Window Class"; }

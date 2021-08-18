@@ -13,8 +13,6 @@ class SetSearchCollectionWindow : public BaseWindow<SetSearchCollectionWindow>
 	Button* btnOk, * btnCancel, *btnRes, *btnAR;
 	CategoryComponent* catCom;
 	PurityComponent* purCom;
-	HFONT font;
-	HBRUSH bkBrush;
 	char tmpRes[255], tmpAR[255];
 	static SetSearchCollectionWindow* setSearchCollectionWindow;
 	static SearchCollection* currentSearchCollection;
