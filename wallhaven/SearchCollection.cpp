@@ -11,6 +11,7 @@ SearchCollection::SearchCollection()
 	settings->categoriesAndPurity = S_CATEGORY_GENERAL | S_CATEGORY_ANIME | S_CATEGORY_PEOPLE | S_PURITY_SFW;
 	settings->tag[0] = '\0';
 	settings->resolution[0] = '\0';
+	settings->ratio[0] = '\0';
 }
 
 SearchCollection::~SearchCollection()
@@ -30,6 +31,8 @@ bool SearchCollection::saveSettings(FILE* pFile)
 	fputs("\n", pFile);
 	fputs(settings->resolution, pFile);
 	fputs("\n", pFile);
+	fputs(settings->ratio, pFile);
+	fputs("\n", pFile);
 	fputc(settings->categoriesAndPurity, pFile);
 	fputs("\n", pFile);
 	return true;
@@ -47,6 +50,8 @@ bool SearchCollection::loadSettings(FILE* pFile)
 	settings->tag[strlen(settings->tag) - 1] = '\0';
 	fgets(settings->resolution, 255, pFile);
 	settings->resolution[strlen(settings->resolution) - 1] = '\0';
+	fgets(settings->ratio, 255, pFile);
+	settings->ratio[strlen(settings->ratio) - 1] = '\0';
 	fgets(tmpBuffer, 9, pFile);
 	settings->categoriesAndPurity = tmpBuffer[0];
 
@@ -70,6 +75,8 @@ bool SearchCollection::loadSettings(FILE* pFile)
 	strcat_s(searchUrl, settings->categoriesAndPurity & S_PURITY_NSFW ? "1" : "0");
 
 	strcat_s(searchUrl, settings->resolution);
+
+	strcat_s(searchUrl, settings->ratio);
 
 	if (Settings::isApiKeyUsed())
 	{

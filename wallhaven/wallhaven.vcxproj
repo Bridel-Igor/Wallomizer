@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AddCollectionWindow.cpp" />
+    <ClCompile Include="AspRatPickerWindow.cpp" />
     <ClCompile Include="CategoriesAndPurity.cpp" />
     <ClCompile Include="CollectionManager.cpp" />
     <ClCompile Include="LocalCollection.cpp" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddCollectionWindow.h" />
+    <ClInclude Include="AspRatPickerWindow.h" />
     <ClInclude Include="BaseCollection.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="CategoriesAndPurity.h" />

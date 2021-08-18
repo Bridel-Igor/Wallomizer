@@ -11,6 +11,7 @@ private:
 		CategoriesAndPurity categoriesAndPurity;
 		char tag[255];
 		char resolution[255];
+		char ratio[255];
 	};
 
 public:

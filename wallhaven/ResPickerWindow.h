@@ -5,7 +5,6 @@
 #include "PushButton.h"
 #include "Static.h"
 #include "Edit.h"
-#include "SearchCollection.h"
 
 class ResPickerWindow : public BaseWindow<ResPickerWindow>
 {

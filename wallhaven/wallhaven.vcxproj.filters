@@ -90,6 +90,9 @@
     <ClCompile Include="ResPickerWindow.cpp">
       <Filter>Window classes\Code</Filter>
     </ClCompile>
+    <ClCompile Include="AspRatPickerWindow.cpp">
+      <Filter>Window classes\Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h">
@@ -172,6 +175,9 @@
     </ClInclude>
     <ClInclude Include="PushButton.h">
       <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="AspRatPickerWindow.h">
+      <Filter>Window classes\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
