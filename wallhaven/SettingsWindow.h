@@ -9,10 +9,10 @@
 class SettingsWindow : public BaseWindow<SettingsWindow>
 {
 private:
-	Static* stHours, * stMinutes, * stSeconds, * stDelay, * stApiKey, * stUsername;// , * stRes;
+	Static* stHours, * stMinutes, * stSeconds, * stDelay, * stApiKey, * stUsername;
 	Edit* edApiKey, * edUsername;
 	UpDownEdit* udeHours, * udeMinutes, * udeSeconds;
-	Button* btnOk, * btnCancel;// , * btnRes;
+	Button* btnOk, * btnCancel;
 	char tmpRes[255];
 
 public:

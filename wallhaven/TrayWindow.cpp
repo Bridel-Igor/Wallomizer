@@ -54,7 +54,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{		
 		pszIDStatusIcon = MAKEINTRESOURCE(IDI_ICON1);
 		hStatusIcon = LoadIcon(GetModuleHandleA(NULL), pszIDStatusIcon);
-		TrayMessage(hWnd, NIM_ADD, 1, hStatusIcon, "wallhaven");
+		TrayMessage(hWnd, NIM_ADD, 1, hStatusIcon, "Wallhaven");
 		hMenu = LoadMenu(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDR_MENU1));
 	}
 	return 0;
@@ -97,7 +97,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 #ifdef DEMO
 			stopDemo = true;
 #endif
-			TrayMessage(hWnd, NIM_DELETE, 1, hStatusIcon, "wallhaven");
+			TrayMessage(hWnd, NIM_DELETE, 1, hStatusIcon, "Wallhaven");
 			DestroyMenu(hMenu);
 			DestroyWindow(hWnd);
 			break;
@@ -124,7 +124,7 @@ void demoLimitation()
 	}
 	SendMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_PAUSE, 0);
 	SendMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_EXIT, 0);
-	MessageBoxA(nullptr, "In demo version you can't run application for longer than 10 minutes.", "wallhaven - demo", MB_OK);
+	MessageBoxA(nullptr, "In demo version you can't run application for longer than 10 minutes.", "Wallhaven - demo", MB_OK | MB_ICONEXCLAMATION);
 }
 #endif
 
@@ -152,5 +152,4 @@ void TrayWindow::windowThread()
 	Settings::exiting = true;
 	Settings::abortDelay();
 	trayWindow = nullptr;
-	
 }

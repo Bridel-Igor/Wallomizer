@@ -59,7 +59,7 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 		{
 			if (edPath->isEmpty())
 			{
-				MessageBoxA(nullptr, "Path can't be empty.", "Wallhaven", MB_OK);
+				MessageBoxA(nullptr, "Path can't be empty.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
 			edPath->getTextA(currentLocalCollection->directoryPath, 255);

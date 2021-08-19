@@ -142,10 +142,13 @@
     <ClCompile Include="AddCollectionWindow.cpp" />
     <ClCompile Include="AspRatPickerWindow.cpp" />
     <ClCompile Include="CategoriesAndPurity.cpp" />
+    <ClCompile Include="CollectionItem.cpp" />
     <ClCompile Include="CollectionManager.cpp" />
+    <ClCompile Include="ColorButton.cpp" />
     <ClCompile Include="ColorPickerWindow.cpp" />
     <ClCompile Include="LocalCollection.cpp" />
     <ClCompile Include="HMenuGenerator.cpp" />
+    <ClCompile Include="PushButton.cpp" />
     <ClCompile Include="ResPickerWindow.cpp" />
     <ClCompile Include="SearchCollection.cpp" />
     <ClCompile Include="SetLocalCollectionWindow.cpp" />
@@ -195,9 +198,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="wallhaven.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

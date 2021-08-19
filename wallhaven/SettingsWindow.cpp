@@ -27,9 +27,6 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		stApiKey = new Static(Window(), "Api key:",		10,		90,		80,		20, SS_RIGHT);
 		edApiKey = new Edit(Window(), "",				100,	90,		240,	20, ES_PASSWORD);
 
-		//stRes = new Static(Window(), "Resolution:",		10,		120,	80,		20, SS_RIGHT);
-		//btnRes = new Button(Window(), "Pick default resolution",100,120,240,	20);
-
 		btnCancel = new Button(Window(), "Cancel",		10,		120,	80,		20);
 		btnOk = new Button(Window(), "Ok",				100,	120,	240,	20);
 
@@ -42,8 +39,8 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 	case WM_DESTROY:
 	{
-		delete btnOk, btnCancel;// , btnRes;
-		delete stHours, stMinutes, stSeconds, stDelay, stApiKey, stUsername;// , stRes;
+		delete btnOk, btnCancel;
+		delete stHours, stMinutes, stSeconds, stDelay, stApiKey, stUsername;
 		delete edApiKey, edUsername;
 		delete udeHours, udeMinutes, udeSeconds;
 
@@ -69,7 +66,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 			if (delay < 5000)
 			{
-				MessageBoxA(nullptr, "Too small delay. Delay must be at least 5 seconds.", "wallhaven", MB_OK);
+				MessageBoxA(nullptr, "Too small delay. Delay must be at least 5 seconds.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
 
@@ -80,11 +77,6 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			DestroyWindow(Window());
 			return 0;
 		}
-		//if COMMANDEVENT(btnRes)
-		//{
-		//	ResPickerWindow::windowThread(tmpRes, Window());
-		//	return 0;
-		//}
 		if COMMANDEVENT(btnCancel)
 		{
 			DestroyWindow(Window());

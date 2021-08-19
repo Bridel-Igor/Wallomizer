@@ -11,7 +11,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     HANDLE hMutex = CreateMutexA(NULL, TRUE, "wallhaven");
     if (GetLastError() == ERROR_ALREADY_EXISTS)
     {
-        MessageBoxA(nullptr, "Program is already launched!", "wallhaven", MB_OK);
+        MessageBoxA(nullptr, "Wallhaven is already launched! You can find it in the system tray.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
         return 0;
     }
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);

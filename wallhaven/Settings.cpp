@@ -32,7 +32,7 @@ void Settings::saveSettings()
 		fclose(pFile);
 		return;
 	}
-	MessageBoxA(nullptr, "Can't save settings.", "wallhaven", MB_OK);
+	MessageBoxA(nullptr, "Can't save settings.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
 }
 
 void Settings::loadSettings()
@@ -52,7 +52,7 @@ void Settings::loadSettings()
 		fclose(pFile);
 		return;
 	}
-	MessageBoxA(nullptr, "Can't load settings.", "wallhaven", MB_OK);
+	MessageBoxA(nullptr, "Can't load settings.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
 }
 
 void Settings::Delay()

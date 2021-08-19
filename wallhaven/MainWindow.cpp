@@ -226,7 +226,7 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 #ifdef DEMO
 			if (CollectionManager::collections.size() >= 3)
 			{
-				MessageBoxA(nullptr, "In demo version you can't add more than 3 collections.", "wallhaven - demo", MB_OK);
+				MessageBoxA(nullptr, "In demo version you can't add more than 3 collections.", "Wallhaven - demo", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
 #endif

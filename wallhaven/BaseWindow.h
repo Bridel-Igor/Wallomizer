@@ -7,6 +7,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include <Windows.h>
 
 #include "WindowStyles.h"
+#include "resource.h"
 
 template <class DERIVED_TYPE>
 class BaseWindow
@@ -88,6 +89,7 @@ public:
 		wc.lpfnWndProc = DERIVED_TYPE::WindowProc;
 		wc.hInstance = GetModuleHandleA(NULL);
 		wc.lpszClassName = ClassName();
+		wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
 
 		RegisterClass(&wc);
 		

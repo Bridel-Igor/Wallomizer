@@ -37,6 +37,9 @@
     <Filter Include="Components\Code">
       <UniqueIdentifier>{1a5c683a-3929-44e9-967f-0e5048addcb8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components\Headers">
+      <UniqueIdentifier>{ec6dfe07-7050-4785-910e-304be68985eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -99,6 +102,15 @@
     <ClCompile Include="ColorPickerWindow.cpp">
       <Filter>Window classes\Code</Filter>
     </ClCompile>
+    <ClCompile Include="PushButton.cpp">
+      <Filter>Components\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="CollectionItem.cpp">
+      <Filter>Components\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorButton.cpp">
+      <Filter>Components\Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h">
@@ -120,12 +132,6 @@
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="UpDownEdit.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="CollectionItem.h">
-      <Filter>Components</Filter>
-    </ClInclude>
-    <ClInclude Include="HMenuGenerator.h">
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="BaseCollection.h">
@@ -170,14 +176,8 @@
     <ClInclude Include="SettingsWindow.h">
       <Filter>Window classes\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="CategoriesAndPurity.h">
-      <Filter>Components</Filter>
-    </ClInclude>
     <ClInclude Include="ResPickerWindow.h">
       <Filter>Window classes\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="PushButton.h">
-      <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="AspRatPickerWindow.h">
       <Filter>Window classes\Headers</Filter>
@@ -191,18 +191,25 @@
     <ClInclude Include="ColorPickerWindow.h">
       <Filter>Window classes\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="CategoriesAndPurity.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CollectionItem.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
     <ClInclude Include="ColorButton.h">
-      <Filter>Components</Filter>
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PushButton.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="HMenuGenerator.h">
+      <Filter>Components\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="wallhaven.rc">
       <Filter>Файлы ресурсов</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="icon1.ico">
-      <Filter>Файлы ресурсов</Filter>
-    </Image>
   </ItemGroup>
 </Project>

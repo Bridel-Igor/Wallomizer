@@ -143,7 +143,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		{
 			if (edUsername->isEmpty() || !validCollection)
 			{
-				MessageBoxA(nullptr, "Invalid data", "wallhaven", MB_OK);
+				MessageBoxA(nullptr, "Invalid data", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
 			strcpy_s(currentUserCollection->settings->collectionName, list[cbCollections->getSelectedItem()].label);
