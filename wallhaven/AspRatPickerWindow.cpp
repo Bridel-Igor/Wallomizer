@@ -1,5 +1,3 @@
-#include <string>
-
 #include "AspRatPickerWindow.h"
 #include "MainWindow.h"
 

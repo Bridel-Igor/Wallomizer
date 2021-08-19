@@ -12,6 +12,7 @@ private:
 		char tag[255];
 		char resolution[255];
 		char ratio[128];
+		char color[16];
 	};
 
 public:

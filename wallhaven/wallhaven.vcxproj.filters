@@ -96,6 +96,9 @@
     <ClCompile Include="WindowStyles.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="ColorPickerWindow.cpp">
+      <Filter>Window classes\Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h">
@@ -184,6 +187,12 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorPickerWindow.h">
+      <Filter>Window classes\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorButton.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
