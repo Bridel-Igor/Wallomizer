@@ -78,10 +78,6 @@ bool CollectionManager::loadSettings()
 				tmpCollection->isValid = true;
 				collections.push_back(tmpCollection);
 			}
-#ifdef DEMO
-			if (i >= 2)
-				break;
-#endif
 		}
 		fclose(pFile);
 	}
