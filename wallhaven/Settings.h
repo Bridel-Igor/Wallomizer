@@ -11,6 +11,7 @@ namespace Settings
 	extern std::mutex loadingImage;
 	extern char username[64];
 	extern char apiKey[128];
+	extern bool loadOnStartup;
 
 	void saveSettings();
 	void loadSettings();

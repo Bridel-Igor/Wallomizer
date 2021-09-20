@@ -5,14 +5,16 @@
 #include "Edit.h"
 #include "Button.h"
 #include "UpDownEdit.h"
+#include "CheckBox.h"
 
 class SettingsWindow : public BaseWindow<SettingsWindow>
 {
 private:
-	Static* stHours, * stMinutes, * stSeconds, * stDelay, * stApiKey, * stUsername;
+	Static* stHours, * stMinutes, * stSeconds, * stDelay, * stApiKey, * stUsername, *stStartup;
 	Edit* edApiKey, * edUsername;
 	UpDownEdit* udeHours, * udeMinutes, * udeSeconds;
 	Button* btnOk, * btnCancel;
+	CheckBox* cbStartup;
 	char tmpRes[255];
 
 public:
@@ -21,6 +23,6 @@ public:
 	static void windowThread();
 
 	static constexpr int width = 350;
-	static constexpr int height = 150;
+	static constexpr int height = 180;
 	static SettingsWindow* settingsWindow;
 };

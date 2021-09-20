@@ -1,9 +1,39 @@
+#include <shlobj_core.h>
+
 #include "SettingsWindow.h"
 #include "Settings.h"
 #include "MainWindow.h"
 #include "ResPickerWindow.h"
 
 SettingsWindow* SettingsWindow::settingsWindow = nullptr;
+
+HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR lpszDesc)
+{
+	HRESULT hres;
+	IShellLink* psl;
+
+	if (!SUCCEEDED(CoInitialize(NULL)))
+		return -1;
+	hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
+	if (SUCCEEDED(hres))
+	{
+		IPersistFile* ppf;
+		psl->SetPath(lpszPathObj);
+		psl->SetDescription(lpszDesc);
+		hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
+		if (SUCCEEDED(hres))
+		{
+			WCHAR wsz[MAX_PATH];
+			int ret = MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH);
+			if (ret != 0)
+				hres = ppf->Save(wsz, TRUE);
+			ppf->Release();
+		}
+		psl->Release();
+	}
+	CoUninitialize();
+	return hres;
+}
 
 LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -20,18 +50,22 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		udeHours = new UpDownEdit(Window(),				100,	30,		74,		20, 0, 999, int((Settings::delay / 1000) / 3600));
 		udeMinutes = new UpDownEdit(Window(),			183,	30,		74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60);
 		udeSeconds = new UpDownEdit(Window(),			266,	30,		74,		20, 0, 59, int(Settings::delay / 1000) % 60);
+		
+		stStartup = new Static(Window(), "Load on startup",120,	60,		100,	20);
+		cbStartup = new CheckBox(Window(), "",			100,	60,		20,		20, NULL);
 
-		stUsername = new Static(Window(), "Username:",	10,		60,		80,		20, SS_RIGHT);
-		edUsername = new Edit(Window(), "",				100,	60,		240,	20);
+		stUsername = new Static(Window(), "Username:",	10,		90,		80,		20, SS_RIGHT);
+		edUsername = new Edit(Window(), "",				100,	90,		240,	20);
 
-		stApiKey = new Static(Window(), "Api key:",		10,		90,		80,		20, SS_RIGHT);
-		edApiKey = new Edit(Window(), "",				100,	90,		240,	20, ES_PASSWORD);
+		stApiKey = new Static(Window(), "Api key:",		10,		120,	80,		20, SS_RIGHT);
+		edApiKey = new Edit(Window(), "",				100,	120,	240,	20, ES_PASSWORD);
 
-		btnCancel = new Button(Window(), "Cancel",		10,		120,	80,		20);
-		btnOk = new Button(Window(), "Ok",				100,	120,	240,	20);
+		btnCancel = new Button(Window(), "Cancel",		10,		150,	80,		20);
+		btnOk = new Button(Window(), "Ok",				100,	150,	240,	20);
 
 		edUsername->setTextA(Settings::username);
 		edApiKey->setTextA(Settings::apiKey);
+		cbStartup->setChecked(Settings::loadOnStartup);
 
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	}
@@ -40,9 +74,10 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	case WM_DESTROY:
 	{
 		delete btnOk, btnCancel;
-		delete stHours, stMinutes, stSeconds, stDelay, stApiKey, stUsername;
+		delete stHours, stMinutes, stSeconds, stDelay, stApiKey, stUsername, stStartup;
 		delete edApiKey, edUsername;
 		delete udeHours, udeMinutes, udeSeconds;
+		delete cbStartup;
 
 		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
 		SetForegroundWindow(MainWindow::mainWindow->Window());
@@ -73,6 +108,26 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			Settings::delay = delay;
 			edUsername->getTextA(Settings::username, 64);
 			edApiKey->getTextA(Settings::apiKey, 128);
+
+			char startupPath[260];
+			HRESULT hr = SHGetFolderPathA(NULL, CSIDL_STARTUP, 0, NULL, startupPath); // if target win Vista and later use SHGetKnownFolderPath()
+			strcat_s(startupPath, "\\Wallhaven.lnk");
+			if (SUCCEEDED(hr))
+			{
+				if (cbStartup->isChecked())
+				{
+					char currentPath[260];
+					GetModuleFileNameA(NULL, currentPath, 260);
+					CreateLink(currentPath, startupPath, "");
+					Settings::loadOnStartup = true;
+				}
+				else
+				{
+					remove(startupPath);
+					Settings::loadOnStartup = false;
+				}
+			}
+
 			Settings::saveSettings();
 			DestroyWindow(Window());
 			return 0;

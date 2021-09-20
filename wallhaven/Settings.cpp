@@ -6,6 +6,7 @@ std::mutex Settings::loadingImage;
 bool Settings::exiting = false;
 char Settings::username[64];
 char Settings::apiKey[128];
+bool Settings::loadOnStartup = false;
 
 namespace Settings
 {
@@ -20,6 +21,8 @@ void Settings::saveSettings()
 	fopen_s(&pFile, "Settings/Settings.dat", "w");
 	if (pFile != NULL)
 	{
+		fputs(loadOnStartup ? "true" : "false", pFile);
+		fputs("\n", pFile);
 		char cNumber[10];
 		_itoa_s(delay, cNumber, 10);
 		cNumber[9] = '\0';
@@ -42,6 +45,9 @@ void Settings::loadSettings()
 	if (pFile != NULL)
 	{
 		char buffer[10];
+		fgets(buffer, 10, pFile);
+		buffer[strlen(buffer) - 1] = '\0';
+		loadOnStartup = strcmp(buffer, "true") == 0 ? true : false;
 		fgets(buffer, 10, pFile);
 		buffer[strlen(buffer) - 1] = '\0';
 		delay = atoi(buffer);
