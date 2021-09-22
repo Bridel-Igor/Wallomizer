@@ -74,6 +74,14 @@ END
 // remains consistent on all systems.
 IDI_ICON1               ICON                    "icon32.ico"
 
+IDI_ICON3               ICON                    "Play_enabled.ico"
+
+IDI_ICON4               ICON                    "Pause_enabled.ico"
+
+IDI_ICON5               ICON                    "Next_enabled.ico"
+
+IDI_ICON6               ICON                    "Prev_enabled.ico"
+
 #endif    // Русский (Россия) resources
 /////////////////////////////////////////////////////////////////////////////
 

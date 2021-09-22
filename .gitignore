@@ -341,3 +341,5 @@ healthchecksdb
 *.txt
 *.dat
 *.jpg
+*.png
+*.bmp

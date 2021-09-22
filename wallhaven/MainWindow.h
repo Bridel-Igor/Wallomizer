@@ -37,7 +37,7 @@ private:
 
 private:
 	Static *stCollections;
-	Button *btnAdd, *btnSetUserData;
+	Button *btnAdd, *btnPlay, *btnPause, *btnSettings, *btnDonate, *btnNext, *btnPrev;
 	
 public:
 	LPCSTR ClassName() const { return "Main Window Class"; }

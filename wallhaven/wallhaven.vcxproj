@@ -199,6 +199,16 @@
   <ItemGroup>
     <ResourceCompile Include="wallhaven.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="bitmap1.bmp" />
+    <Image Include="icon3.ico" />
+    <Image Include="icon32.ico" />
+    <Image Include="Next_enabled.ico" />
+    <Image Include="Pause_enabled.ico" />
+    <Image Include="Play_enabled.ico" />
+    <Image Include="Play_enabled.png" />
+    <Image Include="Prev_enabled.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

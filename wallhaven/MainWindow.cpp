@@ -189,15 +189,22 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		stCollections = new Static(Window(), "Collections:",20,		10,		100,	20);
 		btnAdd = new Button(Window(), "Add collection..",	530,	10,		100,	20);
 
-		btnSetUserData = new Button(Window(), "Settings",	10,		450,	100,	20);
+		btnSettings = new Button(Window(), "Settings",		10,		450,	95,		20);
 
+		btnPrev = new Button(Window(), "<",					265,	450,	20,		20, BS_OWNERDRAW);
+		btnPlay = new Button(Window(), "",					295,	450,	20,		20, BS_OWNERDRAW);
+		btnPause = new Button(Window(), "",					325,	450,	20,		20, BS_OWNERDRAW);
+		btnNext = new Button(Window(), ">",					355,	450,	20,		20, BS_OWNERDRAW);
+		
+		btnDonate = new Button(Window(), "Donate",			535,	450,	95,		20);
+		
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	}
 	return 0;
 
 	case WM_DESTROY:
 	{
-		delete btnAdd, btnSetUserData;
+		delete btnAdd, btnSettings, btnPlay, btnPause, btnDonate, btnNext, btnPrev;
 		delete stCollections;
 		PostQuitMessage(0);
 	}
@@ -207,6 +214,44 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		DestroyWindow(hWnd);
 		return 0;
+	}
+	return 0;
+
+	case WM_DRAWITEM:
+	{
+		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
+		if (pDIS->hwndItem == btnPlay->hWnd)
+		{
+			HICON hIcon = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON3), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			DrawIconEx(pDIS->hDC, 0, 0, hIcon, 0, 0, 0, NULL, DI_NORMAL);
+			DestroyIcon(hIcon);
+			return TRUE;
+		}
+		if (pDIS->hwndItem == btnPause->hWnd)
+		{
+			HICON hIcon = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON4), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			DrawIconEx(pDIS->hDC, 0, 0, hIcon, 0, 0, 0, NULL, DI_NORMAL);
+			DestroyIcon(hIcon);
+			return TRUE;
+		}
+		if (pDIS->hwndItem == btnNext->hWnd)
+		{
+			HICON hIcon = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON5), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			DrawIconEx(pDIS->hDC, 0, 0, hIcon, 0, 0, 0, NULL, DI_NORMAL);
+			DestroyIcon(hIcon);
+			return TRUE;
+		}
+		if (pDIS->hwndItem == btnPrev->hWnd)
+		{
+			HICON hIcon = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON6), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			DrawIconEx(pDIS->hDC, 0, 0, hIcon, 0, 0, 0, NULL, DI_NORMAL);
+			DestroyIcon(hIcon);
+			return TRUE;
+		}
 	}
 	return 0;
 
@@ -226,10 +271,37 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			AddCollectionWindow::windowThread();
 			return 0;
 		}
-		if COMMANDEVENT(btnSetUserData)
+		if COMMANDEVENT(btnPrev)
+		{
+			Settings::replayDelay();
+			CollectionManager::setPreviousWallpaper();
+			return 0;
+		}
+		if COMMANDEVENT(btnPlay)
+		{
+			Settings::startSlideshow();
+			return 0;
+		}
+		if COMMANDEVENT(btnPause)
+		{
+			Settings::pauseSlideshow();
+			return 0;
+		}
+		if COMMANDEVENT(btnNext)
+		{
+			Settings::replayDelay();
+			CollectionManager::setNextWallpaper();
+			return 0;
+		}
+		if COMMANDEVENT(btnSettings)
 		{
 			SettingsWindow::windowThread();
 			Settings::saveSettings();
+			return 0;
+		}
+		if COMMANDEVENT(btnDonate)
+		{
+			ShellExecute(0, 0, "https://donatello.to/IgorBridel", 0, 0, SW_SHOW);
 			return 0;
 		}
 	}

@@ -212,4 +212,30 @@
       <Filter>Файлы ресурсов</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="bitmap1.bmp">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="icon32.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="Play_enabled.png">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="icon3.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="Play_enabled.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="Pause_enabled.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="Next_enabled.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="Prev_enabled.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
