@@ -1,5 +1,4 @@
 # wallhaven
 
-Waiting for Donatello respond.
-
+Link for donations:
 https://donatello.to/IgorBridel
