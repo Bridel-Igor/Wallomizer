@@ -1,8 +1,11 @@
+#include <thread>
+
 #include "MainWindow.h"
 #include "Settings.h"
 #include "CollectionManager.h"
 #include "AddCollectionWindow.h"
 #include "SettingsWindow.h"
+#include "TrayWindow.h"
 
 MainWindow* MainWindow::mainWindow = nullptr;
 MainWindow::CollectionItemsFrame* MainWindow::collectionItemsFrame = nullptr;
@@ -191,10 +194,21 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 		btnSettings = new Button(Window(), "Settings",		10,		450,	95,		20);
 
-		btnPrev = new Button(Window(), "<",					265,	450,	20,		20, BS_OWNERDRAW);
-		btnPlay = new Button(Window(), "",					295,	450,	20,		20, BS_OWNERDRAW);
-		btnPause = new Button(Window(), "",					325,	450,	20,		20, BS_OWNERDRAW);
-		btnNext = new Button(Window(), ">",					355,	450,	20,		20, BS_OWNERDRAW);
+		btnPrev = new Button(Window(), "",					250,	450,	20,		20, BS_OWNERDRAW);
+		btnOpenExternal = new Button(Window(), "",			280,	450,	20,		20, BS_OWNERDRAW);
+		btnPlay = new Button(Window(), "",					310,	450,	20,		20, BS_OWNERDRAW);
+		btnPause = new Button(Window(), "",					340,	450,	20,		20, BS_OWNERDRAW);
+		btnNext = new Button(Window(), "",					370,	450,	20,		20, BS_OWNERDRAW);
+		
+
+		hIPlay = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON3), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT); 
+		hIPlayActive = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON7), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIPause = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON4), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIPauseActive = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON8), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIPrevEnabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON6), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT); 
+		hIPrevDisabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON9), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hINextEnabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON5), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIOpenExternal = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON10), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 		
 		btnDonate = new Button(Window(), "Donate",			535,	450,	95,		20);
 		
@@ -204,7 +218,15 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_DESTROY:
 	{
-		delete btnAdd, btnSettings, btnPlay, btnPause, btnDonate, btnNext, btnPrev;
+		DestroyIcon(hIPlay);
+		DestroyIcon(hIPlayActive);
+		DestroyIcon(hIPause);
+		DestroyIcon(hIPauseActive);
+		DestroyIcon(hIPrevEnabled);
+		DestroyIcon(hIPrevDisabled);
+		DestroyIcon(hINextEnabled);
+		DestroyIcon(hIOpenExternal);
+		delete btnAdd, btnSettings, btnPlay, btnPause, btnDonate, btnNext, btnPrev, btnOpenExternal;
 		delete stCollections;
 		PostQuitMessage(0);
 	}
@@ -222,34 +244,32 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
 		if (pDIS->hwndItem == btnPlay->hWnd)
 		{
-			HICON hIcon = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON3), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, hIcon, 0, 0, 0, NULL, DI_NORMAL);
-			DestroyIcon(hIcon);
+			DrawIconEx(pDIS->hDC, 0, 0, Settings::bRunSlideshow?hIPlayActive:hIPlay, 0, 0, 0, NULL, DI_NORMAL);
 			return TRUE;
 		}
 		if (pDIS->hwndItem == btnPause->hWnd)
 		{
-			HICON hIcon = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON4), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, hIcon, 0, 0, 0, NULL, DI_NORMAL);
-			DestroyIcon(hIcon);
+			DrawIconEx(pDIS->hDC, 0, 0, Settings::bRunSlideshow?hIPause:hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
 			return TRUE;
 		}
 		if (pDIS->hwndItem == btnNext->hWnd)
 		{
-			HICON hIcon = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON5), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, hIcon, 0, 0, 0, NULL, DI_NORMAL);
-			DestroyIcon(hIcon);
+			DrawIconEx(pDIS->hDC, 0, 0, hINextEnabled, 0, 0, 0, NULL, DI_NORMAL);
 			return TRUE;
 		}
 		if (pDIS->hwndItem == btnPrev->hWnd)
 		{
-			HICON hIcon = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON6), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, hIcon, 0, 0, 0, NULL, DI_NORMAL);
-			DestroyIcon(hIcon);
+			DrawIconEx(pDIS->hDC, 0, 0, CollectionManager::isPrevious() ? hIPrevEnabled : hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
+			return TRUE;
+		}
+		if (pDIS->hwndItem == btnOpenExternal->hWnd)
+		{
+			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			DrawIconEx(pDIS->hDC, 0, 0, hIOpenExternal, 0, 0, 0, NULL, DI_NORMAL);
 			return TRUE;
 		}
 	}
@@ -271,26 +291,29 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			AddCollectionWindow::windowThread();
 			return 0;
 		}
+		if COMMANDEVENT(btnOpenExternal)
+		{
+			CollectionManager::openWallpaperExternal();
+			return 0;
+		}
 		if COMMANDEVENT(btnPrev)
 		{
-			Settings::replayDelay();
-			CollectionManager::setPreviousWallpaper();
+			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_PREVIOUSWALLPAPER, NULL);
 			return 0;
 		}
 		if COMMANDEVENT(btnPlay)
 		{
-			Settings::startSlideshow();
+			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_START, NULL);
 			return 0;
 		}
 		if COMMANDEVENT(btnPause)
 		{
-			Settings::pauseSlideshow();
+			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_PAUSE, NULL);
 			return 0;
 		}
 		if COMMANDEVENT(btnNext)
 		{
-			Settings::replayDelay();
-			CollectionManager::setNextWallpaper();
+			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_NEXTWALLPAPER, NULL);
 			return 0;
 		}
 		if COMMANDEVENT(btnSettings)

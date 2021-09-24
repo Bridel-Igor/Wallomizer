@@ -37,7 +37,8 @@ private:
 
 private:
 	Static *stCollections;
-	Button *btnAdd, *btnPlay, *btnPause, *btnSettings, *btnDonate, *btnNext, *btnPrev;
+	Button *btnAdd, *btnPlay, *btnPause, *btnSettings, *btnDonate, *btnNext, *btnPrev, *btnOpenExternal;
+	HICON hIPlay, hIPlayActive, hIPause, hIPauseActive, hIPrevEnabled, hIPrevDisabled, hINextEnabled, hIOpenExternal;
 	
 public:
 	LPCSTR ClassName() const { return "Main Window Class"; }

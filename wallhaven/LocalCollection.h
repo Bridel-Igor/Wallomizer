@@ -12,6 +12,7 @@ public:
 	LPCSTR collectionType() const { return "Local collection"; };
 	LPCSTR collectionName() const;
 	void openCollectionSettingsWindow();
+	void openWallpaperExternal(unsigned int index);
 
 	char directoryPath[255];
 };

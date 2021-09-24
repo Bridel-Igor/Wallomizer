@@ -54,10 +54,12 @@ IDR_MENU1 MENU
 BEGIN
     POPUP "wallhaven"
     BEGIN
-        MENUITEM "Start",                       ID_WALLHAVEN_START, GRAYED
+        MENUITEM "Play",                        ID_WALLHAVEN_START, GRAYED
         MENUITEM "Pause",                       ID_WALLHAVEN_PAUSE
         MENUITEM "Next wallpaper",              ID_WALLHAVEN_NEXTWALLPAPER
         MENUITEM "Previous wallpaper",          ID_WALLHAVEN_PREVIOUSWALLPAPER
+        MENUITEM SEPARATOR
+        MENUITEM "Open original image",         ID_WALLHAVEN_OPENWALLPAPER
         MENUITEM "Settings",                    ID_WALLHAVEN_SETTINGS
         MENUITEM SEPARATOR
         MENUITEM "Exit",                        ID_WALLHAVEN_EXIT
@@ -81,6 +83,14 @@ IDI_ICON4               ICON                    "Pause_enabled.ico"
 IDI_ICON5               ICON                    "Next_enabled.ico"
 
 IDI_ICON6               ICON                    "Prev_enabled.ico"
+
+IDI_ICON7               ICON                    "Play_activated.ico"
+
+IDI_ICON8               ICON                    "Pause_activated.ico"
+
+IDI_ICON9               ICON                    "Prev_disabled.ico"
+
+IDI_ICON10              ICON                    "Open_external.ico"
 
 #endif    // Русский (Россия) resources
 /////////////////////////////////////////////////////////////////////////////

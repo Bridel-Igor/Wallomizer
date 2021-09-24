@@ -99,9 +99,9 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		{
 			unsigned long delay = (udeSeconds->getPos() + (udeMinutes->getPos() * 60) + (udeHours->getPos() * 3600)) * 1000;
 
-			if (delay < 5000)
+			if (delay < 10000)
 			{
-				MessageBoxA(nullptr, "Too small delay. Delay must be at least 5 seconds.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
+				MessageBoxA(nullptr, "Too small delay. Delay must be at least 10 seconds.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
 

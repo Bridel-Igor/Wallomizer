@@ -204,9 +204,13 @@
     <Image Include="icon3.ico" />
     <Image Include="icon32.ico" />
     <Image Include="Next_enabled.ico" />
+    <Image Include="Open_external.ico" />
+    <Image Include="Pause_activated.ico" />
     <Image Include="Pause_enabled.ico" />
+    <Image Include="Play_activated.ico" />
     <Image Include="Play_enabled.ico" />
     <Image Include="Play_enabled.png" />
+    <Image Include="Prev_disabled.ico" />
     <Image Include="Prev_enabled.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

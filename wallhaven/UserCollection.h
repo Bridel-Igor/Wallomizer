@@ -32,7 +32,8 @@ public:
 	static std::vector<UserCollectionInfo> loadCollectionList(char* username, char* apiKey);
 	LPCSTR collectionType() const { return "User collection"; }
 	LPCSTR collectionName() const;
-	void openCollectionSettingsWindow();
+	void openCollectionSettingsWindow(); 
+	void openWallpaperExternal(unsigned int index);
 
 	UserCollectionSettings* settings;
 	

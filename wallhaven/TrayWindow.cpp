@@ -39,6 +39,8 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			EnableMenuItem(hPopup, 3, MF_BYPOSITION | MF_ENABLED);
 		else
 			EnableMenuItem(hPopup, 3, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
+		EnableMenuItem(hPopup, 0, Settings::bRunSlideshow ? MF_BYPOSITION | MF_DISABLED | MF_GRAYED : MF_BYPOSITION | MF_ENABLED);
+		EnableMenuItem(hPopup, 1, Settings::bRunSlideshow ? MF_BYPOSITION | MF_ENABLED : MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
 		SetForegroundWindow(hWnd);
 		POINT pt;
 		GetCursorPos(&pt);
@@ -67,14 +69,14 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		switch (wParam)
 		{
 		case ID_WALLHAVEN_START:
-			EnableMenuItem(hPopup, 0, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
-			EnableMenuItem(hPopup, 1, MF_BYPOSITION | MF_ENABLED);
 			Settings::startSlideshow();
+			if (MainWindow::mainWindow)
+				InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
 			break;
 		case ID_WALLHAVEN_PAUSE:
-			EnableMenuItem(hPopup, 0, MF_BYPOSITION | MF_ENABLED);
-			EnableMenuItem(hPopup, 1, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
 			Settings::pauseSlideshow();
+			if (MainWindow::mainWindow)
+				InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
 			break;
 		case ID_WALLHAVEN_NEXTWALLPAPER:
 			Settings::replayDelay();
@@ -88,6 +90,11 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		{
 			std::thread thr(MainWindow::windowThread);
 			thr.detach();
+			break;
+		}
+		case ID_WALLHAVEN_OPENWALLPAPER:
+		{
+			CollectionManager::openWallpaperExternal();
 			break;
 		}
 		case ID_WALLHAVEN_EXIT:

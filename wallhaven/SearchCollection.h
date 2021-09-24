@@ -24,6 +24,7 @@ public:
 	LPCSTR collectionType() const { return "Search collection"; }
 	LPCSTR collectionName() const;
 	void openCollectionSettingsWindow();
+	void openWallpaperExternal(unsigned int index);
 
 	SearchCollectionSettings* settings;
 

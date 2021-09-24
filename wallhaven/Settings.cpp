@@ -7,12 +7,12 @@ bool Settings::exiting = false;
 char Settings::username[64];
 char Settings::apiKey[128];
 bool Settings::loadOnStartup = false;
+bool Settings::bRunSlideshow = true;
 
 namespace Settings
 {
 	bool bAbortDelay = false;
 	bool bReplayDelay = false;
-	bool bRunSlideshow = true;
 }
 
 void Settings::saveSettings()

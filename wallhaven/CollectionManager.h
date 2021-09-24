@@ -28,6 +28,7 @@ public:
 	static LPCSTR collectionType() { return "Collection manager. You shouldn't see this"; }
 	static unsigned int getNumber() { return number; }
 	static void openCollectionSettingsWindow() { return; }
+	static void openWallpaperExternal();
 	static bool isReady() { return bIsReady; }
 
 	static std::vector<BaseCollection*> collections;

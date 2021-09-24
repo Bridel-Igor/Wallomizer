@@ -237,5 +237,17 @@
     <Image Include="Prev_enabled.ico">
       <Filter>Файлы ресурсов</Filter>
     </Image>
+    <Image Include="Play_activated.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="Pause_activated.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="Prev_disabled.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="Open_external.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
   </ItemGroup>
 </Project>

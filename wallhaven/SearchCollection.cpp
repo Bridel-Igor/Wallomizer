@@ -179,3 +179,41 @@ void SearchCollection::openCollectionSettingsWindow()
 {
 	SetSearchCollectionWindow::windowThread(this);
 }
+
+void SearchCollection::openWallpaperExternal(unsigned int index)
+{
+	int PageNum = int(index / per_page);
+	index -= PageNum * per_page;
+	PageNum++;
+	char pageUrl[1024];
+	strcpy_s(pageUrl, searchUrl);
+	strcat_s(pageUrl, "&page=");
+	char curPageNum[15] = "";
+	_itoa_s(PageNum, curPageNum, 10);
+	strcat_s(pageUrl, curPageNum);
+
+	char* pBuffer = Internet::buffer;
+	Internet::bufferAccess.lock();
+
+	if (!Internet::URLDownloadToBuffer(pageUrl))
+	{
+		Internet::bufferAccess.unlock();
+		return;
+	}
+
+	for (unsigned int i = 0; i < index; i++)
+		if ((pBuffer = Internet::parse(pBuffer, "\"url\":", nullptr)) == nullptr)
+		{
+			Internet::bufferAccess.unlock();
+			return;
+		}
+	char imgUrl[255] = "";
+	if (Internet::parse(pBuffer, "\"url\":", imgUrl) == nullptr)
+	{
+		Internet::bufferAccess.unlock();
+		return;
+	}
+
+	Internet::bufferAccess.unlock();
+	ShellExecute(0, 0, imgUrl, 0, 0, SW_SHOW);
+}

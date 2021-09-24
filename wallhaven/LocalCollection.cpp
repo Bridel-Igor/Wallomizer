@@ -2,6 +2,7 @@
 
 #include <experimental/filesystem>
 #include <string>
+#include <shlobj_core.h>
 
 #include "LocalCollection.h"
 #include "SetLocalCollectionWindow.h"
@@ -104,4 +105,33 @@ LPCSTR LocalCollection::collectionName() const
 void LocalCollection::openCollectionSettingsWindow()
 {
 	SetLocalCollectionWindow::windowThread(this);
+}
+
+void LocalCollection::openWallpaperExternal(unsigned int index)
+{
+	if (directoryPath == "" || number <= 0)
+		return;
+	unsigned int i = 0;
+	std::experimental::filesystem::path p1{ directoryPath };
+	for (auto& p : std::experimental::filesystem::directory_iterator(p1))
+		if (isImage(p))
+		{
+			if (i == index)
+			{
+				wchar_t imgPath[255];
+				wcscpy_s(imgPath, 255, p.path().generic_wstring().c_str());
+				imgPath[wcslen(imgPath)] = '\0';
+				for (int j = 0; j < wcslen(imgPath); j++)
+					if (imgPath[j] == '/')
+						imgPath[j] = '\\';
+
+				ITEMIDLIST* pidl = ILCreateFromPathW(imgPath);
+				if (pidl) {
+					SHOpenFolderAndSelectItems(pidl, 0, 0, 0);
+					ILFree(pidl);
+					return;
+				}
+			}
+			i++;
+		}
 }

@@ -12,6 +12,7 @@ namespace Settings
 	extern char username[64];
 	extern char apiKey[128];
 	extern bool loadOnStartup;
+	extern bool bRunSlideshow;
 
 	void saveSettings();
 	void loadSettings();

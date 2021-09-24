@@ -207,12 +207,15 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	GetCurrentDirectoryA(255, imgPath);
 	strcat_s(imgPath, "\\Resources\\Current wallpaper.jpg");
 	SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, imgPath, SPIF_UPDATEINIFILE);
+	if (MainWindow::mainWindow && !setPrevious)
+		InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
 	Settings::loadingImage.unlock();
 }
 
 void CollectionManager::setNextWallpaper()
 {
 	setLoadedWallpaper();
+	
 	loadNextWallpaper();
 }
 
@@ -226,6 +229,8 @@ void CollectionManager::setPreviousWallpaper()
 	for (unsigned int i = 0; i < Settings::prevCount; i++)
 		previous[i] = previous[i + 1];
 	previous[Settings::prevCount] = -1;
+	if (MainWindow::mainWindow)
+		InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
 }
 
 bool CollectionManager::isPrevious()
@@ -233,4 +238,22 @@ bool CollectionManager::isPrevious()
 	if (previous == nullptr)
 		return false;
 	return previous[1] != -1 ? true : false;
+}
+
+void CollectionManager::openWallpaperExternal()
+{
+	int index = previous[0];
+	for (unsigned int i = 0; i < collections.size(); i++)
+	{
+		if (!collections[i]->isEnabled)
+			continue;
+		index -= collections[i]->getNumber();
+		if (index < 0)
+		{
+			if (collections[i] == nullptr || i >= collections.size() || collections[i]->getNumber() <= (index + collections[i]->getNumber()))
+				return;
+			collections[i]->openWallpaperExternal(index + collections[i]->getNumber());
+		}
+	}
+	return;
 }

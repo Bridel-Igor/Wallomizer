@@ -199,3 +199,40 @@ void UserCollection::openCollectionSettingsWindow()
 {
 	SetUserCollectionWindow::windowThread(this);
 }
+
+void UserCollection::openWallpaperExternal(unsigned int index)
+{
+	int PageNum = int(index / per_page);
+	index -= PageNum * per_page;
+	PageNum++;
+	char pageUrl[255];
+	strcpy_s(pageUrl, collectionUrl);
+	strcat_s(pageUrl, "&page=");
+	char curPageNum[15] = "";
+	_itoa_s(PageNum, curPageNum, 10);
+	strcat_s(pageUrl, curPageNum);
+
+	Internet::bufferAccess.lock();
+
+	if (!Internet::URLDownloadToBuffer(pageUrl))
+	{
+		Internet::bufferAccess.unlock();
+		return;
+	}
+
+	char* pBuffer = Internet::buffer;
+	for (unsigned int i = 1; i < index; i++)
+		if ((pBuffer = Internet::parse(pBuffer, "\"url\":", nullptr)) == nullptr)
+		{
+			Internet::bufferAccess.unlock();
+			return;
+		}
+	char imgUrl[255] = "";
+	if (Internet::parse(pBuffer, "\"url\":", imgUrl) == nullptr)
+	{
+		Internet::bufferAccess.unlock();
+		return;
+	}
+	Internet::bufferAccess.unlock();
+	ShellExecute(0, 0, imgUrl, 0, 0, SW_SHOW);
+}
