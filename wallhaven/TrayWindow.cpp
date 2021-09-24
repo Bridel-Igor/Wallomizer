@@ -53,7 +53,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{		
 		pszIDStatusIcon = MAKEINTRESOURCE(IDI_ICON1);
 		hStatusIcon = LoadIcon(GetModuleHandleA(NULL), pszIDStatusIcon);
-		TrayMessage(hWnd, NIM_ADD, 1, hStatusIcon, "Wallhaven");
+		TrayMessage(hWnd, NIM_ADD, 1, hStatusIcon, "Wallomizer");
 		hMenu = LoadMenu(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDR_MENU1));
 	}
 	return 0;
@@ -98,7 +98,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			break;
 		}
 		case ID_WALLHAVEN_EXIT:
-			TrayMessage(hWnd, NIM_DELETE, 1, hStatusIcon, "Wallhaven");
+			TrayMessage(hWnd, NIM_DELETE, 1, hStatusIcon, "Wallomizer");
 			DestroyMenu(hMenu);
 			DestroyWindow(hWnd);
 			break;
@@ -117,7 +117,7 @@ void TrayWindow::windowThread()
 	if (trayWindow)
 		return;
 	trayWindow = new TrayWindow;
-	trayWindow->Create("Wallhaven", NULL, NULL, 0, 0, 0, 0, NULL, NULL);
+	trayWindow->Create("Wallomizer", NULL, NULL, 0, 0, 0, 0, NULL, NULL);
 	ShowWindow(trayWindow->Window(), SW_HIDE);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)

@@ -35,7 +35,7 @@ void Settings::saveSettings()
 		fclose(pFile);
 		return;
 	}
-	MessageBoxA(nullptr, "Can't save settings.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
+	MessageBoxA(nullptr, "Can't save settings.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 }
 
 void Settings::loadSettings()
@@ -51,6 +51,8 @@ void Settings::loadSettings()
 		fgets(buffer, 10, pFile);
 		buffer[strlen(buffer) - 1] = '\0';
 		delay = atoi(buffer);
+		if (delay < 10000)
+			delay = 10000;
 		fgets(username, 64, pFile);
 		username[strlen(username) - 1] = '\0';
 		fgets(apiKey, 128, pFile);
@@ -58,7 +60,7 @@ void Settings::loadSettings()
 		fclose(pFile);
 		return;
 	}
-	MessageBoxA(nullptr, "Can't load settings.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
+	MessageBoxA(nullptr, "Can't load settings.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 }
 
 void Settings::Delay()

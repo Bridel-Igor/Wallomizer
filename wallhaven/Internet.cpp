@@ -9,7 +9,7 @@ bool Internet::URLDownloadToBuffer(char* URL, char* _buffer, DWORD _bufferSize)
 	HINTERNET hURL;
 	DWORD dwBytesRead;
 
-	hInternetSession = InternetOpenA("Microsoft Internet Explorer", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	hInternetSession = InternetOpenA("Wallomizer", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 	if (!hInternetSession)
 		return false;
 
@@ -47,7 +47,7 @@ bool Internet::URLDownloadToFile(char* URL, char* path)
 	HINTERNET hURL;
 	DWORD dwBytesRead;
 
-	hInternetSession = InternetOpenA("Microsoft Internet Explorer", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	hInternetSession = InternetOpenA("Wallomizer", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 	if (!hInternetSession)
 		return false;
 

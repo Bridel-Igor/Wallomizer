@@ -101,7 +101,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 			if (delay < 10000)
 			{
-				MessageBoxA(nullptr, "Too small delay. Delay must be at least 10 seconds.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
+				MessageBoxA(nullptr, "Too small delay. Delay must be at least 10 seconds.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
 
@@ -111,7 +111,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 			char startupPath[260];
 			HRESULT hr = SHGetFolderPathA(NULL, CSIDL_STARTUP, 0, NULL, startupPath); // if target win Vista and later use SHGetKnownFolderPath()
-			strcat_s(startupPath, "\\Wallhaven.lnk");
+			strcat_s(startupPath, "\\Wallomizer.lnk");
 			if (SUCCEEDED(hr))
 			{
 				if (cbStartup->isChecked())

@@ -8,10 +8,10 @@
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
-    HANDLE hMutex = CreateMutexA(NULL, TRUE, "wallhaven");
+    HANDLE hMutex = CreateMutexA(NULL, TRUE, "Wallomizer");
     if (GetLastError() == ERROR_ALREADY_EXISTS)
     {
-        MessageBoxA(nullptr, "Wallhaven is already launched! You can find it in the system tray.", "Wallhaven", MB_OK | MB_ICONEXCLAMATION);
+        MessageBoxA(nullptr, "Wallomizer is already launched! You can find it in the system tray.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
         return 0;
     }
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
