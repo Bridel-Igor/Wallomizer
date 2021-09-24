@@ -52,17 +52,17 @@ END
 
 IDR_MENU1 MENU
 BEGIN
-    POPUP "wallhaven"
+    POPUP "Wallomizer"
     BEGIN
-        MENUITEM "Play",                        ID_WALLHAVEN_START, GRAYED
-        MENUITEM "Pause",                       ID_WALLHAVEN_PAUSE
-        MENUITEM "Next wallpaper",              ID_WALLHAVEN_NEXTWALLPAPER
-        MENUITEM "Previous wallpaper",          ID_WALLHAVEN_PREVIOUSWALLPAPER
+        MENUITEM "Play",                        ID_WALLOMIZER_START, GRAYED
+        MENUITEM "Pause",                       ID_WALLOMIZER_PAUSE
+        MENUITEM "Next wallpaper",              ID_WALLOMIZER_NEXTWALLPAPER
+        MENUITEM "Previous wallpaper",          ID_WALLOMIZER_PREVIOUSWALLPAPER
         MENUITEM SEPARATOR
-        MENUITEM "Open original image",         ID_WALLHAVEN_OPENWALLPAPER
-        MENUITEM "Settings",                    ID_WALLHAVEN_SETTINGS
+        MENUITEM "Open original image",         ID_WALLOMIZER_OPENWALLPAPER
+        MENUITEM "Settings",                    ID_WALLOMIZER_SETTINGS
         MENUITEM SEPARATOR
-        MENUITEM "Exit",                        ID_WALLHAVEN_EXIT
+        MENUITEM "Exit",                        ID_WALLOMIZER_EXIT
     END
 END
 
@@ -76,21 +76,21 @@ END
 // remains consistent on all systems.
 IDI_ICON1               ICON                    "icon32.ico"
 
-IDI_ICON3               ICON                    "Play_enabled.ico"
+IDI_I_PLAY              ICON                    "Play.ico"
 
-IDI_ICON4               ICON                    "Pause_enabled.ico"
+IDI_I_PAUSE             ICON                    "Pause.ico"
 
-IDI_ICON5               ICON                    "Next_enabled.ico"
+IDI_I_NEXT              ICON                    "Next.ico"
 
-IDI_ICON6               ICON                    "Prev_enabled.ico"
+IDI_I_PREV              ICON                    "Prev.ico"
 
-IDI_ICON7               ICON                    "Play_activated.ico"
+IDI_I_PLAY_ACTIVE       ICON                    "Play_activated.ico"
 
-IDI_ICON8               ICON                    "Pause_activated.ico"
+IDI_I_PAUSE_ACTIVE      ICON                    "Pause_activated.ico"
 
-IDI_ICON9               ICON                    "Prev_disabled.ico"
+IDI_I_PREV_DISABLED     ICON                    "Prev_disabled.ico"
 
-IDI_ICON10              ICON                    "Open_external.ico"
+IDI_I_OPEN_EXTERNAL     ICON                    "Open_external.ico"
 
 #endif    // Русский (Россия) resources
 /////////////////////////////////////////////////////////////////////////////

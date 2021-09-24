@@ -201,14 +201,14 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		btnNext = new Button(Window(), "",					370,	450,	20,		20, BS_OWNERDRAW);
 		
 
-		hIPlay = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON3), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT); 
-		hIPlayActive = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON7), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hIPause = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON4), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hIPauseActive = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON8), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hIPrevEnabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON6), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT); 
-		hIPrevDisabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON9), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hINextEnabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON5), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hIOpenExternal = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_ICON10), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIPlay = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PLAY), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIPlayActive = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PLAY_ACTIVE), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIPause = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PAUSE), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIPauseActive = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PAUSE_ACTIVE), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIPrevEnabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PREV), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIPrevDisabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PREV_DISABLED), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hINextEnabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_NEXT), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		hIOpenExternal = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_OPEN_EXTERNAL), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 		
 		btnDonate = new Button(Window(), "Donate",			535,	450,	95,		20);
 		
@@ -298,22 +298,22 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		}
 		if COMMANDEVENT(btnPrev)
 		{
-			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_PREVIOUSWALLPAPER, NULL);
+			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLOMIZER_PREVIOUSWALLPAPER, NULL);
 			return 0;
 		}
 		if COMMANDEVENT(btnPlay)
 		{
-			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_START, NULL);
+			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLOMIZER_START, NULL);
 			return 0;
 		}
 		if COMMANDEVENT(btnPause)
 		{
-			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_PAUSE, NULL);
+			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLOMIZER_PAUSE, NULL);
 			return 0;
 		}
 		if COMMANDEVENT(btnNext)
 		{
-			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLHAVEN_NEXTWALLPAPER, NULL);
+			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLOMIZER_NEXTWALLPAPER, NULL);
 			return 0;
 		}
 		if COMMANDEVENT(btnSettings)

@@ -1,0 +1,241 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="AddCollectionWindow.cpp">
+      <Filter>Windows\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="AspRatPickerWindow.cpp">
+      <Filter>Windows\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ResPickerWindow.cpp">
+      <Filter>Windows\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="SetLocalCollectionWindow.cpp">
+      <Filter>Windows\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="SetSearchCollectionWindow.cpp">
+      <Filter>Windows\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsWindow.cpp">
+      <Filter>Windows\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="SetUserCollectionWindow.cpp">
+      <Filter>Windows\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorPickerWindow.cpp">
+      <Filter>Windows\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="SearchCollection.cpp">
+      <Filter>Collections\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UserCollection.cpp">
+      <Filter>Collections\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalCollection.cpp">
+      <Filter>Collections\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="CollectionManager.cpp">
+      <Filter>Collections\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>Windows\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="TrayWindow.cpp">
+      <Filter>Windows\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="CategoriesAndPurity.cpp">
+      <Filter>Components\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="CollectionItem.cpp">
+      <Filter>Components\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorButton.cpp">
+      <Filter>Components\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="HMenuGenerator.cpp">
+      <Filter>Components\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="PushButton.cpp">
+      <Filter>Components\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="WinMain.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowStyles.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Settings.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Internet.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AddCollectionWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="AspRatPickerWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorPickerWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SetLocalCollectionWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SetSearchCollectionWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ResPickerWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SetUserCollectionWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseCollection.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CollectionManager.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalCollection.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchCollection.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UserCollection.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="TrayWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWindow.h">
+      <Filter>Windows\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CategoriesAndPurity.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CheckBox.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CollectionItem.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorButton.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ComboBox.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Edit.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="HMenuGenerator.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PushButton.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UpDownEdit.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Static.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Internet.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Settings.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowStyles.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Prev_disabled.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Play_activated.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Pause_activated.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Open_external.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="icon32.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Next.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Pause.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Play.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Prev.ico">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Collections">
+      <UniqueIdentifier>{fba6911a-e7bd-4dc4-9a56-c44a7aae1787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{c3caec5b-8b21-469c-a2ac-9f5a931d701f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows\Headers">
+      <UniqueIdentifier>{5a25c753-c1d2-4a64-a177-00024cf0b779}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collections\Headers">
+      <UniqueIdentifier>{3fd73530-fb78-4906-b4a5-9c4a91eac5c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{ee5eec08-048c-48fb-8813-8c06526c7ba6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\Headers">
+      <UniqueIdentifier>{20e388b9-4e7a-47c1-9133-8ccbaa833ba5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{4c76c573-0ae6-4a0c-80a6-d4413e4c05ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{6c9fb727-7a60-4c52-a482-352a7c53fb28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows\Source">
+      <UniqueIdentifier>{224df574-79ec-4779-b1f9-21e3f1b8f876}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components\Source">
+      <UniqueIdentifier>{39690463-42b8-4720-b77b-254c301003de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collections\Source">
+      <UniqueIdentifier>{013ed8fd-def2-4c0b-ad5b-e602635d7c81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{5ca111ee-2caa-4b9c-b9cd-29d436f46d02}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Wallomizer.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

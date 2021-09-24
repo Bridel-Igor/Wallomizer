@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{855a9d26-014b-4e64-827f-002b65f3e48a}</ProjectGuid>
+    <ProjectGuid>{5137F180-943D-4DF9-8149-AFECD342AB10}</ProjectGuid>
     <RootNamespace>wallhaven</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>Wallomizer</ProjectName>
@@ -198,21 +198,18 @@
     <ClInclude Include="WindowStyles.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="wallhaven.rc" />
+    <ResourceCompile Include="Wallomizer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="bitmap1.bmp" />
-    <Image Include="icon3.ico" />
     <Image Include="icon32.ico" />
-    <Image Include="Next_enabled.ico" />
+    <Image Include="Next.ico" />
     <Image Include="Open_external.ico" />
     <Image Include="Pause_activated.ico" />
-    <Image Include="Pause_enabled.ico" />
+    <Image Include="Pause.ico" />
     <Image Include="Play_activated.ico" />
-    <Image Include="Play_enabled.ico" />
-    <Image Include="Play_enabled.png" />
+    <Image Include="Play.ico" />
     <Image Include="Prev_disabled.ico" />
-    <Image Include="Prev_enabled.ico" />
+    <Image Include="Prev.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

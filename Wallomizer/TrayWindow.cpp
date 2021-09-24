@@ -68,36 +68,36 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		switch (wParam)
 		{
-		case ID_WALLHAVEN_START:
+		case ID_WALLOMIZER_START:
 			Settings::startSlideshow();
 			if (MainWindow::mainWindow)
 				InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
 			break;
-		case ID_WALLHAVEN_PAUSE:
+		case ID_WALLOMIZER_PAUSE:
 			Settings::pauseSlideshow();
 			if (MainWindow::mainWindow)
 				InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
 			break;
-		case ID_WALLHAVEN_NEXTWALLPAPER:
+		case ID_WALLOMIZER_NEXTWALLPAPER:
 			Settings::replayDelay();
 			CollectionManager::setNextWallpaper();
 			break;
-		case ID_WALLHAVEN_PREVIOUSWALLPAPER:
+		case ID_WALLOMIZER_PREVIOUSWALLPAPER:
 			Settings::replayDelay();
 			CollectionManager::setPreviousWallpaper();
 			break;
-		case ID_WALLHAVEN_SETTINGS:
+		case ID_WALLOMIZER_SETTINGS:
 		{
 			std::thread thr(MainWindow::windowThread);
 			thr.detach();
 			break;
 		}
-		case ID_WALLHAVEN_OPENWALLPAPER:
+		case ID_WALLOMIZER_OPENWALLPAPER:
 		{
 			CollectionManager::openWallpaperExternal();
 			break;
 		}
-		case ID_WALLHAVEN_EXIT:
+		case ID_WALLOMIZER_EXIT:
 			TrayMessage(hWnd, NIM_DELETE, 1, hStatusIcon, "Wallomizer");
 			DestroyMenu(hMenu);
 			DestroyWindow(hWnd);
