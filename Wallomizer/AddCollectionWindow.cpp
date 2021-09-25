@@ -15,10 +15,10 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 	{
 		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
 
-		btnAddUserCollection = new Button(Window(), "Add user collection",				10, 10, 180, 20);
-		btnAddLocalCollection = new Button(Window(), "Add local collection",			10, 40, 180, 20);
-		btnAddSearchCollection = new Button(Window(), "Add search collection",			10, 70, 180, 20);
-		btnCancel = new Button(Window(), "Cancel",										10, 110, 180, 20);
+		btnAddLocalCollection = new Button(Window(), "Add local collection",			10, 10, 220, 20);
+		btnAddUserCollection = new Button(Window(), "Add wallhaven user collection",	10, 40, 220, 20);
+		btnAddSearchCollection = new Button(Window(), "Add wallhaven search collection",10, 70, 220, 20);
+		btnCancel = new Button(Window(), "Cancel",										10, 110, 220, 20);
 
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	}
@@ -94,7 +94,7 @@ void AddCollectionWindow::windowThread()
 		return;
 	}
 	addCollectionWindow = new AddCollectionWindow;
-	addCollectionWindow->Create("Add collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 200, 140, NULL, NULL);
+	addCollectionWindow->Create("Add collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 240, 140, NULL, NULL);
 	addCollectionWindow->centerWindow(MainWindow::mainWindow->Window());
 	ShowWindow(addCollectionWindow->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
