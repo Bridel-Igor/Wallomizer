@@ -43,38 +43,47 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	{
 		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
 
-		stDelay = new Static(Window(), "Delay:",		10,		30,		80,		20, SS_RIGHT);
-		stHours = new Static(Window(), "Hours",			100,	10,		74,		20, SS_CENTER);
-		stMinutes = new Static(Window(), "Minutes",		183,	10,		74,		20, SS_CENTER);
-		stSeconds = new Static(Window(), "Seconds",		266,	10,		74,		20, SS_CENTER);
-		udeHours = new UpDownEdit(Window(),				100,	30,		74,		20, 0, 999, int((Settings::delay / 1000) / 3600));
-		udeMinutes = new UpDownEdit(Window(),			183,	30,		74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60);
-		udeSeconds = new UpDownEdit(Window(),			266,	30,		74,		20, 0, 59, int(Settings::delay / 1000) % 60);
+		stApplication = new Static(Window(), "Application",		10,		10,		380,	20, SS_CENTER);
+		stVersion = new Static(Window(), "Version:",			10,		40,		130,	20, SS_RIGHT);
+		stActVersion = new Static(Window(), "1.0.0",			150,	40,		100,	20);
+		btnUpdate = new Button(Window(), "Check for updates",	270,	40,		120,	20);
+		stStartup = new Static(Window(), "Load on startup:",	10,		70,		130,	20, SS_RIGHT);
+		cbStartup = new CheckBox(Window(), "",					150,	70,		20,		20, NULL);
 		
-		stStartup = new Static(Window(), "Load on startup",120,	60,		100,	20);
-		cbStartup = new CheckBox(Window(), "",			100,	60,		20,		20, NULL);
-
-		stUsername = new Static(Window(), "Username:",	10,		90,		80,		20, SS_RIGHT);
-		edUsername = new Edit(Window(), "",				100,	90,		240,	20);
-
-		stApiKey = new Static(Window(), "Api key:",		10,		120,	80,		20, SS_RIGHT);
-		edApiKey = new Edit(Window(), "",				100,	120,	240,	20, ES_PASSWORD);
-
-		btnCancel = new Button(Window(), "Cancel",		10,		150,	80,		20);
-		btnOk = new Button(Window(), "Ok",				100,	150,	240,	20);
+		stSlideshow = new Static(Window(), "Slideshow",			10,		100,	380,	20, SS_CENTER);
+		stDelay = new Static(Window(), "Delay:",				10,		150,	130,	20, SS_RIGHT);
+		stHours = new Static(Window(), "Hours",					150,	130,	74,		20, SS_CENTER);
+		stMinutes = new Static(Window(), "Minutes",				233,	130,	74,		20, SS_CENTER);
+		stSeconds = new Static(Window(), "Seconds",				316,	130,	74,		20, SS_CENTER);
+		udeHours = new UpDownEdit(Window(),						150,	150,	74,		20, 0, 999, int((Settings::delay / 1000) / 3600));
+		udeMinutes = new UpDownEdit(Window(),					233,	150,	74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60);
+		udeSeconds = new UpDownEdit(Window(),					316,	150,	74,		20, 0, 59, int(Settings::delay / 1000) % 60);
+			
+		stWallhaven = new Static(Window(), "Wallhaven",			10,		180,	380,	20, SS_CENTER);
+		stApiKey = new Static(Window(), "Api key:",				10,		210,	130,	20, SS_RIGHT);
+		edApiKey = new Edit(Window(), "",						150,	210,	240,	20, ES_PASSWORD);
+		stUsername = new Static(Window(), "Default username:",	10,		240,	130,	20, SS_RIGHT);
+		edUsername = new Edit(Window(), "",						150,	240,	240,	20);
+		
+		btnCancel = new Button(Window(), "Cancel",				10,		280,	130,	20);
+		btnOk = new Button(Window(), "Ok",						150,	280,	240,	20);
 
 		edUsername->setTextA(Settings::username);
 		edApiKey->setTextA(Settings::apiKey);
 		cbStartup->setChecked(Settings::loadOnStartup);
 
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+		SendMessage(stApplication->hWnd, WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
+		SendMessage(stSlideshow->hWnd, WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
+		SendMessage(stWallhaven->hWnd, WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
 	}
 	return 0;
 
 	case WM_DESTROY:
 	{
-		delete btnOk, btnCancel;
-		delete stHours, stMinutes, stSeconds, stDelay, stApiKey, stUsername, stStartup;
+		delete stApplication, stSlideshow, stWallhaven;
+		delete btnOk, btnCancel, btnUpdate;
+		delete stHours, stMinutes, stSeconds, stDelay, stApiKey, stUsername, stStartup, stVersion, stActVersion;
 		delete edApiKey, edUsername;
 		delete udeHours, udeMinutes, udeSeconds;
 		delete cbStartup;
@@ -135,6 +144,11 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		if COMMANDEVENT(btnCancel)
 		{
 			DestroyWindow(Window());
+			return 0;
+		}
+		if COMMANDEVENT(btnUpdate)
+		{
+			ShellExecute(0, 0, "https://github.com/Bridel-Igor/Wallomizer/releases", 0, 0, SW_SHOW);
 			return 0;
 		}
 	}

@@ -6,6 +6,7 @@ namespace WindowStyles
 {
 	// main style
 	extern HFONT mainFont;
+	extern HFONT titleFont;
 	extern COLORREF mainFontColor;
 	extern HBRUSH mainBkBrush;
 

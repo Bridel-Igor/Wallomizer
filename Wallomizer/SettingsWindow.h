@@ -10,10 +10,11 @@
 class SettingsWindow : public BaseWindow<SettingsWindow>
 {
 private:
-	Static* stHours, * stMinutes, * stSeconds, * stDelay, * stApiKey, * stUsername, *stStartup;
+	Static* stApplication, * stSlideshow, * stWallhaven;
+	Static* stVersion, *stActVersion, * stHours, * stMinutes, * stSeconds, * stDelay, * stApiKey, * stUsername, *stStartup;
 	Edit* edApiKey, * edUsername;
 	UpDownEdit* udeHours, * udeMinutes, * udeSeconds;
-	Button* btnOk, * btnCancel;
+	Button* btnOk, * btnCancel, * btnUpdate;
 	CheckBox* cbStartup;
 	char tmpRes[255];
 
@@ -22,7 +23,7 @@ public:
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void windowThread();
 
-	static constexpr int width = 350;
-	static constexpr int height = 180;
+	static constexpr int width = 400;
+	static constexpr int height = 310;
 	static SettingsWindow* settingsWindow;
 };
