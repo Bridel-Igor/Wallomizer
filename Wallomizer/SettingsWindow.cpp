@@ -176,6 +176,11 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	}
 	return 0;
 
+	case WM_CTLCOLORBTN:
+	{
+		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
+	}
+
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}

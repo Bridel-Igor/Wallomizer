@@ -68,7 +68,7 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 	{
 	case WM_CREATE:
 	{
-		stEmpty = new Static(Window(), "Collection list is empty. Click \"Add collection..\" button to add one.", 0, 0, 480, 20);
+		stEmpty = new Static(Window(), "Collection list is empty. Click \"Add collection..\" button to add one.", 5, 0, 480, 20);
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 
 		yMinScroll = 0;
