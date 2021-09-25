@@ -176,6 +176,16 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	}
 	return 0;
 
+	case WM_CTLCOLOREDIT:
+	{
+		HDC hdc = (HDC)wParam;
+		SetTextColor(hdc, RGB(0, 0, 0));
+		SetBkColor(hdc, RGB(200, 200, 200));
+		SetDCBrushColor(hdc, RGB(200, 200, 200));
+		return (LRESULT)GetStockObject(DC_BRUSH);
+	}
+	return 0;
+
 	case WM_CTLCOLORBTN:
 	{
 		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
