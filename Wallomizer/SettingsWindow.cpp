@@ -163,6 +163,19 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	}
 	return 0;
 
+	case WM_CTLCOLORSTATIC:
+	{
+		HWND hWndStatic = (HWND)lParam;
+		HDC hdcStatic = (HDC)wParam;
+		if ((HWND)lParam == stApplication->hWnd || (HWND)lParam == stSlideshow->hWnd || (HWND)lParam == stWallhaven->hWnd)
+			SetTextColor(hdcStatic, WindowStyles::titleFontColor);
+		else
+			SetTextColor(hdcStatic, WindowStyles::mainFontColor);
+		SetBkMode(hdcStatic, TRANSPARENT);
+		return (LRESULT)WindowStyles::mainBkBrush;
+	}
+	return 0;
+
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}

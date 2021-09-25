@@ -31,7 +31,7 @@ public:
 		}
 		if (pThis)
 		{
-			if (strcmp(pThis->ClassName(), "CollectionItemsFrameClass"))
+			if (strcmp(pThis->ClassName(), "CollectionItemsFrameClass") && strcmp(pThis->ClassName(), "Settings Window Class"))
 			{
 				switch (uMsg)
 				{
