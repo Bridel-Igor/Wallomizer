@@ -19,6 +19,7 @@ private:
 		void updateScroll();
 
 		std::vector<CollectionItem*> collectionItems;
+		Static *stEmpty;
 
 		HDC hdc;
 		PAINTSTRUCT ps;

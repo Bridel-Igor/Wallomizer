@@ -18,8 +18,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	std::thread thr(TrayWindow::windowThread);
 	thr.detach();
-	Settings::loadSettings();
-	CollectionManager::loadSettings();
 	WindowStyles::initialize();
 
 	unsigned int waitedForTrayWindow = 0;
@@ -30,6 +28,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		Sleep(10);
 		waitedForTrayWindow += 10;
 	}
+	
+	Settings::loadSettings();
+	CollectionManager::loadSettings();
 
 	while (TrayWindow::trayWindow!=nullptr)
 	{

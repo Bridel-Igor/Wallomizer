@@ -60,7 +60,7 @@ void Settings::loadSettings()
 		fclose(pFile);
 		return;
 	}
-	MessageBoxA(nullptr, "Can't load settings.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+	saveSettings();
 }
 
 void Settings::Delay()

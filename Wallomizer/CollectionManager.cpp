@@ -7,6 +7,7 @@
 #include "CollectionManager.h"
 #include "Settings.h"
 #include "MainWindow.h"
+#include "TrayWindow.h"
 #include "UserCollection.h"
 #include "LocalCollection.h"
 #include "SearchCollection.h"
@@ -87,6 +88,11 @@ bool CollectionManager::loadSettings()
 	bIsReady = true;
 	Settings::abortDelay();
 	srand((unsigned int)time(NULL));
+	if (number == 0)
+	{
+		Sleep(10);
+		PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, (WPARAM)ID_WALLOMIZER_SETTINGS, NULL);
+	}
 	return true;
 }
 

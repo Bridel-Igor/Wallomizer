@@ -13,6 +13,8 @@ MainWindow::CollectionItemsFrame* MainWindow::collectionItemsFrame = nullptr;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////CollectionItemsFrame
 void MainWindow::CollectionItemsFrame::updateCollectionItems()
 {
+	ShowWindow(stEmpty->hWnd, SW_HIDE);
+
 	for (size_t i = CollectionManager::collections.size(); i < collectionItems.size(); i++) //deleting excess items
 	{
 		delete collectionItems.back();
@@ -29,6 +31,9 @@ void MainWindow::CollectionItemsFrame::updateCollectionItems()
 	updateScroll();
 	for (auto p : collectionItems) // placing according to the scrollbar
 		p->scroll(yCurrentScroll);
+
+	if (collectionItems.size()==0)
+		ShowWindow(stEmpty->hWnd, SW_SHOW);
 }
 
 void MainWindow::CollectionItemsFrame::destroyCollectionItems()
@@ -63,6 +68,9 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 	{
 	case WM_CREATE:
 	{
+		stEmpty = new Static(Window(), "Collection list is empty. Click \"Add collection..\" button to add one.", 0, 0, 480, 20);
+		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+
 		yMinScroll = 0;
 		yCurrentScroll = 0;
 		yMaxScroll = 0;
@@ -73,6 +81,7 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 	case WM_DESTROY:
 	{
 		destroyCollectionItems();
+		delete stEmpty;
 	}
 	return 0;
 
@@ -168,6 +177,14 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLORBTN:
 	{
+		if ((HWND)lParam == stEmpty->hWnd)
+		{
+			HWND hWndStatic = (HWND)lParam;
+			HDC hdcStatic = (HDC)wParam;
+			SetTextColor(hdcStatic, WindowStyles::collItemFontColor);
+			SetBkMode(hdcStatic, TRANSPARENT);
+			return (LRESULT)WindowStyles::collFrameBkBrush;
+		}
 		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, WindowStyles::collItemFontColor);
