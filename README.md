@@ -19,7 +19,7 @@ Just a folder on your HDD or SSD.
 2. Wallhaven user collection.
 Wallpaper collections of wallhaven.cc users. Can be filtered by purity.
 3. Wallhaven search result collection.
-Result of a search result in wallhaven.cc. Can be filtered by category, purity, resolution, aspect ratio, dominant color, tags.
+Result of a search queue in wallhaven.cc. Can be filtered by category, purity, resolution, aspect ratio, dominant color, tags.
 You can add as many collections of these types as You want.
 
 If You want to support the project here is the link for donations:
