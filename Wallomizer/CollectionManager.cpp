@@ -11,6 +11,7 @@
 #include "UserCollection.h"
 #include "LocalCollection.h"
 #include "SearchCollection.h"
+#include "Filesystem.h"
 
 std::vector<BaseCollection*> CollectionManager::collections;
 unsigned int CollectionManager::number=0;
@@ -20,8 +21,11 @@ bool CollectionManager::bIsReady = false;
 
 bool CollectionManager::saveSettings()
 {
+	wchar_t path[MAX_PATH];
+	Filesystem::getRoamingDir(path);
+	wcscat_s(path, MAX_PATH, L"CollectionManager.dat");
 	FILE* pFile;
-	fopen_s(&pFile, "Settings/CollectionManager.dat", "w");
+	_wfopen_s(&pFile, path, L"w");
 	if (pFile != NULL)
 	{
 		char cNumber[10];
@@ -39,9 +43,12 @@ bool CollectionManager::saveSettings()
 
 bool CollectionManager::loadSettings()
 {
+	wchar_t path[MAX_PATH];
+	Filesystem::getRoamingDir(path);
+	wcscat_s(path, MAX_PATH, L"CollectionManager.dat");
 	bIsReady = false;
 	FILE* pFile;
-	fopen_s(&pFile, "Settings/CollectionManager.dat", "r");
+	_wfopen_s(&pFile, path, L"r");
 	if (pFile != NULL)
 	{
 		clear();
@@ -101,7 +108,10 @@ void CollectionManager::reloadSettings()
 	Settings::loadingImage.lock();
 	saveSettings();
 	loadSettings();
-	remove("Resources/Loaded wallpaper.dat");
+	wchar_t path[MAX_PATH];
+	Filesystem::getRoamingDir(path);
+	wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
+	DeleteFileW(path);
 	Settings::loadingImage.unlock();
 }
 
@@ -137,7 +147,10 @@ void CollectionManager::eraseCollection(int index)
 	saveSettings();
 	updateNumber();
 	Settings::loadingImage.lock();
-	remove("Resources/Loaded wallpaper.dat");
+	wchar_t path[MAX_PATH];
+	Filesystem::getRoamingDir(path);
+	wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
+	DeleteFileW(path);
 	Settings::loadingImage.unlock();
 	Settings::abortDelay();
 }
@@ -191,7 +204,13 @@ void CollectionManager::loadNextWallpaper()
 
 void CollectionManager::setLoadedWallpaper(bool setPrevious)
 {
-	if (!std::experimental::filesystem::exists("Resources/Loaded wallpaper.dat"))
+	wchar_t loadedPath[MAX_PATH], currentPath[MAX_PATH];
+	Filesystem::getRoamingDir(loadedPath);
+	Filesystem::getRoamingDir(currentPath);
+	wcscat_s(loadedPath, MAX_PATH, L"Loaded wallpaper.dat");
+	wcscat_s(currentPath, MAX_PATH, L"Current wallpaper.jpg");
+
+	if (!std::experimental::filesystem::exists(loadedPath))
 	{
 		Settings::abortDelay();
 		return;
@@ -203,16 +222,16 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 			previous[i] = previous[i - 1];
 		previous[0] = indexOfLoaded;
 	}
-	remove("Resources/Current wallpaper.jpg");
-	if (rename("Resources/Loaded wallpaper.dat", "Resources/Current wallpaper.jpg"))
+	DeleteFileW(currentPath);
+	if (MoveFileW(loadedPath, currentPath) == 0)
 	{
 		Settings::loadingImage.unlock();
 		return;
 	}
-	char imgPath[255];
-	GetCurrentDirectoryA(255, imgPath);
-	strcat_s(imgPath, "\\Resources\\Current wallpaper.jpg");
-	SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, imgPath, SPIF_UPDATEINIFILE);
+	wchar_t currentPathNative[MAX_PATH];
+	Filesystem::getRoamingDirNative(currentPathNative);
+	wcscat_s(currentPathNative, MAX_PATH, L"Current wallpaper.jpg");
+	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, currentPathNative, SPIF_UPDATEINIFILE);
 	if (MainWindow::mainWindow && !setPrevious)
 		InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
 	Settings::loadingImage.unlock();

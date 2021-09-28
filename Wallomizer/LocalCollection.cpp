@@ -7,6 +7,7 @@
 #include "LocalCollection.h"
 #include "SetLocalCollectionWindow.h"
 #include "Settings.h"
+#include "Filesystem.h"
 
 const char* extensions[] = { ".jpg", ".jpeg", ".bmp", ".dib", ".png", ".jfif", ".jpe", ".gif", ".tif", ".tiff", 
 							 ".wdp", ".heic", ".heif", ".heics", ".heifs", ".avci", ".avcs", ".avif", ".avifs" };
@@ -77,7 +78,10 @@ bool LocalCollection::loadWallpaper(unsigned int index)
 				size_t size;
 				FILE *source=nullptr, *dest=nullptr;
 				_wfopen_s(&source, imgPath, L"rb");
-				_wfopen_s(&dest, L"Resources/Loaded wallpaper.dat", L"wb");
+				wchar_t path[MAX_PATH];
+				Filesystem::getRoamingDir(path);
+				wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
+				_wfopen_s(&dest, path, L"wb");
 				if (source == nullptr || dest == nullptr)
 					return false;
 				while (size = fread(buf, 1, BUFSIZ, source))

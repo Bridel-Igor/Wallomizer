@@ -5,6 +5,7 @@
 #include "CollectionManager.h"
 #include "Settings.h"
 #include "WindowStyles.h"
+#include "Filesystem.h"
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
@@ -16,10 +17,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     }
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 
-	std::thread thr(TrayWindow::windowThread);
-	thr.detach();
+	Filesystem::initialize();
 	WindowStyles::initialize();
 
+	std::thread thr(TrayWindow::windowThread);
+	thr.detach();
+	
 	unsigned int waitedForTrayWindow = 0;
 	while (TrayWindow::trayWindow == nullptr)
 	{

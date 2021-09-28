@@ -70,6 +70,9 @@
     <ClCompile Include="Internet.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Filesystem.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddCollectionWindow.h">
@@ -164,6 +167,9 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Filesystem.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

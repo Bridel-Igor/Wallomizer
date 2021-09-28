@@ -2,6 +2,7 @@
 #include "Internet.h"
 #include "SetSearchCollectionWindow.h"
 #include "Settings.h"
+#include "Filesystem.h"
 
 SearchCollection::SearchCollection()
 {
@@ -144,7 +145,9 @@ bool SearchCollection::loadWallpaper(unsigned int index)
 		return false;
 	}
 
-	char imgPath[255] = "Resources/Loaded wallpaper.dat";
+	wchar_t imgPath[MAX_PATH];
+	Filesystem::getRoamingDir(imgPath);
+	wcscat_s(imgPath, MAX_PATH, L"Loaded wallpaper.dat");
 	Internet::bufferAccess.unlock();
 	return Internet::URLDownloadToFile(imgUrl, imgPath);
 }

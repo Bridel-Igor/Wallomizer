@@ -1,4 +1,5 @@
 #include "Settings.h"
+#include "Filesystem.h"
 
 unsigned int Settings::prevCount = 5;
 unsigned long Settings::delay = 60000;
@@ -17,8 +18,11 @@ namespace Settings
 
 void Settings::saveSettings()
 {
+	wchar_t path[MAX_PATH];
+	Filesystem::getRoamingDir(path);
+	wcscat_s(path, MAX_PATH, L"Settings.dat\0");
 	FILE* pFile;
-	fopen_s(&pFile, "Settings/Settings.dat", "w");
+	_wfopen_s(&pFile, path, L"w");
 	if (pFile != NULL)
 	{
 		fputs(loadOnStartup ? "true" : "false", pFile);
@@ -40,8 +44,11 @@ void Settings::saveSettings()
 
 void Settings::loadSettings()
 {
+	wchar_t path[MAX_PATH];
+	Filesystem::getRoamingDir(path);
+	wcscat_s(path, MAX_PATH, L"Settings.dat\0");
 	FILE* pFile;
-	fopen_s(&pFile, "Settings/Settings.dat", "r");
+	_wfopen_s(&pFile, path, L"r");
 	if (pFile != NULL)
 	{
 		char buffer[10];

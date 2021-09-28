@@ -147,6 +147,7 @@
     <ClCompile Include="CollectionManager.cpp" />
     <ClCompile Include="ColorButton.cpp" />
     <ClCompile Include="ColorPickerWindow.cpp" />
+    <ClCompile Include="Filesystem.cpp" />
     <ClCompile Include="LocalCollection.cpp" />
     <ClCompile Include="HMenuGenerator.cpp" />
     <ClCompile Include="PushButton.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="ColorPickerWindow.h" />
     <ClInclude Include="ComboBox.h" />
+    <ClInclude Include="Filesystem.h" />
     <ClInclude Include="LocalCollection.h" />
     <ClInclude Include="Edit.h" />
     <ClInclude Include="HMenuGenerator.h" />

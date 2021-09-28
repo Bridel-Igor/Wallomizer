@@ -41,12 +41,12 @@ bool Internet::URLDownloadToBuffer(char* URL, char* _buffer, DWORD _bufferSize)
 	return result;
 }
 
-bool Internet::URLDownloadToFile(char* URL, char* path)
+bool Internet::URLDownloadToFile(char* URL, wchar_t* path)
 {
 	HINTERNET hInternetSession;
 	HINTERNET hURL;
 	DWORD dwBytesRead;
-
+	
 	hInternetSession = InternetOpenA("Wallomizer", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 	if (!hInternetSession)
 		return false;
@@ -62,7 +62,7 @@ bool Internet::URLDownloadToFile(char* URL, char* path)
 	char buffer[tmpBufferSize];
 
 	DWORD dwTemp;
-	HANDLE hFile = CreateFileA(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFileW(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	bool result = false;
 	while (InternetReadFile(hURL, (LPSTR)buffer, tmpBufferSize, &dwBytesRead))
