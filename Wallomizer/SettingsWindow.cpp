@@ -7,7 +7,7 @@
 
 SettingsWindow* SettingsWindow::settingsWindow = nullptr;
 
-HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR lpszDesc)
+HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, LPCSTR lpszDesc)
 {
 	HRESULT hres;
 	IShellLink* psl;
@@ -20,6 +20,7 @@ HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszPathLink, LPCSTR lpszDesc)
 		IPersistFile* ppf;
 		psl->SetPath(lpszPathObj);
 		psl->SetDescription(lpszDesc);
+		psl->SetWorkingDirectory(lpszDirPath);
 		hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
 		if (SUCCEEDED(hres))
 		{
@@ -45,7 +46,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 		stApplication = new Static(Window(), "Application",		10,		10,		380,	20, SS_CENTER);
 		stVersion = new Static(Window(), "Version:",			10,		40,		130,	20, SS_RIGHT);
-		stActVersion = new Static(Window(), "1.0.0",			150,	40,		100,	20);
+		stActVersion = new Static(Window(), "1.0.1",			150,	40,		100,	20);
 		btnUpdate = new Button(Window(), "Check for updates",	270,	40,		120,	20);
 		stStartup = new Static(Window(), "Load on startup:",	10,		70,		130,	20, SS_RIGHT);
 		cbStartup = new CheckBox(Window(), "",					150,	70,		20,		20, NULL);
@@ -125,9 +126,10 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			{
 				if (cbStartup->isChecked())
 				{
-					char currentPath[260];
+					char currentPath[260], currentDirectory[260];
 					GetModuleFileNameA(NULL, currentPath, 260);
-					CreateLink(currentPath, startupPath, "");
+					GetCurrentDirectoryA(260, currentDirectory);
+					CreateLink(currentPath, currentDirectory, startupPath, "");
 					Settings::loadOnStartup = true;
 				}
 				else
