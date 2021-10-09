@@ -14,6 +14,7 @@ namespace WindowStyles
 	// edit style
 	extern COLORREF editFontColor;
 	extern COLORREF editBkColor;
+	extern COLORREF editBkInvalidColor;
 
 	// collection items frame style
 	extern COLORREF collItemFontColor;

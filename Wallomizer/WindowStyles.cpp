@@ -10,6 +10,7 @@ COLORREF WindowStyles::titleFontColor;
 // edit style
 COLORREF WindowStyles::editFontColor;
 COLORREF WindowStyles::editBkColor;
+COLORREF WindowStyles::editBkInvalidColor;
 
 // collection items frame style
 COLORREF WindowStyles::collItemFontColor;
@@ -27,6 +28,7 @@ void WindowStyles::initialize()
 
 	editFontColor = RGB(0, 0, 0);
 	editBkColor = RGB(200, 200, 200);
+	editBkInvalidColor = RGB(200, 50, 50);
 
 	collItemFontColor = RGB(200, 200, 200);
 	collItemBkColor = RGB(36, 36, 36);

@@ -22,20 +22,13 @@ void Settings::saveSettings()
 	Filesystem::getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"Settings.dat\0");
 	FILE* pFile;
-	_wfopen_s(&pFile, path, L"w");
+	_wfopen_s(&pFile, path, L"wb");
 	if (pFile != NULL)
 	{
-		fputs(loadOnStartup ? "true" : "false", pFile);
-		fputs("\n", pFile);
-		char cNumber[10];
-		_itoa_s(delay, cNumber, 10);
-		cNumber[9] = '\0';
-		fputs(cNumber, pFile);
-		fputs("\n", pFile);
-		fputs(username, pFile);
-		fputs("\n", pFile);
-		fputs(apiKey, pFile);
-		fputs("\n", pFile);
+		fwrite(&loadOnStartup, sizeof(loadOnStartup), 1, pFile);
+		fwrite(&delay, sizeof(delay), 1, pFile);
+		fwrite(&username, sizeof(username), 1, pFile);
+		fwrite(&apiKey, sizeof(apiKey), 1, pFile);
 		fclose(pFile);
 		return;
 	}
@@ -51,19 +44,12 @@ void Settings::loadSettings()
 	_wfopen_s(&pFile, path, L"r");
 	if (pFile != NULL)
 	{
-		char buffer[10];
-		fgets(buffer, 10, pFile);
-		buffer[strlen(buffer) - 1] = '\0';
-		loadOnStartup = strcmp(buffer, "true") == 0 ? true : false;
-		fgets(buffer, 10, pFile);
-		buffer[strlen(buffer) - 1] = '\0';
-		delay = atoi(buffer);
+		fread(&loadOnStartup, sizeof(loadOnStartup), 1, pFile);
+		fread(&delay, sizeof(delay), 1, pFile);
+		fread(&username, sizeof(username), 1, pFile);
+		fread(&apiKey, sizeof(apiKey), 1, pFile);
 		if (delay < 10000)
 			delay = 10000;
-		fgets(username, 64, pFile);
-		username[strlen(username) - 1] = '\0';
-		fgets(apiKey, 128, pFile);
-		apiKey[strlen(apiKey) -1] = '\0';
 		fclose(pFile);
 		return;
 	}

@@ -105,6 +105,84 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 	case WM_COMMAND:
 	{
+		if (HIWORD(wParam) == EN_UPDATE)
+		{
+			if (udeSeconds != nullptr && (HWND)lParam == udeSeconds->edithWnd)
+			{
+				char buf[10];
+				udeSeconds->getTextA(buf, 10);
+				int res = atoi(buf);
+				if (res <= 59 && res >= 0)
+				{
+					udeSeconds->invalid = false;
+				}
+				else
+					udeSeconds->invalid = true;
+			}
+			if (udeMinutes != nullptr && (HWND)lParam == udeMinutes->edithWnd)
+			{
+				char buf[10];
+				udeMinutes->getTextA(buf, 10);
+				int res = atoi(buf);
+				if (res <= 59 && res >= 0)
+				{
+					udeMinutes->invalid = false;
+				}
+				else
+					udeMinutes->invalid = true;
+			}
+			if (udeHours != nullptr && (HWND)lParam == udeHours->edithWnd)
+			{
+				char buf[10];
+				udeHours->getTextA(buf, 10);
+				int res = atoi(buf);
+				if (res <= 999 && res >= 0)
+				{
+					udeHours->invalid = false;
+				}
+				else
+					udeHours->invalid = true;
+			}
+		}
+		if (HIWORD(wParam) == EN_KILLFOCUS)
+		{
+			if (udeSeconds != nullptr && (HWND)lParam == udeSeconds->edithWnd)
+			{
+				char buf[10];
+				udeSeconds->getTextA(buf, 10);
+				int res = atoi(buf);
+				if (res <= 59 && res >= 0)
+					udeSeconds->setPos(res);
+				if (res > 59)
+					udeSeconds->setPos(59);
+				if (res < 0)
+					udeSeconds->setPos(0);
+			}
+			if (udeMinutes != nullptr && (HWND)lParam == udeMinutes->edithWnd)
+			{
+				char buf[10];
+				udeMinutes->getTextA(buf, 10);
+				int res = atoi(buf);
+				if (res <= 59 && res >= 0)
+					udeMinutes->setPos(res);
+				if (res > 59)
+					udeMinutes->setPos(59);
+				if (res < 0)
+					udeMinutes->setPos(0);
+			}
+			if (udeHours != nullptr && (HWND)lParam == udeHours->edithWnd)
+			{
+				char buf[10];
+				udeHours->getTextA(buf, 10);
+				int res = atoi(buf);
+				if (res <= 999 && res >= 0)
+					udeHours->setPos(res);
+				if (res > 999)
+					udeHours->setPos(999);
+				if (res < 0)
+					udeHours->setPos(0);
+			}
+		}
 		if COMMANDEVENT(btnOk)
 		{
 			unsigned long delay = (udeSeconds->getPos() + (udeMinutes->getPos() * 60) + (udeHours->getPos() * 3600)) * 1000;
@@ -181,9 +259,13 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	case WM_CTLCOLOREDIT:
 	{
 		HDC hdc = (HDC)wParam;
-		SetTextColor(hdc, RGB(0, 0, 0));
-		SetBkColor(hdc, RGB(200, 200, 200));
-		SetDCBrushColor(hdc, RGB(200, 200, 200));
+		SetTextColor(hdc, WindowStyles::editFontColor);
+		SetBkColor(hdc, WindowStyles::editBkColor);
+		SetDCBrushColor(hdc, WindowStyles::editBkColor);
+		if ((udeSeconds != nullptr && (HWND)lParam == udeSeconds->edithWnd && udeSeconds->invalid) ||
+			(udeMinutes != nullptr && (HWND)lParam == udeMinutes->edithWnd && udeMinutes->invalid) ||
+			(udeHours != nullptr && (HWND)lParam == udeHours->edithWnd && udeHours->invalid))
+				SetBkColor(hdc, WindowStyles::editBkInvalidColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
 	return 0;
