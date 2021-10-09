@@ -289,7 +289,7 @@ void SettingsWindow::windowThread()
 		return;
 	}
 	settingsWindow = new SettingsWindow;
-	settingsWindow->Create("Settings", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
+	settingsWindow->Create("Settings", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL, false);
 	settingsWindow->centerWindow(MainWindow::mainWindow->Window());
 	ShowWindow(settingsWindow->Window(), SW_SHOWNORMAL);
 	MSG msg = { };

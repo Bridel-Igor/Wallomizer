@@ -31,7 +31,7 @@ public:
 		}
 		if (pThis)
 		{
-			if (strcmp(pThis->ClassName(), "CollectionItemsFrameClass") && strcmp(pThis->ClassName(), "Settings Window Class"))
+			if (pThis->defaultComponentDraw)
 			{
 				switch (uMsg)
 				{
@@ -81,9 +81,12 @@ public:
 		int nWidth = CW_USEDEFAULT,
 		int nHeight = CW_USEDEFAULT,
 		HWND hWndParent = 0,
-		HMENU hMenu = 0
+		HMENU hMenu = 0,
+		bool _defaultComponentDraw = true
 		)
 	{
+		defaultComponentDraw = _defaultComponentDraw;
+
 		WNDCLASS wc = { 0 };
 
 		wc.lpfnWndProc = DERIVED_TYPE::WindowProc;
@@ -123,7 +126,6 @@ public:
 	}
 
 protected:
-
 	virtual LPCSTR ClassName() const = 0;
 	virtual LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 	static BOOL CALLBACK SetChildFont(HWND hwndChild, LPARAM lParam)
@@ -134,4 +136,5 @@ protected:
 	}
 
 	HWND m_hWnd;
+	bool defaultComponentDraw;
 };

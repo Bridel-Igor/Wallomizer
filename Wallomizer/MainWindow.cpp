@@ -382,7 +382,7 @@ void MainWindow::windowThread()
 	collectionItemsFrame = new CollectionItemsFrame;
 	mainWindow->Create("Wallomizer", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
 	mainWindow->centerWindow(GetDesktopWindow());
-	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 40, width-20, CollectionItemsFrame::height, mainWindow->Window(), NULL);
+	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 40, width-20, CollectionItemsFrame::height, mainWindow->Window(), NULL, false);
 	ShowWindow(mainWindow->Window(), SW_SHOWNORMAL);
 	ShowWindow(collectionItemsFrame->Window(), SW_SHOWNORMAL);
 	MSG msg = { };
