@@ -8,10 +8,10 @@ The goal was to make the smallest program with minimal possible performance impa
 It was created on c++ using WinAPI and Wallhaven API.
 
 Main features:
--Running slideshow on desktop background. Collections acts as source of pictures.
--Controlling slideshow properties and flow.
--Open the source of current wallpaper.
--Optional loading on startup.
+- Running slideshow on desktop background. Collections acts as source of pictures.
+- Controlling slideshow properties and flow.
+- Open the source of current wallpaper.
+- Optional loading on startup.
 
 There are the following types of collections:
 1. Local collection.
