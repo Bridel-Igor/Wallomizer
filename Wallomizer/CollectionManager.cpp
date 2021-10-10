@@ -93,7 +93,8 @@ bool CollectionManager::loadSettings()
 	if (MainWindow::mainWindow != nullptr)
 		MainWindow::collectionItemsFrame->updateCollectionItems();
 	bIsReady = true;
-	Settings::abortDelay();
+	if (Settings::bRunSlideshow)
+		Settings::abortDelay();
 	srand((unsigned int)time(NULL));
 	if (number == 0)
 	{
@@ -113,6 +114,7 @@ void CollectionManager::reloadSettings()
 	wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(path);
 	Settings::loadingImage.unlock();
+	Settings::replayDelay();
 }
 
 void CollectionManager::updateNumber()

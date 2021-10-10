@@ -112,12 +112,7 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 			if COMMANDEVENT(collectionItems[i]->chboEnabled)
 			{
 				CollectionManager::collections[i]->isEnabled = collectionItems[i]->chboEnabled->isChecked();
-				CollectionManager::saveSettings();
-				CollectionManager::updateNumber();
-				Settings::loadingImage.lock();
-				remove("Resources/Loaded wallpaper.dat");
-				Settings::loadingImage.unlock();
-				Settings::abortDelay();
+				CollectionManager::reloadSettings();
 				return 0;
 			}
 		}
@@ -200,6 +195,23 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////MainWindow
+void MainWindow::updateTimer()
+{
+	if (stDelayRemained == nullptr)
+		return;
+	unsigned long remaining = Settings::getRemainingDelay();
+	char buf[16], sec[3], min[3], hour[4];
+	_itoa_s((remaining / 1000) % 60, sec, 10);
+	_itoa_s(((remaining / 1000) /60) %60, min, 10);
+	_itoa_s((remaining / 1000) /3600, hour, 10);
+	strcpy_s(buf, hour);
+	strcat_s(buf, ":");
+	strcat_s(buf, min);
+	strcat_s(buf, ":");
+	strcat_s(buf, sec);
+	SetWindowTextA(stDelayRemained->hWnd, buf);
+}
+
 LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
@@ -216,7 +228,7 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		btnPlay = new Button(Window(), "",					310,	450,	20,		20, BS_OWNERDRAW);
 		btnPause = new Button(Window(), "",					340,	450,	20,		20, BS_OWNERDRAW);
 		btnNext = new Button(Window(), "",					370,	450,	20,		20, BS_OWNERDRAW);
-		
+		stDelayRemained = new Static(Window(), "",			400,	450,	100,	20);
 
 		hIPlay = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PLAY), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 		hIPlayActive = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PLAY_ACTIVE), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
@@ -230,6 +242,8 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		btnDonate = new Button(Window(), "Donate",			535,	450,	95,		20);
 		
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+
+		updateTimer();
 	}
 	return 0;
 
@@ -244,7 +258,7 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		DestroyIcon(hINextEnabled);
 		DestroyIcon(hIOpenExternal);
 		delete btnAdd, btnSettings, btnPlay, btnPause, btnDonate, btnNext, btnPrev, btnOpenExternal;
-		delete stCollections;
+		delete stCollections, stDelayRemained;
 		PostQuitMessage(0);
 	}
 	return 0;

@@ -16,6 +16,9 @@ namespace Settings
 
 	void saveSettings();
 	void loadSettings();
+	void saveSession();
+	void loadSession();
+	unsigned long getRemainingDelay();
 	void Delay();
 	void abortDelay();
 	void replayDelay();

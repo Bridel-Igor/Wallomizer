@@ -64,6 +64,13 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	}
 	return 0;
 
+	case WM_QUERYENDSESSION:
+	{
+		Settings::saveSession();
+		return TRUE;
+	}
+	return 0;
+
 	case WM_COMMAND:
 	{
 		switch (wParam)
