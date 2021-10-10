@@ -135,6 +135,7 @@ void TrayWindow::windowThread()
 	trayWindow->Destroy();
 	delete trayWindow;
 	Settings::exiting = true;
+	Settings::saveSession();
 	Settings::abortDelay();
 	trayWindow = nullptr;
 }

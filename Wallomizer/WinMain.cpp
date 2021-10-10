@@ -32,9 +32,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		waitedForTrayWindow += 10;
 	}
 	
-	Settings::loadSession();
 	Settings::loadSettings();
 	CollectionManager::loadSettings();
+	Settings::loadSession();
 	Settings::Delay();
 
 	while (TrayWindow::trayWindow!=nullptr)
@@ -52,7 +52,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		CollectionManager::setLoadedWallpaper();
 	}
 
-	Settings::saveSession();
 	WindowStyles::clear();
 	CollectionManager::clear();
 	if (hMutex)

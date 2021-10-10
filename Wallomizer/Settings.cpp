@@ -13,7 +13,7 @@ bool Settings::bRunSlideshow = true;
 
 namespace Settings
 {
-	constexpr unsigned char settingsVersion = 1;
+	constexpr unsigned short settingsVersion = 1U;
 	bool bAbortDelay = false;
 	bool bReplayDelay = false;
 	unsigned long delayed = 0;
@@ -48,8 +48,8 @@ void Settings::loadSettings()
 	_wfopen_s(&pFile, path, L"rb");
 	if (pFile != NULL)
 	{
-		unsigned char fileVersion = 0;
-		fwrite(&fileVersion, sizeof(fileVersion), 1, pFile);
+		unsigned short fileVersion = 0;
+		fread(&fileVersion, sizeof(fileVersion), 1, pFile);
 		if (fileVersion != settingsVersion)
 		{
 			fclose(pFile);
@@ -95,6 +95,7 @@ void Settings::loadSession()
 		fread(&bRunSlideshow, sizeof(bRunSlideshow), 1, pFile);
 		fread(&delayed, sizeof(delayed), 1, pFile);
 		fclose(pFile);
+		bAbortDelay = false;
 	}
 	DeleteFileW(path);
 }
