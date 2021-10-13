@@ -12,6 +12,7 @@
 #include "LocalCollection.h"
 #include "SearchCollection.h"
 #include "Filesystem.h"
+#include "Delay.h"
 
 std::vector<BaseCollection*> CollectionManager::collections;
 unsigned int CollectionManager::number=0;
@@ -93,8 +94,8 @@ bool CollectionManager::loadSettings()
 	if (MainWindow::mainWindow != nullptr)
 		MainWindow::collectionItemsFrame->updateCollectionItems();
 	bIsReady = true;
-	if (Settings::bRunSlideshow)
-		Settings::abortDelay();
+	if (Delay::bRunSlideshow)
+		Delay::abortDelay();
 	srand((unsigned int)time(NULL));
 	if (number == 0)
 	{
@@ -106,15 +107,15 @@ bool CollectionManager::loadSettings()
 
 void CollectionManager::reloadSettings()
 {
-	Settings::loadingImage.lock();
+	Delay::loadingImage.lock();
 	saveSettings();
 	loadSettings();
 	wchar_t path[MAX_PATH];
 	Filesystem::getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(path);
-	Settings::loadingImage.unlock();
-	Settings::replayDelay();
+	Delay::loadingImage.unlock();
+	Delay::replayDelay();
 }
 
 void CollectionManager::updateNumber()
@@ -148,13 +149,13 @@ void CollectionManager::eraseCollection(int index)
 	collections.erase(CollectionManager::collections.begin() + index);
 	saveSettings();
 	updateNumber();
-	Settings::loadingImage.lock();
+	Delay::loadingImage.lock();
 	wchar_t path[MAX_PATH];
 	Filesystem::getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(path);
-	Settings::loadingImage.unlock();
-	Settings::abortDelay();
+	Delay::loadingImage.unlock();
+	Delay::abortDelay();
 }
 
 void CollectionManager::clear()
@@ -173,11 +174,11 @@ void CollectionManager::loadRandomWallpaper()
 {
 	if (number <= 0)
 		return;
-	Settings::loadingImage.lock();
+	Delay::loadingImage.lock();
 	int randomFromAll = rand() % number;
 	if (!loadWallpaper(randomFromAll))
 		loadWallpaper(randomFromAll);
-	Settings::loadingImage.unlock();
+	Delay::loadingImage.unlock();
 }
 
 bool CollectionManager::loadWallpaper(int index)
@@ -214,10 +215,10 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 
 	if (!std::experimental::filesystem::exists(loadedPath))
 	{
-		Settings::abortDelay();
+		Delay::abortDelay();
 		return;
 	}
-	Settings::loadingImage.lock();
+	Delay::loadingImage.lock();
 	if (!setPrevious && previous != nullptr)
 	{
 		for (int i = Settings::prevCount; i > 0; i--)
@@ -227,7 +228,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	DeleteFileW(currentPath);
 	if (MoveFileW(loadedPath, currentPath) == 0)
 	{
-		Settings::loadingImage.unlock();
+		Delay::loadingImage.unlock();
 		return;
 	}
 	wchar_t currentPathNative[MAX_PATH];
@@ -236,7 +237,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, currentPathNative, SPIF_UPDATEINIFILE);
 	if (MainWindow::mainWindow && !setPrevious)
 		InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
-	Settings::loadingImage.unlock();
+	Delay::loadingImage.unlock();
 }
 
 void CollectionManager::setNextWallpaper()

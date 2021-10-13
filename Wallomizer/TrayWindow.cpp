@@ -3,6 +3,7 @@
 #include "MainWindow.h"
 #include "Settings.h"
 #include "CollectionManager.h"
+#include "Delay.h"
 
 #define WM_NOTIFYICONMSG (WM_USER + 2)
 
@@ -39,8 +40,8 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			EnableMenuItem(hPopup, 3, MF_BYPOSITION | MF_ENABLED);
 		else
 			EnableMenuItem(hPopup, 3, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
-		EnableMenuItem(hPopup, 0, Settings::bRunSlideshow ? MF_BYPOSITION | MF_DISABLED | MF_GRAYED : MF_BYPOSITION | MF_ENABLED);
-		EnableMenuItem(hPopup, 1, Settings::bRunSlideshow ? MF_BYPOSITION | MF_ENABLED : MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
+		EnableMenuItem(hPopup, 0, Delay::bRunSlideshow ? MF_BYPOSITION | MF_DISABLED | MF_GRAYED : MF_BYPOSITION | MF_ENABLED);
+		EnableMenuItem(hPopup, 1, Delay::bRunSlideshow ? MF_BYPOSITION | MF_ENABLED : MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
 		SetForegroundWindow(hWnd);
 		POINT pt;
 		GetCursorPos(&pt);
@@ -66,7 +67,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_QUERYENDSESSION:
 	{
-		Settings::saveSession();
+		Delay::saveSession();
 		return TRUE;
 	}
 	return 0;
@@ -76,21 +77,21 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		switch (wParam)
 		{
 		case ID_WALLOMIZER_START:
-			Settings::startSlideshow();
+			Delay::startSlideshow();
 			if (MainWindow::mainWindow)
 				InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
 			break;
 		case ID_WALLOMIZER_PAUSE:
-			Settings::pauseSlideshow();
+			Delay::pauseSlideshow();
 			if (MainWindow::mainWindow)
 				InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
 			break;
 		case ID_WALLOMIZER_NEXTWALLPAPER:
-			Settings::replayDelay();
+			Delay::replayDelay();
 			CollectionManager::setNextWallpaper();
 			break;
 		case ID_WALLOMIZER_PREVIOUSWALLPAPER:
-			Settings::replayDelay();
+			Delay::replayDelay();
 			CollectionManager::setPreviousWallpaper();
 			break;
 		case ID_WALLOMIZER_SETTINGS:
@@ -134,8 +135,8 @@ void TrayWindow::windowThread()
 	}
 	trayWindow->Destroy();
 	delete trayWindow;
-	Settings::exiting = true;
-	Settings::saveSession();
-	Settings::abortDelay();
+	Delay::exiting = true;
+	Delay::saveSession();
+	Delay::abortDelay();
 	trayWindow = nullptr;
 }

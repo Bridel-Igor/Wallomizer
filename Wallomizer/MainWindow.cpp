@@ -6,6 +6,7 @@
 #include "AddCollectionWindow.h"
 #include "SettingsWindow.h"
 #include "TrayWindow.h"
+#include "Delay.h"
 
 MainWindow* MainWindow::mainWindow = nullptr;
 MainWindow::CollectionItemsFrame* MainWindow::collectionItemsFrame = nullptr;
@@ -199,7 +200,7 @@ void MainWindow::updateTimer()
 {
 	if (stDelayRemained == nullptr)
 		return;
-	unsigned long remaining = Settings::getRemainingDelay();
+	unsigned long remaining = Delay::getRemainingDelay();
 	char buf[16], sec[3], min[3], hour[4];
 	_itoa_s((remaining / 1000) % 60, sec, 10);
 	_itoa_s(((remaining / 1000) /60) %60, min, 10);
@@ -276,13 +277,13 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		if (pDIS->hwndItem == btnPlay->hWnd)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, Settings::bRunSlideshow?hIPlayActive:hIPlay, 0, 0, 0, NULL, DI_NORMAL);
+			DrawIconEx(pDIS->hDC, 0, 0, Delay::bRunSlideshow?hIPlayActive:hIPlay, 0, 0, 0, NULL, DI_NORMAL);
 			return TRUE;
 		}
 		if (pDIS->hwndItem == btnPause->hWnd)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, Settings::bRunSlideshow?hIPause:hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
+			DrawIconEx(pDIS->hDC, 0, 0, Delay::bRunSlideshow?hIPause:hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
 			return TRUE;
 		}
 		if (pDIS->hwndItem == btnNext->hWnd)

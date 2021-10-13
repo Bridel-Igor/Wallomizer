@@ -73,6 +73,9 @@
     <ClCompile Include="Filesystem.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Delay.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddCollectionWindow.h">
@@ -171,6 +174,9 @@
     <ClInclude Include="Filesystem.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Delay.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Prev_disabled.ico">
@@ -220,12 +226,6 @@
     <Filter Include="Components\Headers">
       <UniqueIdentifier>{20e388b9-4e7a-47c1-9133-8ccbaa833ba5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headers">
-      <UniqueIdentifier>{4c76c573-0ae6-4a0c-80a6-d4413e4c05ac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source">
-      <UniqueIdentifier>{6c9fb727-7a60-4c52-a482-352a7c53fb28}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Windows\Source">
       <UniqueIdentifier>{224df574-79ec-4779-b1f9-21e3f1b8f876}</UniqueIdentifier>
     </Filter>
@@ -237,6 +237,12 @@
     </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{5ca111ee-2caa-4b9c-b9cd-29d436f46d02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{4c76c573-0ae6-4a0c-80a6-d4413e4c05ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{6c9fb727-7a60-4c52-a482-352a7c53fb28}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

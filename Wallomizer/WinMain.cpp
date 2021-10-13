@@ -6,6 +6,7 @@
 #include "Settings.h"
 #include "WindowStyles.h"
 #include "Filesystem.h"
+#include "Delay.h"
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
@@ -34,8 +35,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	
 	Settings::loadSettings();
 	CollectionManager::loadSettings();
-	Settings::loadSession();
-	Settings::Delay();
+	Delay::loadSession();
+	Delay::Delay();
 
 	while (TrayWindow::trayWindow!=nullptr)
 	{
@@ -44,10 +45,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			Sleep(100);
 			continue;
 		}
-		std::thread delayThread(Settings::Delay);
+		std::thread delayThread(Delay::Delay);
 		CollectionManager::loadNextWallpaper();
 		delayThread.join();
-		if (Settings::exiting)
+		if (Delay::exiting)
 			break;
 		CollectionManager::setLoadedWallpaper();
 	}
