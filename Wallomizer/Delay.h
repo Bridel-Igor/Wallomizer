@@ -1,11 +1,8 @@
 #pragma once
 
-#include <mutex>
-
 namespace Delay
 {
 	extern bool exiting;
-	extern std::mutex loadingImage;
 	extern bool bRunSlideshow;
 
 	void saveSession();
@@ -16,4 +13,6 @@ namespace Delay
 	void replayDelay();
 	void startSlideshow();
 	void pauseSlideshow();
+	void beginImageModification();
+	void endImageModification();
 }

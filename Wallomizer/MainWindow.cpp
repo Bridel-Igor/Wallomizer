@@ -200,7 +200,14 @@ void MainWindow::updateTimer()
 {
 	if (stDelayRemained == nullptr)
 		return;
+	if (CollectionManager::bLoading)
+	{
+		SetWindowTextA(stDelayRemained->hWnd, "loading...");
+		return;
+	}
 	unsigned long remaining = Delay::getRemainingDelay();
+	if (remaining % 1000 != 0)
+		remaining += 1000;
 	char buf[16], sec[3], min[3], hour[4];
 	_itoa_s((remaining / 1000) % 60, sec, 10);
 	_itoa_s(((remaining / 1000) /60) %60, min, 10);

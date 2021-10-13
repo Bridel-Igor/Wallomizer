@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "TrayWindow.h"
 #include "resource.h"
 #include "MainWindow.h"

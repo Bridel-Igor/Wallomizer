@@ -1,16 +1,17 @@
 #include <windows.h>
+#include <mutex>
 
 #include "Delay.h"
 #include "Settings.h"
 #include "Filesystem.h"
 #include "MainWindow.h"
 
-std::mutex Delay::loadingImage;
 bool Delay::exiting = false;
 bool Delay::bRunSlideshow = true;
 
 namespace Delay
 {
+	std::mutex loadingImage;
 	bool bAbortDelay = false;
 	bool bReplayDelay = false;
 	unsigned long delayed = 0;
@@ -96,4 +97,14 @@ void Delay::startSlideshow()
 void Delay::pauseSlideshow()
 {
 	bRunSlideshow = false;
+}
+
+void Delay::beginImageModification()
+{
+	Delay::loadingImage.lock();
+}
+
+void Delay::endImageModification()
+{
+	Delay::loadingImage.unlock();
 }

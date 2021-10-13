@@ -5,7 +5,7 @@
 #include "Filesystem.h"
 
 unsigned int Settings::prevCount = 5;
-unsigned long Settings::delay = 60000;
+unsigned long Settings::delay = 300000;
 char Settings::username[64];
 char Settings::apiKey[128];
 bool Settings::loadOnStartup = false;

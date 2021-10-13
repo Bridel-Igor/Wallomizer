@@ -32,6 +32,7 @@ public:
 	static bool isReady() { return bIsReady; }
 
 	static std::vector<BaseCollection*> collections;
+	static bool bLoading;
 
 private:
 	static unsigned int number;

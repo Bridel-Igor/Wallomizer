@@ -19,6 +19,7 @@ unsigned int CollectionManager::number=0;
 int *CollectionManager::previous = nullptr;
 int CollectionManager::indexOfLoaded = 0;
 bool CollectionManager::bIsReady = false;
+bool CollectionManager::bLoading = false;
 
 bool CollectionManager::saveSettings()
 {
@@ -44,6 +45,9 @@ bool CollectionManager::saveSettings()
 
 bool CollectionManager::loadSettings()
 {
+	bLoading = true;
+	if (MainWindow::mainWindow != nullptr)
+		MainWindow::mainWindow->updateTimer();
 	wchar_t path[MAX_PATH];
 	Filesystem::getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"CollectionManager.dat");
@@ -102,19 +106,20 @@ bool CollectionManager::loadSettings()
 		Sleep(10);
 		PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, (WPARAM)ID_WALLOMIZER_SETTINGS, NULL);
 	}
+	bLoading = false;
 	return true;
 }
 
 void CollectionManager::reloadSettings()
 {
-	Delay::loadingImage.lock();
+	Delay::beginImageModification();
 	saveSettings();
 	loadSettings();
 	wchar_t path[MAX_PATH];
 	Filesystem::getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(path);
-	Delay::loadingImage.unlock();
+	Delay::endImageModification();
 	Delay::replayDelay();
 }
 
@@ -149,12 +154,12 @@ void CollectionManager::eraseCollection(int index)
 	collections.erase(CollectionManager::collections.begin() + index);
 	saveSettings();
 	updateNumber();
-	Delay::loadingImage.lock();
+	Delay::beginImageModification();
 	wchar_t path[MAX_PATH];
 	Filesystem::getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(path);
-	Delay::loadingImage.unlock();
+	Delay::endImageModification();
 	Delay::abortDelay();
 }
 
@@ -174,11 +179,11 @@ void CollectionManager::loadRandomWallpaper()
 {
 	if (number <= 0)
 		return;
-	Delay::loadingImage.lock();
+	Delay::beginImageModification();
 	int randomFromAll = rand() % number;
 	if (!loadWallpaper(randomFromAll))
 		loadWallpaper(randomFromAll);
-	Delay::loadingImage.unlock();
+	Delay::endImageModification();
 }
 
 bool CollectionManager::loadWallpaper(int index)
@@ -218,7 +223,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 		Delay::abortDelay();
 		return;
 	}
-	Delay::loadingImage.lock();
+	Delay::beginImageModification();
 	if (!setPrevious && previous != nullptr)
 	{
 		for (int i = Settings::prevCount; i > 0; i--)
@@ -228,7 +233,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	DeleteFileW(currentPath);
 	if (MoveFileW(loadedPath, currentPath) == 0)
 	{
-		Delay::loadingImage.unlock();
+		Delay::endImageModification();
 		return;
 	}
 	wchar_t currentPathNative[MAX_PATH];
@@ -237,7 +242,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, currentPathNative, SPIF_UPDATEINIFILE);
 	if (MainWindow::mainWindow && !setPrevious)
 		InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
-	Delay::loadingImage.unlock();
+	Delay::endImageModification();
 }
 
 void CollectionManager::setNextWallpaper()
