@@ -1,7 +1,7 @@
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 
 #include <experimental/filesystem>
-#include <time.h>
+#include <ctime>
 
 #include "CollectionManager.h"
 #include "Settings.h"
@@ -20,6 +20,8 @@ bool CollectionManager::bIsReady = false;
 bool CollectionManager::bLoading = false;
 Wallpaper *CollectionManager::current;
 Wallpaper *CollectionManager::next;
+std::mt19937 CollectionManager::rndGen(time(0));
+std::uniform_int_distribution<int> CollectionManager::uid(0, 0);
 
 bool CollectionManager::saveSettings()
 {
@@ -97,7 +99,6 @@ bool CollectionManager::loadSettings()
 	bIsReady = true;
 	if (Delay::bRunSlideshow)
 		Delay::abortDelay();
-	srand((unsigned int)time(NULL));
 	if (number == 0)
 	{
 		Sleep(10);
@@ -125,6 +126,7 @@ void CollectionManager::updateNumber()
 	number = 0;
 	for (unsigned int i = 0; i < collections.size(); i++)
 		number += collections[i]->isEnabled ? collections[i]->getNumber() : 0;
+	uid = std::uniform_int_distribution<int>(0, number-1);
 }
 
 template <typename T> void CollectionManager::addCollection()
@@ -172,11 +174,9 @@ void CollectionManager::loadRandomWallpaper()
 	if (number <= 0)
 		return;
 	Delay::beginImageModification();
-	int randomFromAll = rand() % number;
-	//if (!getWallpaperInfo(&next, randomFromAll))
-		getWallpaperInfo(next, randomFromAll);
-	//if (!loadWallpaper(&next))
-		loadWallpaper(next); // ?????????
+	int randomFromAll = uid(rndGen);
+	getWallpaperInfo(next, randomFromAll);
+	loadWallpaper(next);
 	Delay::endImageModification();
 }
 

@@ -126,7 +126,6 @@ void TrayWindow::windowThread()
 {
 	if (trayWindow)
 		return;
-	srand((unsigned int)time(NULL)); // change to c++11 random
 	trayWindow = new TrayWindow;
 	trayWindow->Create("Wallomizer", NULL, NULL, 0, 0, 0, 0, NULL, NULL);
 	ShowWindow(trayWindow->Window(), SW_HIDE);

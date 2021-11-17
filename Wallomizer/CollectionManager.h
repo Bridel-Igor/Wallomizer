@@ -2,6 +2,7 @@
 
 #include <list>
 #include <vector>
+#include <random>
 
 #include "BaseCollection.h"
 
@@ -40,4 +41,6 @@ private:
 	static std::list<Wallpaper*> previous;
 	static Wallpaper *current, *next;
 	static bool bIsReady;
+	static std::mt19937 rndGen;
+	static std::uniform_int_distribution<int> uid;
 };
