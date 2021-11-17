@@ -134,6 +134,7 @@ bool UserCollection::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index)
 	}
 	
 	Internet::bufferAccess.unlock();
+	return true;
 }
 
 bool UserCollection::loadWallpaper(Wallpaper* wallpaper)
@@ -212,7 +213,7 @@ void UserCollection::openWallpaperExternal(Wallpaper* wallpaper)
 {
 	char imgUrl[255] = "https://wallhaven.cc/w/";
 	bool dashFound = false;
-	int j = strlen(imgUrl);
+	int j = (int)strlen(imgUrl);
 	for (int i = 0; i < strlen(wallpaper->getPathA()); i++)
 	{
 		if (dashFound)

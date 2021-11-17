@@ -20,7 +20,7 @@ bool CollectionManager::bIsReady = false;
 bool CollectionManager::bLoading = false;
 Wallpaper *CollectionManager::current;
 Wallpaper *CollectionManager::next;
-std::mt19937 CollectionManager::rndGen(time(0));
+std::mt19937 CollectionManager::rndGen(static_cast<unsigned int>(time(0)));
 std::uniform_int_distribution<int> CollectionManager::uid(0, 0);
 
 bool CollectionManager::saveSettings()
@@ -33,7 +33,7 @@ bool CollectionManager::saveSettings()
 	if (pFile != NULL)
 	{
 		char cNumber[10];
-		_itoa_s(collections.size(), cNumber, 10);
+		_itoa_s((int)collections.size(), cNumber, 10);
 		cNumber[9] = '\0';
 		fputs(cNumber, pFile);
 		fputs("\n", pFile);

@@ -30,7 +30,7 @@ public:
     }
     int getPos()
     {
-        return SendMessageA(hWnd, UDM_GETPOS32, NULL, NULL);
+        return (int)SendMessageA(hWnd, UDM_GETPOS32, NULL, NULL);
     }
     char* getPosA()
     {

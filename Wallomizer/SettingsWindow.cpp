@@ -46,7 +46,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 		stApplication = new Static(Window(), "Application",		10,		10,		380,	20, SS_CENTER);
 		stVersion = new Static(Window(), "Version:",			10,		40,		130,	20, SS_RIGHT);
-		stActVersion = new Static(Window(), "1.0.3",			150,	40,		100,	20);
+		stActVersion = new Static(Window(), "1.0.4",			150,	40,		100,	20);
 		btnUpdate = new Button(Window(), "Check for updates",	270,	40,		120,	20);
 		stStartup = new Static(Window(), "Load on startup:",	10,		70,		130,	20, SS_RIGHT);
 		cbStartup = new CheckBox(Window(), "",					150,	70,		20,		20, NULL);

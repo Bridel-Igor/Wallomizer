@@ -23,7 +23,7 @@ public:
 	}
 	int getSelectedItem()
 	{
-		return SendMessage(hWnd, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+		return (int)SendMessage(hWnd, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
 	}
 	void getTextA(char* buffer, int size)
 	{

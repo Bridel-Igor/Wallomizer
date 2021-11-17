@@ -27,7 +27,7 @@ void MainWindow::CollectionItemsFrame::updateCollectionItems()
 
 	for (size_t i = collectionItems.size(); i < CollectionManager::collections.size(); i++) // creation
 		if (CollectionManager::collections[i]!=nullptr)
-			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->Window(), 0, (i * 20), MainWindow::width-20-18, 20, CollectionManager::collections[i], WindowStyles::mainFont));
+			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->Window(), 0, (int)(i * 20), MainWindow::width-20-18, 20, CollectionManager::collections[i], WindowStyles::mainFont));
 	
 	updateScroll();
 	for (auto p : collectionItems) // placing according to the scrollbar

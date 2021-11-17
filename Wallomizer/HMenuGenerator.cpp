@@ -6,7 +6,7 @@
 namespace HMenuGenerator
 {
 	std::vector<HMENU> usedValues;
-	std::mt19937 rndGen(time(0));
+	std::mt19937 rndGen(static_cast<unsigned int>(time(0)));
 	std::uniform_int_distribution<unsigned long long> uid(1000, 1999);
 }
 

@@ -35,11 +35,11 @@ public:
 
 	static std::vector<BaseCollection*> collections;
 	static bool bLoading;
+	static Wallpaper *current, *next;
 	
 private:
 	static unsigned int number;
 	static std::list<Wallpaper*> previous;
-	static Wallpaper *current, *next;
 	static bool bIsReady;
 	static std::mt19937 rndGen;
 	static std::uniform_int_distribution<int> uid;

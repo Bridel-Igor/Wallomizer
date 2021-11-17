@@ -138,7 +138,7 @@ void TrayWindow::windowThread()
 	trayWindow->Destroy();
 	delete trayWindow;
 	Delay::exiting = true;
-	Delay::saveSession();
+	Delay::saveSession(CollectionManager::current);
 	Delay::abortDelay();
 	trayWindow = nullptr;
 }

@@ -82,7 +82,7 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		if (custom.find("x") != std::string::npos)
 		{
 			char buf[8] = { 0 };
-			int n = custom.find("x");
+			int n = static_cast<int>(custom.find("x"));
 			for (int i = 0; i < n; i++)
 				buf[i] = custom[i];
 			edWidth->setTextA(buf);

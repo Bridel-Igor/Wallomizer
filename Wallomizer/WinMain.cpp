@@ -35,7 +35,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	
 	Settings::loadSettings();
 	CollectionManager::loadSettings();
-	Delay::loadSession();
+	Delay::loadSession(CollectionManager::current);
 
 	while (TrayWindow::trayWindow!=nullptr)
 	{

@@ -1,12 +1,14 @@
 #pragma once
 
+#include "Wallpaper.h"
+
 namespace Delay
 {
 	extern bool exiting;
 	extern bool bRunSlideshow;
 
-	void saveSession();
-	void loadSession();
+	void saveSession(Wallpaper *current = nullptr);
+	void loadSession(Wallpaper *&current);
 	unsigned long getRemainingDelay();
 	void Delay();
 	void abortDelay();

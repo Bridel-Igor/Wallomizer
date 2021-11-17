@@ -17,7 +17,7 @@ namespace Delay
 	unsigned long delayed = 0;
 }
 
-void Delay::saveSession()
+void Delay::saveSession(Wallpaper *current)
 {
 	wchar_t path[MAX_PATH];
 	Filesystem::getRoamingDir(path);
@@ -28,11 +28,28 @@ void Delay::saveSession()
 	{
 		fwrite(&bRunSlideshow, sizeof(bRunSlideshow), 1, pFile);
 		fwrite(&delayed, sizeof(delayed), 1, pFile);
+		unsigned char type;
+		if (current != nullptr)
+		{
+			type = static_cast<unsigned char>(current->getType());
+			fwrite(&type, sizeof(CollectionType), 1, pFile);
+			if (current->getType() == CollectionType::local)
+				fwrite(current->getPathW(), sizeof(wchar_t), MAX_PATH, pFile);
+			if (current->getType() == CollectionType::user)
+				fwrite(current->getPathA(), sizeof(char), 255, pFile);
+			if (current->getType() == CollectionType::search)
+				fwrite(current->getPathA(), sizeof(char), 1024, pFile);
+		}
+		else
+		{
+			type = static_cast<unsigned char>(CollectionType::none);
+			fwrite(&type, sizeof(CollectionType), 1, pFile);
+		}
 		fclose(pFile);
 	}
 }
 
-void Delay::loadSession()
+void Delay::loadSession(Wallpaper*& current)
 {
 	wchar_t path[MAX_PATH];
 	Filesystem::getRoamingDir(path);
@@ -43,6 +60,18 @@ void Delay::loadSession()
 	{
 		fread(&bRunSlideshow, sizeof(bRunSlideshow), 1, pFile);
 		fread(&delayed, sizeof(delayed), 1, pFile);
+		if (current == nullptr)
+		{
+			unsigned char type;
+			fread(&type, sizeof(CollectionType), 1, pFile);
+			current = new Wallpaper(static_cast<CollectionType>(type));
+			if (current->getType() == CollectionType::local)
+				fread(current->getPathW(), sizeof(wchar_t), MAX_PATH, pFile);
+			if (current->getType() == CollectionType::user)
+				fread(current->getPathA(), sizeof(char), 255, pFile);
+			if (current->getType() == CollectionType::search)
+				fread(current->getPathA(), sizeof(char), 1024, pFile);
+		}
 		fclose(pFile);
 		bAbortDelay = false;
 	}

@@ -130,7 +130,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 			int index = 0;
 			if (strlen(prevName))
 			{
-				index = SendMessageA(cbCollections->hWnd, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)prevName);
+				index = (int)SendMessageA(cbCollections->hWnd, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)prevName);
 				if (index == CB_ERR)
 					index = 0;
 			}

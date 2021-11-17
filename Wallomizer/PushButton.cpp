@@ -61,6 +61,6 @@ void PushButton::draw(LPDRAWITEMSTRUCT& pDIS)
 	SetTextAlign(pDIS->hDC, TA_CENTER);
 	char staticText[32];
 	staticText[31] = '\0';
-	int len = SendMessageA(pDIS->hwndItem, WM_GETTEXT, 31, (LPARAM)staticText);
+	int len = (int)SendMessageA(pDIS->hwndItem, WM_GETTEXT, 31, (LPARAM)staticText);
 	TextOutA(pDIS->hDC, (pDIS->rcItem.right - pDIS->rcItem.left) / 2, pDIS->rcItem.left + 3, staticText, len);
 }
