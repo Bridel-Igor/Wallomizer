@@ -28,12 +28,13 @@ public:
 	~UserCollection();
 	bool saveSettings(FILE* pFile);
 	bool loadSettings(FILE* pFile);
-	bool loadWallpaper(unsigned int index);
+	bool getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index);
+	static bool loadWallpaper(Wallpaper* wallpaper);
 	static std::vector<UserCollectionInfo> loadCollectionList(char* username, char* apiKey);
 	LPCSTR collectionType() const { return "User collection"; }
 	LPCSTR collectionName() const;
 	void openCollectionSettingsWindow(); 
-	void openWallpaperExternal(unsigned int index);
+	static void openWallpaperExternal(Wallpaper* wallpaper);
 
 	UserCollectionSettings* settings;
 	

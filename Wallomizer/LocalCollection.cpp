@@ -60,7 +60,7 @@ bool LocalCollection::loadSettings(FILE* pFile)
 	return false;
 }
 
-bool LocalCollection::loadWallpaper(unsigned int index)
+bool LocalCollection::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index)
 {
 	if (directoryPath == "" || number <= 0)
 		return false;
@@ -71,28 +71,33 @@ bool LocalCollection::loadWallpaper(unsigned int index)
 		{
 			if (i == index)
 			{
-				wchar_t imgPath[255];
-				wcscpy_s(imgPath, 255, p.path().generic_wstring().c_str());
-				imgPath[wcslen(imgPath)] = '\0';
-				char buf[BUFSIZ];
-				size_t size;
-				FILE *source=nullptr, *dest=nullptr;
-				_wfopen_s(&source, imgPath, L"rb");
-				wchar_t path[MAX_PATH];
-				Filesystem::getRoamingDir(path);
-				wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
-				_wfopen_s(&dest, path, L"wb");
-				if (source == nullptr || dest == nullptr)
-					return false;
-				while (size = fread(buf, 1, BUFSIZ, source))
-					fwrite(buf, 1, size, dest);
-				fclose(source);
-				fclose(dest);
+				wallpaper = new Wallpaper(CollectionType::local);
+				wcscpy_s(wallpaper->getPathW(), MAX_PATH, p.path().generic_wstring().c_str());
+				wallpaper->getPathW()[wcslen(wallpaper->getPathW())] = '\0';
 				return true;
 			}
 			i++;
 		}
 	return false;
+}
+
+bool LocalCollection::loadWallpaper(Wallpaper *wallpaper)
+{
+	char buf[BUFSIZ];
+	size_t size;
+	FILE* source = nullptr, * dest = nullptr;
+	_wfopen_s(&source, wallpaper->getPathW(), L"rb");
+	wchar_t path[MAX_PATH];
+	Filesystem::getRoamingDir(path);
+	wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
+	_wfopen_s(&dest, path, L"wb");
+	if (source == nullptr || dest == nullptr)
+		return false;
+	while (size = fread(buf, 1, BUFSIZ, source))
+		fwrite(buf, 1, size, dest);
+	fclose(source);
+	fclose(dest);
+	return true;
 }
 
 LPCSTR LocalCollection::collectionName() const
@@ -111,31 +116,19 @@ void LocalCollection::openCollectionSettingsWindow()
 	SetLocalCollectionWindow::windowThread(this);
 }
 
-void LocalCollection::openWallpaperExternal(unsigned int index)
+void LocalCollection::openWallpaperExternal(Wallpaper* wallpaper)
 {
-	if (directoryPath == "" || number <= 0)
-		return;
-	unsigned int i = 0;
-	std::experimental::filesystem::path p1{ directoryPath };
-	for (auto& p : std::experimental::filesystem::directory_iterator(p1))
-		if (isImage(p))
-		{
-			if (i == index)
-			{
-				wchar_t imgPath[255];
-				wcscpy_s(imgPath, 255, p.path().generic_wstring().c_str());
-				imgPath[wcslen(imgPath)] = '\0';
-				for (int j = 0; j < wcslen(imgPath); j++)
-					if (imgPath[j] == '/')
-						imgPath[j] = '\\';
+	wchar_t imgPath[MAX_PATH];
+	wcscpy_s(imgPath, MAX_PATH, wallpaper->getPathW());
 
-				ITEMIDLIST* pidl = ILCreateFromPathW(imgPath);
-				if (pidl) {
-					SHOpenFolderAndSelectItems(pidl, 0, 0, 0);
-					ILFree(pidl);
-					return;
-				}
-			}
-			i++;
-		}
+	for (int j = 0; j < wcslen(imgPath); j++)
+		if (imgPath[j] == '/')
+			imgPath[j] = '\\';
+
+	ITEMIDLIST* pidl = ILCreateFromPathW(imgPath);
+	if (pidl) {
+		SHOpenFolderAndSelectItems(pidl, 0, 0, 0);
+		ILFree(pidl);
+		return;
+	}
 }

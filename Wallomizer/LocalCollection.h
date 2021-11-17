@@ -8,11 +8,12 @@ public:
 	LocalCollection();
 	bool saveSettings(FILE* pFile);
 	bool loadSettings(FILE* pFile);
-	virtual bool loadWallpaper(unsigned int index);
+	bool getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index);
+	static bool loadWallpaper(Wallpaper* wallpaper);
 	LPCSTR collectionType() const { return "Local collection"; };
 	LPCSTR collectionName() const;
 	void openCollectionSettingsWindow();
-	void openWallpaperExternal(unsigned int index);
+	static void openWallpaperExternal(Wallpaper* wallpaper);
 
 	char directoryPath[255];
 };

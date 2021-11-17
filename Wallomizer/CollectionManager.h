@@ -1,7 +1,7 @@
 #pragma once
 
+#include <list>
 #include <vector>
-#include <string>
 
 #include "BaseCollection.h"
 
@@ -19,7 +19,8 @@ public:
 	static void eraseCollection(int index);
 	static void clear();
 	static void loadRandomWallpaper();
-	static bool loadWallpaper(int index);
+	static bool getWallpaperInfo(Wallpaper*& wallpaper, int index);
+	static bool loadWallpaper(Wallpaper *wallpaper);
 	static void loadNextWallpaper();
 	static void setLoadedWallpaper(bool setPrevious = false);
 	static void setNextWallpaper();
@@ -33,9 +34,10 @@ public:
 
 	static std::vector<BaseCollection*> collections;
 	static bool bLoading;
-
+	
 private:
 	static unsigned int number;
-	static int *previous, indexOfLoaded;
+	static std::list<Wallpaper*> previous;
+	static Wallpaper *current, *next;
 	static bool bIsReady;
 };

@@ -1,7 +1,6 @@
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 
 #include <experimental/filesystem>
-#include <string>
 #include <time.h>
 
 #include "CollectionManager.h"
@@ -16,10 +15,11 @@
 
 std::vector<BaseCollection*> CollectionManager::collections;
 unsigned int CollectionManager::number=0;
-int *CollectionManager::previous = nullptr;
-int CollectionManager::indexOfLoaded = 0;
+std::list<Wallpaper*> CollectionManager::previous;
 bool CollectionManager::bIsReady = false;
 bool CollectionManager::bLoading = false;
+Wallpaper *CollectionManager::current;
+Wallpaper *CollectionManager::next;
 
 bool CollectionManager::saveSettings()
 {
@@ -57,9 +57,6 @@ bool CollectionManager::loadSettings()
 	if (pFile != NULL)
 	{
 		clear();
-		previous = new int[Settings::prevCount+1];
-		for (unsigned int i = 0; i < Settings::prevCount+1; i++)
-			previous[i] = -1;
 		size_t n;
 		char buffer[255];
 		fgets(buffer, 255, pFile);
@@ -165,11 +162,6 @@ void CollectionManager::eraseCollection(int index)
 
 void CollectionManager::clear()
 {
-	if (previous!=nullptr)
-	{
-		delete [] previous;
-		previous = nullptr;
-	}
 	for (auto p : collections)
 		delete p;
 	collections.clear();
@@ -181,15 +173,15 @@ void CollectionManager::loadRandomWallpaper()
 		return;
 	Delay::beginImageModification();
 	int randomFromAll = rand() % number;
-	if (!loadWallpaper(randomFromAll))
-		loadWallpaper(randomFromAll);
+	//if (!getWallpaperInfo(&next, randomFromAll))
+		getWallpaperInfo(next, randomFromAll);
+	//if (!loadWallpaper(&next))
+		loadWallpaper(next); // ?????????
 	Delay::endImageModification();
 }
 
-bool CollectionManager::loadWallpaper(int index)
+bool CollectionManager::getWallpaperInfo(Wallpaper*& wallpaper, int index)
 {
-	int tmpIndex = index;
-	indexOfLoaded = index;
 	for (unsigned int i = 0; i < collections.size(); i++)
 	{
 		if (!collections[i]->isEnabled)
@@ -199,10 +191,26 @@ bool CollectionManager::loadWallpaper(int index)
 		{
 			if (collections[i] == nullptr || i >= collections.size() || collections[i]->getNumber() <= (index + collections[i]->getNumber()))
 				return false;
-			return collections[i]->loadWallpaper(index + collections[i]->getNumber());
+			collections[i]->getWallpaperInfo(wallpaper, index + collections[i]->getNumber());
+			return true;
 		}
 	}
 	return false;
+}
+
+bool CollectionManager::loadWallpaper(Wallpaper *wallpaper)
+{
+	switch (wallpaper->getType())
+	{
+	case CollectionType::local:
+		return LocalCollection::loadWallpaper(wallpaper);
+	case CollectionType::user:
+		return UserCollection::loadWallpaper(wallpaper);
+	case CollectionType::search:
+		return SearchCollection::loadWallpaper(wallpaper);
+	default:
+		return false;
+	}
 }
 
 void CollectionManager::loadNextWallpaper()
@@ -224,11 +232,18 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 		return;
 	}
 	Delay::beginImageModification();
-	if (!setPrevious && previous != nullptr)
+	if (!setPrevious)
 	{
-		for (int i = Settings::prevCount; i > 0; i--)
-			previous[i] = previous[i - 1];
-		previous[0] = indexOfLoaded;
+		if (current != nullptr)
+		{
+			previous.push_back(current);
+			if (previous.size() > Settings::prevCount)
+			{
+				delete previous.front();
+				previous.pop_front();
+			}
+		}
+		current = next;
 	}
 	DeleteFileW(currentPath);
 	if (MoveFileW(loadedPath, currentPath) == 0)
@@ -248,45 +263,45 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 void CollectionManager::setNextWallpaper()
 {
 	setLoadedWallpaper();
-	
 	loadNextWallpaper();
 }
 
 void CollectionManager::setPreviousWallpaper()
 {
-	if (previous == nullptr || previous[1] == -1)
+	if (previous.empty())
 		return;
-	loadWallpaper(previous[1]);
+
+	loadWallpaper(previous.back());
 	setLoadedWallpaper(true);
 	loadNextWallpaper();
-	for (unsigned int i = 0; i < Settings::prevCount; i++)
-		previous[i] = previous[i + 1];
-	previous[Settings::prevCount] = -1;
+
+	delete current;
+	current = previous.back();
+	previous.pop_back();
+
 	if (MainWindow::mainWindow)
 		InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
 }
 
 bool CollectionManager::isPrevious()
 {
-	if (previous == nullptr)
-		return false;
-	return previous[1] != -1 ? true : false;
+	return !previous.empty();
 }
 
 void CollectionManager::openWallpaperExternal()
 {
-	int index = previous[0];
-	for (unsigned int i = 0; i < collections.size(); i++)
+	switch (current->getType())
 	{
-		if (!collections[i]->isEnabled)
-			continue;
-		index -= collections[i]->getNumber();
-		if (index < 0)
-		{
-			if (collections[i] == nullptr || i >= collections.size() || collections[i]->getNumber() <= (index + collections[i]->getNumber()))
-				return;
-			collections[i]->openWallpaperExternal(index + collections[i]->getNumber());
-		}
+	case CollectionType::local:
+		LocalCollection::openWallpaperExternal(current);
+		break;
+	case CollectionType::user:
+		UserCollection::openWallpaperExternal(current);
+		break;
+	case CollectionType::search:
+		SearchCollection::openWallpaperExternal(current);
+		break;
+	default:
+		return;
 	}
-	return;
 }

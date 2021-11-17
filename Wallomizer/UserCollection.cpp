@@ -98,7 +98,7 @@ bool UserCollection::loadSettings(FILE* pFile)
 	return true;
 }
 
-bool UserCollection::loadWallpaper(unsigned int index)
+bool UserCollection::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index)
 {
 	int PageNum = int(index / per_page);
 	index -= PageNum * per_page;
@@ -125,18 +125,23 @@ bool UserCollection::loadWallpaper(unsigned int index)
 			Internet::bufferAccess.unlock();
 			return false;
 		}
-	char imgUrl[255] = "";
-	if (Internet::parse(pBuffer, "\"path\":", imgUrl) == nullptr)
+	wallpaper = new Wallpaper(CollectionType::user);
+	if (Internet::parse(pBuffer, "\"path\":", wallpaper->getPathA()) == nullptr)
 	{
 		Internet::bufferAccess.unlock();
+		delete wallpaper;
 		return false;
 	}
+	
+	Internet::bufferAccess.unlock();
+}
 
+bool UserCollection::loadWallpaper(Wallpaper* wallpaper)
+{
 	wchar_t imgPath[MAX_PATH];
 	Filesystem::getRoamingDir(imgPath);
 	wcscat_s(imgPath, MAX_PATH, L"Loaded wallpaper.dat");
-	Internet::bufferAccess.unlock();
-	return Internet::URLDownloadToFile(imgUrl, imgPath);
+	return Internet::URLDownloadToFile(wallpaper->getPathA(), imgPath);
 }
 
 std::vector<UserCollection::UserCollectionInfo> UserCollection::loadCollectionList(char* username, char* apiKey)
@@ -203,39 +208,24 @@ void UserCollection::openCollectionSettingsWindow()
 	SetUserCollectionWindow::windowThread(this);
 }
 
-void UserCollection::openWallpaperExternal(unsigned int index)
+void UserCollection::openWallpaperExternal(Wallpaper* wallpaper)
 {
-	int PageNum = int(index / per_page);
-	index -= PageNum * per_page;
-	PageNum++;
-	char pageUrl[255];
-	strcpy_s(pageUrl, collectionUrl);
-	strcat_s(pageUrl, "&page=");
-	char curPageNum[15] = "";
-	_itoa_s(PageNum, curPageNum, 10);
-	strcat_s(pageUrl, curPageNum);
-
-	Internet::bufferAccess.lock();
-
-	if (!Internet::URLDownloadToBuffer(pageUrl))
+	char imgUrl[255] = "https://wallhaven.cc/w/";
+	bool dashFound = false;
+	int j = strlen(imgUrl);
+	for (int i = 0; i < strlen(wallpaper->getPathA()); i++)
 	{
-		Internet::bufferAccess.unlock();
-		return;
-	}
-
-	char* pBuffer = Internet::buffer;
-	for (unsigned int i = 1; i < index; i++)
-		if ((pBuffer = Internet::parse(pBuffer, "\"url\":", nullptr)) == nullptr)
+		if (dashFound)
 		{
-			Internet::bufferAccess.unlock();
-			return;
+			if (wallpaper->getPathA()[i] == '.')
+				break;
+			imgUrl[j] = wallpaper->getPathA()[i];
+			j++;
 		}
-	char imgUrl[255] = "";
-	if (Internet::parse(pBuffer, "\"url\":", imgUrl) == nullptr)
-	{
-		Internet::bufferAccess.unlock();
-		return;
+		if (wallpaper->getPathA()[i] == '-')
+			dashFound = true;
 	}
-	Internet::bufferAccess.unlock();
+	imgUrl[j] = '\0';
+
 	ShellExecute(0, 0, imgUrl, 0, 0, SW_SHOW);
 }

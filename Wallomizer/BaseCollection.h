@@ -3,17 +3,20 @@
 #include <Windows.h>
 #include <string>
 
+#include "Wallpaper.h"
+
 class BaseCollection
 {
 public:
 	virtual bool saveSettings(FILE *pFile) = 0;
 	virtual bool loadSettings(FILE *pFile) = 0;
-	virtual bool loadWallpaper(unsigned int index) = 0;
+	virtual bool getWallpaperInfo(Wallpaper *&wallpaper, unsigned int index) = 0;
+	//virtual bool loadWallpaper(Wallpaper *wallpaper) = 0;
 	virtual LPCSTR collectionType() const = 0;
 	virtual LPCSTR collectionName() const = 0;
 	virtual unsigned int getNumber() { return number; }
 	virtual void openCollectionSettingsWindow() = 0;
-	virtual void openWallpaperExternal(unsigned int index) = 0;
+	//virtual void openWallpaperExternal(Wallpaper *wallpaper) = 0;
 	
 	bool isEnabled = true;
 	bool isValid = false;

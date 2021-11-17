@@ -76,6 +76,9 @@
     <ClCompile Include="Delay.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Wallpaper.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddCollectionWindow.h">
@@ -175,6 +178,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Delay.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Wallpaper.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

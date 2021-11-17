@@ -163,6 +163,7 @@
     <ClCompile Include="TrayWindow.cpp" />
     <ClCompile Include="UserCollection.cpp" />
     <ClCompile Include="SetUserCollectionWindow.cpp" />
+    <ClCompile Include="Wallpaper.cpp" />
     <ClCompile Include="WindowStyles.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
@@ -199,6 +200,7 @@
     <ClInclude Include="UpDownEdit.h" />
     <ClInclude Include="UserCollection.h" />
     <ClInclude Include="BaseWindow.h" />
+    <ClInclude Include="Wallpaper.h" />
     <ClInclude Include="WindowStyles.h" />
   </ItemGroup>
   <ItemGroup>
