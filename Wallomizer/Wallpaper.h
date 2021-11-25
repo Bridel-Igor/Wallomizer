@@ -10,9 +10,12 @@ enum class CollectionType : unsigned char
 
 class Wallpaper
 {
+	union CharX
+	{
+		wchar_t* w;
+		char* a;
+	}charX;
 	CollectionType type;
-	wchar_t* dataW;
-	char* dataA;
 
 public:
 	Wallpaper(CollectionType type);

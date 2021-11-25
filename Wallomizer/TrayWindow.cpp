@@ -69,7 +69,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_QUERYENDSESSION:
 	{
-		Delay::saveSession();
+		Delay::saveSession(CollectionManager::current);
 		return TRUE;
 	}
 	return 0;
