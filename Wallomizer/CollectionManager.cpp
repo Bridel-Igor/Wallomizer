@@ -49,7 +49,9 @@ bool CollectionManager::loadSettings()
 {
 	bLoading = true;
 	if (MainWindow::mainWindow != nullptr)
-		MainWindow::mainWindow->updateTimer();
+		MainWindow::mainWindow->player->updateTimer();
+	if (TrayWindow::trayWindow != nullptr)
+		TrayWindow::trayWindow->player->updateTimer();
 	wchar_t path[MAX_PATH];
 	Filesystem::getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"CollectionManager.dat");
@@ -101,10 +103,15 @@ bool CollectionManager::loadSettings()
 		Delay::abortDelay();
 	if (number == 0)
 	{
-		Sleep(10);
-		PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, (WPARAM)ID_WALLOMIZER_SETTINGS, NULL);
+		while (TrayWindow::trayWindow == nullptr)
+			Sleep(10);
+		PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, (WPARAM)TrayWindow::trayWindow->btnSettings->hMenu, NULL);
 	}
 	bLoading = false;
+	if (MainWindow::mainWindow != nullptr)
+		MainWindow::mainWindow->player->updateTimer();
+	if (TrayWindow::trayWindow != nullptr)
+		TrayWindow::trayWindow->player->updateTimer();
 	return true;
 }
 
@@ -126,7 +133,8 @@ void CollectionManager::updateNumber()
 	number = 0;
 	for (unsigned int i = 0; i < collections.size(); i++)
 		number += collections[i]->isEnabled ? collections[i]->getNumber() : 0;
-	uid = std::uniform_int_distribution<int>(0, number-1);
+	if (number>0)
+		uid = std::uniform_int_distribution<int>(0, number-1);
 }
 
 template <typename T> void CollectionManager::addCollection()
@@ -255,8 +263,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	Filesystem::getRoamingDirNative(currentPathNative);
 	wcscat_s(currentPathNative, MAX_PATH, L"Current wallpaper.jpg");
 	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, currentPathNative, SPIF_UPDATEINIFILE);
-	if (MainWindow::mainWindow && !setPrevious)
-		InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
+	Player::redrawPlayers();
 	Delay::endImageModification();
 }
 
@@ -279,8 +286,7 @@ void CollectionManager::setPreviousWallpaper()
 	current = previous.back();
 	previous.pop_back();
 
-	if (MainWindow::mainWindow)
-		InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
+	Player::redrawPlayers();
 }
 
 bool CollectionManager::isPrevious()

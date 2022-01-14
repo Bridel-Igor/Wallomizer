@@ -79,6 +79,9 @@
     <ClCompile Include="Wallpaper.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Components\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddCollectionWindow.h">
@@ -182,6 +185,9 @@
     </ClInclude>
     <ClInclude Include="Wallpaper.h">
       <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Components\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

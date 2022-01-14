@@ -1,6 +1,8 @@
 #pragma once
 
 #include "BaseWindow.h"
+#include "Button.h"
+#include "Player.h"
 
 class TrayWindow : public BaseWindow<TrayWindow>
 {
@@ -9,10 +11,14 @@ public:
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void windowThread();
 	
+	Button* btnSettings, * btnExit;
+	Player* player;
+	
+	static constexpr int width = 160;
+	static constexpr int height = 90;
 	static TrayWindow *trayWindow;
 
 private:
-	HMENU hPopup = nullptr, hMenu = nullptr;
 	HICON hStatusIcon = nullptr;
 	LPCSTR pszIDStatusIcon = nullptr;
 };

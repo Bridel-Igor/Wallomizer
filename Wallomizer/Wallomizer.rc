@@ -47,28 +47,6 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Menu
-//
-
-IDR_MENU1 MENU
-BEGIN
-    POPUP "Wallomizer"
-    BEGIN
-        MENUITEM "Play",                        ID_WALLOMIZER_START, GRAYED
-        MENUITEM "Pause",                       ID_WALLOMIZER_PAUSE
-        MENUITEM "Next wallpaper",              ID_WALLOMIZER_NEXTWALLPAPER
-        MENUITEM "Previous wallpaper",          ID_WALLOMIZER_PREVIOUSWALLPAPER
-        MENUITEM SEPARATOR
-        MENUITEM "Open original image",         ID_WALLOMIZER_OPENWALLPAPER
-        MENUITEM "Settings",                    ID_WALLOMIZER_SETTINGS
-        MENUITEM SEPARATOR
-        MENUITEM "Exit",                        ID_WALLOMIZER_EXIT
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Icon
 //
 
@@ -99,8 +77,8 @@ IDI_I_OPEN_EXTERNAL     ICON                    "Open_external.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,4,0
- PRODUCTVERSION 1,0,4,0
+ FILEVERSION 1,0,5,0
+ PRODUCTVERSION 1,0,5,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -116,13 +94,13 @@ BEGIN
         BLOCK "000904b0"
         BEGIN
             VALUE "CompanyName", "Igor Bridel"
-            VALUE "FileDescription", "Wallomizer executable file."
-            VALUE "FileVersion", "1.0.4.0"
+            VALUE "FileDescription", "Wallomizer"
+            VALUE "FileVersion", "1.0.5.0"
             VALUE "InternalName", "Wallomizer.exe"
             VALUE "LegalCopyright", "Copyright (c) 2021 Igor Bridel"
             VALUE "OriginalFilename", "Wallomizer.exe"
             VALUE "ProductName", "Wallomizer"
-            VALUE "ProductVersion", "1.0.4.0"
+            VALUE "ProductVersion", "1.0.5.0"
         END
     END
     BLOCK "VarFileInfo"

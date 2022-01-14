@@ -196,30 +196,6 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////MainWindow
-void MainWindow::updateTimer()
-{
-	if (stDelayRemained == nullptr)
-		return;
-	if (CollectionManager::bLoading)
-	{
-		SetWindowTextA(stDelayRemained->hWnd, "loading...");
-		return;
-	}
-	unsigned long remaining = Delay::getRemainingDelay();
-	if (remaining % 1000 != 0)
-		remaining += 1000;
-	char buf[16], sec[3], min[3], hour[4];
-	_itoa_s((remaining / 1000) % 60, sec, 10);
-	_itoa_s(((remaining / 1000) /60) %60, min, 10);
-	_itoa_s((remaining / 1000) /3600, hour, 10);
-	strcpy_s(buf, hour);
-	strcat_s(buf, ":");
-	strcat_s(buf, min);
-	strcat_s(buf, ":");
-	strcat_s(buf, sec);
-	SetWindowTextA(stDelayRemained->hWnd, buf);
-}
-
 LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
@@ -230,43 +206,29 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		btnAdd = new Button(Window(), "Add collection..",	530,	10,		100,	20);
 
 		btnSettings = new Button(Window(), "Settings",		10,		450,	95,		20);
-
-		btnPrev = new Button(Window(), "",					250,	450,	20,		20, BS_OWNERDRAW);
-		btnOpenExternal = new Button(Window(), "",			280,	450,	20,		20, BS_OWNERDRAW);
-		btnPlay = new Button(Window(), "",					310,	450,	20,		20, BS_OWNERDRAW);
-		btnPause = new Button(Window(), "",					340,	450,	20,		20, BS_OWNERDRAW);
-		btnNext = new Button(Window(), "",					370,	450,	20,		20, BS_OWNERDRAW);
-		stDelayRemained = new Static(Window(), "",			400,	450,	100,	20);
-
-		hIPlay = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PLAY), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hIPlayActive = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PLAY_ACTIVE), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hIPause = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PAUSE), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hIPauseActive = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PAUSE_ACTIVE), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hIPrevEnabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PREV), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hIPrevDisabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PREV_DISABLED), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hINextEnabled = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_NEXT), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		hIOpenExternal = (HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_OPEN_EXTERNAL), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-		
+		player = new Player(Window(),						250,	450,					
+															400,	450,	100,	20);	
 		btnDonate = new Button(Window(), "Donate",			535,	450,	95,		20);
 		
 		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	}
+	return 0;
 
-		updateTimer();
+	case WM_SHOWWINDOW:
+	{
+		if (wParam == TRUE)
+		{
+			player->updateTimer(true);
+			player->redrawPlayers();
+		}
 	}
 	return 0;
 
 	case WM_DESTROY:
 	{
-		DestroyIcon(hIPlay);
-		DestroyIcon(hIPlayActive);
-		DestroyIcon(hIPause);
-		DestroyIcon(hIPauseActive);
-		DestroyIcon(hIPrevEnabled);
-		DestroyIcon(hIPrevDisabled);
-		DestroyIcon(hINextEnabled);
-		DestroyIcon(hIOpenExternal);
-		delete btnAdd, btnSettings, btnPlay, btnPause, btnDonate, btnNext, btnPrev, btnOpenExternal;
-		delete stCollections, stDelayRemained;
+		delete btnAdd, btnSettings, btnDonate;
+		delete stCollections;
+		delete player;
 		PostQuitMessage(0);
 	}
 	return 0;
@@ -281,36 +243,8 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	case WM_DRAWITEM:
 	{
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
-		if (pDIS->hwndItem == btnPlay->hWnd)
-		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, Delay::bRunSlideshow?hIPlayActive:hIPlay, 0, 0, 0, NULL, DI_NORMAL);
+		if (player->draw(pDIS))
 			return TRUE;
-		}
-		if (pDIS->hwndItem == btnPause->hWnd)
-		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, Delay::bRunSlideshow?hIPause:hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
-			return TRUE;
-		}
-		if (pDIS->hwndItem == btnNext->hWnd)
-		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, hINextEnabled, 0, 0, 0, NULL, DI_NORMAL);
-			return TRUE;
-		}
-		if (pDIS->hwndItem == btnPrev->hWnd)
-		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, CollectionManager::isPrevious() ? hIPrevEnabled : hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
-			return TRUE;
-		}
-		if (pDIS->hwndItem == btnOpenExternal->hWnd)
-		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, hIOpenExternal, 0, 0, 0, NULL, DI_NORMAL);
-			return TRUE;
-		}
 	}
 	return 0;
 
@@ -330,31 +264,8 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			AddCollectionWindow::windowThread();
 			return 0;
 		}
-		if COMMANDEVENT(btnOpenExternal)
-		{
-			CollectionManager::openWallpaperExternal();
+		if (player->click(wParam))
 			return 0;
-		}
-		if COMMANDEVENT(btnPrev)
-		{
-			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLOMIZER_PREVIOUSWALLPAPER, NULL);
-			return 0;
-		}
-		if COMMANDEVENT(btnPlay)
-		{
-			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLOMIZER_START, NULL);
-			return 0;
-		}
-		if COMMANDEVENT(btnPause)
-		{
-			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLOMIZER_PAUSE, NULL);
-			return 0;
-		}
-		if COMMANDEVENT(btnNext)
-		{
-			PostMessageA(TrayWindow::trayWindow->Window(), WM_COMMAND, ID_WALLOMIZER_NEXTWALLPAPER, NULL);
-			return 0;
-		}
 		if COMMANDEVENT(btnSettings)
 		{
 			SettingsWindow::windowThread();

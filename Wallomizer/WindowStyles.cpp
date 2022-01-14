@@ -1,4 +1,5 @@
 #include "WindowStyles.h"
+#include "resource.h"
 
 // main style
 HFONT WindowStyles::mainFont;
@@ -18,6 +19,11 @@ COLORREF WindowStyles::collItemBkColor;
 HBRUSH WindowStyles::collItemBkBrush;
 HBRUSH WindowStyles::collFrameBkBrush;
 
+// player icons
+HICON WindowStyles::hIPlay, WindowStyles::hIPlayActive, WindowStyles::hIPause, 
+		WindowStyles::hIPauseActive, WindowStyles::hIPrevEnabled, WindowStyles::hIPrevDisabled, 
+		WindowStyles::hINextEnabled, WindowStyles::hIOpenExternal;
+
 void WindowStyles::initialize()
 {
 	mainFont = CreateFontA(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
@@ -34,10 +40,28 @@ void WindowStyles::initialize()
 	collItemBkColor = RGB(36, 36, 36);
 	collItemBkBrush = CreateSolidBrush(collItemBkColor);
 	collFrameBkBrush = CreateSolidBrush(RGB(15, 15, 15));
+
+	hIPlay =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PLAY),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPlayActive =		(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PLAY_ACTIVE),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPause =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PAUSE),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPauseActive =		(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PAUSE_ACTIVE),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPrevEnabled =		(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PREV),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPrevDisabled =	(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_PREV_DISABLED),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hINextEnabled =		(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_NEXT),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIOpenExternal =	(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_I_OPEN_EXTERNAL),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 }
 
 void WindowStyles::clear()
 {
+	DestroyIcon(hIPlay);
+	DestroyIcon(hIPlayActive);
+	DestroyIcon(hIPause);
+	DestroyIcon(hIPauseActive);
+	DestroyIcon(hIPrevEnabled);
+	DestroyIcon(hIPrevDisabled);
+	DestroyIcon(hINextEnabled);
+	DestroyIcon(hIOpenExternal);
+
 	DeleteObject(mainBkBrush);
 	DeleteObject(mainFont);
 	DeleteObject(titleFont);

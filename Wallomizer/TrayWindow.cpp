@@ -35,35 +35,85 @@ BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCSTR pszTi
 
 LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (uMsg == WM_NOTIFYICONMSG && (lParam == WM_RBUTTONDOWN || lParam == WM_LBUTTONDOWN))
-	{
-		hPopup = GetSubMenu(hMenu, 0);
-		if (CollectionManager::isPrevious())
-			EnableMenuItem(hPopup, 3, MF_BYPOSITION | MF_ENABLED);
-		else
-			EnableMenuItem(hPopup, 3, MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
-		EnableMenuItem(hPopup, 0, Delay::bRunSlideshow ? MF_BYPOSITION | MF_DISABLED | MF_GRAYED : MF_BYPOSITION | MF_ENABLED);
-		EnableMenuItem(hPopup, 1, Delay::bRunSlideshow ? MF_BYPOSITION | MF_ENABLED : MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
-		SetForegroundWindow(hWnd);
-		POINT pt;
-		GetCursorPos(&pt);
-		TrackPopupMenu(hPopup, 0, pt.x, pt.y, 0, hWnd, NULL);
-	}
-
 	switch (uMsg)
 	{
+	case WM_NOTIFYICONMSG:
+	{	
+		if (lParam == WM_RBUTTONDOWN || lParam == WM_LBUTTONDOWN)
+		{
+			POINT pt;
+			RECT wrkArea;
+
+			GetCursorPos(&pt);
+			pt.x -= int(width / 2);
+			pt.y -= int(height / 2);
+
+			SystemParametersInfoA(SPI_GETWORKAREA, 0, &wrkArea, 0);
+			pt.x = pt.x - int(width / 2) < wrkArea.left		? wrkArea.left				: pt.x;
+			pt.x = pt.x + int(width / 2) > wrkArea.right	? wrkArea.right - width		: pt.x;
+			pt.y = pt.y - int(height / 2) < wrkArea.top		? wrkArea.top				: pt.y;
+			pt.y = pt.y + int(height / 2) > wrkArea.bottom	? wrkArea.bottom - height	: pt.y;
+
+			player->updateTimer(true);
+			player->redrawPlayers();
+			SetWindowPos(trayWindow->Window(), HWND_TOPMOST, pt.x, pt.y, width, height, SWP_SHOWWINDOW);
+			SetForegroundWindow(trayWindow->Window());
+		}
+	}
+	return 0;
+
+	case WM_NCACTIVATE:
+	{
+		if (wParam == FALSE)
+			ShowWindow(trayWindow->Window(), SW_HIDE);
+	}
+	return 0;
+
 	case WM_CREATE:
 	{		
 		pszIDStatusIcon = MAKEINTRESOURCE(IDI_ICON1);
 		hStatusIcon = LoadIcon(GetModuleHandleA(NULL), pszIDStatusIcon);
 		TrayMessage(hWnd, NIM_ADD, 1, hStatusIcon, "Wallomizer");
-		hMenu = LoadMenu(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDR_MENU1));
+
+		player = new Player(Window(),					10,		10,						
+														10,		35,		140,	20, SS_CENTER);
+			
+		btnSettings = new Button(Window(), "Settings",	10,		60,		65,		20);
+		btnExit = new Button(Window(), "Exit",			85,		60,		65,		20);
+
+		EnumChildWindows(Window(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	}
 	return 0;
 
 	case WM_DESTROY:
 	{
+		delete btnSettings, btnExit;
+		delete player;
+		DestroyIcon(hStatusIcon);
 		PostQuitMessage(0);
+	}
+	return 0;
+
+	case WM_DRAWITEM:
+	{
+		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
+		if (player->draw(pDIS))
+			return TRUE;
+	}
+	return 0;
+
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(m_hWnd, &ps);
+		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
+		EndPaint(m_hWnd, &ps);
+	}
+	return 0;
+
+	case WM_CTLCOLORBTN:
+	{
+		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 	}
 	return 0;
 
@@ -76,42 +126,19 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_COMMAND:
 	{
-		switch (wParam)
-		{
-		case ID_WALLOMIZER_START:
-			Delay::startSlideshow();
-			if (MainWindow::mainWindow)
-				InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
-			break;
-		case ID_WALLOMIZER_PAUSE:
-			Delay::pauseSlideshow();
-			if (MainWindow::mainWindow)
-				InvalidateRect(MainWindow::mainWindow->Window(), NULL, FALSE);
-			break;
-		case ID_WALLOMIZER_NEXTWALLPAPER:
-			Delay::replayDelay();
-			CollectionManager::setNextWallpaper();
-			break;
-		case ID_WALLOMIZER_PREVIOUSWALLPAPER:
-			Delay::replayDelay();
-			CollectionManager::setPreviousWallpaper();
-			break;
-		case ID_WALLOMIZER_SETTINGS:
+		if (player->click(wParam))
+			return 0;
+		if COMMANDEVENT(btnSettings)
 		{
 			std::thread thr(MainWindow::windowThread);
 			thr.detach();
-			break;
+			return 0;
 		}
-		case ID_WALLOMIZER_OPENWALLPAPER:
+		if COMMANDEVENT(btnExit)
 		{
-			CollectionManager::openWallpaperExternal();
-			break;
-		}
-		case ID_WALLOMIZER_EXIT:
 			TrayMessage(hWnd, NIM_DELETE, 1, hStatusIcon, "Wallomizer");
-			DestroyMenu(hMenu);
 			DestroyWindow(hWnd);
-			break;
+			return 0;
 		}
 	}
 	return 0;
@@ -127,7 +154,7 @@ void TrayWindow::windowThread()
 	if (trayWindow)
 		return;
 	trayWindow = new TrayWindow;
-	trayWindow->Create("Wallomizer", NULL, NULL, 0, 0, 0, 0, NULL, NULL);
+	trayWindow->Create("Wallomizer", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 500, 500, width, height, NULL, NULL);
 	ShowWindow(trayWindow->Window(), SW_HIDE);
 	MSG msg = { };
 	while (GetMessage(&msg, NULL, 0, 0) > 0)
@@ -135,6 +162,7 @@ void TrayWindow::windowThread()
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+	ShowWindow(trayWindow->Window(), SW_HIDE);
 	trayWindow->Destroy();
 	delete trayWindow;
 	Delay::exiting = true;

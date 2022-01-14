@@ -4,7 +4,7 @@
 #include "Delay.h"
 #include "Settings.h"
 #include "Filesystem.h"
-#include "MainWindow.h"
+#include "Player.h"
 
 bool Delay::exiting = false;
 bool Delay::bRunSlideshow = true;
@@ -102,8 +102,8 @@ void Delay::Delay()
 		Sleep(100);
 		if (bRunSlideshow)
 			delayed += 100;
-		if (MainWindow::mainWindow != nullptr && delayed % 1000 == 0)
-			MainWindow::mainWindow->updateTimer();
+		if (delayed % 1000 == 0)
+			Player::updateTimer();
 	}
 	delayed = 0;
 }

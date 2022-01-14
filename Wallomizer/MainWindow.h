@@ -8,6 +8,7 @@
 #include "UpDownEdit.h"
 #include "CollectionItem.h"
 #include "Edit.h"
+#include "Player.h"
 
 class MainWindow : public BaseWindow<MainWindow>
 {
@@ -37,16 +38,15 @@ private:
 	};
 
 private:
-	Static *stCollections, *stDelayRemained;
-	Button *btnAdd, *btnPlay, *btnPause, *btnSettings, *btnDonate, *btnNext, *btnPrev, *btnOpenExternal;
-	HICON hIPlay, hIPlayActive, hIPause, hIPauseActive, hIPrevEnabled, hIPrevDisabled, hINextEnabled, hIOpenExternal;
+	Static *stCollections;
+	Button *btnAdd, *btnSettings, *btnDonate;
 	
 public:
-	void updateTimer();
 	LPCSTR ClassName() const { return "Main Window Class"; }
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void windowThread();
 
+	Player* player;
 	static constexpr int width = 640;
 	static constexpr int height = 480;
 	static MainWindow* mainWindow;

@@ -22,6 +22,9 @@ namespace WindowStyles
 	extern HBRUSH collItemBkBrush;
 	extern HBRUSH collFrameBkBrush;
 
+	// player icons
+	extern HICON hIPlay, hIPlayActive, hIPause, hIPauseActive, hIPrevEnabled, hIPrevDisabled, hINextEnabled, hIOpenExternal;
+
 	void initialize();
 	void clear();
 }
