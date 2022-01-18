@@ -21,9 +21,13 @@ namespace WindowStyles
 	extern COLORREF collItemBkColor;
 	extern HBRUSH collItemBkBrush;
 	extern HBRUSH collFrameBkBrush;
+	extern HICON hIOptions, hIDelete;
 
 	// player icons
 	extern HICON hIPlay, hIPlayActive, hIPause, hIPauseActive, hIPrevEnabled, hIPrevDisabled, hINextEnabled, hIOpenExternal;
+
+	// check box
+	extern HICON hICheckBox, hICheckBoxChecked, hICheckBoxHover, hICheckBoxCheckedHover;
 
 	void initialize();
 	void clear();

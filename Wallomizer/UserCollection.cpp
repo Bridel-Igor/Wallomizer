@@ -196,12 +196,15 @@ LPCSTR UserCollection::collectionName() const
 	strcat_s(name, 255, settings->username);
 	strcat_s(name, 255, ": ");
 	strcat_s(name, 255, settings->collectionName);
-	strcat_s(name, 255, " | ");
-	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_SFW ? "SFW " : "");
-	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_SKETCHY ? "Sketchy " : "");
-	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_NSFW ? "NSFW " : "");
 
 	return name;
+}
+
+CategoriesAndPurity UserCollection::getCAP() 
+{
+	if (settings)
+		return settings->categoriesAndPurity;
+	return 0;
 }
 
 void UserCollection::openCollectionSettingsWindow()

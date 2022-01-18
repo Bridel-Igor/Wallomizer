@@ -70,6 +70,18 @@ IDI_I_PREV_DISABLED     ICON                    "Prev_disabled.ico"
 
 IDI_I_OPEN_EXTERNAL     ICON                    "Open_external.ico"
 
+IDI_I_DELETE            ICON                    "Delete.ico"
+
+IDI_I_OPTIONS           ICON                    "Options.ico"
+
+IDI_I_CHECKBOX          ICON                    "CheckBox.ico"
+
+IDI_I_CHECKBOX_CHECKED  ICON                    "CheckBox_checked.ico"
+
+IDI_I_CHECKBOX_CHECKED_HOVER ICON                    "CheckBox_checked_hover.ico"
+
+IDI_I_CHECKBOX_HOVER    ICON                    "CheckBox_hover.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

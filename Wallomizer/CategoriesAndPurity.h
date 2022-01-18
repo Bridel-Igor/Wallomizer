@@ -22,6 +22,7 @@ public:
 	CategoriesAndPurity getPurity();	
 	bool draw(LPDRAWITEMSTRUCT &pDIS);
 	bool click(WPARAM &wParam);
+	void moveComponent(int x, int y, int width, int height);
 
 private:
 	PushButton *pbSFW, *pbSketchy, *pbNSFW;

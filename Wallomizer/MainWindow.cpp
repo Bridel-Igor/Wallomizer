@@ -27,15 +27,17 @@ void MainWindow::CollectionItemsFrame::updateCollectionItems()
 
 	for (size_t i = collectionItems.size(); i < CollectionManager::collections.size(); i++) // creation
 		if (CollectionManager::collections[i]!=nullptr)
-			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->Window(), 0, (int)(i * 20), MainWindow::width-20-18, 20, CollectionManager::collections[i], WindowStyles::mainFont));
+			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->Window(), 0, (int)(i * 27), MainWindow::width-20-18, 26, CollectionManager::collections[i], WindowStyles::mainFont));
 	
 	updateScroll();
 	for (auto p : collectionItems) // placing according to the scrollbar
-		p->scroll(yCurrentScroll);
+		p->reposition(yCurrentScroll);
 
 	if (collectionItems.size()==0)
 		ShowWindow(stEmpty->hWnd, SW_SHOW);
-}
+
+	InvalidateRect(collectionItemsFrame->Window(), NULL, FALSE);
+} // BUG: window is not updated after adding new collection
 
 void MainWindow::CollectionItemsFrame::destroyCollectionItems()
 {
@@ -47,7 +49,7 @@ void MainWindow::CollectionItemsFrame::destroyCollectionItems()
 
 void MainWindow::CollectionItemsFrame::updateScroll()
 {
-	int itemListHeight = (int)collectionItems.size() * 20;
+	int itemListHeight = (int)collectionItems.size() * 27;
 	yMaxScroll = max(itemListHeight - height, 0);
 	yCurrentScroll = min(yCurrentScroll, yMaxScroll);
 	yCurrentScroll = yCurrentScroll < 0 ? 0 : yCurrentScroll;
@@ -94,6 +96,15 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 	}
 	return 0;
 
+	case WM_DRAWITEM:
+	{
+		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
+		for (int i=0;i<collectionItems.size();i++)
+			if (collectionItems[i]->draw(pDIS))
+				return TRUE;
+	}
+	return 0;
+
 	case WM_COMMAND:
 	{
 		for (unsigned int i = 0; i < collectionItems.size(); i++)
@@ -112,11 +123,23 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 			}
 			if COMMANDEVENT(collectionItems[i]->chboEnabled)
 			{
-				CollectionManager::collections[i]->isEnabled = collectionItems[i]->chboEnabled->isChecked();
-				CollectionManager::reloadSettings();
-				return 0;
+				if (HIWORD(wParam) == BN_CLICKED)
+				{
+					collectionItems[i]->chboEnabled->click();
+					CollectionManager::collections[i]->isEnabled = collectionItems[i]->chboEnabled->isChecked();
+					CollectionManager::reloadSettings();
+					return 0;
+				}
 			}
 		}
+	}
+	return 0;
+
+	case WM_SETCURSOR:
+	{
+		for (int i = 0; i < collectionItems.size(); i++)
+			collectionItems[i]->notify((HWND)wParam);
+		return FALSE;
 	}
 	return 0;
 
@@ -164,7 +187,10 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 		yDelta = yNewPos - yCurrentScroll;
 		yCurrentScroll = yNewPos;
 
-		updateCollectionItems();
+		updateScroll();
+		for (auto p : collectionItems) // placing according to the scrollbar
+			p->reposition(yCurrentScroll);
+
 		ScrollWindowEx(Window(), 0, -yDelta, (CONST RECT*) NULL, (CONST RECT*) NULL, (HRGN)NULL, (PRECT)NULL, SW_INVALIDATE);
 		UpdateWindow(Window());
 	}

@@ -1,13 +1,18 @@
+#include <Windows.h>
+#include <CommCtrl.h>
+
 #include "CollectionItem.h"
+#include "WindowStyles.h"
 
 CollectionItem::CollectionItem(HWND hParent, int _x, int _y, int _width, int _height, BaseCollection* collection, HFONT hFont)
 	: x(_x), y(_y), width(_width), height(_height)
 {
-	chboEnabled = new CheckBox(hParent, "", x, y, 20, height, 0, (HINSTANCE)GetWindowLongPtr(hParent, GWLP_HINSTANCE), 0, WS_EX_STATICEDGE);
-	stName = new Static(hParent, "", x + 20, y, width - 110, height, 0, WS_EX_STATICEDGE);
-	stNumber = new Static(hParent, "0", x + width - 90, y, 50, height, 0, WS_EX_STATICEDGE);
-	btnSettings = new Button(hParent, "...", x + width - 40, y, 20, height, 0, WS_EX_STATICEDGE);
-	btnDelete = new Button(hParent, "X", x + width - 20, y, 20, height, 0, WS_EX_STATICEDGE);
+	chboEnabled = new CheckBox(hParent, "",		0, 0, 0, 0, 0, (HINSTANCE)GetWindowLongPtr(hParent, GWLP_HINSTANCE), BS_NOTIFY | BS_OWNERDRAW);
+	stName = new Static(hParent, "",			0, 0, 0, 0, 0);
+	purity = new PurityComponent(hParent,		0, 0, 0, 0);
+	stNumber = new Static(hParent, "0",			0, 0, 0, 0, SS_CENTER);
+	btnSettings = new Button(hParent, "...",	0, 0, 0, 0, BS_OWNERDRAW);
+	btnDelete = new Button(hParent, "",			0, 0, 0, 0, BS_OWNERDRAW);
 	SendMessage(stName->hWnd, WM_SETFONT, (LPARAM)hFont, TRUE);
 	SendMessage(stNumber->hWnd, WM_SETFONT, (LPARAM)hFont, TRUE);
 	SendMessage(btnSettings->hWnd, WM_SETFONT, (LPARAM)hFont, TRUE);
@@ -17,22 +22,19 @@ CollectionItem::CollectionItem(HWND hParent, int _x, int _y, int _width, int _he
 
 CollectionItem::~CollectionItem()
 {
-	if (chboEnabled != nullptr)
-		delete chboEnabled;
-	if (stName != nullptr)
-		delete stName;
-	if (stNumber != nullptr)
-		delete stNumber;
-	if (btnSettings != nullptr)
-		delete btnSettings;
-	if (btnDelete != nullptr)
-		delete btnDelete;
+	delete chboEnabled;
+	delete stName;
+	delete purity;
+	delete stNumber;
+	delete btnSettings;
+	delete btnDelete;
 }
 
 void CollectionItem::updateInfo(BaseCollection* collection)
 {
 	if (collection == nullptr)
 		return;
+	purity->setPurity(collection->getCAP());
 	chboEnabled->setChecked(collection->isEnabled);
 	SetWindowTextA(stName->hWnd, collection->collectionName());
 	char c[10];
@@ -41,11 +43,39 @@ void CollectionItem::updateInfo(BaseCollection* collection)
 	SetWindowTextA(stNumber->hWnd, c);
 }
 
-void CollectionItem::scroll(int yPos)
+void CollectionItem::reposition(int yPos)
 {
-	MoveWindow(chboEnabled->hWnd, x, y - yPos, 20, height, FALSE);
-	MoveWindow(stName->hWnd, x + 20, y - yPos, width - 110, height, FALSE);
-	MoveWindow(stNumber->hWnd, x + width - 90, y - yPos, 50, height, FALSE);
-	MoveWindow(btnSettings->hWnd, x + width - 40, y - yPos, 20, height, FALSE);
-	MoveWindow(btnDelete->hWnd, x + width - 20, y - yPos, 20, height, FALSE);
+	MoveWindow(chboEnabled->hWnd,	x,								y - yPos,	22,							height, FALSE);
+	MoveWindow(stName->hWnd,		x + 23,							y - yPos,	width - height * 3 - 121,	height, FALSE);
+	purity->moveComponent(			x + width - height * 3 - 97,	y - yPos,	height * 3,					height);
+	MoveWindow(stNumber->hWnd,		x + width - 96,					y - yPos,	50,							height, FALSE);
+	MoveWindow(btnSettings->hWnd,	x + width - 45,					y - yPos,	22,							height, FALSE);
+	MoveWindow(btnDelete->hWnd,		x + width - 22,					y - yPos,	22,							height, FALSE);
+}
+
+bool CollectionItem::draw(LPDRAWITEMSTRUCT& pDIS)
+{
+	if (chboEnabled->draw(pDIS, WindowStyles::collItemBkBrush))
+		return true;
+	if (purity->draw(pDIS))
+		return true;
+	if (pDIS->hwndItem == btnSettings->hWnd)
+	{
+		FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::collItemBkBrush);
+		DrawIconEx(pDIS->hDC, 1, (height - 20) / 2, WindowStyles::hIOptions, 0, 0, 0, NULL, DI_NORMAL);
+		return true;
+	}
+	if (pDIS->hwndItem == btnDelete->hWnd)
+	{
+		FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::collItemBkBrush);
+		DrawIconEx(pDIS->hDC, 1, (height - 20) / 2, WindowStyles::hIDelete, 0, 0, 0, NULL, DI_NORMAL);
+		return true;
+	}
+	return false;
+}
+
+bool CollectionItem::notify(HWND hWnd)
+{
+	chboEnabled->mouseHovering(hWnd == chboEnabled->hWnd);
+	return true;
 }

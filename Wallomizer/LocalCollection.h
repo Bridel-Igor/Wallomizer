@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BaseCollection.h"
+#include "CategoriesAndPurity.h"
 
 class LocalCollection : public BaseCollection
 {
@@ -12,6 +13,7 @@ public:
 	static bool loadWallpaper(Wallpaper* wallpaper);
 	LPCSTR collectionType() const { return "Local collection"; };
 	LPCSTR collectionName() const;
+	CategoriesAndPurity getCAP();
 	void openCollectionSettingsWindow();
 	static void openWallpaperExternal(Wallpaper* wallpaper);
 

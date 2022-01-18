@@ -3,14 +3,16 @@
 
 PurityComponent::PurityComponent(HWND hParent, int x, int y, int width, int height)
 {
-	pbSFW = new PushButton(hParent, "SFW", x, y, width / 3 -1, height, 0, 0, RGB(85,150,85), RGB(55,88,55));
-	pbSketchy = new PushButton(hParent, "Sketchy", x + width / 3, y, width / 3, height, 0, 0, RGB(150,150,85), RGB(88,88,55));
-	pbNSFW = new PushButton(hParent, "NSFW", 1+x + (2 * width / 3), y, width / 3-1, height, 0, 0, RGB(150,85,85), RGB(88,55,55));
+	pbSFW = new PushButton(hParent, "SFW",			x,							y, width / 3 - 1,	height, 0, 0, RGB(85,150,85), RGB(55,88,55));
+	pbSketchy = new PushButton(hParent, "Sketchy",	x + width / 3,				y, width / 3,		height, 0, 0, RGB(150,150,85), RGB(88,88,55));
+	pbNSFW = new PushButton(hParent, "NSFW",		1 + x + (2 * width / 3),	y, width / 3 - 1,	height, 0, 0, RGB(150,85,85), RGB(88,55,55));
 }
 
 PurityComponent::~PurityComponent()
 {
-	delete pbSFW, pbSketchy, pbNSFW;
+	delete pbSFW;
+	delete pbSketchy;
+	delete pbNSFW;
 }
 
 void PurityComponent::setPurity(CategoriesAndPurity cap)
@@ -67,6 +69,15 @@ bool PurityComponent::click(WPARAM &wParam)
 	return false;
 }
 
+void PurityComponent::moveComponent(int x, int y, int width, int height)
+{
+	MoveWindow(pbSFW->hWnd,		x,							y, width / 3 - 1,	height, FALSE);
+	MoveWindow(pbSketchy->hWnd, x + width / 3,				y, width / 3,		height, FALSE);
+	MoveWindow(pbNSFW->hWnd,	1 + x + (2 * width / 3),	y, width / 3 - 1,	height, FALSE);
+}
+
+// CategoryComponent section
+
 CategoryComponent::CategoryComponent(HWND hParent, int x, int y, int width, int height)
 {
 	pbGeneral = new PushButton(hParent, "General", x, y, width / 3 - 1, height);
@@ -76,7 +87,9 @@ CategoryComponent::CategoryComponent(HWND hParent, int x, int y, int width, int 
 
 CategoryComponent::~CategoryComponent()
 {
-	delete pbGeneral, pbAnime, pbPeople;
+	delete pbGeneral;
+	delete pbAnime;
+	delete pbPeople;
 }
 
 void CategoryComponent::setCategory(CategoriesAndPurity cap)

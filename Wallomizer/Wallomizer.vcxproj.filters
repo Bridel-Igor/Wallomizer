@@ -82,6 +82,9 @@
     <ClCompile Include="Player.cpp">
       <Filter>Components\Source</Filter>
     </ClCompile>
+    <ClCompile Include="CheckBox.cpp">
+      <Filter>Components\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AddCollectionWindow.h">
@@ -216,6 +219,24 @@
       <Filter>Resources</Filter>
     </Image>
     <Image Include="Prev.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Delete.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Options.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="CheckBox.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="CheckBox_checked.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="CheckBox_checked_hover.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="CheckBox_hover.ico">
       <Filter>Resources</Filter>
     </Image>
   </ItemGroup>

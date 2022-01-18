@@ -24,6 +24,7 @@ public:
 	static bool loadWallpaper(Wallpaper* wallpaper);
 	LPCSTR collectionType() const { return "Search collection"; }
 	LPCSTR collectionName() const;
+	CategoriesAndPurity getCAP();
 	void openCollectionSettingsWindow();
 	static void openWallpaperExternal(Wallpaper* wallpaper);
 

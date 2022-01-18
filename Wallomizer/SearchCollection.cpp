@@ -175,14 +175,15 @@ LPCSTR SearchCollection::collectionName() const
 	strcat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_GENERAL ? "General " : "");
 	strcat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_ANIME ? "Anime " : "");
 	strcat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_PEOPLE ? "People " : "");
-	
-	strcat_s(name, 255, "| ");
-
-	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_SFW ? "SFW " : "");
-	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_SKETCHY ? "Sketchy " : "");
-	strcat_s(name, 255, settings->categoriesAndPurity & S_PURITY_NSFW ? "NSFW " : "");
 
 	return name;
+}
+
+CategoriesAndPurity SearchCollection::getCAP()
+{
+	if (settings)
+		return settings->categoriesAndPurity;
+	return 0;
 }
 
 void SearchCollection::openCollectionSettingsWindow()

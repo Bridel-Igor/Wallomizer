@@ -54,13 +54,15 @@ void PushButton::draw(LPDRAWITEMSTRUCT& pDIS)
 		FillRect(pDIS->hDC, &temp, color);
 		DeleteObject(color);
 	}
-
-
-	SetTextColor(pDIS->hDC, checked ? RGB(255, 255, 255) : RGB(200, 200, 200));
-	SetBkMode(pDIS->hDC, TRANSPARENT);
-	SetTextAlign(pDIS->hDC, TA_CENTER);
-	char staticText[32];
-	staticText[31] = '\0';
-	int len = (int)SendMessageA(pDIS->hwndItem, WM_GETTEXT, 31, (LPARAM)staticText);
-	TextOutA(pDIS->hDC, (pDIS->rcItem.right - pDIS->rcItem.left) / 2, pDIS->rcItem.left + 3, staticText, len);
+	// draw text only if button is horizontal
+	if (((double)(pDIS->rcItem.right - pDIS->rcItem.left) / (double)(pDIS->rcItem.bottom - pDIS->rcItem.top)) > 1.1) 
+	{
+		SetTextColor(pDIS->hDC, checked ? RGB(255, 255, 255) : RGB(200, 200, 200));
+		SetBkMode(pDIS->hDC, TRANSPARENT);
+		SetTextAlign(pDIS->hDC, TA_CENTER);
+		char staticText[32];
+		staticText[31] = '\0';
+		int len = (int)SendMessageA(pDIS->hwndItem, WM_GETTEXT, 31, (LPARAM)staticText);
+		TextOutA(pDIS->hDC, (pDIS->rcItem.right - pDIS->rcItem.left) / 2, pDIS->rcItem.left + 3, staticText, len);
+	}
 }

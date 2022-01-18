@@ -236,6 +236,19 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			ShellExecute(0, 0, "https://github.com/Bridel-Igor/Wallomizer/releases", 0, 0, SW_SHOW);
 			return 0;
 		}
+		if COMMANDEVENT(cbStartup)
+		{
+			cbStartup->click();
+			return 0;
+		}
+	}
+	return 0;
+
+	case WM_DRAWITEM:
+	{
+		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
+		if (cbStartup->draw(pDIS, WindowStyles::mainBkBrush))
+			return TRUE;
 	}
 	return 0;
 

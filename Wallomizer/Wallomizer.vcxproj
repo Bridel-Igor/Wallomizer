@@ -143,6 +143,7 @@
     <ClCompile Include="AddCollectionWindow.cpp" />
     <ClCompile Include="AspRatPickerWindow.cpp" />
     <ClCompile Include="CategoriesAndPurity.cpp" />
+    <ClCompile Include="CheckBox.cpp" />
     <ClCompile Include="CollectionItem.cpp" />
     <ClCompile Include="CollectionManager.cpp" />
     <ClCompile Include="ColorButton.cpp" />
@@ -209,9 +210,15 @@
     <ResourceCompile Include="Wallomizer.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="CheckBox.ico" />
+    <Image Include="CheckBox_checked.ico" />
+    <Image Include="CheckBox_checked_hover.ico" />
+    <Image Include="CheckBox_hover.ico" />
+    <Image Include="Delete.ico" />
     <Image Include="icon32.ico" />
     <Image Include="Next.ico" />
     <Image Include="Open_external.ico" />
+    <Image Include="Options.ico" />
     <Image Include="Pause_activated.ico" />
     <Image Include="Pause.ico" />
     <Image Include="Play_activated.ico" />

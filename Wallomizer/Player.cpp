@@ -42,7 +42,7 @@ bool Player::click(WPARAM& wParam)
 		redrawPlayers();
 		return true;
 	}
-	if COMMANDEVENT(btnPause)
+	if COMMANDEVENT(btnPause) // TODO: save session file on pause. And don't rewrite it on exit
 	{
 		Delay::pauseSlideshow();
 		redrawPlayers();
@@ -129,7 +129,7 @@ void Player::updateTimer(bool forsed)
 	if (TrayWindow::trayWindow && (forsed || IsWindowVisible(TrayWindow::trayWindow->Window())))
 	{
 		TrayWindow::trayWindow->player->updateText();
-		InvalidateRect(TrayWindow::trayWindow->player->stDelayRemained->hWnd, NULL, FALSE);
+		InvalidateRect(TrayWindow::trayWindow->player->stDelayRemained->hWnd, NULL, FALSE); // BUG: stDelayRemained can be invalid during an app exit
 	}
 }
 

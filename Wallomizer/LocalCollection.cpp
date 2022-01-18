@@ -111,6 +111,11 @@ LPCSTR LocalCollection::collectionName() const
 	return name;
 }
 
+CategoriesAndPurity LocalCollection::getCAP()
+{
+	return 0;
+}
+
 void LocalCollection::openCollectionSettingsWindow()
 {
 	SetLocalCollectionWindow::windowThread(this);
