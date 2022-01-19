@@ -17,7 +17,8 @@ private:
 	{
 	private:
 		void destroyCollectionItems();
-		void updateScroll();
+		// Method returns visibility of the scroll bar.
+		bool updateScroll();
 
 		std::vector<CollectionItem*> collectionItems;
 		Static *stEmpty;

@@ -43,14 +43,14 @@ void CollectionItem::updateInfo(BaseCollection* collection)
 	SetWindowTextA(stNumber->hWnd, c);
 }
 
-void CollectionItem::reposition(int yPos)
+void CollectionItem::reposition(int yPos, bool sb)
 {
-	MoveWindow(chboEnabled->hWnd,	x,								y - yPos,	22,							height, FALSE);
-	MoveWindow(stName->hWnd,		x + 23,							y - yPos,	width - height * 3 - 121,	height, FALSE);
-	purity->moveComponent(			x + width - height * 3 - 97,	y - yPos,	height * 3,					height);
-	MoveWindow(stNumber->hWnd,		x + width - 96,					y - yPos,	50,							height, FALSE);
-	MoveWindow(btnSettings->hWnd,	x + width - 45,					y - yPos,	22,							height, FALSE);
-	MoveWindow(btnDelete->hWnd,		x + width - 22,					y - yPos,	22,							height, FALSE);
+	MoveWindow(chboEnabled->hWnd,	x,										y - yPos,	22,									height, FALSE);
+	MoveWindow(stName->hWnd,		x + 23,									y - yPos,	width - height * 3 - 121 - sb * 18,	height, FALSE);
+	purity->moveComponent(			x + width - height * 3 - 97 - sb * 18,	y - yPos,	height * 3,							height);
+	MoveWindow(stNumber->hWnd,		x + width - 96 - sb * 18,				y - yPos,	50,									height, FALSE);
+	MoveWindow(btnSettings->hWnd,	x + width - 45 - sb * 18,				y - yPos,	22,									height, FALSE);
+	MoveWindow(btnDelete->hWnd,		x + width - 22 - sb * 18,				y - yPos,	22,									height, FALSE);
 }
 
 bool CollectionItem::draw(LPDRAWITEMSTRUCT& pDIS)

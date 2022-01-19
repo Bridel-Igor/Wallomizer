@@ -15,7 +15,7 @@ public:
 	CollectionItem(HWND hParent, int x, int y, int width, int height, BaseCollection* collection, HFONT hFont);
 	~CollectionItem();
 	void updateInfo(BaseCollection* collection);
-	void reposition(int yPos);
+	void reposition(int yPos, bool scrollBarISVisible);
 	bool draw(LPDRAWITEMSTRUCT& pDIS);
 	bool notify(HWND hWnd);
 
