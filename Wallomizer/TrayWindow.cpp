@@ -87,7 +87,8 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_DESTROY:
 	{
-		delete btnSettings, btnExit;
+		delete btnSettings;
+		delete btnExit;
 		delete player;
 		DestroyIcon(hStatusIcon);
 		PostQuitMessage(0);

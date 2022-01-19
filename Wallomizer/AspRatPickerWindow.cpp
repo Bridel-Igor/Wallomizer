@@ -57,9 +57,14 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 	{
 		for (int i = 0; i < 12; i++)
 			delete btnAR[i];
-		delete btnAllWide, btnAllPortrait;
-		delete btnOk, btnCancel;
-		delete stUltrawide, stWide, stPortrait, stSquare;
+		delete btnAllWide;
+		delete btnAllPortrait;
+		delete btnOk;
+		delete btnCancel;
+		delete stUltrawide;
+		delete stWide;
+		delete stPortrait;
+		delete stSquare;
 		PostQuitMessage(0);
 	}
 	return 0;

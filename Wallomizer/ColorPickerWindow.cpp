@@ -73,7 +73,8 @@ LRESULT ColorPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	{
 		for (int i = 0; i < 30; i++)
 			delete btnClr[i];
-		delete btnOk, btnCancel;
+		delete btnOk;
+		delete btnCancel;
 		PostQuitMessage(0);
 	}
 	return 0;

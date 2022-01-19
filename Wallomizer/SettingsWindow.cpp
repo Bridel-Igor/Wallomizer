@@ -40,7 +40,7 @@ HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, 
 LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
-	{
+	{ // TODO: notify checkBox to make it responsible to mouse events
 	case WM_CREATE:
 	{
 		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
@@ -83,11 +83,31 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 	case WM_DESTROY:
 	{
-		delete stApplication, stSlideshow, stWallhaven;
-		delete btnOk, btnCancel, btnUpdate;
-		delete stHours, stMinutes, stSeconds, stDelay, stApiKey, stUsername, stStartup, stVersion, stActVersion;
-		delete edApiKey, edUsername;
-		delete udeHours, udeMinutes, udeSeconds;
+		delete stApplication;
+		delete stSlideshow;
+		delete stWallhaven;
+
+		delete btnOk;
+		delete btnCancel;
+		delete btnUpdate;
+
+		delete stHours;
+		delete stMinutes;
+		delete stSeconds;
+		delete stDelay;
+		delete stApiKey;
+		delete stUsername;
+		delete stStartup;
+		delete stVersion;
+		delete stActVersion;
+
+		delete edApiKey;
+		delete edUsername;
+
+		delete udeHours;
+		delete udeMinutes;
+		delete udeSeconds;
+
 		delete cbStartup;
 
 		EnableWindow(MainWindow::mainWindow->Window(), TRUE);

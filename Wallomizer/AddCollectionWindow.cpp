@@ -26,7 +26,10 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
 	case WM_DESTROY:
 	{
-		delete btnAddUserCollection, btnAddLocalCollection, btnAddSearchCollection, btnCancel;
+		delete btnAddUserCollection;
+		delete btnAddLocalCollection;
+		delete btnAddSearchCollection;
+		delete btnCancel;
 		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
 		SetForegroundWindow(MainWindow::mainWindow->Window());
 		PostQuitMessage(0);

@@ -17,3 +17,6 @@ public:
 private:
 	bool checked, hovering;
 };
+
+// TODO: instead doing separatly click, draw and notify better to do Proc method with it's own cases.
+// even more, better to create base class Component and move all similar things there

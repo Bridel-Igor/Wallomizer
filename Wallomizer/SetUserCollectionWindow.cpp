@@ -54,10 +54,17 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 	case WM_DESTROY:
 	{
 		currentUserCollection = nullptr;
-		delete stUsername, stCollectionID, stPurity;
+
+		delete stUsername;
+		delete stCollectionID;
+		delete stPurity;
+
 		delete edUsername;
 		delete cbCollections;
-		delete btnOk, btnCancel;
+
+		delete btnOk;
+		delete btnCancel;
+
 		delete purCom;
 		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
 		SetForegroundWindow(MainWindow::mainWindow->Window());

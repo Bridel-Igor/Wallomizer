@@ -30,7 +30,10 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 		currentLocalCollection = nullptr;
 		delete stPath;
 		delete edPath;
-		delete btnOk, btnCancel, btnPath;
+
+		delete btnOk;
+		delete btnCancel;
+		delete btnPath;
 		EnableWindow(MainWindow::mainWindow->Window(), TRUE);
 		SetForegroundWindow(MainWindow::mainWindow->Window());
 		PostQuitMessage(0);

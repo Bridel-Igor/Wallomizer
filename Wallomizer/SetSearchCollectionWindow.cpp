@@ -60,9 +60,20 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 		currentSearchCollection = nullptr;
 		for (int i = 0; i < 8; i++)
 			delete stTagInstruct[i];
-		delete stCategory, stPurity, stTag, stFilt;
+
+		delete stCategory;
+		delete stPurity;
+		delete stTag;
+		delete stFilt;
+
 		delete edTag;
-		delete btnOk, btnCancel, btnRes, btnAR, btnColor;
+
+		delete btnOk;
+		delete btnCancel;
+		delete btnRes;
+		delete btnAR;
+		delete btnColor;
+
 		delete catCom;
 		delete purCom;
 		EnableWindow(MainWindow::mainWindow->Window(), TRUE);

@@ -252,7 +252,9 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_DESTROY:
 	{
-		delete btnAdd, btnSettings, btnDonate;
+		delete btnAdd;
+		delete btnSettings;
+		delete btnDonate;
 		delete stCollections;
 		delete player;
 		PostQuitMessage(0);

@@ -20,7 +20,12 @@ Player::Player(HWND hParent, int xPlayer, int yPlayer, int xTimer, int yTimer, i
 
 Player::~Player()
 {
-	delete btnPlay, btnPause, btnNext, btnPrev, btnOpenExternal, stDelayRemained;
+	delete btnPlay;
+	delete btnPause;
+	delete btnNext;
+	delete btnPrev;
+	delete btnOpenExternal;
+	delete stDelayRemained;
 }
 
 bool Player::click(WPARAM& wParam)

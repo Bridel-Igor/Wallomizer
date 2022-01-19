@@ -98,10 +98,23 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	{
 		for (int i = 0; i < 23; i++)
 			delete btnRes[i];
-		delete btnAtLeast, btnExactly;
-		delete btnOk, btnCancel;
-		delete stUltrawide, st169, st1610, st43, st54, stCustom, stX;
-		delete edWidth, edHeight;
+
+		delete btnAtLeast;
+		delete btnExactly;
+
+		delete btnOk;
+		delete btnCancel;
+
+		delete stUltrawide;
+		delete st169;
+		delete st1610;
+		delete st43;
+		delete st54;
+		delete stCustom;
+		delete stX;
+
+		delete edWidth;
+		delete edHeight;
 		PostQuitMessage(0);
 	}
 	return 0;
