@@ -29,9 +29,9 @@ void MainWindow::CollectionItemsFrame::updateCollectionItems()
 		if (CollectionManager::collections[i]!=nullptr)
 			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->Window(), 0, (int)(i * 27), MainWindow::width-20, 26, CollectionManager::collections[i], WindowStyles::mainFont));
 	
-	bool sbIsVisible = updateScroll();
+	updateScroll();
 	for (auto p : collectionItems) // placing according to the scrollbar
-		p->reposition(yCurrentScroll, sbIsVisible);
+		p->reposition(yCurrentScroll, scrollBarIsVisible);
 
 	if (collectionItems.size()==0)
 		ShowWindow(stEmpty->hWnd, SW_SHOW);
@@ -47,7 +47,7 @@ void MainWindow::CollectionItemsFrame::destroyCollectionItems()
 	updateScroll();
 }
 
-bool MainWindow::CollectionItemsFrame::updateScroll()
+void MainWindow::CollectionItemsFrame::updateScroll()
 {
 	int itemListHeight = (int)collectionItems.size() * 27;
 	yMaxScroll = max(itemListHeight - height, 0);
@@ -60,11 +60,10 @@ bool MainWindow::CollectionItemsFrame::updateScroll()
 	si.nPage = height;
 	si.nPos = yCurrentScroll;
 	
-	bool sbIsVisible = itemListHeight <= height ? FALSE : TRUE;
+	scrollBarIsVisible = itemListHeight <= height ? FALSE : TRUE;
 	SetScrollInfo(Window(), SB_VERT, &si, TRUE);
-	ShowScrollBar(Window(), SB_VERT, sbIsVisible);
+	ShowScrollBar(Window(), SB_VERT, scrollBarIsVisible);
 	EnableScrollBar(Window(), SB_VERT, itemListHeight <= height? ESB_DISABLE_BOTH : ESB_ENABLE_BOTH);
-	return sbIsVisible;
 }
 
 LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -189,9 +188,9 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 		yDelta = yNewPos - yCurrentScroll;
 		yCurrentScroll = yNewPos;
 
-		bool sbIsVisible = updateScroll();
+		updateScroll();
 		for (auto p : collectionItems) // placing according to the scrollbar
-			p->reposition(yCurrentScroll, sbIsVisible);
+			p->reposition(yCurrentScroll, scrollBarIsVisible);
 
 		ScrollWindowEx(Window(), 0, -yDelta, (CONST RECT*) NULL, (CONST RECT*) NULL, (HRGN)NULL, (PRECT)NULL, SW_INVALIDATE);
 		UpdateWindow(Window());
