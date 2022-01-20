@@ -152,6 +152,14 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 	}
 	return 0;
 
+	case WM_SETCURSOR:
+	{
+		catCom->notify((HWND)wParam);
+		purCom->notify((HWND)wParam);
+		return FALSE;
+	}
+	return 0;
+
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}

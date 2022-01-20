@@ -4,19 +4,19 @@
 #include "CollectionItem.h"
 #include "WindowStyles.h"
 
-CollectionItem::CollectionItem(HWND hParent, int _x, int _y, int _width, int _height, BaseCollection* collection, HFONT hFont)
-	: x(_x), y(_y), width(_width), height(_height)
+int CollectionItem::height = 26;
+
+CollectionItem::CollectionItem(HWND hParent, int _x, int _y, int _width, BaseCollection* collection, HFONT hFont)
+	: x(_x), y(_y), width(_width)
 {
 	chboEnabled = new CheckBox(hParent, "",		0, 0, 0, 0, 0, (HINSTANCE)GetWindowLongPtr(hParent, GWLP_HINSTANCE), BS_NOTIFY | BS_OWNERDRAW);
 	stName = new Static(hParent, "",			0, 0, 0, 0, 0);
 	purity = new PurityComponent(hParent,		0, 0, 0, 0);
 	stNumber = new Static(hParent, "0",			0, 0, 0, 0, SS_CENTER);
-	btnSettings = new Button(hParent, "...",	0, 0, 0, 0, BS_OWNERDRAW);
-	btnDelete = new Button(hParent, "",			0, 0, 0, 0, BS_OWNERDRAW);
+	btnSettings = new IconButton(hParent,		0, 0, 0, height, WindowStyles::hIOptions, WindowStyles::hIOptionsHover);
+	btnDelete = new IconButton(hParent,			0, 0, 0, height, WindowStyles::hIDelete, WindowStyles::hIDeleteHover);
 	SendMessage(stName->hWnd, WM_SETFONT, (LPARAM)hFont, TRUE);
 	SendMessage(stNumber->hWnd, WM_SETFONT, (LPARAM)hFont, TRUE);
-	SendMessage(btnSettings->hWnd, WM_SETFONT, (LPARAM)hFont, TRUE);
-	SendMessage(btnDelete->hWnd, WM_SETFONT, (LPARAM)hFont, TRUE);
 	updateInfo(collection);
 }
 
@@ -59,23 +59,17 @@ bool CollectionItem::draw(LPDRAWITEMSTRUCT& pDIS)
 		return true;
 	if (purity->draw(pDIS))
 		return true;
-	if (pDIS->hwndItem == btnSettings->hWnd)
-	{
-		FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::collItemBkBrush);
-		DrawIconEx(pDIS->hDC, 1, (height - 20) / 2, WindowStyles::hIOptions, 0, 0, 0, NULL, DI_NORMAL);
+	if (btnSettings->draw(pDIS, WindowStyles::collItemBkBrush, 1, (height - 20) / 2))
 		return true;
-	}
-	if (pDIS->hwndItem == btnDelete->hWnd)
-	{
-		FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::collItemBkBrush);
-		DrawIconEx(pDIS->hDC, 1, (height - 20) / 2, WindowStyles::hIDelete, 0, 0, 0, NULL, DI_NORMAL);
+	if (btnDelete->draw(pDIS, WindowStyles::collItemBkBrush, 1, (height - 20) / 2))
 		return true;
-	}
 	return false;
 }
 
 bool CollectionItem::notify(HWND hWnd)
 {
 	chboEnabled->mouseHovering(hWnd == chboEnabled->hWnd);
+	btnSettings->mouseHovering(hWnd == btnSettings->hWnd);
+	btnDelete->mouseHovering(hWnd == btnDelete->hWnd);
 	return true;
 }

@@ -27,7 +27,7 @@ void MainWindow::CollectionItemsFrame::updateCollectionItems()
 
 	for (size_t i = collectionItems.size(); i < CollectionManager::collections.size(); i++) // creation
 		if (CollectionManager::collections[i]!=nullptr)
-			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->Window(), 0, (int)(i * 27), MainWindow::width-20, 26, CollectionManager::collections[i], WindowStyles::mainFont));
+			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->Window(), 0, (int)(i * (CollectionItem::height + 1)), MainWindow::width-20, CollectionManager::collections[i], WindowStyles::mainFont));
 	
 	updateScroll();
 	for (auto p : collectionItems) // placing according to the scrollbar
@@ -49,7 +49,7 @@ void MainWindow::CollectionItemsFrame::destroyCollectionItems()
 
 void MainWindow::CollectionItemsFrame::updateScroll()
 {
-	int itemListHeight = (int)collectionItems.size() * 27;
+	int itemListHeight = (int)collectionItems.size() * (CollectionItem::height + 1);
 	yMaxScroll = max(itemListHeight - height, 0);
 	yCurrentScroll = min(yCurrentScroll, yMaxScroll);
 	yCurrentScroll = yCurrentScroll < 0 ? 0 : yCurrentScroll;
@@ -306,6 +306,13 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			ShellExecute(0, 0, "https://donatello.to/IgorBridel", 0, 0, SW_SHOW);
 			return 0;
 		}
+	}
+	return 0;
+
+	case WM_SETCURSOR:
+	{
+		player->notify((HWND)wParam);
+		return FALSE;
 	}
 	return 0;
 

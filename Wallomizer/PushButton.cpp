@@ -45,6 +45,13 @@ void PushButton::draw(LPDRAWITEMSTRUCT& pDIS)
 		g = g1 + (i * (g2 - g1) / pDIS->rcItem.bottom);
 		b = b1 + (i * (b2 - b1) / pDIS->rcItem.bottom);
 
+		if (!checked && hovering)
+		{
+			r = (r + 10) > 255 ? 255 : r + 10;
+			g = (g + 10) > 255 ? 255 : r + 10;
+			b = (b + 10) > 255 ? 255 : r + 10;
+		}
+
 		temp.left = 0;
 		temp.top = i;
 		temp.right = pDIS->rcItem.right;
@@ -64,5 +71,14 @@ void PushButton::draw(LPDRAWITEMSTRUCT& pDIS)
 		staticText[31] = '\0';
 		int len = (int)SendMessageA(pDIS->hwndItem, WM_GETTEXT, 31, (LPARAM)staticText);
 		TextOutA(pDIS->hDC, (pDIS->rcItem.right - pDIS->rcItem.left) / 2, pDIS->rcItem.left + 3, staticText, len);
+	}
+}
+
+void PushButton::mouseHovering(bool isHovering)
+{
+	if (hovering != isHovering)
+	{
+		hovering = isHovering;
+		InvalidateRect(hWnd, NULL, FALSE);
 	}
 }

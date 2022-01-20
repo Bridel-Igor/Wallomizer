@@ -9,11 +9,11 @@ char Player::timer[16];
 
 Player::Player(HWND hParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, DWORD additionalStyles)
 {
-	btnPrev = new Button(hParent, "",			xPlayer,		yPlayer,	20,		20, BS_OWNERDRAW);
-	btnOpenExternal = new Button(hParent, "",	xPlayer+30,		yPlayer,	20,		20, BS_OWNERDRAW);
-	btnPlay = new Button(hParent, "",			xPlayer+60,		yPlayer,	20,		20, BS_OWNERDRAW);
-	btnPause = new Button(hParent, "",			xPlayer+90,		yPlayer,	20,		20, BS_OWNERDRAW);
-	btnNext = new Button(hParent, "",			xPlayer+120,	yPlayer,	20,		20, BS_OWNERDRAW);
+	btnPrev = new IconButton(hParent,			xPlayer,		yPlayer,	20,		20, WindowStyles::hIPrev, WindowStyles::hIPrevHover);
+	btnOpenExternal = new IconButton(hParent,	xPlayer + 30,	yPlayer,	20,		20, WindowStyles::hIOpenExternal, WindowStyles::hIOpenExternalHover);
+	btnPlay = new IconButton(hParent,			xPlayer + 60,	yPlayer,	20,		20, WindowStyles::hIPlay, WindowStyles::hIPlayHover);
+	btnPause = new IconButton(hParent,			xPlayer + 90,	yPlayer,	20,		20, WindowStyles::hIPause, WindowStyles::hIPauseHover);
+	btnNext = new IconButton(hParent,			xPlayer + 120,	yPlayer,	20,		20, WindowStyles::hINext, WindowStyles::hINextHover);
 
 	stDelayRemained = new Static(hParent, "",	xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles);
 }
@@ -63,37 +63,44 @@ bool Player::click(WPARAM& wParam)
 }
 
 bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
-{
+{	
+	if (pDIS->hwndItem == btnPrev->hWnd)
+	{
+		if (!CollectionManager::isPrevious())
+		{
+			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
+			return true;
+		}
+		if (btnPrev->draw(pDIS, WindowStyles::mainBkBrush))
+			return true;
+	}
+	if (btnOpenExternal->draw(pDIS, WindowStyles::mainBkBrush))
+		return true;
 	if (pDIS->hwndItem == btnPlay->hWnd)
 	{
-		FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-		DrawIconEx(pDIS->hDC, 0, 0, Delay::bRunSlideshow ? WindowStyles::hIPlayActive : WindowStyles::hIPlay, 0, 0, 0, NULL, DI_NORMAL);
-		return true;
+		if (Delay::bRunSlideshow)
+		{
+			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIPlayActive, 0, 0, 0, NULL, DI_NORMAL);
+			return true;
+		}
+		if (btnPlay->draw(pDIS, WindowStyles::mainBkBrush))
+			return true;
 	}
 	if (pDIS->hwndItem == btnPause->hWnd)
 	{
-		FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-		DrawIconEx(pDIS->hDC, 0, 0, Delay::bRunSlideshow ? WindowStyles::hIPause : WindowStyles::hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
-		return true;
+		if (!Delay::bRunSlideshow)
+		{
+			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
+			return true;
+		}
+		if (btnPause->draw(pDIS, WindowStyles::mainBkBrush))
+			return true;
 	}
-	if (pDIS->hwndItem == btnNext->hWnd)
-	{
-		FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-		DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hINextEnabled, 0, 0, 0, NULL, DI_NORMAL);
+	if (btnNext->draw(pDIS, WindowStyles::mainBkBrush))
 		return true;
-	}
-	if (pDIS->hwndItem == btnPrev->hWnd)
-	{
-		FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-		DrawIconEx(pDIS->hDC, 0, 0, CollectionManager::isPrevious() ? WindowStyles::hIPrevEnabled : WindowStyles::hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
-		return true;
-	}
-	if (pDIS->hwndItem == btnOpenExternal->hWnd)
-	{
-		FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-		DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIOpenExternal, 0, 0, 0, NULL, DI_NORMAL);
-		return true;
-	}
 	return false;
 }
 
@@ -160,4 +167,14 @@ void Player::redrawPlayers()
 void Player::updateText()
 {
 	SetWindowTextA(stDelayRemained->hWnd, timer);
+}
+
+bool Player::notify(HWND hWnd)
+{
+	btnPrev->mouseHovering(hWnd == btnPrev->hWnd);
+	btnOpenExternal->mouseHovering(hWnd == btnOpenExternal->hWnd);
+	btnPlay->mouseHovering(hWnd == btnPlay->hWnd);
+	btnPause->mouseHovering(hWnd == btnPause->hWnd);
+	btnNext->mouseHovering(hWnd == btnNext->hWnd);
+	return true;
 }

@@ -71,7 +71,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_CREATE:
 	{		
-		pszIDStatusIcon = MAKEINTRESOURCE(IDI_ICON1);
+		pszIDStatusIcon = MAKEINTRESOURCE(IDI_APP);
 		hStatusIcon = LoadIcon(GetModuleHandleA(NULL), pszIDStatusIcon);
 		TrayMessage(hWnd, NIM_ADD, 1, hStatusIcon, "Wallomizer");
 
@@ -141,6 +141,13 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			DestroyWindow(hWnd);
 			return 0;
 		}
+	}
+	return 0;
+
+	case WM_SETCURSOR:
+	{
+		player->notify((HWND)wParam);
+		return FALSE;
 	}
 	return 0;
 

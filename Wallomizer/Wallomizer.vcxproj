@@ -180,6 +180,7 @@
     <ClInclude Include="ColorButton.h" />
     <ClInclude Include="ColorPickerWindow.h" />
     <ClInclude Include="ComboBox.h" />
+    <ClInclude Include="IconButton.h" />
     <ClInclude Include="Delay.h" />
     <ClInclude Include="Filesystem.h" />
     <ClInclude Include="LocalCollection.h" />
@@ -210,21 +211,31 @@
     <ResourceCompile Include="Wallomizer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="CheckBox.ico" />
-    <Image Include="CheckBox_checked.ico" />
-    <Image Include="CheckBox_checked_hover.ico" />
-    <Image Include="CheckBox_hover.ico" />
-    <Image Include="Delete.ico" />
-    <Image Include="icon32.ico" />
-    <Image Include="Next.ico" />
-    <Image Include="Open_external.ico" />
-    <Image Include="Options.ico" />
-    <Image Include="Pause_activated.ico" />
-    <Image Include="Pause.ico" />
-    <Image Include="Play_activated.ico" />
-    <Image Include="Play.ico" />
-    <Image Include="Prev_disabled.ico" />
-    <Image Include="Prev.ico" />
+    <Image Include="Icons\App.ico" />
+    <Image Include="Icons\CheckBox.ico" />
+    <Image Include="Icons\CheckBox_checked.ico" />
+    <Image Include="Icons\CheckBox_checked_hover.ico" />
+    <Image Include="Icons\CheckBox_hover.ico" />
+    <Image Include="Icons\Check_black.ico" />
+    <Image Include="Icons\Check_white.ico" />
+    <Image Include="Icons\ColorEmpty.ico" />
+    <Image Include="Icons\Delete.ico" />
+    <Image Include="Icons\Delete_hover.ico" />
+    <Image Include="Icons\Next.ico" />
+    <Image Include="Icons\Next_hover.ico" />
+    <Image Include="Icons\Open_external.ico" />
+    <Image Include="Icons\Open_external_hover.ico" />
+    <Image Include="Icons\Options.ico" />
+    <Image Include="Icons\Options_hover.ico" />
+    <Image Include="Icons\Pause_activated.ico" />
+    <Image Include="Icons\Pause.ico" />
+    <Image Include="Icons\Pause_hover.ico" />
+    <Image Include="Icons\Play_activated.ico" />
+    <Image Include="Icons\Play.ico" />
+    <Image Include="Icons\Play_hover.ico" />
+    <Image Include="Icons\Prev_disabled.ico" />
+    <Image Include="Icons\Prev.ico" />
+    <Image Include="Icons\Prev_hover.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

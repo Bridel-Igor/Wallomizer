@@ -40,7 +40,7 @@ HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, 
 LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
-	{ // TODO: notify checkBox to make it responsible to mouse events
+	{
 	case WM_CREATE:
 	{
 		EnableWindow(MainWindow::mainWindow->Window(), FALSE);
@@ -261,6 +261,13 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			cbStartup->click();
 			return 0;
 		}
+	}
+	return 0;
+
+	case WM_SETCURSOR:
+	{
+		cbStartup->mouseHovering((HWND)wParam == cbStartup->hWnd);
+		return FALSE;
 	}
 	return 0;
 

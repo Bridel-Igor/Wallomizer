@@ -192,51 +192,84 @@
     <ClInclude Include="Player.h">
       <Filter>Components\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="IconButton.h">
+      <Filter>Components\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Prev_disabled.ico">
+    <Image Include="Icons\Prev_disabled.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="Play_activated.ico">
+    <Image Include="Icons\Play_activated.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="Pause_activated.ico">
+    <Image Include="Icons\Pause_activated.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="Open_external.ico">
+    <Image Include="Icons\Open_external.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="icon32.ico">
+    <Image Include="Icons\Next.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="Next.ico">
+    <Image Include="Icons\Pause.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="Pause.ico">
+    <Image Include="Icons\Play.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="Play.ico">
+    <Image Include="Icons\Prev.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="Prev.ico">
+    <Image Include="Icons\Delete.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="Delete.ico">
+    <Image Include="Icons\Options.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="Options.ico">
+    <Image Include="Icons\CheckBox.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="CheckBox.ico">
+    <Image Include="Icons\CheckBox_checked.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="CheckBox_checked.ico">
+    <Image Include="Icons\CheckBox_checked_hover.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="CheckBox_checked_hover.ico">
+    <Image Include="Icons\CheckBox_hover.ico">
       <Filter>Resources</Filter>
     </Image>
-    <Image Include="CheckBox_hover.ico">
+    <Image Include="Icons\Options_hover.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Icons\Play_hover.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Icons\App.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Icons\Delete_hover.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Icons\Pause_hover.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Icons\Prev_hover.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Icons\Open_external_hover.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Icons\Next_hover.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Icons\Check_black.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Icons\Check_white.ico">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Icons\ColorEmpty.ico">
       <Filter>Resources</Filter>
     </Image>
   </ItemGroup>

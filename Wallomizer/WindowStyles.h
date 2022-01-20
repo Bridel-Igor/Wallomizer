@@ -21,13 +21,21 @@ namespace WindowStyles
 	extern COLORREF collItemBkColor;
 	extern HBRUSH collItemBkBrush;
 	extern HBRUSH collFrameBkBrush;
-	extern HICON hIOptions, hIDelete;
+	extern HICON hIOptions, hIOptionsHover, hIDelete, hIDeleteHover;
 
 	// player icons
-	extern HICON hIPlay, hIPlayActive, hIPause, hIPauseActive, hIPrevEnabled, hIPrevDisabled, hINextEnabled, hIOpenExternal;
+	extern HICON	hIPlay, hIPlayHover, hIPlayActive, 
+					hIPause, hIPauseHover, hIPauseActive, 
+					hIPrev, hIPrevHover, hIPrevDisabled, 
+					hINext, hINextHover, 
+					hIOpenExternal, hIOpenExternalHover;
 
 	// check box
 	extern HICON hICheckBox, hICheckBoxChecked, hICheckBoxHover, hICheckBoxCheckedHover;
+
+	// HACK: move this to ColorPickerWindow class
+	// color button
+	extern HICON hICheckWhite, hICheckBlack, hIColorEmpty;
 
 	void initialize();
 	void clear();

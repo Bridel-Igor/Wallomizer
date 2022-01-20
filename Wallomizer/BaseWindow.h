@@ -92,7 +92,7 @@ public:
 		wc.lpfnWndProc = DERIVED_TYPE::WindowProc;
 		wc.hInstance = GetModuleHandleA(NULL);
 		wc.lpszClassName = ClassName();
-		wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
+		wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_APP));
 
 		RegisterClass(&wc);
 		

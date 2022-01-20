@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Static.h"
-#include "Button.h"
+#include "IconButton.h"
 
 class Player
 {
@@ -12,11 +12,12 @@ public:
 	bool draw(LPDRAWITEMSTRUCT& pDIS);
 	static void updateTimer(bool forsed = false);
 	static void redrawPlayers();
+	bool notify(HWND hWnd);
 
 private:
 	void updateText();
 
 	Static* stDelayRemained;
-	Button* btnPlay, * btnPause, * btnNext, * btnPrev, * btnOpenExternal;
+	IconButton* btnPlay, * btnPause, * btnNext, * btnPrev, * btnOpenExternal;
 	static char timer[16];
 };

@@ -138,6 +138,14 @@ LRESULT ColorPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	}
 	return 0;
 
+	case WM_SETCURSOR:
+	{
+		for (int i = 0; i < 30; i++)
+			btnClr[i]->mouseHovering((HWND)wParam == btnClr[i]->hWnd);
+		return FALSE;
+	}
+	return 0;
+
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}

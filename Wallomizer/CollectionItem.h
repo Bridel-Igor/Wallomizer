@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Static.h"
-#include "Button.h"
+#include "IconButton.h"
 #include "CheckBox.h"
 #include "BaseCollection.h"
 #include "CategoriesAndPurity.h"
@@ -9,10 +9,10 @@
 class CollectionItem
 {
 private:
-	int x, y, width, height;
+	int x, y, width;
 
 public:
-	CollectionItem(HWND hParent, int x, int y, int width, int height, BaseCollection* collection, HFONT hFont);
+	CollectionItem(HWND hParent, int x, int y, int width, BaseCollection* collection, HFONT hFont);
 	~CollectionItem();
 	void updateInfo(BaseCollection* collection);
 	void reposition(int yPos, bool scrollBarISVisible);
@@ -21,7 +21,8 @@ public:
 
 	CheckBox* chboEnabled;
 	Static* stName, * stNumber;
-	Button *btnSettings, *btnDelete;
+	IconButton *btnSettings, *btnDelete;
 	BaseCollection* collection;
 	PurityComponent* purity;
+	static int height;
 };

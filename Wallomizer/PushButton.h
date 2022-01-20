@@ -6,7 +6,7 @@
 
 class PushButton
 {
-	bool checked = false;
+	bool checked = false, hovering;
 	COLORREF checked1, checked2;
 	RECT temp = {0};
 	HBRUSH color = NULL;
@@ -17,7 +17,9 @@ public:
 	void check(bool state);
 	bool isChecked();
 	void draw(LPDRAWITEMSTRUCT& pDIS);
+	void mouseHovering(bool isHovering);
 
 	HWND hWnd = NULL;
 	HMENU hMenu;
 };
+// TODO: make all PushButtons sensible to mouse hovering

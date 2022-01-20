@@ -76,6 +76,14 @@ void PurityComponent::moveComponent(int x, int y, int width, int height)
 	MoveWindow(pbNSFW->hWnd,	1 + x + (2 * width / 3),	y, width / 3 - 1,	height, FALSE);
 }
 
+bool PurityComponent::notify(HWND hWnd)
+{
+	pbSFW->mouseHovering(hWnd == pbSFW->hWnd);
+	pbSketchy->mouseHovering(hWnd == pbSketchy->hWnd);
+	pbNSFW->mouseHovering(hWnd == pbNSFW->hWnd);
+	return true;
+}
+
 // CategoryComponent section
 
 CategoryComponent::CategoryComponent(HWND hParent, int x, int y, int width, int height)
@@ -144,4 +152,12 @@ bool CategoryComponent::click(WPARAM& wParam)
 		return true;
 	}
 	return false;
+}
+
+bool CategoryComponent::notify(HWND hWnd)
+{
+	pbGeneral->mouseHovering(hWnd == pbGeneral->hWnd);
+	pbAnime->mouseHovering(hWnd == pbAnime->hWnd);
+	pbPeople->mouseHovering(hWnd == pbPeople->hWnd);
+	return true;
 }

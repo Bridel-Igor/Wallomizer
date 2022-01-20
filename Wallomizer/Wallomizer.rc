@@ -52,35 +52,55 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "icon32.ico"
+IDI_APP                 ICON                    "Icons/App.ico"
 
-IDI_I_PLAY              ICON                    "Play.ico"
+IDI_PLAY                ICON                    "Icons/Play.ico"
 
-IDI_I_PAUSE             ICON                    "Pause.ico"
+IDI_PAUSE               ICON                    "Icons/Pause.ico"
 
-IDI_I_NEXT              ICON                    "Next.ico"
+IDI_NEXT                ICON                    "Icons/Next.ico"
 
-IDI_I_PREV              ICON                    "Prev.ico"
+IDI_PREV                ICON                    "Icons/Prev.ico"
 
-IDI_I_PLAY_ACTIVE       ICON                    "Play_activated.ico"
+IDI_PLAY_ACTIVE         ICON                    "Icons/Play_activated.ico"
 
-IDI_I_PAUSE_ACTIVE      ICON                    "Pause_activated.ico"
+IDI_PAUSE_ACTIVE        ICON                    "Icons/Pause_activated.ico"
 
-IDI_I_PREV_DISABLED     ICON                    "Prev_disabled.ico"
+IDI_PREV_DISABLED       ICON                    "Icons/Prev_disabled.ico"
 
-IDI_I_OPEN_EXTERNAL     ICON                    "Open_external.ico"
+IDI_OPEN_EXTERNAL       ICON                    "Icons/Open_external.ico"
 
-IDI_I_DELETE            ICON                    "Delete.ico"
+IDI_DELETE_HOVER        ICON                    "Icons/Delete_hover.ico"
 
-IDI_I_OPTIONS           ICON                    "Options.ico"
+IDI_OPTIONS             ICON                    "Icons/Options.ico"
 
-IDI_I_CHECKBOX          ICON                    "CheckBox.ico"
+IDI_CHECKBOX            ICON                    "Icons/CheckBox.ico"
 
-IDI_I_CHECKBOX_CHECKED  ICON                    "CheckBox_checked.ico"
+IDI_CHECKBOX_CHECKED    ICON                    "Icons/CheckBox_checked.ico"
 
-IDI_I_CHECKBOX_CHECKED_HOVER ICON                    "CheckBox_checked_hover.ico"
+IDI_CHECKBOX_CHECKED_HOVER ICON                 "Icons/CheckBox_checked_hover.ico"
 
-IDI_I_CHECKBOX_HOVER    ICON                    "CheckBox_hover.ico"
+IDI_CHECKBOX_HOVER      ICON                    "Icons/CheckBox_hover.ico"
+
+IDI_OPTIONS_HOVER       ICON                    "Icons/Options_hover.ico"
+
+IDI_DELETE              ICON                    "Icons/Delete.ico"
+
+IDI_PLAY_HOVER          ICON                    "Icons/Play_hover.ico"
+
+IDI_PAUSE_HOVER         ICON                    "Icons/Pause_hover.ico"
+
+IDI_NEXT_HOVER          ICON                    "Icons/Next_hover.ico"
+
+IDI_OPEN_EXTERNAL_HOVER ICON                    "Icons/Open_external_hover.ico"
+
+IDI_PREV_HOVER          ICON                    "Icons/Prev_hover.ico"
+
+IDI_CHECK_BLACK         ICON                    "Icons/Check_black.ico"
+
+IDI_CHECK_WHITE         ICON                    "Icons/Check_white.ico"
+
+IDI_COLOR_EMPTY         ICON                    "Icons/ColorEmpty.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

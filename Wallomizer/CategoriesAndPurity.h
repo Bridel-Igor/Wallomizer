@@ -23,6 +23,7 @@ public:
 	bool draw(LPDRAWITEMSTRUCT &pDIS);
 	bool click(WPARAM &wParam);
 	void moveComponent(int x, int y, int width, int height);
+	bool notify(HWND hWnd);
 
 private:
 	PushButton *pbSFW, *pbSketchy, *pbNSFW;
@@ -37,6 +38,7 @@ public:
 	CategoriesAndPurity getCategory();
 	bool draw(LPDRAWITEMSTRUCT& pDIS);
 	bool click(WPARAM& wParam);
+	bool notify(HWND hWnd);
 
 private:
 	PushButton* pbGeneral, * pbAnime, * pbPeople;

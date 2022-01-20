@@ -167,6 +167,16 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 	}
 	return 0;
 
+	case WM_SETCURSOR:
+	{
+		btnAllWide->mouseHovering((HWND)wParam == btnAllWide->hWnd);
+		btnAllPortrait->mouseHovering((HWND)wParam == btnAllPortrait->hWnd);
+		for (int i = 0; i < 12; i++)
+			btnAR[i]->mouseHovering((HWND)wParam == btnAR[i]->hWnd);
+		return FALSE;
+	}
+	return 0;
+
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}

@@ -280,6 +280,16 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	}
 	return 0;
 
+	case WM_SETCURSOR:
+	{
+		btnAtLeast->mouseHovering((HWND)wParam == btnAtLeast->hWnd);
+		btnExactly->mouseHovering((HWND)wParam == btnExactly->hWnd);
+		for (int i = 0; i < 23; i++)
+			btnRes[i]->mouseHovering((HWND)wParam == btnRes[i]->hWnd);
+		return FALSE;
+	}
+	return 0;
+
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
