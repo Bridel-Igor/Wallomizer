@@ -73,15 +73,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\igor\source\repos\Wallomizer\Wallomizer\Collections;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Windows;C:\Users\igor\source\repos\Wallomizer\Wallomizer;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Interfaces;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Compositions;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Components;$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\igor\source\repos\Wallomizer\Wallomizer\Collections;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Windows;C:\Users\igor\source\repos\Wallomizer\Wallomizer;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Interfaces;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Compositions;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Components;$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\igor\source\repos\Wallomizer\Wallomizer\Collections;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Windows;C:\Users\igor\source\repos\Wallomizer\Wallomizer;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Interfaces;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Compositions;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Components;$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\igor\source\repos\Wallomizer\Wallomizer\Collections;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Windows;C:\Users\igor\source\repos\Wallomizer\Wallomizer;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Interfaces;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Compositions;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Components;$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -140,102 +148,113 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AddCollectionWindow.cpp" />
-    <ClCompile Include="AspRatPickerWindow.cpp" />
-    <ClCompile Include="CategoriesAndPurity.cpp" />
-    <ClCompile Include="CheckBox.cpp" />
-    <ClCompile Include="CollectionItem.cpp" />
-    <ClCompile Include="CollectionManager.cpp" />
-    <ClCompile Include="ColorButton.cpp" />
-    <ClCompile Include="ColorPickerWindow.cpp" />
+    <ClCompile Include="UI\Interfaces\IClickable.cpp" />
+    <ClCompile Include="UI\Interfaces\IHoverable.cpp" />
+    <ClCompile Include="UI\Windows\AddCollectionWindow.cpp" />
+    <ClCompile Include="UI\Windows\AspRatPickerWindow.cpp" />
+    <ClCompile Include="UI\Components\Button.cpp" />
+    <ClCompile Include="UI\Compositions\CategoriesAndPurity.cpp" />
+    <ClCompile Include="UI\Components\CheckBox.cpp" />
+    <ClCompile Include="UI\Compositions\CollectionItem.cpp" />
+    <ClCompile Include="Collections\CollectionManager.cpp" />
+    <ClCompile Include="UI\Components\ColorButton.cpp" />
+    <ClCompile Include="UI\Windows\ColorPickerWindow.cpp" />
+    <ClCompile Include="UI\Components\ComboBox.cpp" />
     <ClCompile Include="Delay.cpp" />
+    <ClCompile Include="UI\Components\Edit.cpp" />
     <ClCompile Include="Filesystem.cpp" />
-    <ClCompile Include="LocalCollection.cpp" />
-    <ClCompile Include="HMenuGenerator.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PushButton.cpp" />
-    <ClCompile Include="ResPickerWindow.cpp" />
-    <ClCompile Include="SearchCollection.cpp" />
-    <ClCompile Include="SetLocalCollectionWindow.cpp" />
-    <ClCompile Include="SetSearchCollectionWindow.cpp" />
+    <ClCompile Include="UI\Components\IconButton.cpp" />
+    <ClCompile Include="Collections\LocalCollection.cpp" />
+    <ClCompile Include="UI\Interfaces\HMenuGenerator.cpp" />
+    <ClCompile Include="UI\Compositions\Player.cpp" />
+    <ClCompile Include="UI\Components\PushButton.cpp" />
+    <ClCompile Include="UI\Windows\ResPickerWindow.cpp" />
+    <ClCompile Include="Collections\SearchCollection.cpp" />
+    <ClCompile Include="UI\Windows\SetLocalCollectionWindow.cpp" />
+    <ClCompile Include="UI\Windows\SetSearchCollectionWindow.cpp" />
     <ClCompile Include="Settings.cpp" />
-    <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="UI\Windows\MainWindow.cpp" />
     <ClCompile Include="Internet.cpp" />
-    <ClCompile Include="SettingsWindow.cpp" />
-    <ClCompile Include="TrayWindow.cpp" />
-    <ClCompile Include="UserCollection.cpp" />
-    <ClCompile Include="SetUserCollectionWindow.cpp" />
+    <ClCompile Include="UI\Windows\SettingsWindow.cpp" />
+    <ClCompile Include="UI\Components\Static.cpp" />
+    <ClCompile Include="UI\Windows\TrayWindow.cpp" />
+    <ClCompile Include="UI\Components\UpDownEdit.cpp" />
+    <ClCompile Include="Collections\UserCollection.cpp" />
+    <ClCompile Include="UI\Windows\SetUserCollectionWindow.cpp" />
     <ClCompile Include="Wallpaper.cpp" />
-    <ClCompile Include="WindowStyles.cpp" />
+    <ClCompile Include="UI\WindowStyles.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AddCollectionWindow.h" />
-    <ClInclude Include="AspRatPickerWindow.h" />
-    <ClInclude Include="BaseCollection.h" />
-    <ClInclude Include="Button.h" />
-    <ClInclude Include="CategoriesAndPurity.h" />
-    <ClInclude Include="CollectionItem.h" />
-    <ClInclude Include="CollectionManager.h" />
-    <ClInclude Include="ColorButton.h" />
-    <ClInclude Include="ColorPickerWindow.h" />
-    <ClInclude Include="ComboBox.h" />
-    <ClInclude Include="IconButton.h" />
+    <ClInclude Include="UI\Windows\AddCollectionWindow.h" />
+    <ClInclude Include="UI\Windows\AspRatPickerWindow.h" />
+    <ClInclude Include="Collections\BaseCollection.h" />
+    <ClInclude Include="UI\Components\Button.h" />
+    <ClInclude Include="UI\Compositions\CategoriesAndPurity.h" />
+    <ClInclude Include="UI\Compositions\CollectionItem.h" />
+    <ClInclude Include="Collections\CollectionManager.h" />
+    <ClInclude Include="UI\Components\ColorButton.h" />
+    <ClInclude Include="UI\Windows\ColorPickerWindow.h" />
+    <ClInclude Include="UI\Components\ComboBox.h" />
+    <ClInclude Include="UI\Interfaces\IClickable.h" />
+    <ClInclude Include="UI\Components\IconButton.h" />
     <ClInclude Include="Delay.h" />
     <ClInclude Include="Filesystem.h" />
-    <ClInclude Include="LocalCollection.h" />
-    <ClInclude Include="Edit.h" />
-    <ClInclude Include="HMenuGenerator.h" />
+    <ClInclude Include="UI\Interfaces\IComponent.h" />
+    <ClInclude Include="UI\Interfaces\IHoverable.h" />
+    <ClInclude Include="Collections\LocalCollection.h" />
+    <ClInclude Include="UI\Components\Edit.h" />
+    <ClInclude Include="UI\Interfaces\HMenuGenerator.h" />
     <ClInclude Include="Internet.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="PushButton.h" />
+    <ClInclude Include="UI\Compositions\Player.h" />
+    <ClInclude Include="UI\Components\PushButton.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="ResPickerWindow.h" />
-    <ClInclude Include="SearchCollection.h" />
-    <ClInclude Include="SetLocalCollectionWindow.h" />
-    <ClInclude Include="SetSearchCollectionWindow.h" />
+    <ClInclude Include="UI\Windows\ResPickerWindow.h" />
+    <ClInclude Include="Collections\SearchCollection.h" />
+    <ClInclude Include="UI\Windows\SetLocalCollectionWindow.h" />
+    <ClInclude Include="UI\Windows\SetSearchCollectionWindow.h" />
     <ClInclude Include="Settings.h" />
-    <ClInclude Include="MainWindow.h" />
-    <ClInclude Include="SettingsWindow.h" />
-    <ClInclude Include="SetUserCollectionWindow.h" />
-    <ClInclude Include="CheckBox.h" />
-    <ClInclude Include="Static.h" />
-    <ClInclude Include="TrayWindow.h" />
-    <ClInclude Include="UpDownEdit.h" />
-    <ClInclude Include="UserCollection.h" />
-    <ClInclude Include="BaseWindow.h" />
+    <ClInclude Include="UI\Windows\MainWindow.h" />
+    <ClInclude Include="UI\Windows\SettingsWindow.h" />
+    <ClInclude Include="UI\Windows\SetUserCollectionWindow.h" />
+    <ClInclude Include="UI\Components\CheckBox.h" />
+    <ClInclude Include="UI\Components\Static.h" />
+    <ClInclude Include="UI\Windows\TrayWindow.h" />
+    <ClInclude Include="UI\Components\UpDownEdit.h" />
+    <ClInclude Include="Collections\UserCollection.h" />
+    <ClInclude Include="UI\Interfaces\BaseWindow.h" />
     <ClInclude Include="Wallpaper.h" />
-    <ClInclude Include="WindowStyles.h" />
+    <ClInclude Include="UI\WindowStyles.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Wallomizer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Icons\App.ico" />
-    <Image Include="Icons\CheckBox.ico" />
-    <Image Include="Icons\CheckBox_checked.ico" />
-    <Image Include="Icons\CheckBox_checked_hover.ico" />
-    <Image Include="Icons\CheckBox_hover.ico" />
-    <Image Include="Icons\Check_black.ico" />
-    <Image Include="Icons\Check_white.ico" />
-    <Image Include="Icons\ColorEmpty.ico" />
-    <Image Include="Icons\Delete.ico" />
-    <Image Include="Icons\Delete_hover.ico" />
-    <Image Include="Icons\Next.ico" />
-    <Image Include="Icons\Next_hover.ico" />
-    <Image Include="Icons\Open_external.ico" />
-    <Image Include="Icons\Open_external_hover.ico" />
-    <Image Include="Icons\Options.ico" />
-    <Image Include="Icons\Options_hover.ico" />
-    <Image Include="Icons\Pause_activated.ico" />
-    <Image Include="Icons\Pause.ico" />
-    <Image Include="Icons\Pause_hover.ico" />
-    <Image Include="Icons\Play_activated.ico" />
-    <Image Include="Icons\Play.ico" />
-    <Image Include="Icons\Play_hover.ico" />
-    <Image Include="Icons\Prev_disabled.ico" />
-    <Image Include="Icons\Prev.ico" />
-    <Image Include="Icons\Prev_hover.ico" />
+    <Image Include="UI\Icons\App.ico" />
+    <Image Include="UI\Icons\CheckBox.ico" />
+    <Image Include="UI\Icons\CheckBox_checked.ico" />
+    <Image Include="UI\Icons\CheckBox_checked_hover.ico" />
+    <Image Include="UI\Icons\CheckBox_hover.ico" />
+    <Image Include="UI\Icons\Check_black.ico" />
+    <Image Include="UI\Icons\Check_white.ico" />
+    <Image Include="UI\Icons\ColorEmpty.ico" />
+    <Image Include="UI\Icons\Delete.ico" />
+    <Image Include="UI\Icons\Delete_hover.ico" />
+    <Image Include="UI\Icons\Next.ico" />
+    <Image Include="UI\Icons\Next_hover.ico" />
+    <Image Include="UI\Icons\Open_external.ico" />
+    <Image Include="UI\Icons\Open_external_hover.ico" />
+    <Image Include="UI\Icons\Options.ico" />
+    <Image Include="UI\Icons\Options_hover.ico" />
+    <Image Include="UI\Icons\Pause_activated.ico" />
+    <Image Include="UI\Icons\Pause.ico" />
+    <Image Include="UI\Icons\Pause_hover.ico" />
+    <Image Include="UI\Icons\Play_activated.ico" />
+    <Image Include="UI\Icons\Play.ico" />
+    <Image Include="UI\Icons\Play_hover.ico" />
+    <Image Include="UI\Icons\Prev_disabled.ico" />
+    <Image Include="UI\Icons\Prev.ico" />
+    <Image Include="UI\Icons\Prev_hover.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

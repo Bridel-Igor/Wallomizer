@@ -10,17 +10,18 @@ enum class CollectionType : unsigned char
 
 class Wallpaper
 {
-	union CharX
-	{
-		wchar_t* w;
-		char* a;
-	}charX;
-	CollectionType type;
-
 public:
 	Wallpaper(CollectionType type);
 	~Wallpaper();
 	CollectionType getType();
 	char* getPathA();
 	wchar_t* getPathW();
+
+private:
+	union CharX
+	{
+		wchar_t* w;
+		char* a;
+	}charX;
+	CollectionType type;
 };
