@@ -5,6 +5,7 @@
 namespace WindowStyles
 {
 	// main style
+
 	extern HFONT mainFont;
 	extern HFONT titleFont;
 	extern COLORREF mainFontColor;
@@ -12,11 +13,13 @@ namespace WindowStyles
 	extern HBRUSH mainBkBrush;
 
 	// edit style
+
 	extern COLORREF editFontColor;
 	extern COLORREF editBkColor;
 	extern COLORREF editBkInvalidColor;
 
 	// collection items frame style
+
 	extern COLORREF collItemFontColor;
 	extern COLORREF collItemBkColor;
 	extern HBRUSH collItemBkBrush;
@@ -24,6 +27,7 @@ namespace WindowStyles
 	extern HICON hIOptions, hIOptionsHover, hIDelete, hIDeleteHover;
 
 	// player icons
+
 	extern HICON	hIPlay, hIPlayHover, hIPlayActive, 
 					hIPause, hIPauseHover, hIPauseActive, 
 					hIPrev, hIPrevHover, hIPrevDisabled, 
@@ -31,10 +35,12 @@ namespace WindowStyles
 					hIOpenExternal, hIOpenExternalHover;
 
 	// check box
+
 	extern HICON hICheckBox, hICheckBoxChecked, hICheckBoxHover, hICheckBoxCheckedHover;
 
 	// HACK: move this to ColorPickerWindow class
 	// color button
+
 	extern HICON hICheckWhite, hICheckBlack, hIColorEmpty;
 
 	void initialize();

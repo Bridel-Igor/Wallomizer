@@ -16,6 +16,9 @@ public:
 	void mouseHovering(WPARAM wParam);
 
 protected:
+	/// Protected constructor to prevent allocation of an interface object.
+	IHoverable() = default;
+
 	/// Indicates mouse hovering status.
 	/// Changed by the mouseHovering method.
 	/// Used by draw method of components.

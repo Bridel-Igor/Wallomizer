@@ -2,8 +2,8 @@
 
 char Internet::buffer[bufferSize];
 std::mutex Internet::bufferAccess;
-
-bool Internet::URLDownloadToBuffer(char* URL, char* _buffer, DWORD _bufferSize) // TODO: no internet exception handler
+// TODO: no internet exception handler
+bool Internet::URLDownloadToBuffer(char* URL, char* _buffer, DWORD _bufferSize) 
 {
 	HINTERNET hInternetSession;
 	HINTERNET hURL;

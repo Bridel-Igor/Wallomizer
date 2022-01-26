@@ -8,9 +8,6 @@
 class IClickable : public IComponent
 {
 public:
-	IClickable();
-	~IClickable();
-
 	/// Handle to menu value of the component that used by WinAPI messaging.
 	HMENU hMenu() {	return m_hMenu; }
 
@@ -23,6 +20,10 @@ public:
 	bool isClicked(WPARAM wParam);
 
 protected:
+	/// Protected constructor to prevent allocation of an interface object.
+	IClickable();
+	~IClickable();
+
 	/// Handle to menu value of the component that used by WinAPI messaging.
 	HMENU m_hMenu = NULL;
 };

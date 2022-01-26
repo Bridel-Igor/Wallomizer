@@ -76,7 +76,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		TrayMessage(hWnd, NIM_ADD, 1, hStatusIcon, "Wallomizer");
 
 		player = new Player(this->hWnd(),					10,		10,
-														10,		35,		140,	20, SS_CENTER);
+															10,		35,		140,	20, SS_CENTER);
 			
 		btnSettings = new Button(this->hWnd(), "Settings",	10,		60,		65,		20);
 		btnExit = new Button(this->hWnd(), "Exit",			85,		60,		65,		20);
