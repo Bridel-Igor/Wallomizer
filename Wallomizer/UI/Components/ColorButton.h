@@ -56,8 +56,19 @@ private:
 	bool m_empty = false;
 	/// values of color chanels in range [0, 255].
 	BYTE m_red, m_green, m_blue;
-	/// Handles for pens for drawing outlines. Used for drawing. // HACK: make 3 static pens and just assing them in this members
-	HPEN m_checkedPen, m_pen; 
+	/// Flags if checked color must be white or black. Used for drawing.
+	bool m_checkedPenIsWhite;
 	/// Handle for brush which holds the color of the button. Used for drawing.
 	HBRUSH m_brush;
+
+	/// Resource management section
+
+	/// Reference count of object, that are using resources. 
+	/// When it gets > 0 resources are allocated. 
+	/// When it reaches 0 resources are released.
+	static unsigned char s_refCount;
+	/// Handles to pens to draw outlines.
+	static HPEN s_checkedPenWhite, s_checkedPenBlack, s_nullPen;
+	/// Handles to icons that holds bitmaps of check mark and appearence of empty color button.
+	static HICON s_hICheckWhite, s_hICheckBlack, s_hIColorEmpty;
 };

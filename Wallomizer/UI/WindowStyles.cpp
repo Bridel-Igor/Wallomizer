@@ -32,9 +32,6 @@ HICON	WindowStyles::hIPlay, WindowStyles::hIPlayHover, WindowStyles::hIPlayActiv
 HICON	WindowStyles::hICheckBox, WindowStyles::hICheckBoxChecked, 
 		WindowStyles::hICheckBoxHover, WindowStyles::hICheckBoxCheckedHover;
 
-// color button
-HICON WindowStyles::hICheckWhite, WindowStyles::hICheckBlack, WindowStyles::hIColorEmpty;
-
 void WindowStyles::initialize()
 {
 	// main style
@@ -79,11 +76,6 @@ void WindowStyles::initialize()
 	hICheckBoxChecked =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX_CHECKED),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 	hICheckBoxHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 	hICheckBoxCheckedHover =	(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX_CHECKED_HOVER),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-
-	// color button
-	hICheckWhite =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECK_WHITE),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hICheckBlack =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECK_BLACK),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIColorEmpty =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_COLOR_EMPTY),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 }
 
 void WindowStyles::clear()
@@ -118,8 +110,4 @@ void WindowStyles::clear()
 
 	DeleteObject(collItemBkBrush);
 	DeleteObject(collFrameBkBrush);
-
-	DeleteObject(hICheckBlack);
-	DeleteObject(hICheckWhite);
-	DeleteObject(hIColorEmpty);
 }

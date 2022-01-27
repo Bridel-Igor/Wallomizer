@@ -3,7 +3,10 @@
 #include <Windows.h>
 
 namespace WindowStyles
-{
+{	
+	void initialize();
+	void clear();
+
 	// main style
 
 	extern HFONT mainFont;
@@ -37,12 +40,4 @@ namespace WindowStyles
 	// check box
 
 	extern HICON hICheckBox, hICheckBoxChecked, hICheckBoxHover, hICheckBoxCheckedHover;
-
-	// HACK: move this to ColorPickerWindow class
-	// color button
-
-	extern HICON hICheckWhite, hICheckBlack, hIColorEmpty;
-
-	void initialize();
-	void clear();
 }
