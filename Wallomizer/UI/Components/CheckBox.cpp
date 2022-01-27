@@ -3,10 +3,10 @@
 #include "CheckBox.h"
 #include "WindowStyles.h"
 
-CheckBox::CheckBox(HWND hParent, LPCSTR text, int x, int y, int width, int height, HINSTANCE hInstance, bool isChecked, DWORD additionalStyles, DWORD additionalExStyles)
+CheckBox::CheckBox(HWND hParent, int x, int y, int width, int height, bool isChecked, DWORD additionalStyles, DWORD additionalExStyles)
 {
-	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), text, WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, hParent, m_hMenu, hInstance, NULL);
-	checked = isChecked;
+	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), TEXT(""), WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, hParent, m_hMenu, NULL, NULL);
+	m_checked = isChecked;
 }
 
 CheckBox::~CheckBox()
@@ -16,18 +16,18 @@ CheckBox::~CheckBox()
 
 void CheckBox::click()
 {
-	setChecked(!checked);
+	setChecked(!m_checked);
 }
 
 void CheckBox::setChecked(bool state)
 {
-	checked = state;
+	m_checked = state;
 	InvalidateRect(m_hWnd, NULL, FALSE);
 }
 
 bool CheckBox::isChecked()
 {
-	return checked;
+	return m_checked;
 }
 
 bool CheckBox::draw(LPDRAWITEMSTRUCT& pDIS, HBRUSH bkgrnd)
@@ -37,7 +37,7 @@ bool CheckBox::draw(LPDRAWITEMSTRUCT& pDIS, HBRUSH bkgrnd)
 	FillRect(pDIS->hDC, &pDIS->rcItem, bkgrnd);
 
 	DrawIconEx(pDIS->hDC, (pDIS->rcItem.right - 20) / 2, (pDIS->rcItem.bottom - 20) / 2,
-		checked ? (m_hovering ? WindowStyles::hICheckBoxCheckedHover : WindowStyles::hICheckBoxChecked) : (m_hovering ? WindowStyles::hICheckBoxHover : WindowStyles::hICheckBox)
+		m_checked ? (m_hovering ? WindowStyles::hICheckBoxCheckedHover : WindowStyles::hICheckBoxChecked) : (m_hovering ? WindowStyles::hICheckBoxHover : WindowStyles::hICheckBox)
 		, 0, 0, 0, NULL, DI_NORMAL);
 	return true;
 }

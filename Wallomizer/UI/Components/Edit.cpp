@@ -15,14 +15,14 @@ void Edit::getTextA(char* buffer, int size)
 	GetWindowTextA(m_hWnd, buffer, size);
 }
 
-void Edit::setTextW(LPWSTR text)
-{
-	SetWindowTextW(m_hWnd, text);
-}
-
 void Edit::setTextA(LPCSTR text)
 {
 	SetWindowTextA(m_hWnd, text);
+}
+
+void Edit::setTextW(LPWSTR text)
+{
+	SetWindowTextW(m_hWnd, text);
 }
 
 bool Edit::isEmpty()

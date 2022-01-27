@@ -3,8 +3,8 @@
 PushButton::PushButton(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles, DWORD additionalExStyles, COLORREF color1, COLORREF color2)
 {
 	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), text, WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, hParent, m_hMenu, NULL, NULL);
-	checked1 = color1;
-	checked2 = color2;
+	m_checkedColorTop = color1;
+	m_checkedColorBottom = color2;
 }
 
 PushButton::~PushButton()
@@ -14,16 +14,16 @@ PushButton::~PushButton()
 
 void PushButton::check(bool state)
 {
-	if (checked != state)
+	if (m_checked != state)
 	{
-		checked = state;
+		m_checked = state;
 		InvalidateRect(m_hWnd, nullptr, true);
 	}
 }
 
 bool PushButton::isChecked()
 {
-	return checked;
+	return m_checked;
 }
 
 void PushButton::draw(LPDRAWITEMSTRUCT& pDIS)
@@ -31,10 +31,10 @@ void PushButton::draw(LPDRAWITEMSTRUCT& pDIS)
 	int r1 = 70, g1 = 70, b1 = 70;
 	int r2 = 40, g2 = 40, b2 = 40;
 
-	if (checked)
+	if (m_checked)
 	{
-		r1 = GetRValue(checked1), g1 = GetGValue(checked1), b1 = GetBValue(checked1);
-		r2 = GetRValue(checked2), g2 = GetGValue(checked2), b2 = GetBValue(checked2);
+		r1 = GetRValue(m_checkedColorTop),		g1 = GetGValue(m_checkedColorTop),		b1 = GetBValue(m_checkedColorTop);
+		r2 = GetRValue(m_checkedColorBottom),	g2 = GetGValue(m_checkedColorBottom),	b2 = GetBValue(m_checkedColorBottom);
 	}
 	for (int i = 0; i < pDIS->rcItem.bottom; i++)
 	{
@@ -43,26 +43,26 @@ void PushButton::draw(LPDRAWITEMSTRUCT& pDIS)
 		g = g1 + (i * (g2 - g1) / pDIS->rcItem.bottom);
 		b = b1 + (i * (b2 - b1) / pDIS->rcItem.bottom);
 
-		if (!checked && m_hovering)
+		if (!m_checked && m_hovering)
 		{
 			r = (r + 10) > 255 ? 255 : r + 10;
 			g = (g + 10) > 255 ? 255 : r + 10;
 			b = (b + 10) > 255 ? 255 : r + 10;
 		}
 
-		temp.left = 0;
-		temp.top = i;
-		temp.right = pDIS->rcItem.right;
-		temp.bottom = i + 1;
+		m_temp.left = 0;
+		m_temp.top = i;
+		m_temp.right = pDIS->rcItem.right;
+		m_temp.bottom = i + 1;
 
-		color = CreateSolidBrush(RGB(r, g, b));
-		FillRect(pDIS->hDC, &temp, color);
-		DeleteObject(color);
+		m_color = CreateSolidBrush(RGB(r, g, b));
+		FillRect(pDIS->hDC, &m_temp, m_color);
+		DeleteObject(m_color);
 	}
 	// draw text only if button is horizontal
 	if (((double)(pDIS->rcItem.right - pDIS->rcItem.left) / (double)(pDIS->rcItem.bottom - pDIS->rcItem.top)) > 1.1) 
 	{
-		SetTextColor(pDIS->hDC, checked ? RGB(255, 255, 255) : RGB(200, 200, 200));
+		SetTextColor(pDIS->hDC, m_checked ? RGB(255, 255, 255) : RGB(200, 200, 200));
 		SetBkMode(pDIS->hDC, TRANSPARENT);
 		SetTextAlign(pDIS->hDC, TA_CENTER);
 		char staticText[32];

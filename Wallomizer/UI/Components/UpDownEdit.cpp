@@ -2,29 +2,29 @@
 
 #include <CommCtrl.h>
 
-UpDownEdit::UpDownEdit(HWND hParent, int x, int y, int width, int height, int minPos, int maxPos, int Pos)
+UpDownEdit::UpDownEdit(HWND hParent, int x, int y, int width, int height, int minPos, int maxPos, int pos)
 {
-    edithWnd = CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, NULL, WS_CHILDWINDOW | WS_VISIBLE | WS_BORDER | ES_NUMBER,
+    m_edithWnd = CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, NULL, WS_CHILDWINDOW | WS_VISIBLE | WS_BORDER | ES_NUMBER,
         x, y, width, height, hParent, NULL, NULL, NULL);
 
     m_hWnd = CreateWindowEx(WS_EX_LEFT | WS_EX_LTRREADING, UPDOWN_CLASS, NULL, WS_CHILDWINDOW | WS_VISIBLE | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_ARROWKEYS | UDS_HOTTRACK,
         0, 0, 0, 0, hParent, NULL, NULL, NULL);
 
-    SendMessageA(m_hWnd, UDM_SETBUDDY, (WPARAM)edithWnd, NULL);
+    SendMessageA(m_hWnd, UDM_SETBUDDY, (WPARAM)m_edithWnd, NULL);
     SendMessageA(m_hWnd, UDM_SETRANGE32, (WPARAM)minPos, (LPARAM)maxPos);
-    setPos(Pos);
-    invalid = false;
+    setPos(pos);
+    m_invalid = false;
 }
 
 UpDownEdit::~UpDownEdit()
 {
     DestroyWindow(m_hWnd);
-    DestroyWindow(edithWnd);
+    DestroyWindow(m_edithWnd);
 }
 
-void UpDownEdit::setPos(int Pos)
+void UpDownEdit::setPos(int pos)
 {
-    SendMessageA(m_hWnd, UDM_SETPOS32, NULL, (LPARAM)Pos);
+    SendMessageA(m_hWnd, UDM_SETPOS32, NULL, (LPARAM)pos);
 }
 
 int UpDownEdit::getPos()
@@ -34,16 +34,16 @@ int UpDownEdit::getPos()
 
 char* UpDownEdit::getPosA()
 {
-    _itoa_s(getPos(), buffer, 10);
-    return buffer;
+    _itoa_s(getPos(), m_buffer, 10);
+    return m_buffer;
 }
 
 void UpDownEdit::getTextA(char* buffer, int size)
 {
-    GetWindowTextA(edithWnd, buffer, size);
+    GetWindowTextA(m_edithWnd, buffer, size);
 }
 
 void UpDownEdit::update()
 {
-    SetWindowTextA(edithWnd, getPosA());
+    SetWindowTextA(m_edithWnd, getPosA());
 }

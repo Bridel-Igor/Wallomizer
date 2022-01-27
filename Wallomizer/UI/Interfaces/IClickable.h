@@ -16,6 +16,7 @@ public:
 	/// Event reaction should be initiated if method returns true.
 	///
 	/// @param wParam - WPARAM value that was recieved with WM_COMMAND message
+	/// 
 	/// @return Returns true if click was detected.
 	bool isClicked(WPARAM wParam);
 

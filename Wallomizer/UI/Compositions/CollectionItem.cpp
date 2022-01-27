@@ -9,7 +9,7 @@ int CollectionItem::height = 26;
 CollectionItem::CollectionItem(HWND hParent, int _x, int _y, int _width, BaseCollection* collection, HFONT hFont)
 	: x(_x), y(_y), width(_width)
 {
-	chboEnabled = new CheckBox(hParent, "",		0, 0, 0, 0, 0, (HINSTANCE)GetWindowLongPtr(hParent, GWLP_HINSTANCE), BS_NOTIFY | BS_OWNERDRAW);
+	chboEnabled = new CheckBox(hParent,			0, 0, 0, 0, 0, BS_NOTIFY | BS_OWNERDRAW);
 	stName = new Static(hParent, "",			0, 0, 0, 0, 0);
 	purity = new PurityComponent(hParent,		0, 0, 0, 0);
 	stNumber = new Static(hParent, "0",			0, 0, 0, 0, SS_CENTER);

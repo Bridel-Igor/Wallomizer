@@ -65,7 +65,7 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 				MessageBoxA(nullptr, "Path can't be empty.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
-			edPath->getTextA(currentLocalCollection->directoryPath, 255);
+			edPath->getTextA(currentLocalCollection->directoryPath, 255); // HACK: do it via getTextW
 			if (currentLocalCollection->isValid == false)
 				currentLocalCollection->isValid = true;
 			else

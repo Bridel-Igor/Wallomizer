@@ -50,7 +50,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		stActVersion = new Static(this->hWnd(), "1.0.5a",			150,	40,		100,	20);
 		btnUpdate = new Button(this->hWnd(), "Check for updates",	270,	40,		120,	20);
 		stStartup = new Static(this->hWnd(), "Load on startup:",	10,		70,		130,	20, SS_RIGHT);
-		cbStartup = new CheckBox(this->hWnd(), "",					150,	70,		20,		20, NULL);
+		cbStartup = new CheckBox(this->hWnd(),						150,	70,		20,		20);
 		
 		stSlideshow = new Static(this->hWnd(), "Slideshow",			10,		100,	380,	20, SS_CENTER);
 		stDelay = new Static(this->hWnd(), "Delay:",				10,		150,	130,	20, SS_RIGHT);
@@ -128,46 +128,46 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	{
 		if (HIWORD(wParam) == EN_UPDATE)
 		{
-			if (udeSeconds != nullptr && (HWND)lParam == udeSeconds->edithWnd)
+			if (udeSeconds != nullptr && (HWND)lParam == udeSeconds->m_edithWnd)
 			{
 				char buf[10];
 				udeSeconds->getTextA(buf, 10);
 				int res = atoi(buf);
 				if (res <= 59 && res >= 0)
 				{
-					udeSeconds->invalid = false;
+					udeSeconds->m_invalid = false;
 				}
 				else
-					udeSeconds->invalid = true;
+					udeSeconds->m_invalid = true;
 			}
-			if (udeMinutes != nullptr && (HWND)lParam == udeMinutes->edithWnd)
+			if (udeMinutes != nullptr && (HWND)lParam == udeMinutes->m_edithWnd)
 			{
 				char buf[10];
 				udeMinutes->getTextA(buf, 10);
 				int res = atoi(buf);
 				if (res <= 59 && res >= 0)
 				{
-					udeMinutes->invalid = false;
+					udeMinutes->m_invalid = false;
 				}
 				else
-					udeMinutes->invalid = true;
+					udeMinutes->m_invalid = true;
 			}
-			if (udeHours != nullptr && (HWND)lParam == udeHours->edithWnd)
+			if (udeHours != nullptr && (HWND)lParam == udeHours->m_edithWnd)
 			{
 				char buf[10];
 				udeHours->getTextA(buf, 10);
 				int res = atoi(buf);
 				if (res <= 999 && res >= 0)
 				{
-					udeHours->invalid = false;
+					udeHours->m_invalid = false;
 				}
 				else
-					udeHours->invalid = true;
+					udeHours->m_invalid = true;
 			}
 		}
 		if (HIWORD(wParam) == EN_KILLFOCUS)
 		{
-			if (udeSeconds != nullptr && (HWND)lParam == udeSeconds->edithWnd)
+			if (udeSeconds != nullptr && (HWND)lParam == udeSeconds->m_edithWnd)
 			{
 				char buf[10];
 				udeSeconds->getTextA(buf, 10);
@@ -179,7 +179,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 				if (res < 0)
 					udeSeconds->setPos(0);
 			}
-			if (udeMinutes != nullptr && (HWND)lParam == udeMinutes->edithWnd)
+			if (udeMinutes != nullptr && (HWND)lParam == udeMinutes->m_edithWnd)
 			{
 				char buf[10];
 				udeMinutes->getTextA(buf, 10);
@@ -191,7 +191,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 				if (res < 0)
 					udeMinutes->setPos(0);
 			}
-			if (udeHours != nullptr && (HWND)lParam == udeHours->edithWnd)
+			if (udeHours != nullptr && (HWND)lParam == udeHours->m_edithWnd)
 			{
 				char buf[10];
 				udeHours->getTextA(buf, 10);
@@ -307,9 +307,9 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		SetTextColor(hdc, WindowStyles::editFontColor);
 		SetBkColor(hdc, WindowStyles::editBkColor);
 		SetDCBrushColor(hdc, WindowStyles::editBkColor);
-		if ((udeSeconds != nullptr && (HWND)lParam == udeSeconds->edithWnd && udeSeconds->invalid) ||
-			(udeMinutes != nullptr && (HWND)lParam == udeMinutes->edithWnd && udeMinutes->invalid) ||
-			(udeHours != nullptr && (HWND)lParam == udeHours->edithWnd && udeHours->invalid))
+		if ((udeSeconds != nullptr && (HWND)lParam == udeSeconds->m_edithWnd && udeSeconds->m_invalid) ||
+			(udeMinutes != nullptr && (HWND)lParam == udeMinutes->m_edithWnd && udeMinutes->m_invalid) ||
+			(udeHours != nullptr && (HWND)lParam == udeHours->m_edithWnd && udeHours->m_invalid))
 				SetBkColor(hdc, WindowStyles::editBkInvalidColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
