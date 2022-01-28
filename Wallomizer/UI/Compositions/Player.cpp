@@ -141,7 +141,7 @@ void Player::updateTimer(bool forsed)
 	if (TrayWindow::trayWindow && (forsed || IsWindowVisible(TrayWindow::trayWindow->hWnd())))
 	{
 		TrayWindow::trayWindow->player->updateText();
-		InvalidateRect(TrayWindow::trayWindow->player->stDelayRemained->hWnd(), NULL, FALSE); // BUG: stDelayRemained can be invalid during an app exit
+		InvalidateRect(TrayWindow::trayWindow->player->stDelayRemained->hWnd(), NULL, FALSE);
 	}
 }
 

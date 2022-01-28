@@ -10,9 +10,11 @@ public:
 	LPCSTR ClassName() const { return "Tray Window Class"; }
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void windowThread();
+	static bool isReady();
 	
 	Button* btnSettings, * btnExit;
 	Player* player;
+	
 	
 	static constexpr int width = 160;
 	static constexpr int height = 90;
@@ -21,4 +23,5 @@ public:
 private:
 	HICON hStatusIcon = nullptr;
 	LPCSTR pszIDStatusIcon = nullptr;
+	static bool s_isReady;
 };

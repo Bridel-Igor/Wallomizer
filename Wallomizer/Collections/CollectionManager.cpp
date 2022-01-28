@@ -103,11 +103,7 @@ bool CollectionManager::loadSettings()
 	if (Delay::bRunSlideshow)
 		Delay::abortDelay();
 	if (number == 0)
-	{
-		while (TrayWindow::trayWindow == nullptr)
-			Sleep(10);
 		PostMessageA(TrayWindow::trayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::trayWindow->btnSettings->hMenu(), NULL);
-	}
 	bLoading = false;
 	if (MainWindow::mainWindow != nullptr)
 		MainWindow::mainWindow->player->updateTimer();

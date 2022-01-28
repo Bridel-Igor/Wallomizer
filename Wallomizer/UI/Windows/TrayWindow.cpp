@@ -10,6 +10,7 @@
 #define WM_NOTIFYICONMSG (WM_USER + 2)
 
 TrayWindow *TrayWindow::trayWindow = nullptr;
+bool TrayWindow::s_isReady = false;
 
 BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCSTR pszTip)
 {
@@ -82,11 +83,15 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		btnExit = new Button(this->hWnd(), "Exit",			85,		60,		65,		20);
 
 		EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+
+		s_isReady = true;
 	}
 	return 0;
 
 	case WM_DESTROY:
 	{
+		s_isReady = false;
+
 		delete btnSettings;
 		delete btnExit;
 		delete player;
@@ -177,4 +182,9 @@ void TrayWindow::windowThread()
 	Delay::saveSession(CollectionManager::current);
 	Delay::abortDelay();
 	trayWindow = nullptr;
+}
+
+bool TrayWindow::isReady()
+{
+	return trayWindow && s_isReady;
 }

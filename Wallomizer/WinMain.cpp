@@ -24,11 +24,20 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	std::thread thr(TrayWindow::windowThread);
 	thr.detach();
 	
-	unsigned int waitedForTrayWindow = 0;
-	while (TrayWindow::trayWindow == nullptr)
+	unsigned short waitedForTrayWindow = 0;
+	while (!TrayWindow::isReady())
 	{
 		if (waitedForTrayWindow >= 5000)
-			break;
+		{
+			WindowStyles::clear();
+			if (hMutex)
+			{
+				ReleaseMutex(hMutex);
+				CloseHandle(hMutex);
+			}
+			MessageBoxA(nullptr, "Wallomizer was unable to start.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+			return 0;
+		}
 		Sleep(10);
 		waitedForTrayWindow += 10;
 	}
@@ -37,7 +46,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	CollectionManager::loadSettings();
 	Delay::loadSession(CollectionManager::current);
 
-	while (TrayWindow::trayWindow!=nullptr)
+	while (TrayWindow::isReady())
 	{
 		if (CollectionManager::getNumber() == 0)
 		{
