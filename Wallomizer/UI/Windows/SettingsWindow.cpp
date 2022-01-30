@@ -264,12 +264,6 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	}
 	return 0;
 
-	case WM_SETCURSOR:
-	{
-		cbStartup->mouseHovering(wParam);
-		// Fallthrough. DefWindowProc must be reached anyway.
-	}
-
 	case WM_DRAWITEM:
 	{
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
@@ -317,6 +311,12 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	case WM_CTLCOLORBTN:
 	{
 		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
+	}
+
+	case WM_SETCURSOR:
+	{
+		cbStartup->mouseHovering(wParam);
+		// Fallthrough. DefWindowProc must be reached anyway.
 	}
 
 	default:
