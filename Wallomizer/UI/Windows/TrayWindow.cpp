@@ -40,7 +40,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 	case WM_NOTIFYICONMSG:
 	{	
-		if (lParam == WM_RBUTTONDOWN || lParam == WM_LBUTTONDOWN)
+		if (lParam == WM_RBUTTONDOWN || lParam == WM_LBUTTONDOWN || lParam == WM_LBUTTONDBLCLK || lParam == WM_RBUTTONDBLCLK)
 		{
 			POINT pt;
 			RECT wrkArea;
@@ -64,7 +64,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	return 0;
 
 	case WM_NCACTIVATE:
-	{// BUG: window isn't appearing sometimes
+	{
 		if (wParam == FALSE)
 			ShowWindow(trayWindow->hWnd(), SW_HIDE);
 	}
