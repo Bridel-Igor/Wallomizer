@@ -186,5 +186,5 @@ void TrayWindow::windowThread()
 
 bool TrayWindow::isReady()
 {
-	return trayWindow && s_isReady;
+	return s_isReady;
 }

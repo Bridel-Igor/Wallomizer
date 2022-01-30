@@ -49,9 +49,9 @@ bool CollectionManager::saveSettings()
 bool CollectionManager::loadSettings()
 {
 	bLoading = true;
-	if (MainWindow::mainWindow != nullptr)
+	if (MainWindow::mainWindow && MainWindow::isReady())
 		MainWindow::mainWindow->player->updateTimer();
-	if (TrayWindow::trayWindow != nullptr)
+	if (TrayWindow::trayWindow && TrayWindow::isReady())
 		TrayWindow::trayWindow->player->updateTimer();
 	wchar_t path[MAX_PATH];
 	Filesystem::getRoamingDir(path);
@@ -97,17 +97,17 @@ bool CollectionManager::loadSettings()
 		fclose(pFile);
 	}
 	updateNumber();
-	if (MainWindow::mainWindow != nullptr)
+	if (MainWindow::mainWindow && MainWindow::isReady())
 		MainWindow::collectionItemsFrame->updateCollectionItems();
 	bIsReady = true;
 	if (Delay::bRunSlideshow)
 		Delay::abortDelay();
-	if (number == 0)
+	if (number == 0 && TrayWindow::trayWindow && TrayWindow::isReady())
 		PostMessageA(TrayWindow::trayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::trayWindow->btnSettings->hMenu(), NULL);
 	bLoading = false;
-	if (MainWindow::mainWindow != nullptr)
+	if (MainWindow::mainWindow && MainWindow::isReady())
 		MainWindow::mainWindow->player->updateTimer();
-	if (TrayWindow::trayWindow != nullptr)
+	if (TrayWindow::trayWindow && TrayWindow::isReady())
 		TrayWindow::trayWindow->player->updateTimer();
 	return true;
 }

@@ -46,10 +46,12 @@ public:
 	LPCSTR ClassName() const { return "Main Window Class"; }
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void windowThread();
+	static bool isReady();
 
 	Player* player;
 	static constexpr int width = 640;
 	static constexpr int height = 480;
 	static MainWindow* mainWindow;
 	static CollectionItemsFrame* collectionItemsFrame;
+	static bool s_isReady;
 };

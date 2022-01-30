@@ -10,6 +10,7 @@
 
 MainWindow* MainWindow::mainWindow = nullptr;
 MainWindow::CollectionItemsFrame* MainWindow::collectionItemsFrame = nullptr;
+bool MainWindow::s_isReady = false;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////CollectionItemsFrame
 void MainWindow::CollectionItemsFrame::updateCollectionItems()
@@ -234,10 +235,12 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 		btnSettings = new Button(this->hWnd(), "Settings",		10,		450,	95,		20);
 		player = new Player(this->hWnd(),						250,	450,
-															400,	450,	100,	20);	
+																400,	450,	100,	20);	
 		btnDonate = new Button(this->hWnd(), "Donate",			535,	450,	95,		20);
 		
 		EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+
+		s_isReady = true;
 	}
 	return 0;
 
@@ -253,6 +256,8 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_DESTROY:
 	{
+		s_isReady = false;
+
 		delete btnAdd;
 		delete btnSettings;
 		delete btnDonate;
@@ -367,4 +372,9 @@ void MainWindow::windowThread()
 	collectionItemsFrame->Destroy();
 	delete collectionItemsFrame;
 	collectionItemsFrame = nullptr;
+}
+
+bool MainWindow::isReady()
+{
+	return s_isReady;
 }
