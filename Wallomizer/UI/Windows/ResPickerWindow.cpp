@@ -286,9 +286,8 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		btnExactly->mouseHovering(wParam);
 		for (int i = 0; i < 23; i++)
 			btnRes[i]->mouseHovering(wParam);
-		return FALSE;
+		// Fallthrough. DefWindowProc must be reached anyway.
 	}
-	return 0;
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);

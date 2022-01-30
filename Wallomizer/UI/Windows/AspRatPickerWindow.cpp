@@ -173,9 +173,8 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 		btnAllPortrait->mouseHovering(wParam);
 		for (int i = 0; i < 12; i++)
 			btnAR[i]->mouseHovering(wParam);
-		return FALSE;
+		// Fallthrough. DefWindowProc must be reached anyway.
 	}
-	return 0;
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);

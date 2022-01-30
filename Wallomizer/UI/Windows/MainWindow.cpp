@@ -137,14 +137,6 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 	}
 	return 0;
 
-	case WM_SETCURSOR:
-	{
-		for (int i = 0; i < collectionItems.size(); i++)
-			collectionItems[i]->mouseHovering(wParam);
-		return FALSE;
-	}
-	return 0;
-
 	case WM_MOUSEWHEEL:
 	{
 		if (GET_WHEEL_DELTA_WPARAM(wParam)>0)
@@ -216,6 +208,13 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 		return (LRESULT)WindowStyles::collItemBkBrush;
 	}
 	return 0;
+
+	case WM_SETCURSOR:
+	{
+		for (int i = 0; i < collectionItems.size(); i++)
+			collectionItems[i]->mouseHovering(wParam);
+		// Fallthrough. DefWindowProc must be reached anyway.
+	}
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
@@ -314,13 +313,6 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	}
 	return 0;
 
-	case WM_SETCURSOR:
-	{
-		player->mouseHovering(wParam);
-		return FALSE;
-	}
-	return 0;
-
 	case WM_CTLCOLORSTATIC:
 	{
 		HWND hWndStatic = (HWND)lParam;
@@ -336,6 +328,12 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 	}
 	return 0;
+	
+	case WM_SETCURSOR:
+	{
+		player->mouseHovering(wParam);
+		// Fallthrough. DefWindowProc must be reached anyway.
+	} 
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);

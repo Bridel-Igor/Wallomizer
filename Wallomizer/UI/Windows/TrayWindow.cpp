@@ -152,9 +152,8 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	case WM_SETCURSOR:
 	{
 		player->mouseHovering(wParam);
-		return FALSE;
+		// Fallthrough. DefWindowProc must be reached anyway.
 	}
-	return 0;
 
 	default:
 		return DefWindowProcA(m_hWnd, uMsg, wParam, lParam);

@@ -179,9 +179,8 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 	case WM_SETCURSOR:
 	{
 		purCom->mouseHovering(wParam);
-		return FALSE;
+		// Fallthrough. DefWindowProc must be reached anyway.
 	}
-	return 0;
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);

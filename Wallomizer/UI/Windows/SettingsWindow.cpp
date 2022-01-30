@@ -267,9 +267,8 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	case WM_SETCURSOR:
 	{
 		cbStartup->mouseHovering(wParam);
-		return FALSE;
+		// Fallthrough. DefWindowProc must be reached anyway.
 	}
-	return 0;
 
 	case WM_DRAWITEM:
 	{

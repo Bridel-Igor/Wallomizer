@@ -142,9 +142,8 @@ LRESULT ColorPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	{
 		for (int i = 0; i < 30; i++)
 			btnClr[i]->mouseHovering(wParam);
-		return FALSE;
+		// Fallthrough. DefWindowProc must be reached anyway.
 	}
-	return 0;
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);

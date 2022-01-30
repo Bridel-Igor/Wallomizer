@@ -156,9 +156,8 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 	{
 		catCom->mouseHovering(wParam);
 		purCom->mouseHovering(wParam);
-		return FALSE;
+		// Fallthrough. DefWindowProc must be reached anyway.
 	}
-	return 0;
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
