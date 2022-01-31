@@ -52,9 +52,10 @@ bool LocalCollection::loadSettings(FILE* pFile)
 		directoryPath[strlen(directoryPath) - 1] = '\0';
 		std::experimental::filesystem::path p1{ directoryPath };
 		number = 0;
-		for (auto& p : std::experimental::filesystem::directory_iterator(p1))
-			if (isImage(p))
-				number++;
+		if (isEnabled)
+			for (auto& p : std::experimental::filesystem::directory_iterator(p1))
+				if (isImage(p))
+					number++;
 		return true;
 	}
 	return false;

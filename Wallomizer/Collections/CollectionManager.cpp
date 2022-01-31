@@ -45,7 +45,6 @@ bool CollectionManager::saveSettings()
 	return false;
 }
 
-// PERF: don't update number of disabled collections
 bool CollectionManager::loadSettings()
 {
 	bLoading = true;

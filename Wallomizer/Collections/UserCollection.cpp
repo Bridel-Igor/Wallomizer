@@ -76,6 +76,9 @@ bool UserCollection::loadSettings(FILE* pFile)
 		strcat_s(collectionUrl, Settings::getApiKey());
 	}
 
+	if (!isEnabled)
+		return true;
+
 	// Getting the META
 	char* pBuffer = Internet::buffer;
 	Internet::bufferAccess.lock();

@@ -90,6 +90,9 @@ bool SearchCollection::loadSettings(FILE* pFile)
 		strcat_s(searchUrl, Settings::getApiKey());
 	}
 
+	if (!isEnabled)
+		return true;
+
 	char* pBuffer = Internet::buffer;
 	Internet::bufferAccess.lock();
 	if (!Internet::URLDownloadToBuffer(searchUrl))

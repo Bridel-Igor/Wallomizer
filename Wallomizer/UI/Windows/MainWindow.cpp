@@ -193,16 +193,26 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLORBTN:
 	{
-		if ((HWND)lParam == stEmpty->hWnd())
+		HWND hWndStatic = (HWND)lParam;
+		HDC hdcStatic = (HDC)wParam;
+
+		for (int i = 0; i < collectionItems.size(); i++)
+			if (hWndStatic == collectionItems[i]->stNumber->hWnd())
+			{
+				if (collectionItems[i]->chboEnabled->isChecked())
+					SetTextColor(hdcStatic, WindowStyles::collItemFontColor);
+				else
+					SetTextColor(hdcStatic, RGB(80, 80, 80));
+				SetBkColor(hdcStatic, WindowStyles::collItemBkColor);
+				return (LRESULT)WindowStyles::collItemBkBrush;
+			}
+
+		if (hWndStatic == stEmpty->hWnd())
 		{
-			HWND hWndStatic = (HWND)lParam;
-			HDC hdcStatic = (HDC)wParam;
 			SetTextColor(hdcStatic, WindowStyles::collItemFontColor);
 			SetBkMode(hdcStatic, TRANSPARENT);
 			return (LRESULT)WindowStyles::collFrameBkBrush;
 		}
-		HWND hWndStatic = (HWND)lParam;
-		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, WindowStyles::collItemFontColor);
 		SetBkColor(hdcStatic, WindowStyles::collItemBkColor);
 		return (LRESULT)WindowStyles::collItemBkBrush;
