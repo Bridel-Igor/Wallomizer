@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <thread>
 
+#include "AppMutex.h"
 #include "TrayWindow.h"
 #include "CollectionManager.h"
 #include "Settings.h"
@@ -10,12 +11,7 @@
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
-    HANDLE hMutex = CreateMutexA(NULL, TRUE, "Wallomizer");
-    if (GetLastError() == ERROR_ALREADY_EXISTS)
-    {
-        MessageBoxA(nullptr, "Wallomizer is already launched! You can find it in the system tray.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
-        return 0;
-    }
+	AppMutex appMutex("Wallomizer");
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 
 	Filesystem::initialize();
@@ -30,11 +26,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		if (waitedForTrayWindow >= 5000)
 		{
 			WindowStyles::clear();
-			if (hMutex)
-			{
-				ReleaseMutex(hMutex);
-				CloseHandle(hMutex);
-			}
 			MessageBoxA(nullptr, "Wallomizer was unable to start.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 			return 0;
 		}
@@ -63,10 +54,5 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	WindowStyles::clear();
 	CollectionManager::clear();
-	if (hMutex)
-	{
-		ReleaseMutex(hMutex);
-		CloseHandle(hMutex);
-	}
 	return 0;
 }

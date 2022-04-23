@@ -228,6 +228,9 @@
     <ClInclude Include="UI\WindowStyles.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="AppMutex.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="UI\Icons\Prev_disabled.ico">
