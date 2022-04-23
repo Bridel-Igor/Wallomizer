@@ -1,5 +1,6 @@
 #include <shlobj.h>
 #include <Windows.h>
+#include <exception>
 
 #include "Filesystem.h"
 
@@ -16,7 +17,7 @@ void Filesystem::initialize()
 	if (res != S_OK)
 	{
 		CoTaskMemFree(tmp_path);
-		return;
+		throw std::exception("Can't get .../AppData/Roaming/ path.");
 	}
 	wcscpy_s(roamingNative, MAX_PATH, tmp_path);
 	CoTaskMemFree(tmp_path);

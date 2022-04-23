@@ -27,8 +27,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			if (waitedForTrayWindow >= 5000)
 			{
 				WindowStyles::clear();
-				MessageBoxA(nullptr, "Wallomizer was unable to start.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
-				return 0;
+				throw std::exception("Wallomizer was unable to start.");
 			}
 			Sleep(10);
 			waitedForTrayWindow += 10;
