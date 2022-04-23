@@ -109,6 +109,9 @@
     <ClCompile Include="UI\Interfaces\IHoverable.cpp">
       <Filter>UI\Interfaces</Filter>
     </ClCompile>
+    <ClCompile Include="AppMutex.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI\Windows\AddCollectionWindow.h">
