@@ -64,7 +64,7 @@ void Settings::loadSettings()
 	saveSettings();
 }
 
-void Settings::setApiKey(char* _apiKey)
+void Settings::setApiKey(const char* _apiKey)
 {
 	strcpy_s(apiKey, 64, _apiKey);
 }

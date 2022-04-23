@@ -10,7 +10,7 @@ namespace Settings
 
 	void saveSettings();
 	void loadSettings();
-	void setApiKey(char* apiKey);
+	void setApiKey(const char* apiKey);
 	char* getApiKey();
 	bool isApiKeyUsed();
 }

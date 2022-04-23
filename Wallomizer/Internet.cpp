@@ -1,9 +1,12 @@
 #include "Internet.h"
 
+#include <WinInet.h>
+#pragma comment(lib, "Wininet.lib")
+
 char Internet::buffer[bufferSize];
 std::mutex Internet::bufferAccess;
 // TODO: no internet exception handler
-bool Internet::URLDownloadToBuffer(char* URL, char* _buffer, DWORD _bufferSize) 
+bool Internet::URLDownloadToBuffer(const char* URL, char* _buffer, DWORD _bufferSize) 
 {
 	HINTERNET hInternetSession;
 	HINTERNET hURL;
@@ -12,7 +15,7 @@ bool Internet::URLDownloadToBuffer(char* URL, char* _buffer, DWORD _bufferSize)
 	hInternetSession = InternetOpenA("Wallomizer", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 	if (!hInternetSession)
 		return false;
-
+	
 	hURL = InternetOpenUrlA(hInternetSession, URL, NULL, 0, INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 	if (!hURL)
 	{
@@ -41,7 +44,7 @@ bool Internet::URLDownloadToBuffer(char* URL, char* _buffer, DWORD _bufferSize)
 	return result;
 }
 
-bool Internet::URLDownloadToFile(char* URL, wchar_t* path)
+bool Internet::URLDownloadToFile(const char* URL, const wchar_t* path)
 {
 	HINTERNET hInternetSession;
 	HINTERNET hURL;
