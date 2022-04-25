@@ -1,4 +1,5 @@
 #include <thread>
+#include <stdexcept>
 
 #include "AppMutex.h"
 #include "TrayWindow.h"
@@ -19,15 +20,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		WindowStyles::initialize();
 		CollectionManager collectionManager;
 
-		std::thread trayWindowThread(TrayWindow::windowThread, &collectionManager);
+		std::exception_ptr trayWindowThreadException = nullptr;
+		std::thread trayWindowThread(TrayWindow::windowThread, std::ref(trayWindowThreadException), &collectionManager);
 		unsigned short waitedForTrayWindow = 0;
 		while (!TrayWindow::isReady())
 		{
 			if (waitedForTrayWindow >= 5000)
-			{
-				WindowStyles::clear();
 				throw std::exception("Wallomizer was unable to start.");
-			}
 			Sleep(10);
 			waitedForTrayWindow += 10;
 		}
@@ -52,6 +51,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		}
 
 		trayWindowThread.join();
+		if (trayWindowThreadException)
+			std::rethrow_exception(trayWindowThreadException);
 		WindowStyles::clear();
 		return 0;
 	}
@@ -63,5 +64,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	{
 		MessageBox(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
+	WindowStyles::clear();
 	return -1;
 }

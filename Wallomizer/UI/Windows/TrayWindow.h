@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdexcept>
+
 #include "BaseWindow.h"
 #include "Button.h"
 #include "Player.h"
@@ -10,7 +12,7 @@ class TrayWindow : public BaseWindow<TrayWindow>
 public:
 	LPCSTR ClassName() const { return "Tray Window Class"; }
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static void windowThread(CollectionManager* collectionManager);
+	static void windowThread(std::exception_ptr &ex, CollectionManager* collectionManager);
 	static bool isReady();
 	
 	Button* btnSettings, * btnExit;

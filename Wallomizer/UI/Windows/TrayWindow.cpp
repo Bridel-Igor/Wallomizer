@@ -160,27 +160,36 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	return TRUE;
 }
 
-void TrayWindow::windowThread(CollectionManager* _collectionManager)
+void TrayWindow::windowThread(std::exception_ptr &ex, CollectionManager* _collectionManager)
 {
-	if (trayWindow)
-		return;
-	trayWindow = new TrayWindow;
-	trayWindow->collectionManager = _collectionManager;
-	trayWindow->Create("Wallomizer", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 500, 500, width, height, NULL, NULL);
-	ShowWindow(trayWindow->hWnd(), SW_HIDE);
-	MSG msg = { };
-	while (GetMessage(&msg, NULL, 0, 0) > 0)
+	try
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		if (trayWindow)
+			return;
+		trayWindow = new TrayWindow;
+		trayWindow->collectionManager = _collectionManager;
+		trayWindow->Create("Wallomizer", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 500, 500, width, height, NULL, NULL);
+		ShowWindow(trayWindow->hWnd(), SW_HIDE);
+		MSG msg = { };
+		while (GetMessage(&msg, NULL, 0, 0) > 0)
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		ShowWindow(trayWindow->hWnd(), SW_HIDE);
+		trayWindow->Destroy();
+		Delay::exiting = true;
+		Delay::saveSession(trayWindow->collectionManager->current);
+		Delay::abortDelay();
+		delete trayWindow;
+		trayWindow = nullptr;
 	}
-	ShowWindow(trayWindow->hWnd(), SW_HIDE);
-	trayWindow->Destroy();
-	Delay::exiting = true;
-	Delay::saveSession(trayWindow->collectionManager->current);
-	Delay::abortDelay();
-	delete trayWindow;
-	trayWindow = nullptr;
+	catch (...)
+	{
+		TrayWindow::s_isReady = false;
+		ex = std::current_exception();
+		Delay::exiting = true;
+	}
 }
 
 bool TrayWindow::isReady()
