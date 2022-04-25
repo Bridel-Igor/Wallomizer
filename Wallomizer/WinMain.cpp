@@ -17,10 +17,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		Filesystem::initialize();
 		WindowStyles::initialize();
+		CollectionManager collectionManager;
 
-		std::thread thr(TrayWindow::windowThread);
-		thr.detach();
-
+		std::thread trayWindowThread(TrayWindow::windowThread, &collectionManager);
 		unsigned short waitedForTrayWindow = 0;
 		while (!TrayWindow::isReady())
 		{
@@ -34,26 +33,26 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		}
 
 		Settings::loadSettings();
-		CollectionManager::loadSettings();
-		Delay::loadSession(CollectionManager::current);
+		collectionManager.loadSettings();
+		Delay::loadSession(collectionManager.current);
 
 		while (TrayWindow::isReady())
 		{
-			if (CollectionManager::getNumber() == 0)
+			if (collectionManager.getNumber() == 0)
 			{
 				Sleep(100);
 				continue;
 			}
 			std::thread delayThread(Delay::Delay);
-			CollectionManager::loadNextWallpaper();
+			collectionManager.loadNextWallpaper();
 			delayThread.join();
 			if (Delay::exiting)
 				break;
-			CollectionManager::setLoadedWallpaper();
+			collectionManager.setLoadedWallpaper();
 		}
 
+		trayWindowThread.join();
 		WindowStyles::clear();
-		CollectionManager::clear();
 		return 0;
 	}
 	catch (const std::exception& e)

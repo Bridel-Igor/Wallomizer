@@ -1,7 +1,6 @@
 #include <ShObjIdl.h>
 
 #include "SetLocalCollectionWindow.h"
-#include "CollectionManager.h"
 #include "MainWindow.h"
 
 SetLocalCollectionWindow* SetLocalCollectionWindow::setLocalCollectionWindow = nullptr;
@@ -69,7 +68,7 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 			if (currentLocalCollection->isValid == false)
 				currentLocalCollection->isValid = true;
 			else
-				CollectionManager::reloadSettings();
+				collectionManager->reloadSettings();
 			DestroyWindow(hWnd);
 			return 0;
 		}
@@ -119,7 +118,7 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 	return TRUE;
 }
 
-void SetLocalCollectionWindow::windowThread(LocalCollection *collection)
+void SetLocalCollectionWindow::windowThread(LocalCollection *collection, CollectionManager* _collectionManager)
 {
 	if (setLocalCollectionWindow)
 	{
@@ -128,6 +127,7 @@ void SetLocalCollectionWindow::windowThread(LocalCollection *collection)
 	}
 	currentLocalCollection = collection;
 	setLocalCollectionWindow = new SetLocalCollectionWindow;
+	setLocalCollectionWindow->collectionManager = _collectionManager;
 	setLocalCollectionWindow->Create("Local collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90, NULL, NULL);
 	setLocalCollectionWindow->centerWindow(MainWindow::mainWindow->hWnd());
 	ShowWindow(setLocalCollectionWindow->hWnd(), SW_SHOWNORMAL);

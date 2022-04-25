@@ -1,5 +1,4 @@
 #include "SetSearchCollectionWindow.h"
-#include "CollectionManager.h"
 #include "MainWindow.h"
 #include "ResPickerWindow.h"
 #include "AspRatPickerWindow.h"
@@ -140,7 +139,7 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 			if (currentSearchCollection->isValid == false)
 				currentSearchCollection->isValid = true;
 			else
-				CollectionManager::reloadSettings();
+				collectionManager->reloadSettings();
 			DestroyWindow(hWnd);
 			return 0;
 		}
@@ -165,7 +164,7 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 	return TRUE;
 }
 
-void SetSearchCollectionWindow::windowThread(SearchCollection* collection)
+void SetSearchCollectionWindow::windowThread(SearchCollection* collection, CollectionManager* _collectionManager)
 {
 	if (setSearchCollectionWindow)
 	{
@@ -174,6 +173,7 @@ void SetSearchCollectionWindow::windowThread(SearchCollection* collection)
 	}
 	currentSearchCollection = collection;
 	setSearchCollectionWindow = new SetSearchCollectionWindow;
+	setSearchCollectionWindow->collectionManager = _collectionManager;
 	setSearchCollectionWindow->Create("Search collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 260, NULL, NULL);
 	setSearchCollectionWindow->centerWindow(MainWindow::mainWindow->hWnd());
 	ShowWindow(setSearchCollectionWindow->hWnd(), SW_SHOWNORMAL);

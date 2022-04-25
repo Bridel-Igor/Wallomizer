@@ -2,7 +2,6 @@
 
 #include "MainWindow.h"
 #include "Settings.h"
-#include "CollectionManager.h"
 #include "AddCollectionWindow.h"
 #include "SettingsWindow.h"
 #include "TrayWindow.h"
@@ -17,18 +16,18 @@ void MainWindow::CollectionItemsFrame::updateCollectionItems()
 {
 	ShowWindow(stEmpty->hWnd(), SW_HIDE);
 
-	for (size_t i = CollectionManager::collections.size(); i < collectionItems.size(); i++) //deleting excess items
+	for (size_t i = collectionManager->collections.size(); i < collectionItems.size(); i++) //deleting excess items
 	{
 		delete collectionItems.back();
 		collectionItems.pop_back();
 	}
 
 	for (size_t i = 0; i < collectionItems.size(); i++) // updating those which won't be created
-		collectionItems[i]->updateInfo(CollectionManager::collections[i]);
+		collectionItems[i]->updateInfo(collectionManager->collections[i]);
 
-	for (size_t i = collectionItems.size(); i < CollectionManager::collections.size(); i++) // creation
-		if (CollectionManager::collections[i]!=nullptr)
-			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->hWnd(), 0, (int)(i * (CollectionItem::height + 1)), MainWindow::width-20, CollectionManager::collections[i], WindowStyles::mainFont));
+	for (size_t i = collectionItems.size(); i < collectionManager->collections.size(); i++) // creation
+		if (collectionManager->collections[i]!=nullptr)
+			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->hWnd(), 0, (int)(i * (CollectionItem::height + 1)), MainWindow::width-20, collectionManager->collections[i], WindowStyles::mainFont));
 	
 	updateScroll();
 	for (auto p : collectionItems) // placing according to the scrollbar
@@ -113,12 +112,12 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 		{
 			if (collectionItems[i]->btnSettings->isClicked(wParam))
 			{
-				CollectionManager::collections[i]->openCollectionSettingsWindow();
+				collectionManager->collections[i]->openCollectionSettingsWindow();
 				return 0;
 			}
 			if (collectionItems[i]->btnDelete->isClicked(wParam))
 			{
-				CollectionManager::eraseCollection(i);
+				collectionManager->eraseCollection(i);
 				updateCollectionItems();
 				InvalidateRect(this->hWnd(), nullptr, TRUE);
 				return 0;
@@ -128,8 +127,8 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 				if (HIWORD(wParam) == BN_CLICKED)
 				{
 					collectionItems[i]->chboEnabled->click();
-					CollectionManager::collections[i]->isEnabled = collectionItems[i]->chboEnabled->isChecked();
-					CollectionManager::reloadSettings();
+					collectionManager->collections[i]->isEnabled = collectionItems[i]->chboEnabled->isChecked();
+					collectionManager->reloadSettings();
 					return 0;
 				}
 			}
@@ -244,7 +243,7 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 		btnSettings = new Button(this->hWnd(), "Settings",		10,		450,	95,		20);
 		player = new Player(this->hWnd(),						250,	450,
-																400,	450,	100,	20);	
+																400,	450,	100,	20, collectionManager);	
 		btnDonate = new Button(this->hWnd(), "Donate",			535,	450,	95,		20);
 		
 		EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
@@ -304,7 +303,7 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		if (btnAdd->isClicked(wParam))
 		{
-			AddCollectionWindow::windowThread();
+			AddCollectionWindow::windowThread(collectionManager);
 			return 0;
 		}
 		if (player->click(wParam))
@@ -351,19 +350,21 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	return TRUE;
 }
 
-void MainWindow::windowThread()
+void MainWindow::windowThread(CollectionManager* _collectionManager)
 {
 	if (mainWindow)
 	{
 		SetForegroundWindow(mainWindow->hWnd());
 		return;
 	}
-	while (!CollectionManager::isReady())
+	while (!_collectionManager->isReady())
 		Sleep(50);
 	mainWindow = new MainWindow;
 	collectionItemsFrame = new CollectionItemsFrame;
+	mainWindow->collectionManager = _collectionManager;
 	mainWindow->Create("Wallomizer", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
 	mainWindow->centerWindow(GetDesktopWindow());
+	collectionItemsFrame->collectionManager = _collectionManager;
 	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 40, width-20, CollectionItemsFrame::height, mainWindow->hWnd(), NULL, false);
 	ShowWindow(mainWindow->hWnd(), SW_SHOWNORMAL);
 	ShowWindow(collectionItemsFrame->hWnd(), SW_SHOWNORMAL);

@@ -4,8 +4,9 @@
 #include "Settings.h"
 #include "Filesystem.h"
 
-UserCollection::UserCollection()
+UserCollection::UserCollection(CollectionManager* _collectionManager)
 {
+	m_pCollectionManager = _collectionManager;
 	number = 0;
 	settings = new UserCollectionSettings;
 	settings->username[0] = '\0';
@@ -212,7 +213,7 @@ CategoriesAndPurity UserCollection::getCAP()
 
 void UserCollection::openCollectionSettingsWindow()
 {
-	SetUserCollectionWindow::windowThread(this);
+	SetUserCollectionWindow::windowThread(this, m_pCollectionManager);
 }
 
 void UserCollection::openWallpaperExternal(Wallpaper* wallpaper)

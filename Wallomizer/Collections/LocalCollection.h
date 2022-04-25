@@ -2,11 +2,12 @@
 
 #include "BaseCollection.h"
 #include "CategoriesAndPurity.h"
+#include "CollectionManager.h"
 
 class LocalCollection : public BaseCollection
 {
 public:
-	LocalCollection();
+	LocalCollection(CollectionManager* collectionManager);
 	bool saveSettings(FILE* pFile);
 	bool loadSettings(FILE* pFile);
 	bool getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index);
@@ -18,4 +19,7 @@ public:
 	static void openWallpaperExternal(Wallpaper* wallpaper);
 
 	char directoryPath[255];
+
+private:
+	CollectionManager* m_pCollectionManager = nullptr;
 };

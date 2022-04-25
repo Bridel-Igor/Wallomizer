@@ -4,8 +4,9 @@
 #include "Settings.h"
 #include "Filesystem.h"
 
-SearchCollection::SearchCollection()
+SearchCollection::SearchCollection(CollectionManager* _collectionManager)
 {
+	m_pCollectionManager = _collectionManager;
 	isEnabled = true;
 	number = 0;
 	settings = new SearchCollectionSettings;
@@ -191,7 +192,7 @@ CategoriesAndPurity SearchCollection::getCAP()
 
 void SearchCollection::openCollectionSettingsWindow()
 {
-	SetSearchCollectionWindow::windowThread(this);
+	SetSearchCollectionWindow::windowThread(this, m_pCollectionManager);
 }
 
 void SearchCollection::openWallpaperExternal(Wallpaper* wallpaper)

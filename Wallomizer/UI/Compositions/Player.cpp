@@ -6,9 +6,12 @@
 #include "MainWindow.h"
 
 char Player::timer[16];
+CollectionManager* Player::s_pCollectionManager = nullptr;
 
-Player::Player(HWND hParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, DWORD additionalStyles)
+Player::Player(HWND hParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, CollectionManager* _collectionManager, DWORD additionalStyles)
 {
+	s_pCollectionManager = _collectionManager;
+
 	btnPrev = new IconButton(hParent,			xPlayer,		yPlayer,	20,		20, WindowStyles::hIPrev, WindowStyles::hIPrevHover);
 	btnOpenExternal = new IconButton(hParent,	xPlayer + 30,	yPlayer,	20,		20, WindowStyles::hIOpenExternal, WindowStyles::hIOpenExternalHover);
 	btnPlay = new IconButton(hParent,			xPlayer + 60,	yPlayer,	20,		20, WindowStyles::hIPlay, WindowStyles::hIPlayHover);
@@ -32,13 +35,13 @@ bool Player::click(WPARAM& wParam)
 {
 	if (btnOpenExternal->isClicked(wParam))
 	{
-		CollectionManager::openWallpaperExternal();
+		s_pCollectionManager->openWallpaperExternal();
 		return true;
 	}
 	if (btnPrev->isClicked(wParam))
 	{
 		Delay::replayDelay();
-		CollectionManager::setPreviousWallpaper();
+		s_pCollectionManager->setPreviousWallpaper();
 		return true;
 	}
 	if (btnPlay->isClicked(wParam))
@@ -56,7 +59,7 @@ bool Player::click(WPARAM& wParam)
 	if (btnNext->isClicked(wParam))
 	{
 		Delay::replayDelay();
-		CollectionManager::setNextWallpaper();
+		s_pCollectionManager->setNextWallpaper();
 		return true;
 	}
 	return false;
@@ -66,7 +69,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 {	
 	if (pDIS->hwndItem == btnPrev->hWnd())
 	{
-		if (!CollectionManager::isPrevious())
+		if (!s_pCollectionManager->isPrevious())
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
@@ -109,7 +112,7 @@ void Player::updateTimer(bool forsed)
 	if ((!(MainWindow::mainWindow && MainWindow::isReady() && IsWindowVisible(MainWindow::mainWindow->hWnd()) ||
 		(TrayWindow::trayWindow && TrayWindow::isReady() && IsWindowVisible(TrayWindow::trayWindow->hWnd())))) && forsed == false)
 		return;
-	if (CollectionManager::bLoading)
+	if (s_pCollectionManager && s_pCollectionManager->bLoading)
 		strcpy_s(timer, "loading...");
 	else
 	{

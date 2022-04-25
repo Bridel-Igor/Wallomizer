@@ -1,5 +1,4 @@
 #include "SetUserCollectionWindow.h"
-#include "CollectionManager.h"
 #include "MainWindow.h"
 #include "Settings.h"
 
@@ -163,7 +162,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 			if (currentUserCollection->isValid == false)
 				currentUserCollection->isValid = true;
 			else
-				CollectionManager::reloadSettings();
+				collectionManager->reloadSettings();
 			DestroyWindow(hWnd);
 			return 0;
 		}
@@ -188,7 +187,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 	return TRUE;
 }
 
-void SetUserCollectionWindow::windowThread(UserCollection* collection)
+void SetUserCollectionWindow::windowThread(UserCollection* collection, CollectionManager* _collectionManager)
 {
 	if (collection == nullptr)
 		return;
@@ -199,6 +198,7 @@ void SetUserCollectionWindow::windowThread(UserCollection* collection)
 	}
 	currentUserCollection = collection;
 	setUserCollectionWindow = new SetUserCollectionWindow;
+	setUserCollectionWindow->collectionManager = _collectionManager;
 	setUserCollectionWindow->Create("User collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL);
 	setUserCollectionWindow->centerWindow(MainWindow::mainWindow->hWnd());
 	ShowWindow(setUserCollectionWindow->hWnd(), SW_SHOWNORMAL);

@@ -9,38 +9,40 @@
 class CollectionManager : public BaseCollection
 {
 public:
-	CollectionManager() = delete;
+	CollectionManager();
+	~CollectionManager();
 	CollectionManager(CollectionManager&) = delete;
 	void operator=(const CollectionManager&) = delete;
-	static bool saveSettings();
-	static bool loadSettings();
-	static void reloadSettings();
-	static void updateNumber();
-	template <typename T> static void addCollection();
-	static void eraseCollection(int index);
-	static void clear();
-	static void loadRandomWallpaper();
-	static bool getWallpaperInfo(Wallpaper*& wallpaper, int index);
+	bool saveSettings(FILE* pFile = nullptr);
+	bool loadSettings(FILE* pFile = nullptr);
+	void reloadSettings();
+	void updateNumber();
+	template <typename T> void addCollection();
+	void eraseCollection(int index);
+	void clear();
+	void loadRandomWallpaper();
+	bool getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index);
 	static bool loadWallpaper(Wallpaper *wallpaper);
-	static void loadNextWallpaper();
-	static void setLoadedWallpaper(bool setPrevious = false);
-	static void setNextWallpaper();
-	static void setPreviousWallpaper();
-	static bool isPrevious();
-	static LPCSTR collectionType() { return "Collection manager. You shouldn't see this"; }
-	static unsigned int getNumber() { return number; }
-	static void openCollectionSettingsWindow() { return; }
-	static void openWallpaperExternal();
-	static bool isReady() { return bIsReady; }
+	void loadNextWallpaper();
+	void setLoadedWallpaper(bool setPrevious = false);
+	void setNextWallpaper();
+	void setPreviousWallpaper();
+	bool isPrevious();
+	LPCSTR collectionType() const { return "Collection manager. You shouldn't see this"; }
+	LPCSTR collectionName() const { return ""; };
+	CategoriesAndPurity getCAP() { return 0; };
+	unsigned int getNumber() { return number; }
+	void openCollectionSettingsWindow() { return; }
+	void openWallpaperExternal();
+	bool isReady() { return bIsReady; }
 
-	static std::vector<BaseCollection*> collections;
-	static bool bLoading;
-	static Wallpaper *current, *next;
+	std::vector<BaseCollection*> collections;
+	bool bLoading;
+	Wallpaper *current, *next;
 	
 private:
-	static unsigned int number;
-	static std::list<Wallpaper*> previous;
-	static bool bIsReady;
-	static std::mt19937 rndGen;
-	static std::uniform_int_distribution<int> uid;
+	std::list<Wallpaper*> previous;
+	bool bIsReady;
+	std::mt19937 rndGen;
+	std::uniform_int_distribution<int> uid;
 };

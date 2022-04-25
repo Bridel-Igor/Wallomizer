@@ -2,6 +2,7 @@
 
 #include "BaseCollection.h"
 #include "CategoriesAndPurity.h"
+#include "CollectionManager.h"
 
 class SearchCollection : public BaseCollection
 {
@@ -16,7 +17,7 @@ private:
 	};
 
 public:
-	SearchCollection();
+	SearchCollection(CollectionManager* collectionManager);
 	~SearchCollection();
 	bool saveSettings(FILE* pFile);
 	bool loadSettings(FILE* pFile);
@@ -33,4 +34,5 @@ public:
 private:
 	char searchUrl[1024] = "";
 	int per_page = 24;
+	CollectionManager* m_pCollectionManager = nullptr;
 };

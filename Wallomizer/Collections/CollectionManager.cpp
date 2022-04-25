@@ -13,17 +13,23 @@
 #include "Filesystem.h"
 #include "Delay.h"
 
-std::vector<BaseCollection*> CollectionManager::collections;
-unsigned int CollectionManager::number=0;
-std::list<Wallpaper*> CollectionManager::previous;
-bool CollectionManager::bIsReady = false;
-bool CollectionManager::bLoading = false;
-Wallpaper *CollectionManager::current;
-Wallpaper *CollectionManager::next;
-std::mt19937 CollectionManager::rndGen(static_cast<unsigned int>(time(0)));
-std::uniform_int_distribution<int> CollectionManager::uid(0, 0);
+CollectionManager::CollectionManager()
+{
+	number = 0;
+	bIsReady = false;
+	bLoading = false;
+	current = nullptr;
+	next = nullptr;
+	rndGen = std::mt19937(static_cast<unsigned int>(time(0)));
+	uid = std::uniform_int_distribution<int>(0, 0);
+}
 
-bool CollectionManager::saveSettings()
+CollectionManager::~CollectionManager()
+{
+	clear();
+}
+
+bool CollectionManager::saveSettings(FILE* _pFile)
 {
 	wchar_t path[MAX_PATH];
 	Filesystem::getRoamingDir(path);
@@ -45,7 +51,7 @@ bool CollectionManager::saveSettings()
 	return false;
 }
 
-bool CollectionManager::loadSettings()
+bool CollectionManager::loadSettings(FILE* _pFile)
 {
 	bLoading = true;
 	if (MainWindow::mainWindow && MainWindow::isReady())
@@ -73,21 +79,21 @@ bool CollectionManager::loadSettings()
 			buffer[strlen(buffer) - 1] = '\0';
 			if (strcmp(buffer, "Local collection") == 0)
 			{
-				tmpCollection = new LocalCollection();
+				tmpCollection = new LocalCollection(this);
 				tmpCollection->loadSettings(pFile);
 				tmpCollection->isValid = true;
 				collections.push_back(tmpCollection);
 			}
 			if (strcmp(buffer, "User collection") == 0)
 			{
-				tmpCollection = new UserCollection();
+				tmpCollection = new UserCollection(this);
 				tmpCollection->loadSettings(pFile);
 				tmpCollection->isValid = true;
 				collections.push_back(tmpCollection);
 			}
 			if (strcmp(buffer, "Search collection") == 0)
 			{
-				tmpCollection = new SearchCollection();
+				tmpCollection = new SearchCollection(this);
 				tmpCollection->loadSettings(pFile);
 				tmpCollection->isValid = true;
 				collections.push_back(tmpCollection);
@@ -135,7 +141,7 @@ void CollectionManager::updateNumber()
 
 template <typename T> void CollectionManager::addCollection()
 {
-	BaseCollection* col = new T;
+	BaseCollection* col = new T(this);
 	collections.push_back(col);
 	collections.back()->openCollectionSettingsWindow();
 	if (!collections.back()->isValid)
@@ -184,8 +190,9 @@ void CollectionManager::loadRandomWallpaper()
 	Delay::endImageModification();
 }
 
-bool CollectionManager::getWallpaperInfo(Wallpaper*& wallpaper, int index)
+bool CollectionManager::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int _index)
 {
+	int index = _index;
 	for (unsigned int i = 0; i < collections.size(); i++)
 	{
 		if (!collections[i]->isEnabled)

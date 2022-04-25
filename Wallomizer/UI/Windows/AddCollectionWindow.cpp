@@ -1,5 +1,4 @@
 #include "AddCollectionWindow.h"
-#include "CollectionManager.h"
 #include "MainWindow.h"
 #include "UserCollection.h"
 #include "LocalCollection.h"
@@ -57,21 +56,21 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		if (btnAddUserCollection->isClicked(wParam))
 		{
 			ShowWindow(this->hWnd(), SW_HIDE);
-			CollectionManager::addCollection<UserCollection>();
+			collectionManager->addCollection<UserCollection>();
 			DestroyWindow(this->hWnd());
 			return 0;
 		}
 		if (btnAddLocalCollection->isClicked(wParam))
 		{
 			ShowWindow(this->hWnd(), SW_HIDE);
-			CollectionManager::addCollection<LocalCollection>();
+			collectionManager->addCollection<LocalCollection>();
 			DestroyWindow(this->hWnd());
 			return 0;
 		}
 		if (btnAddSearchCollection->isClicked(wParam))
 		{
 			ShowWindow(this->hWnd(), SW_HIDE);
-			CollectionManager::addCollection<SearchCollection>();
+			collectionManager->addCollection<SearchCollection>();
 			DestroyWindow(this->hWnd());
 			return 0;
 		}
@@ -89,7 +88,7 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 	return TRUE;
 }
 
-void AddCollectionWindow::windowThread()
+void AddCollectionWindow::windowThread(CollectionManager* _collectionManager)
 {
 	if (addCollectionWindow)
 	{
@@ -97,6 +96,7 @@ void AddCollectionWindow::windowThread()
 		return;
 	}
 	addCollectionWindow = new AddCollectionWindow;
+	addCollectionWindow->collectionManager = _collectionManager;
 	addCollectionWindow->Create("Add collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 240, 140, NULL, NULL);
 	addCollectionWindow->centerWindow(MainWindow::mainWindow->hWnd());
 	ShowWindow(addCollectionWindow->hWnd(), SW_SHOWNORMAL);

@@ -4,7 +4,6 @@
 #include "resource.h"
 #include "MainWindow.h"
 #include "Settings.h"
-#include "CollectionManager.h"
 #include "Delay.h"
 
 #define WM_NOTIFYICONMSG (WM_USER + 2)
@@ -77,7 +76,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		TrayMessage(hWnd, NIM_ADD, 1, hStatusIcon, "Wallomizer");
 
 		player = new Player(this->hWnd(),					10,		10,
-															10,		35,		140,	20, SS_CENTER);
+															10,		35,		140,	20, collectionManager, SS_CENTER);
 			
 		btnSettings = new Button(this->hWnd(), "Settings",	10,		60,		65,		20);
 		btnExit = new Button(this->hWnd(), "Exit",			85,		60,		65,		20);
@@ -125,7 +124,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_QUERYENDSESSION:
 	{
-		Delay::saveSession(CollectionManager::current);
+		Delay::saveSession(collectionManager->current);
 		return TRUE;
 	}
 	return 0;
@@ -136,7 +135,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			return 0;
 		if (btnSettings->isClicked(wParam))
 		{
-			std::thread thr(MainWindow::windowThread);
+			std::thread thr(MainWindow::windowThread, collectionManager);
 			thr.detach();
 			return 0;
 		}
@@ -161,11 +160,12 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	return TRUE;
 }
 
-void TrayWindow::windowThread()
+void TrayWindow::windowThread(CollectionManager* _collectionManager)
 {
 	if (trayWindow)
 		return;
 	trayWindow = new TrayWindow;
+	trayWindow->collectionManager = _collectionManager;
 	trayWindow->Create("Wallomizer", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 500, 500, width, height, NULL, NULL);
 	ShowWindow(trayWindow->hWnd(), SW_HIDE);
 	MSG msg = { };
@@ -176,10 +176,10 @@ void TrayWindow::windowThread()
 	}
 	ShowWindow(trayWindow->hWnd(), SW_HIDE);
 	trayWindow->Destroy();
-	delete trayWindow;
 	Delay::exiting = true;
-	Delay::saveSession(CollectionManager::current);
+	Delay::saveSession(trayWindow->collectionManager->current);
 	Delay::abortDelay();
+	delete trayWindow;
 	trayWindow = nullptr;
 }
 

@@ -4,6 +4,7 @@
 
 #include "BaseCollection.h"
 #include "CategoriesAndPurity.h"
+#include "CollectionManager.h"
 
 class UserCollection : public BaseCollection
 {
@@ -24,7 +25,7 @@ public:
 	};
 
 public:
-	UserCollection();
+	UserCollection(CollectionManager* collectionManager);
 	~UserCollection();
 	bool saveSettings(FILE* pFile);
 	bool loadSettings(FILE* pFile);
@@ -42,4 +43,5 @@ public:
 private:
 	int per_page = 24;
 	char collectionUrl[255] = "";
+	CollectionManager* m_pCollectionManager = nullptr;
 };

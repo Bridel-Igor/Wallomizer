@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SearchCollection.h"
+#include "CollectionManager.h"
 #include "BaseWindow.h"
 #include "Button.h"
 #include "Static.h"
@@ -16,9 +17,10 @@ class SetSearchCollectionWindow : public BaseWindow<SetSearchCollectionWindow>
 	char tmpRes[255], tmpAR[128], tmpColor[16];
 	static SetSearchCollectionWindow* setSearchCollectionWindow;
 	static SearchCollection* currentSearchCollection;
+	CollectionManager* collectionManager = nullptr;
 
 public:
 	LPCSTR ClassName() const { return "Set Search Collection Window Class"; }
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static void windowThread(SearchCollection* collection);
+	static void windowThread(SearchCollection* collection, CollectionManager* collectionManager);
 };

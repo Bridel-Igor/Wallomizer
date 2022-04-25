@@ -9,6 +9,7 @@
 #include "CollectionItem.h"
 #include "Edit.h"
 #include "Player.h"
+#include "CollectionManager.h"
 
 class MainWindow : public BaseWindow<MainWindow>
 {
@@ -36,16 +37,18 @@ private:
 		LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		static constexpr int height = 400;
+		CollectionManager* collectionManager = nullptr;
 	};
 
 private:
 	Static *stCollections;
 	Button *btnAdd, *btnSettings, *btnDonate;
+	CollectionManager* collectionManager = nullptr;
 	
 public:
 	LPCSTR ClassName() const { return "Main Window Class"; }
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static void windowThread();
+	static void windowThread(CollectionManager* collectionManager);
 	static bool isReady();
 
 	Player* player;

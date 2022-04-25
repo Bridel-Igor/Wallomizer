@@ -19,8 +19,9 @@ bool isImage(std::experimental::filesystem::v1::directory_entry path)
 	return false;
 }
 
-LocalCollection::LocalCollection()
+LocalCollection::LocalCollection(CollectionManager* _collectionManager)
 {
+	m_pCollectionManager = _collectionManager;
 	number = 0;
 	directoryPath[0] = '\0';
 }
@@ -119,7 +120,7 @@ CategoriesAndPurity LocalCollection::getCAP()
 
 void LocalCollection::openCollectionSettingsWindow()
 {
-	SetLocalCollectionWindow::windowThread(this);
+	SetLocalCollectionWindow::windowThread(this, m_pCollectionManager);
 }
 
 void LocalCollection::openWallpaperExternal(Wallpaper* wallpaper)
