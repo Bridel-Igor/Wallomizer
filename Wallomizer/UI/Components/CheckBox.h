@@ -47,9 +47,8 @@ public:
 	/// @return True if component is drawn, false otherwise. 
 	///			If it's true return TRUE from function that handles WinAPI messages. 
 	bool draw(LPDRAWITEMSTRUCT& pDIS, HBRUSH bkgrnd);
-	// HACK: move draw methods to IDrawable interface
 
 private:
-	/// Holds the current state of check box. // HACK: move all checked methods to ICheckable interface
+	/// Holds the current state of check box.
 	bool m_checked;
 };

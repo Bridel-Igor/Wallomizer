@@ -133,7 +133,7 @@ void LocalCollection::openWallpaperExternal(Wallpaper* wallpaper)
 		if (imgPath[j] == '/')
 			imgPath[j] = '\\';
 
-	ITEMIDLIST* pidl = ILCreateFromPathW(imgPath);
+	__unaligned ITEMIDLIST* pidl = ILCreateFromPathW(imgPath);
 	if (pidl) {
 		SHOpenFolderAndSelectItems(pidl, 0, 0, 0);
 		ILFree(pidl);
