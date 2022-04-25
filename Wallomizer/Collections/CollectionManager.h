@@ -21,7 +21,7 @@ public:
 	void eraseCollection(int index);
 	void clear();
 	void loadRandomWallpaper();
-	bool getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index);
+	Wallpaper* getWallpaperInfo(unsigned int index);
 	static bool loadWallpaper(Wallpaper *wallpaper);
 	void loadNextWallpaper();
 	void setLoadedWallpaper(bool setPrevious = false);

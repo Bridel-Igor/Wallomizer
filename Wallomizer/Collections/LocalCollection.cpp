@@ -62,10 +62,11 @@ bool LocalCollection::loadSettings(FILE* pFile)
 	return false;
 }
 
-bool LocalCollection::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index)
+Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index)
 {
+	Wallpaper* wallpaper = nullptr;
 	if (directoryPath == "" || number <= 0)
-		return false;
+		return wallpaper;
 	unsigned int i = 0;
 	std::experimental::filesystem::path p1{ directoryPath };
 	for (auto& p : std::experimental::filesystem::directory_iterator(p1))
@@ -76,11 +77,11 @@ bool LocalCollection::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index
 				wallpaper = new Wallpaper(CollectionType::local);
 				wcscpy_s(wallpaper->getPathW(), MAX_PATH, p.path().generic_wstring().c_str());
 				wallpaper->getPathW()[wcslen(wallpaper->getPathW())] = '\0';
-				return true;
+				return wallpaper;
 			}
 			i++;
 		}
-	return false;
+	return wallpaper;
 }
 
 bool LocalCollection::loadWallpaper(Wallpaper *wallpaper)

@@ -10,7 +10,7 @@ public:
 	LocalCollection(CollectionManager* collectionManager);
 	bool saveSettings(FILE* pFile);
 	bool loadSettings(FILE* pFile);
-	bool getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index);
+	Wallpaper* getWallpaperInfo(unsigned int index);
 	static bool loadWallpaper(Wallpaper* wallpaper);
 	LPCSTR collectionType() const { return "Local collection"; };
 	LPCSTR collectionName() const;

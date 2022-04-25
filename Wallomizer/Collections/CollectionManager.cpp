@@ -185,12 +185,12 @@ void CollectionManager::loadRandomWallpaper()
 		return;
 	Delay::beginImageModification();
 	int randomFromAll = uid(rndGen);
-	getWallpaperInfo(next, randomFromAll);
+	next = getWallpaperInfo(randomFromAll);
 	loadWallpaper(next);
 	Delay::endImageModification();
 }
 
-bool CollectionManager::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int _index)
+Wallpaper* CollectionManager::getWallpaperInfo(unsigned int _index)
 {
 	int index = _index;
 	for (unsigned int i = 0; i < collections.size(); i++)
@@ -201,12 +201,11 @@ bool CollectionManager::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int _in
 		if (index < 0)
 		{
 			if (collections[i] == nullptr || i >= collections.size() || collections[i]->getNumber() <= (index + collections[i]->getNumber()))
-				return false;
-			collections[i]->getWallpaperInfo(wallpaper, index + collections[i]->getNumber());
-			return true;
+				return nullptr;
+			return collections[i]->getWallpaperInfo(index + collections[i]->getNumber());
 		}
 	}
-	return false;
+	return nullptr;
 }
 
 bool CollectionManager::loadWallpaper(Wallpaper *wallpaper)

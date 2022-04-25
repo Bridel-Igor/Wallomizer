@@ -11,8 +11,7 @@ class BaseCollection
 public:
 	virtual bool saveSettings(FILE *pFile) = 0;
 	virtual bool loadSettings(FILE *pFile) = 0;
-	// TODO: change method to return Wallpaper*
-	virtual bool getWallpaperInfo(Wallpaper *&wallpaper, unsigned int index) = 0;
+	virtual Wallpaper* getWallpaperInfo(unsigned int index) = 0;
 	virtual LPCSTR collectionType() const = 0;
 	virtual LPCSTR collectionName() const = 0;
 	virtual CategoriesAndPurity getCAP() = 0;

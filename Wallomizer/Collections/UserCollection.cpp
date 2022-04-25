@@ -102,8 +102,9 @@ bool UserCollection::loadSettings(FILE* pFile)
 	return true;
 }
 
-bool UserCollection::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index)
+Wallpaper* UserCollection::getWallpaperInfo(unsigned int index)
 {
+	Wallpaper* wallpaper = nullptr;
 	int PageNum = int(index / per_page);
 	index -= PageNum * per_page;
 	PageNum++;
@@ -119,7 +120,7 @@ bool UserCollection::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index)
 	if (!Internet::URLDownloadToBuffer(pageUrl))
 	{
 		Internet::bufferAccess.unlock();
-		return false;
+		return wallpaper;
 	}
 
 	char *pBuffer = Internet::buffer;
@@ -127,18 +128,18 @@ bool UserCollection::getWallpaperInfo(Wallpaper*& wallpaper, unsigned int index)
 		if ((pBuffer = Internet::parse(pBuffer, "\"path\":", nullptr)) == nullptr)
 		{
 			Internet::bufferAccess.unlock();
-			return false;
+			return wallpaper;
 		}
 	wallpaper = new Wallpaper(CollectionType::user);
 	if (Internet::parse(pBuffer, "\"path\":", wallpaper->getPathA()) == nullptr)
 	{
 		Internet::bufferAccess.unlock();
 		delete wallpaper;
-		return false;
+		return wallpaper;
 	}
 	
 	Internet::bufferAccess.unlock();
-	return true;
+	return wallpaper;
 }
 
 bool UserCollection::loadWallpaper(Wallpaper* wallpaper)
