@@ -29,7 +29,8 @@ public:
 	void setPreviousWallpaper();
 	bool isPrevious();
 	LPCSTR collectionType() const { return "Collection manager. You shouldn't see this"; }
-	LPCSTR collectionName() const { return ""; };
+	LPCWSTR collectionName() const { return L""; };
+	CollectionType getCollectionType() const { return CollectionType::none; };
 	CategoriesAndPurity getCAP() { return 0; };
 	unsigned int getNumber() { return number; }
 	void openCollectionSettingsWindow() { return; }

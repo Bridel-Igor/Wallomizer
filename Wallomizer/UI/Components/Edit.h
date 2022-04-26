@@ -18,6 +18,7 @@ public:
 	/// @param additionalStyles - WinAPI style flags that will be added to WS_CHILD, WS_VISIBLE and ES_AUTOHSCROLL flags. Can be ignored.
 	/// @param additionalExStyles - WinAPI extended style flags. Can be ignored.
 	Edit(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0);
+	Edit(HWND hParent, LPCWSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0);
 	~Edit();
 
 	/// Get an ASCII text from edit component. You should provide char array to write it to.
@@ -25,6 +26,12 @@ public:
 	/// @param buffer - pointer to char array
 	/// @param size - size of the char array
 	void getTextA(char* buffer, int size);
+
+	/// Get an wide text from edit component. You should provide wchar_t array to write it to.
+	/// 
+	/// @param buffer - pointer to wchar_t array
+	/// @param size - size of the wchar_t array
+	void getTextW(wchar_t* buffer, int size);
 
 	/// Set ASCII text to edit component.
 	/// 

@@ -35,14 +35,11 @@ bool CollectionManager::saveSettings(FILE* _pFile)
 	Filesystem::getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"CollectionManager.dat");
 	FILE* pFile;
-	_wfopen_s(&pFile, path, L"w");
+	_wfopen_s(&pFile, path, L"wb");
 	if (pFile != NULL)
 	{
-		char cNumber[10];
-		_itoa_s((int)collections.size(), cNumber, 10);
-		cNumber[9] = '\0';
-		fputs(cNumber, pFile);
-		fputs("\n", pFile);
+		const size_t size = collections.size();
+		fwrite(&size, sizeof(size_t), 1, pFile);
 		for (auto p : collections)
 			p->saveSettings(pFile);
 		fclose(pFile);
@@ -68,30 +65,27 @@ bool CollectionManager::loadSettings(FILE* _pFile)
 	{
 		clear();
 		size_t n;
-		char buffer[255];
-		fgets(buffer, 255, pFile);
-		buffer[strlen(buffer)-1] = '\0';
-		n = atoi(buffer);
+		fread(&n, sizeof(n), 1, pFile);
 		BaseCollection* tmpCollection;
 		for (unsigned int i = 0; i < n; i++)
 		{
-			fgets(buffer, 255, pFile);
-			buffer[strlen(buffer) - 1] = '\0';
-			if (strcmp(buffer, "Local collection") == 0)
+			CollectionType ct;
+			fread(&ct, sizeof(ct), 1, pFile);
+			if (ct == CollectionType::local)
 			{
 				tmpCollection = new LocalCollection(this);
 				tmpCollection->loadSettings(pFile);
 				tmpCollection->isValid = true;
 				collections.push_back(tmpCollection);
 			}
-			if (strcmp(buffer, "User collection") == 0)
+			if (ct == CollectionType::user)
 			{
 				tmpCollection = new UserCollection(this);
 				tmpCollection->loadSettings(pFile);
 				tmpCollection->isValid = true;
 				collections.push_back(tmpCollection);
 			}
-			if (strcmp(buffer, "Search collection") == 0)
+			if (ct == CollectionType::search)
 			{
 				tmpCollection = new SearchCollection(this);
 				tmpCollection->loadSettings(pFile);

@@ -18,5 +18,6 @@ public:
 	/// @param additionalStyles - WinAPI style flags that will be added to WS_CHILD, WS_VISIBLE and SS_CENTERIMAGE flags. Can be ignored.
 	/// @param additionalExStyles - WinAPI extended style flags. Can be ignored.
 	Static(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
+	Static(HWND hParent, LPCWSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
 	~Static();
 };

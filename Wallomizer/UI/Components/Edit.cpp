@@ -5,6 +5,11 @@ Edit::Edit(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD
 	m_hWnd = CreateWindowExA(WS_EX_CLIENTEDGE, TEXT("Edit"), text, WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | additionalStyles, x, y, width, height, hParent, NULL, NULL, NULL);
 }
 
+Edit::Edit(HWND hParent, LPCWSTR text, int x, int y, int width, int height, DWORD additionalStyles)
+{
+	m_hWnd = CreateWindowExW(WS_EX_CLIENTEDGE, TEXT(L"Edit"), text, WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | additionalStyles, x, y, width, height, hParent, NULL, NULL, NULL);
+}
+
 Edit::~Edit()
 {
 	DestroyWindow(m_hWnd);
@@ -13,6 +18,11 @@ Edit::~Edit()
 void Edit::getTextA(char* buffer, int size)
 {
 	GetWindowTextA(m_hWnd, buffer, size);
+}
+
+void Edit::getTextW(wchar_t* buffer, int size)
+{
+	GetWindowTextW(m_hWnd, buffer, size);
 }
 
 void Edit::setTextA(LPCSTR text)

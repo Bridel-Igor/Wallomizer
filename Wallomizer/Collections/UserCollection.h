@@ -33,7 +33,8 @@ public:
 	static bool loadWallpaper(Wallpaper* wallpaper);
 	static std::vector<UserCollectionInfo> loadCollectionList(char* username, char* apiKey);
 	LPCSTR collectionType() const { return "User collection"; }
-	LPCSTR collectionName() const;
+	LPCWSTR collectionName() const;
+	CollectionType getCollectionType() const { return CollectionType::user; };
 	CategoriesAndPurity getCAP();
 	void openCollectionSettingsWindow(); 
 	static void openWallpaperExternal(Wallpaper* wallpaper);

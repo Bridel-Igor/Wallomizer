@@ -9,11 +9,13 @@
 class BaseCollection
 {
 public:
+	virtual ~BaseCollection() {}
 	virtual bool saveSettings(FILE *pFile) = 0;
 	virtual bool loadSettings(FILE *pFile) = 0;
 	virtual Wallpaper* getWallpaperInfo(unsigned int index) = 0;
 	virtual LPCSTR collectionType() const = 0;
-	virtual LPCSTR collectionName() const = 0;
+	virtual LPCWSTR collectionName() const = 0;
+	virtual CollectionType getCollectionType() const = 0;
 	virtual CategoriesAndPurity getCAP() = 0;
 	virtual unsigned int getNumber() { return number; }
 	virtual void openCollectionSettingsWindow() = 0;

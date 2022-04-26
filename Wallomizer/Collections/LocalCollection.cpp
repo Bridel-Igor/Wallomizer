@@ -28,44 +28,36 @@ LocalCollection::LocalCollection(CollectionManager* _collectionManager)
 
 bool LocalCollection::saveSettings(FILE* pFile)
 {
-	if (pFile != NULL)
-	{
-		fputs(collectionType(), pFile);
-		fputs("\n", pFile);
-		fputs(isEnabled ? "true" : "false", pFile);
-		fputs("\n", pFile);
-		fputs(directoryPath, pFile);
-		fputs("\n", pFile);
-		return true;
-	}
-	return false;
+	if (pFile == NULL)
+		return false;
+	const CollectionType ct = getCollectionType();
+	fwrite(&ct, sizeof(ct), 1, pFile);
+	fwrite(&isEnabled, sizeof(isEnabled), 1, pFile);
+	fwrite(&directoryPath, sizeof(directoryPath), 1, pFile);
+	return true;
 }
 
 bool LocalCollection::loadSettings(FILE* pFile)
 {
-	if (pFile != NULL)
-	{
-		char tmpBuffer[10];
-		fgets(tmpBuffer, 10, pFile);
-		tmpBuffer[strlen(tmpBuffer) - 1] = '\0';
-		isEnabled = strcmp(tmpBuffer, "true") == 0 ? true : false;
-		fgets(directoryPath, 255, pFile);
-		directoryPath[strlen(directoryPath) - 1] = '\0';
-		std::experimental::filesystem::path p1{ directoryPath };
-		number = 0;
-		if (isEnabled)
-			for (auto& p : std::experimental::filesystem::directory_iterator(p1))
-				if (isImage(p))
-					number++;
-		return true;
-	}
-	return false;
+	if (pFile == NULL)
+		return false;
+	
+	fread(&isEnabled, sizeof(isEnabled), 1, pFile);
+	fread(&directoryPath, sizeof(directoryPath), 1, pFile);
+
+	std::experimental::filesystem::path p1{ directoryPath };
+	number = 0;
+	if (isEnabled)
+		for (auto& p : std::experimental::filesystem::directory_iterator(p1))
+			if (isImage(p))
+				number++;
+	return true;
 }
 
 Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index)
 {
 	Wallpaper* wallpaper = nullptr;
-	if (directoryPath == "" || number <= 0)
+	if (directoryPath == L"" || number <= 0)
 		return wallpaper;
 	unsigned int i = 0;
 	std::experimental::filesystem::path p1{ directoryPath };
@@ -103,13 +95,13 @@ bool LocalCollection::loadWallpaper(Wallpaper *wallpaper)
 	return true;
 }
 
-LPCSTR LocalCollection::collectionName() const
+LPCWSTR LocalCollection::collectionName() const
 {
-	char* name;
-	name = new char[255]{ 0 };
+	wchar_t* name;
+	name = new wchar_t[255]{ 0 };
 
-	strcat_s(name, 255, " Local: ");
-	strcat_s(name, 255, directoryPath);
+	wcscat_s(name, 255, L" Local: ");
+	wcscat_s(name, 255, directoryPath);
 
 	return name;
 }

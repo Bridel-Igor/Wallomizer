@@ -26,20 +26,10 @@ bool SearchCollection::saveSettings(FILE* pFile)
 {
 	if (pFile == NULL)
 		return false;
-	fputs(collectionType(), pFile);
-	fputs("\n", pFile);
-	fputs(isEnabled ? "true" : "false", pFile);
-	fputs("\n", pFile);
-	fputs(settings->tag, pFile);
-	fputs("\n", pFile);
-	fputs(settings->resolution, pFile);
-	fputs("\n", pFile);
-	fputs(settings->ratio, pFile);
-	fputs("\n", pFile);
-	fputs(settings->color, pFile);
-	fputs("\n", pFile);
-	fputc(settings->categoriesAndPurity, pFile);
-	fputs("\n", pFile);
+	const CollectionType ct = getCollectionType();
+	fwrite(&ct, sizeof(ct), 1, pFile);
+	fwrite(&isEnabled, sizeof(isEnabled), 1, pFile);
+	fwrite(settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
 	return true;
 }
 
@@ -49,18 +39,8 @@ bool SearchCollection::loadSettings(FILE* pFile)
 		return false;
 	char tmpBuffer[10] = { 0 };
 
-	fgets(tmpBuffer, 9, pFile);
-	isEnabled = strcmp(tmpBuffer, "true\n") == 0 ? true : false;
-	fgets(settings->tag, 255, pFile);
-	settings->tag[strlen(settings->tag) - 1] = '\0';
-	fgets(settings->resolution, 255, pFile);
-	settings->resolution[strlen(settings->resolution) - 1] = '\0';
-	fgets(settings->ratio, 128, pFile);
-	settings->ratio[strlen(settings->ratio) - 1] = '\0';
-	fgets(settings->color, 16, pFile);
-	settings->color[strlen(settings->color) - 1] = '\0';
-	fgets(tmpBuffer, 9, pFile);
-	settings->categoriesAndPurity = tmpBuffer[0];
+	fread(&isEnabled, sizeof(isEnabled), 1, pFile);
+	fread(settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
 
 	strcpy_s(searchUrl, "https://wallhaven.cc/api/v1/search?");
 
@@ -164,22 +144,25 @@ bool SearchCollection::loadWallpaper(Wallpaper* wallpaper)
 	return Internet::URLDownloadToFile(wallpaper->getPathA(), imgPath);
 }
 
-LPCSTR SearchCollection::collectionName() const
+LPCWSTR SearchCollection::collectionName() const
 {
-	char* name;
-	name = new char[255]{ 0 };
+	wchar_t* name;
+	name = new wchar_t[255]{ 0 };
 
-	strcat_s(name, 255, " Search: ");
+	wcscat_s(name, 255, L" Search: ");
 
 	if (strlen(settings->tag))
 	{
-		strcat_s(name, 255, settings->tag);
-		strcat_s(name, 255, " | ");
+		wchar_t wtag[255]{ 0 };
+		for (int i = 0; i < strlen(settings->tag); i++)
+			wtag[i] = settings->tag[i];
+		wcscat_s(name, 255, wtag);
+		wcscat_s(name, 255, L" | ");
 	}
 
-	strcat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_GENERAL ? "General " : "");
-	strcat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_ANIME ? "Anime " : "");
-	strcat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_PEOPLE ? "People " : "");
+	wcscat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_GENERAL ? L"General " : L"");
+	wcscat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_ANIME ? L"Anime " : L"");
+	wcscat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_PEOPLE ? L"People " : L"");
 
 	return name;
 }

@@ -10,7 +10,7 @@ CollectionItem::CollectionItem(HWND hParent, int _x, int _y, int _width, BaseCol
 	: x(_x), y(_y), width(_width)
 {
 	chboEnabled = new CheckBox(hParent,			0, 0, 0, 0, 0, BS_NOTIFY | BS_OWNERDRAW);
-	stName = new Static(hParent, "",			0, 0, 0, 0, 0);
+	stName = new Static(hParent, L"",			0, 0, 0, 0, 0);
 	purity = new PurityComponent(hParent,		0, 0, 0, 0);
 	stNumber = new Static(hParent, "0",			0, 0, 0, 0, SS_CENTER);
 	btnSettings = new IconButton(hParent,		0, 0, 0, height, WindowStyles::hIOptions, WindowStyles::hIOptionsHover);
@@ -36,7 +36,7 @@ void CollectionItem::updateInfo(BaseCollection* collection)
 		return;
 	purity->setPurity(collection->getCAP());
 	chboEnabled->setChecked(collection->isEnabled);
-	SetWindowTextA(stName->hWnd(), collection->collectionName());
+	SetWindowTextW(stName->hWnd(), collection->collectionName());
 	char c[10];
 	_itoa_s(collection->getNumber(), c, 10);
 	c[9] = '\0';

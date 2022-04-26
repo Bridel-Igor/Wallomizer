@@ -1,5 +1,4 @@
 #include <thread>
-#include <stdexcept>
 
 #include "AppMutex.h"
 #include "TrayWindow.h"

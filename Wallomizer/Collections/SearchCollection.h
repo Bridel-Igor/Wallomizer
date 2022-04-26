@@ -24,7 +24,8 @@ public:
 	Wallpaper* getWallpaperInfo(unsigned int index);
 	static bool loadWallpaper(Wallpaper* wallpaper);
 	LPCSTR collectionType() const { return "Search collection"; }
-	LPCSTR collectionName() const;
+	LPCWSTR collectionName() const;
+	CollectionType getCollectionType() const { return CollectionType::search; };
 	CategoriesAndPurity getCAP();
 	void openCollectionSettingsWindow();
 	static void openWallpaperExternal(Wallpaper* wallpaper);

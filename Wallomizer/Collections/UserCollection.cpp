@@ -24,18 +24,10 @@ bool UserCollection::saveSettings(FILE* pFile)
 {
 	if (pFile == NULL)
 		return false;
-	fputs(collectionType(), pFile);
-	fputs("\n", pFile);
-	fputs(isEnabled ? "true" : "false", pFile);
-	fputs("\n", pFile);
-	fputs(settings->username, pFile);
-	fputs("\n", pFile);
-	fputs(settings->collectionID, pFile);
-	fputs("\n", pFile);
-	fputs(settings->collectionName, pFile);
-	fputs("\n", pFile);
-	fputc(settings->categoriesAndPurity, pFile);
-	fputs("\n", pFile);
+	const CollectionType ct = getCollectionType();
+	fwrite(&ct, sizeof(ct), 1, pFile);
+	fwrite(&isEnabled, sizeof(isEnabled), 1, pFile);
+	fwrite(settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
 	return true;
 }
 
@@ -45,20 +37,8 @@ bool UserCollection::loadSettings(FILE* pFile)
 		return false;
 	char tmpBuffer[10]={0};
 
-	fgets(tmpBuffer, 9, pFile);
-	isEnabled = strcmp(tmpBuffer, "true\n") == 0 ? true : false;
-
-	fgets(settings->username, 64, pFile);
-	settings->username[strlen(settings->username) - 1] = '\0';
-
-	fgets(settings->collectionID, 16, pFile);
-	settings->collectionID[strlen(settings->collectionID) - 1] = '\0';
-
-	fgets(settings->collectionName, 64, pFile);
-	settings->collectionName[strlen(settings->collectionName) - 1] = '\0';
-
-	fgets(tmpBuffer, 9, pFile);
-	settings->categoriesAndPurity = tmpBuffer[0];
+	fread(&isEnabled, sizeof(isEnabled), 1, pFile);
+	fread(settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
 
 	// Forming collection URL
 	strcpy_s(collectionUrl, "https://wallhaven.cc/api/v1/collections/");
@@ -192,15 +172,23 @@ std::vector<UserCollection::UserCollectionInfo> UserCollection::loadCollectionLi
 	return list;
 }
 
-LPCSTR UserCollection::collectionName() const
+LPCWSTR UserCollection::collectionName() const
 {
-	char* name;
-	name = new char[255] {0};
+	wchar_t* name;
+	name = new wchar_t[255] { 0 };
 
-	strcat_s(name, 255, " ");
-	strcat_s(name, 255, settings->username);
-	strcat_s(name, 255, ": ");
-	strcat_s(name, 255, settings->collectionName);
+	wchar_t wusername[64] { 0 };
+	for (int i = 0; i < strlen(settings->username); i++)
+		wusername[i] = settings->username[i];
+
+	wchar_t wcollectionName[64] { 0 };
+	for (int i = 0; i < strlen(settings->collectionName); i++)
+		wcollectionName[i] = settings->collectionName[i];
+
+	wcscat_s(name, 255, L" ");
+	wcscat_s(name, 255, wusername);
+	wcscat_s(name, 255, L": ");
+	wcscat_s(name, 255, wcollectionName);
 
 	return name;
 }
