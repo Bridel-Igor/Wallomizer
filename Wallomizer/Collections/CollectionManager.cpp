@@ -184,7 +184,7 @@ void CollectionManager::loadRandomWallpaper()
 	if (m_uiNumber <= 0)
 		return;
 	Delay::beginImageModification();
-	int randomFromAll = m_uniformIntDistribution(m_randomGenerator);
+	const int randomFromAll = m_uniformIntDistribution(m_randomGenerator);
 	pNext = getWallpaperInfo(randomFromAll);
 	loadWallpaper(pNext);
 	Delay::endImageModification();
@@ -253,7 +253,7 @@ void CollectionManager::setPreviousWallpaper()
 	Player::redrawPlayers();
 }
 
-void CollectionManager::openWallpaperExternal()
+void CollectionManager::openWallpaperExternal() const
 {
 	switch (pCurrent->getType())
 	{

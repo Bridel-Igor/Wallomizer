@@ -132,6 +132,7 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 	{
 		Internet::bufferAccess.unlock();
 		delete pWallpaper;
+		pWallpaper = nullptr;
 		return pWallpaper;
 	}
 	

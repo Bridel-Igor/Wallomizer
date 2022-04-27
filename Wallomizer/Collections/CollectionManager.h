@@ -30,7 +30,7 @@ public:
 	void setLoadedWallpaper(bool setPrevious = false);
 	void setNextWallpaper();
 	void setPreviousWallpaper();
-	void openWallpaperExternal();
+	void openWallpaperExternal() const;
 	bool hasPrevious() const;
 	bool isReady() const { return m_isReady; }
 
