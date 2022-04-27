@@ -1,4 +1,4 @@
-#include "CategoriesAndPurity.h"
+#include "CategoriesAndPurityComponents.h"
 
 PurityComponent::PurityComponent(HWND hParent, int x, int y, int width, int height)
 {
@@ -16,16 +16,16 @@ PurityComponent::~PurityComponent()
 
 void PurityComponent::setPurity(CategoriesAndPurity cap)
 {
-	pbSFW->check(cap & S_PURITY_SFW);
-	pbSketchy->check(cap & S_PURITY_SKETCHY);
-	pbNSFW->check(cap & S_PURITY_NSFW);
+	pbSFW->check(cap & CAP::puritySFW);
+	pbSketchy->check(cap & CAP::puritySketchy);
+	pbNSFW->check(cap & CAP::purityNSFW);
 }
 
 CategoriesAndPurity PurityComponent::getPurity()
 {
-	return S_PURITY_SFW * pbSFW->isChecked() |
-		S_PURITY_SKETCHY * pbSketchy->isChecked() |
-		S_PURITY_NSFW * pbNSFW->isChecked();
+	return	CAP::puritySFW * pbSFW->isChecked() |
+			CAP::puritySketchy * pbSketchy->isChecked() |
+			CAP::purityNSFW * pbNSFW->isChecked();
 }
 
 bool PurityComponent::draw(LPDRAWITEMSTRUCT &pDIS)
@@ -100,16 +100,16 @@ CategoryComponent::~CategoryComponent()
 
 void CategoryComponent::setCategory(CategoriesAndPurity cap)
 {
-	pbGeneral->check(cap & S_CATEGORY_GENERAL);
-	pbAnime->check(cap & S_CATEGORY_ANIME);
-	pbPeople->check(cap & S_CATEGORY_PEOPLE);
+	pbGeneral->check(cap & CAP::categoryGeneral);
+	pbAnime->check(cap & CAP::categoryAnime);
+	pbPeople->check(cap & CAP::categoryPeople);
 }
 
 CategoriesAndPurity CategoryComponent::getCategory()
 {
-	return S_CATEGORY_GENERAL * pbGeneral->isChecked() |
-		S_CATEGORY_ANIME * pbAnime->isChecked() |
-		S_CATEGORY_PEOPLE * pbPeople->isChecked();
+	return	CAP::categoryGeneral * pbGeneral->isChecked() |
+			CAP::categoryAnime * pbAnime->isChecked() |
+			CAP::categoryPeople * pbPeople->isChecked();
 }
 
 bool CategoryComponent::draw(LPDRAWITEMSTRUCT& pDIS)

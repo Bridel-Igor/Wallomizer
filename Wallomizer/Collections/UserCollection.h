@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "BaseCollection.h"
-#include "CategoriesAndPurity.h"
+#include "CategoriesAndPurityComponents.h"
 #include "CollectionManager.h"
 
 class UserCollection : public BaseCollection
@@ -21,7 +21,7 @@ private:
 		char sUsername[64] = "";
 		char sCollectionID[16] = "";
 		char sCollectionName[64] = "";
-		CategoriesAndPurity categoriesAndPurity = S_PURITY_SFW;
+		CategoriesAndPurity categoriesAndPurity = CAP::puritySFW;
 	};
 
 public:

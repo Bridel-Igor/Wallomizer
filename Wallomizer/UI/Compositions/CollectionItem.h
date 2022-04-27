@@ -4,7 +4,7 @@
 #include "IconButton.h"
 #include "CheckBox.h"
 #include "BaseCollection.h"
-#include "CategoriesAndPurity.h"
+#include "CategoriesAndPurityComponents.h"
 
 class CollectionItem
 {

@@ -33,14 +33,14 @@ bool SearchCollection::loadSettings(FILE* pFile)
 	}
 
 	strcat_s(m_sSearchUrl, "categories=");
-	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_CATEGORY_GENERAL ? "1" : "0");
-	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_CATEGORY_ANIME ? "1" : "0");
-	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_CATEGORY_PEOPLE ? "1" : "0");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & CAP::categoryGeneral ? "1" : "0");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & CAP::categoryAnime ? "1" : "0");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & CAP::categoryPeople ? "1" : "0");
 
 	strcat_s(m_sSearchUrl, "&purity=");
-	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_PURITY_SFW ? "1" : "0");
-	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_PURITY_SKETCHY ? "1" : "0");
-	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_PURITY_NSFW ? "1" : "0");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & CAP::puritySFW ? "1" : "0");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & CAP::puritySketchy ? "1" : "0");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & CAP::purityNSFW ? "1" : "0");
 
 	strcat_s(m_sSearchUrl, settings.sResolution);
 	strcat_s(m_sSearchUrl, settings.sRatio);
@@ -89,9 +89,9 @@ void SearchCollection::getCollectionName(wchar_t* pwsName, size_t size) const
 		wcscat_s(pwsName, 255, L" | ");
 	}
 
-	wcscat_s(pwsName, 255, settings.categoriesAndPurity & S_CATEGORY_GENERAL ? L"General " : L"");
-	wcscat_s(pwsName, 255, settings.categoriesAndPurity & S_CATEGORY_ANIME ? L"Anime " : L"");
-	wcscat_s(pwsName, 255, settings.categoriesAndPurity & S_CATEGORY_PEOPLE ? L"People " : L"");
+	wcscat_s(pwsName, 255, settings.categoriesAndPurity & CAP::categoryGeneral ? L"General " : L"");
+	wcscat_s(pwsName, 255, settings.categoriesAndPurity & CAP::categoryAnime ? L"Anime " : L"");
+	wcscat_s(pwsName, 255, settings.categoriesAndPurity & CAP::categoryPeople ? L"People " : L"");
 }
 
 CategoriesAndPurity SearchCollection::getCAP() const

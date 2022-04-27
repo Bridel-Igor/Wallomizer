@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BaseCollection.h"
-#include "CategoriesAndPurity.h"
+#include "CategoriesAndPurityComponents.h"
 #include "CollectionManager.h"
 
 class SearchCollection : public BaseCollection
@@ -9,7 +9,7 @@ class SearchCollection : public BaseCollection
 private:
 	struct SearchCollectionSettings
 	{
-		CategoriesAndPurity categoriesAndPurity = S_CATEGORY_GENERAL | S_CATEGORY_ANIME | S_CATEGORY_PEOPLE | S_PURITY_SFW;
+		CategoriesAndPurity categoriesAndPurity = CAP::categoryGeneral | CAP::categoryAnime | CAP::categoryPeople | CAP::puritySFW;
 		char sTag[255] = "";
 		char sResolution[255] = "";
 		char sRatio[128] = "";

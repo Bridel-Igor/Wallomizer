@@ -30,9 +30,9 @@ bool UserCollection::loadSettings(FILE* pFile)
 	strcat_s(m_sCollectionUrl, settings.sCollectionID);
 
 	strcat_s(m_sCollectionUrl, "?purity=");
-	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & S_PURITY_SFW ? "1" : "0");
-	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & S_PURITY_SKETCHY ? "1" : "0");
-	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & S_PURITY_NSFW ? "1" : "0");
+	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & CAP::puritySFW ? "1" : "0");
+	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & CAP::puritySketchy ? "1" : "0");
+	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & CAP::purityNSFW ? "1" : "0");
 
 	if (Settings::isApiKeyUsed())
 	{

@@ -76,7 +76,7 @@
     <ClCompile Include="UI\Components\UpDownEdit.cpp">
       <Filter>UI\Components\Source</Filter>
     </ClCompile>
-    <ClCompile Include="UI\Compositions\CategoriesAndPurity.cpp">
+    <ClCompile Include="UI\Compositions\CategoriesAndPurityComponents.cpp">
       <Filter>UI\Clusters</Filter>
     </ClCompile>
     <ClCompile Include="UI\Compositions\CollectionItem.cpp">
@@ -216,7 +216,7 @@
     <ClInclude Include="UI\Interfaces\IClickable.h">
       <Filter>UI\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="UI\Compositions\CategoriesAndPurity.h">
+    <ClInclude Include="UI\Compositions\CategoriesAndPurityComponents.h">
       <Filter>UI\Clusters</Filter>
     </ClInclude>
     <ClInclude Include="UI\Compositions\Player.h">
@@ -232,6 +232,9 @@
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="AppMutex.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CategoriesAndPurity.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

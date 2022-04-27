@@ -154,7 +154,7 @@
     <ClCompile Include="UI\Windows\AddCollectionWindow.cpp" />
     <ClCompile Include="UI\Windows\AspRatPickerWindow.cpp" />
     <ClCompile Include="UI\Components\Button.cpp" />
-    <ClCompile Include="UI\Compositions\CategoriesAndPurity.cpp" />
+    <ClCompile Include="UI\Compositions\CategoriesAndPurityComponents.cpp" />
     <ClCompile Include="UI\Components\CheckBox.cpp" />
     <ClCompile Include="UI\Compositions\CollectionItem.cpp" />
     <ClCompile Include="Collections\CollectionManager.cpp" />
@@ -188,11 +188,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppMutex.h" />
+    <ClInclude Include="CategoriesAndPurity.h" />
     <ClInclude Include="UI\Windows\AddCollectionWindow.h" />
     <ClInclude Include="UI\Windows\AspRatPickerWindow.h" />
     <ClInclude Include="Collections\BaseCollection.h" />
     <ClInclude Include="UI\Components\Button.h" />
-    <ClInclude Include="UI\Compositions\CategoriesAndPurity.h" />
+    <ClInclude Include="UI\Compositions\CategoriesAndPurityComponents.h" />
     <ClInclude Include="UI\Compositions\CollectionItem.h" />
     <ClInclude Include="Collections\CollectionManager.h" />
     <ClInclude Include="UI\Components\ColorButton.h" />
