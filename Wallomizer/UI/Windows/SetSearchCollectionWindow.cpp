@@ -42,12 +42,12 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 
 		if (currentSearchCollection)
 		{
-			catCom->setCategory(currentSearchCollection->settings->categoriesAndPurity);
-			purCom->setPurity(currentSearchCollection->settings->categoriesAndPurity);
-			edTag->setTextA(currentSearchCollection->settings->tag);
-			strcpy_s(tmpRes, currentSearchCollection->settings->resolution);
-			strcpy_s(tmpAR, currentSearchCollection->settings->ratio);
-			strcpy_s(tmpColor, currentSearchCollection->settings->color);
+			catCom->setCategory(currentSearchCollection->settings.categoriesAndPurity);
+			purCom->setPurity(currentSearchCollection->settings.categoriesAndPurity);
+			edTag->setTextA(currentSearchCollection->settings.sTag);
+			strcpy_s(tmpRes, currentSearchCollection->settings.sResolution);
+			strcpy_s(tmpAR, currentSearchCollection->settings.sRatio);
+			strcpy_s(tmpColor, currentSearchCollection->settings.sColor);
 		}
 
 		EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
@@ -130,14 +130,14 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 		}
 		if (btnOk->isClicked(wParam))
 		{
-			currentSearchCollection->settings->categoriesAndPurity = 0;
-			currentSearchCollection->settings->categoriesAndPurity = catCom->getCategory() | purCom->getPurity();
-			edTag->getTextA(currentSearchCollection->settings->tag, 255);
-			strcpy_s(currentSearchCollection->settings->resolution, tmpRes);
-			strcpy_s(currentSearchCollection->settings->ratio, tmpAR);
-			strcpy_s(currentSearchCollection->settings->color, tmpColor);
-			if (currentSearchCollection->isValid == false)
-				currentSearchCollection->isValid = true;
+			currentSearchCollection->settings.categoriesAndPurity = 0;
+			currentSearchCollection->settings.categoriesAndPurity = catCom->getCategory() | purCom->getPurity();
+			edTag->getTextA(currentSearchCollection->settings.sTag, 255);
+			strcpy_s(currentSearchCollection->settings.sResolution, tmpRes);
+			strcpy_s(currentSearchCollection->settings.sRatio, tmpAR);
+			strcpy_s(currentSearchCollection->settings.sColor, tmpColor);
+			if (currentSearchCollection->isValid() == false)
+				currentSearchCollection->setValid(true);
 			else
 				collectionManager->reloadSettings();
 			DestroyWindow(hWnd);

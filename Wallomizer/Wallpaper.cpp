@@ -48,21 +48,21 @@ Wallpaper::~Wallpaper()
 	}
 }
 
-CollectionType Wallpaper::getType()
+CollectionType Wallpaper::getType() const
 {
 	if (this == nullptr)
 		return CollectionType::none;
 	return type;
 }
 
-char* Wallpaper::getPathA()
+char* Wallpaper::getPathA() const
 {
 	if (this == nullptr)
 		return nullptr;
 	return charX.a;
 }
 
-wchar_t* Wallpaper::getPathW()
+wchar_t* Wallpaper::getPathW() const
 {
 	if (this == nullptr)
 		return nullptr;

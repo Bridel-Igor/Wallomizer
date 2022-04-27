@@ -4,30 +4,14 @@
 #include "Settings.h"
 #include "Filesystem.h"
 
-UserCollection::UserCollection(CollectionManager* _collectionManager)
-{
-	m_pCollectionManager = _collectionManager;
-	number = 0;
-	settings = new UserCollectionSettings;
-	settings->username[0] = '\0';
-	settings->collectionID[0] = '\0';
-	settings->collectionName[0] = '\0';
-	settings->categoriesAndPurity = S_PURITY_SFW;
-}
-
-UserCollection::~UserCollection()
-{
-	delete settings;
-}
-
-bool UserCollection::saveSettings(FILE* pFile)
+bool UserCollection::saveSettings(FILE* pFile) const
 {
 	if (pFile == NULL)
 		return false;
-	const CollectionType ct = getCollectionType();
-	fwrite(&ct, sizeof(ct), 1, pFile);
-	fwrite(&isEnabled, sizeof(isEnabled), 1, pFile);
-	fwrite(settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
+	const CollectionType collType = getCollectionType();
+	fwrite(&collType, sizeof(collType), 1, pFile);
+	fwrite(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
+	fwrite(&settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
 	return true;
 }
 
@@ -35,35 +19,34 @@ bool UserCollection::loadSettings(FILE* pFile)
 {
 	if (pFile == NULL)
 		return false;
-	char tmpBuffer[10]={0};
 
-	fread(&isEnabled, sizeof(isEnabled), 1, pFile);
-	fread(settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
+	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
+	fread(&settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
 
 	// Forming collection URL
-	strcpy_s(collectionUrl, "https://wallhaven.cc/api/v1/collections/");
-	strcat_s(collectionUrl, settings->username);
-	strcat_s(collectionUrl, "/");
-	strcat_s(collectionUrl, settings->collectionID);
+	strcpy_s(m_sCollectionUrl, "https://wallhaven.cc/api/v1/collections/");
+	strcat_s(m_sCollectionUrl, settings.sUsername);
+	strcat_s(m_sCollectionUrl, "/");
+	strcat_s(m_sCollectionUrl, settings.sCollectionID);
 
-	strcat_s(collectionUrl, "?purity=");
-	strcat_s(collectionUrl, settings->categoriesAndPurity & S_PURITY_SFW ? "1" : "0");
-	strcat_s(collectionUrl, settings->categoriesAndPurity & S_PURITY_SKETCHY ? "1" : "0");
-	strcat_s(collectionUrl, settings->categoriesAndPurity & S_PURITY_NSFW ? "1" : "0");
+	strcat_s(m_sCollectionUrl, "?purity=");
+	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & S_PURITY_SFW ? "1" : "0");
+	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & S_PURITY_SKETCHY ? "1" : "0");
+	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & S_PURITY_NSFW ? "1" : "0");
 
 	if (Settings::isApiKeyUsed())
 	{
-		strcat_s(collectionUrl, "&apikey=");
-		strcat_s(collectionUrl, Settings::getApiKey());
+		strcat_s(m_sCollectionUrl, "&apikey=");
+		strcat_s(m_sCollectionUrl, Settings::getApiKey());
 	}
 
-	if (!isEnabled)
+	if (!m_isEnabled)
 		return true;
 
 	// Getting the META
 	char* pBuffer = Internet::buffer;
 	Internet::bufferAccess.lock();
-	if (!Internet::URLDownloadToBuffer(collectionUrl))
+	if (!Internet::URLDownloadToBuffer(m_sCollectionUrl))
 	{
 		Internet::bufferAccess.unlock();
 		return false;
@@ -73,7 +56,7 @@ bool UserCollection::loadSettings(FILE* pFile)
 		Internet::bufferAccess.unlock();
 		return false;
 	}
-	if (Internet::parse(pBuffer, "\"total\":", &number) == nullptr)
+	if (Internet::parse(pBuffer, "\"total\":", &m_uiNumber) == nullptr)
 	{
 		Internet::bufferAccess.unlock();
 		return false;
@@ -82,25 +65,44 @@ bool UserCollection::loadSettings(FILE* pFile)
 	return true;
 }
 
-Wallpaper* UserCollection::getWallpaperInfo(unsigned int index)
+void UserCollection::getCollectionName(wchar_t* pwsName, size_t size) const
 {
-	Wallpaper* wallpaper = nullptr;
-	int PageNum = int(index / per_page);
-	index -= PageNum * per_page;
-	PageNum++;
-	char pageUrl[255];
-	strcpy_s(pageUrl, collectionUrl);
-	strcat_s(pageUrl, "&page=");
-	char curPageNum[15] = "";
-	_itoa_s(PageNum, curPageNum, 10);
-	strcat_s(pageUrl, curPageNum);
+	wchar_t wsUsername[64]{ 0 };
+	mbstowcs_s(nullptr, wsUsername, settings.sUsername, 64);
+
+	wchar_t wsCollectionName[64]{ 0 };
+	mbstowcs_s(nullptr, wsCollectionName, settings.sCollectionName, 64);
+
+	wcscpy_s(pwsName, 255, L" ");
+	wcscat_s(pwsName, 255, wsUsername);
+	wcscat_s(pwsName, 255, L": ");
+	wcscat_s(pwsName, 255, wsCollectionName);
+}
+
+CategoriesAndPurity UserCollection::getCAP() const
+{
+	return settings.categoriesAndPurity;
+}
+
+Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
+{
+	Wallpaper* pWallpaper = nullptr;
+	int page = int(index / s_nPerPage);
+	index -= page * s_nPerPage;
+	page++;
+	char sPageUrl[255];
+	strcpy_s(sPageUrl, m_sCollectionUrl);
+	strcat_s(sPageUrl, "&page=");
+	char sCurrentPage[15] = "";
+	_itoa_s(page, sCurrentPage, 10);
+	strcat_s(sPageUrl, sCurrentPage);
 
 	Internet::bufferAccess.lock();
 
-	if (!Internet::URLDownloadToBuffer(pageUrl))
+	if (!Internet::URLDownloadToBuffer(sPageUrl))
 	{
 		Internet::bufferAccess.unlock();
-		return wallpaper;
+		return pWallpaper;
 	}
 
 	char *pBuffer = Internet::buffer;
@@ -108,45 +110,72 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index)
 		if ((pBuffer = Internet::parse(pBuffer, "\"path\":", nullptr)) == nullptr)
 		{
 			Internet::bufferAccess.unlock();
-			return wallpaper;
+			return pWallpaper;
 		}
-	wallpaper = new Wallpaper(CollectionType::user);
-	if (Internet::parse(pBuffer, "\"path\":", wallpaper->getPathA()) == nullptr)
+	pWallpaper = new Wallpaper(CollectionType::user);
+	if (Internet::parse(pBuffer, "\"path\":", pWallpaper->getPathA()) == nullptr)
 	{
 		Internet::bufferAccess.unlock();
-		delete wallpaper;
-		return wallpaper;
+		delete pWallpaper;
+		return pWallpaper;
 	}
 	
 	Internet::bufferAccess.unlock();
-	return wallpaper;
+	return pWallpaper;
 }
 
-bool UserCollection::loadWallpaper(Wallpaper* wallpaper)
+void UserCollection::openCollectionSettingsWindow()
 {
-	wchar_t imgPath[MAX_PATH];
-	Filesystem::getRoamingDir(imgPath);
-	wcscat_s(imgPath, MAX_PATH, L"Loaded wallpaper.dat");
-	return Internet::URLDownloadToFile(wallpaper->getPathA(), imgPath);
+	SetUserCollectionWindow::windowThread(this, m_pCollectionManager);
 }
 
-std::vector<UserCollection::UserCollectionInfo> UserCollection::loadCollectionList(char* username, char* apiKey)
+bool UserCollection::loadWallpaper(const Wallpaper* pWallpaper)
 {
-	char collectionInfoURL[255];
-	strcpy_s(collectionInfoURL, "https://wallhaven.cc/api/v1/collections/");
-	strcat_s(collectionInfoURL, username);
+	wchar_t wsImgPath[MAX_PATH];
+	Filesystem::getRoamingDir(wsImgPath);
+	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
+	return Internet::URLDownloadToFile(pWallpaper->getPathA(), wsImgPath);
+}
 
-	if (strlen(apiKey))
+void UserCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
+{
+	char sImgUrl[255] = "https://wallhaven.cc/w/";
+	bool isDashFound = false;
+	int j = (int)strlen(sImgUrl);
+	for (int i = 0; i < strlen(pWallpaper->getPathA()); i++)
 	{
-		strcat_s(collectionInfoURL, "?apikey=");
-		strcat_s(collectionInfoURL, Settings::getApiKey());
+		if (isDashFound)
+		{
+			if (pWallpaper->getPathA()[i] == '.')
+				break;
+			sImgUrl[j] = pWallpaper->getPathA()[i];
+			j++;
+		}
+		if (pWallpaper->getPathA()[i] == '-')
+			isDashFound = true;
+	}
+	sImgUrl[j] = '\0';
+
+	ShellExecute(0, 0, sImgUrl, 0, 0, SW_SHOW);
+}
+
+std::vector<UserCollection::UserCollectionInfo> UserCollection::loadCollectionList(const char* sUsername, const char* sApiKey)
+{
+	char sCollectionInfoURL[255];
+	strcpy_s(sCollectionInfoURL, "https://wallhaven.cc/api/v1/collections/");
+	strcat_s(sCollectionInfoURL, sUsername);
+
+	if (strlen(sApiKey))
+	{
+		strcat_s(sCollectionInfoURL, "?apikey=");
+		strcat_s(sCollectionInfoURL, Settings::getApiKey());
 	}
 
 	Internet::bufferAccess.lock();
 	std::vector<UserCollectionInfo> list;
 	char* pBuffer = Internet::buffer;
 
-	if (!Internet::URLDownloadToBuffer(collectionInfoURL))
+	if (!Internet::URLDownloadToBuffer(sCollectionInfoURL))
 	{
 		Internet::bufferAccess.unlock();
 		return list;
@@ -160,7 +189,7 @@ std::vector<UserCollection::UserCollectionInfo> UserCollection::loadCollectionLi
 			delete uci;
 			break;
 		}
-		if ((pBuffer = Internet::parse(pBuffer, "\"label\":", uci->label)) == nullptr)
+		if ((pBuffer = Internet::parse(pBuffer, "\"label\":", uci->sLabel)) == nullptr)
 		{
 			delete uci;
 			break;
@@ -170,59 +199,4 @@ std::vector<UserCollection::UserCollectionInfo> UserCollection::loadCollectionLi
 
 	Internet::bufferAccess.unlock();
 	return list;
-}
-
-LPCWSTR UserCollection::collectionName() const
-{
-	wchar_t* name;
-	name = new wchar_t[255] { 0 };
-
-	wchar_t wusername[64] { 0 };
-	for (int i = 0; i < strlen(settings->username); i++)
-		wusername[i] = settings->username[i];
-
-	wchar_t wcollectionName[64] { 0 };
-	for (int i = 0; i < strlen(settings->collectionName); i++)
-		wcollectionName[i] = settings->collectionName[i];
-
-	wcscat_s(name, 255, L" ");
-	wcscat_s(name, 255, wusername);
-	wcscat_s(name, 255, L": ");
-	wcscat_s(name, 255, wcollectionName);
-
-	return name;
-}
-
-CategoriesAndPurity UserCollection::getCAP() 
-{
-	if (settings)
-		return settings->categoriesAndPurity;
-	return 0;
-}
-
-void UserCollection::openCollectionSettingsWindow()
-{
-	SetUserCollectionWindow::windowThread(this, m_pCollectionManager);
-}
-
-void UserCollection::openWallpaperExternal(Wallpaper* wallpaper)
-{
-	char imgUrl[255] = "https://wallhaven.cc/w/";
-	bool dashFound = false;
-	int j = (int)strlen(imgUrl);
-	for (int i = 0; i < strlen(wallpaper->getPathA()); i++)
-	{
-		if (dashFound)
-		{
-			if (wallpaper->getPathA()[i] == '.')
-				break;
-			imgUrl[j] = wallpaper->getPathA()[i];
-			j++;
-		}
-		if (wallpaper->getPathA()[i] == '-')
-			dashFound = true;
-	}
-	imgUrl[j] = '\0';
-
-	ShellExecute(0, 0, imgUrl, 0, 0, SW_SHOW);
 }

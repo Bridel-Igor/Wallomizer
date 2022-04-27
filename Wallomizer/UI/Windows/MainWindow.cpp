@@ -16,18 +16,18 @@ void MainWindow::CollectionItemsFrame::updateCollectionItems()
 {
 	ShowWindow(stEmpty->hWnd(), SW_HIDE);
 
-	for (size_t i = collectionManager->collections.size(); i < collectionItems.size(); i++) //deleting excess items
+	for (size_t i = collectionManager->m_pCollections.size(); i < collectionItems.size(); i++) //deleting excess items
 	{
 		delete collectionItems.back();
 		collectionItems.pop_back();
 	}
 
 	for (size_t i = 0; i < collectionItems.size(); i++) // updating those which won't be created
-		collectionItems[i]->updateInfo(collectionManager->collections[i]);
+		collectionItems[i]->updateInfo(collectionManager->m_pCollections[i]);
 
-	for (size_t i = collectionItems.size(); i < collectionManager->collections.size(); i++) // creation
-		if (collectionManager->collections[i]!=nullptr)
-			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->hWnd(), 0, (int)(i * (CollectionItem::height + 1)), MainWindow::width-20, collectionManager->collections[i], WindowStyles::mainFont));
+	for (size_t i = collectionItems.size(); i < collectionManager->m_pCollections.size(); i++) // creation
+		if (collectionManager->m_pCollections[i]!=nullptr)
+			collectionItems.push_back(new CollectionItem(MainWindow::collectionItemsFrame->hWnd(), 0, (int)(i * (CollectionItem::height + 1)), MainWindow::width-20, collectionManager->m_pCollections[i], WindowStyles::mainFont));
 	
 	updateScroll();
 	for (auto p : collectionItems) // placing according to the scrollbar
@@ -112,7 +112,7 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 		{
 			if (collectionItems[i]->btnSettings->isClicked(wParam))
 			{
-				collectionManager->collections[i]->openCollectionSettingsWindow();
+				collectionManager->m_pCollections[i]->openCollectionSettingsWindow();
 				return 0;
 			}
 			if (collectionItems[i]->btnDelete->isClicked(wParam))
@@ -127,7 +127,7 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 				if (HIWORD(wParam) == BN_CLICKED)
 				{
 					collectionItems[i]->chboEnabled->click();
-					collectionManager->collections[i]->isEnabled = collectionItems[i]->chboEnabled->isChecked();
+					collectionManager->m_pCollections[i]->setEnabled(collectionItems[i]->chboEnabled->isChecked());
 					collectionManager->reloadSettings();
 					return 0;
 				}

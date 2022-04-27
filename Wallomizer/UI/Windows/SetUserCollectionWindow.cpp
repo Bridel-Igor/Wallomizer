@@ -24,24 +24,24 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		btnCancel = new Button			(this->hWnd(), "Cancel",			10,		100,	80,		20);
 		btnOk = new Button				(this->hWnd(), "Ok",				100,	100,	240,	20);
 
-		edUsername->setTextA(currentUserCollection->settings->username);
-		purCom->setPurity(currentUserCollection->settings->categoriesAndPurity);
+		edUsername->setTextA(currentUserCollection->settings.sUsername);
+		purCom->setPurity(currentUserCollection->settings.categoriesAndPurity);
 
 		if (edUsername->isEmpty())
 		{
 			edUsername->setTextA(Settings::username);
-			strcpy_s(currentUserCollection->settings->username, Settings::username);
+			strcpy_s(currentUserCollection->settings.sUsername, Settings::username);
 		}
 
-		if (currentUserCollection->settings->collectionID!=0 && strlen(currentUserCollection->settings->collectionName)!=0)
+		if (currentUserCollection->settings.sCollectionID!=0 && strlen(currentUserCollection->settings.sCollectionName)!=0)
 		{
 			list.clear();
 			UserCollection::UserCollectionInfo info;
-			info.id = atoi(currentUserCollection->settings->collectionID);
-			strcpy_s(info.label, currentUserCollection->settings->collectionName);
+			info.id = atoi(currentUserCollection->settings.sCollectionID);
+			strcpy_s(info.sLabel, currentUserCollection->settings.sCollectionName);
 			list.push_back(info);
 			SendMessageA(cbCollections->hWnd(), CB_RESETCONTENT, NULL, NULL);
-			SendMessageA(cbCollections->hWnd(), CB_ADDSTRING, NULL, (LPARAM)list[0].label);
+			SendMessageA(cbCollections->hWnd(), CB_ADDSTRING, NULL, (LPARAM)list[0].sLabel);
 			SendMessageA(cbCollections->hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 			validCollection = true;
 		}
@@ -112,7 +112,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		{
 			char prevName[64] = {0};
 			if (!list.empty() && validCollection)
-				strcpy_s(prevName, list[cbCollections->getSelectedItem()].label);
+				strcpy_s(prevName, list[cbCollections->getSelectedItem()].sLabel);
 
 			validCollection = false;
 			SendMessageA(cbCollections->hWnd(), CB_RESETCONTENT, NULL, NULL);
@@ -131,7 +131,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 				return 0;
 			}
 			for (size_t i=0;i<list.size(); i++)
-				SendMessageA(cbCollections->hWnd(), CB_ADDSTRING, NULL, (LPARAM)list[i].label);
+				SendMessageA(cbCollections->hWnd(), CB_ADDSTRING, NULL, (LPARAM)list[i].sLabel);
 
 			int index = 0;
 			if (strlen(prevName))
@@ -152,15 +152,15 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 				MessageBoxA(nullptr, "Invalid data", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
-			strcpy_s(currentUserCollection->settings->collectionName, list[cbCollections->getSelectedItem()].label);
+			strcpy_s(currentUserCollection->settings.sCollectionName, list[cbCollections->getSelectedItem()].sLabel);
 			char cid[16] = { 0 };
 			_itoa_s(list[cbCollections->getSelectedItem()].id, cid, 10);
-			strcpy_s(currentUserCollection->settings->collectionID, cid);
+			strcpy_s(currentUserCollection->settings.sCollectionID, cid);
 
-			edUsername->getTextA(currentUserCollection->settings->username, 64);
-			currentUserCollection->settings->categoriesAndPurity = purCom->getPurity();
-			if (currentUserCollection->isValid == false)
-				currentUserCollection->isValid = true;
+			edUsername->getTextA(currentUserCollection->settings.sUsername, 64);
+			currentUserCollection->settings.categoriesAndPurity = purCom->getPurity();
+			if (currentUserCollection->isValid() == false)
+				currentUserCollection->setValid(true);
 			else
 				collectionManager->reloadSettings();
 			DestroyWindow(hWnd);

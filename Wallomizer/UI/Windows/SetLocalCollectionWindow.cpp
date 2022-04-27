@@ -15,7 +15,7 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 		EnableWindow(MainWindow::mainWindow->hWnd(), FALSE);
 
 		stPath = new Static(this->hWnd(), "Enter path to directory:",	10,		10,		390,	20);
-		edPath = new Edit(this->hWnd(), currentLocalCollection?currentLocalCollection->directoryPath:L"",
+		edPath = new Edit(this->hWnd(), currentLocalCollection?currentLocalCollection->m_wsDirectoryPath:L"",
 																	10,		30,		360,	20);
 		btnPath = new Button(this->hWnd(), "..",						370,	30,		20,		20);
 		btnCancel = new Button(this->hWnd(), "Cancel",					10,		60,		185,	20);
@@ -64,9 +64,9 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 				MessageBoxA(nullptr, "Path can't be empty.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
-			edPath->getTextW(currentLocalCollection->directoryPath, 255);
-			if (currentLocalCollection->isValid == false)
-				currentLocalCollection->isValid = true;
+			edPath->getTextW(currentLocalCollection->m_wsDirectoryPath, 255);
+			if (currentLocalCollection->isValid() == false)
+				currentLocalCollection->setValid(true);
 			else
 				collectionManager->reloadSettings();
 			DestroyWindow(hWnd);

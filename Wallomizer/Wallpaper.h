@@ -26,17 +26,17 @@ public:
 	/// Get the collection type this wallpaper correspondes to.
 	/// 
 	/// @return One of the values of CollectionType enum that corresponds to collection class.
-	CollectionType getType();
+	CollectionType getType() const;
 
 	/// Get path or URL for current wallpaper.
 	/// 
 	/// @return Pointer to char array, that contains path or URL.
-	char* getPathA();
+	char* getPathA() const;
 
 	/// Get path or URL for current wallpaper.
 	/// 
 	/// @return Pointer to wide char array, that contains path or URL.
-	wchar_t* getPathW();
+	wchar_t* getPathW() const;
 
 private:
 	/// Union that contains wide and ansi char pointers. 

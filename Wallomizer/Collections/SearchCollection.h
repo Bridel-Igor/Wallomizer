@@ -9,31 +9,34 @@ class SearchCollection : public BaseCollection
 private:
 	struct SearchCollectionSettings
 	{
-		CategoriesAndPurity categoriesAndPurity;
-		char tag[255];
-		char resolution[255];
-		char ratio[128];
-		char color[16];
+		CategoriesAndPurity categoriesAndPurity = S_CATEGORY_GENERAL | S_CATEGORY_ANIME | S_CATEGORY_PEOPLE | S_PURITY_SFW;
+		char sTag[255] = "";
+		char sResolution[255] = "";
+		char sRatio[128] = "";
+		char sColor[16] = "";
 	};
 
 public:
-	SearchCollection(CollectionManager* collectionManager);
-	~SearchCollection();
-	bool saveSettings(FILE* pFile);
-	bool loadSettings(FILE* pFile);
-	Wallpaper* getWallpaperInfo(unsigned int index);
-	static bool loadWallpaper(Wallpaper* wallpaper);
-	LPCSTR collectionType() const { return "Search collection"; }
-	LPCWSTR collectionName() const;
-	CollectionType getCollectionType() const { return CollectionType::search; };
-	CategoriesAndPurity getCAP();
-	void openCollectionSettingsWindow();
-	static void openWallpaperExternal(Wallpaper* wallpaper);
+	SearchCollection(CollectionManager* collectionManager) :
+		m_pCollectionManager(collectionManager)
+	{}
 
-	SearchCollectionSettings* settings;
+	~SearchCollection() {};
+	bool saveSettings(FILE* pFile) const;
+	bool loadSettings(FILE* pFile);
+	void getCollectionName(wchar_t* pwsName, size_t size) const;
+	CollectionType getCollectionType() const { return CollectionType::search; }
+	CategoriesAndPurity getCAP() const;
+	Wallpaper* getWallpaperInfo(unsigned int index) const;
+	void openCollectionSettingsWindow();
+
+	static bool loadWallpaper(const Wallpaper* pWallpaper);
+	static void openWallpaperExternal(const Wallpaper* pWallpaper);
+
+	SearchCollectionSettings settings;
 
 private:
-	char searchUrl[1024] = "";
-	int per_page = 24;
+	static constexpr int s_nPerPage = 24;
 	CollectionManager* m_pCollectionManager = nullptr;
+	char m_sSearchUrl[1024] = "";	
 };

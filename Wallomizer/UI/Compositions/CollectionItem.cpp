@@ -35,8 +35,10 @@ void CollectionItem::updateInfo(BaseCollection* collection)
 	if (collection == nullptr)
 		return;
 	purity->setPurity(collection->getCAP());
-	chboEnabled->setChecked(collection->isEnabled);
-	SetWindowTextW(stName->hWnd(), collection->collectionName());
+	chboEnabled->setChecked(collection->isEnabled());
+	wchar_t text[255] { 0 };
+	collection->getCollectionName(text, 255);
+	SetWindowTextW(stName->hWnd(), text);
 	char c[10];
 	_itoa_s(collection->getNumber(), c, 10);
 	c[9] = '\0';

@@ -7,20 +7,23 @@
 class LocalCollection : public BaseCollection
 {
 public:
-	LocalCollection(CollectionManager* collectionManager);
-	~LocalCollection() {}
-	bool saveSettings(FILE* pFile);
-	bool loadSettings(FILE* pFile);
-	Wallpaper* getWallpaperInfo(unsigned int index);
-	static bool loadWallpaper(Wallpaper* wallpaper);
-	LPCSTR collectionType() const { return "Local collection"; };
-	LPCWSTR collectionName() const;
-	CollectionType getCollectionType() const { return CollectionType::local; };
-	CategoriesAndPurity getCAP();
-	void openCollectionSettingsWindow();
-	static void openWallpaperExternal(Wallpaper* wallpaper);
+	LocalCollection(CollectionManager* pCollectionManager) : 
+		m_pCollectionManager(pCollectionManager) 
+	{}
 
-	wchar_t directoryPath[255];
+	~LocalCollection() {}
+	bool saveSettings(FILE* pFile) const;
+	bool loadSettings(FILE* pFile);
+	void getCollectionName(wchar_t* pwsName, size_t size) const;
+	CollectionType getCollectionType() const { return CollectionType::local; }
+	CategoriesAndPurity getCAP() const { return 0; }
+	Wallpaper* getWallpaperInfo(unsigned int index) const;
+	void openCollectionSettingsWindow();
+
+	static bool loadWallpaper(const Wallpaper* pWallpaper);
+	static void openWallpaperExternal(const Wallpaper* pWallpaper);
+
+	wchar_t m_wsDirectoryPath[255] = L"";
 
 private:
 	CollectionManager* m_pCollectionManager = nullptr;

@@ -124,7 +124,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_QUERYENDSESSION:
 	{
-		Delay::saveSession(collectionManager->current);
+		Delay::saveSession(collectionManager->pCurrent);
 		return TRUE;
 	}
 	return 0;
@@ -179,7 +179,7 @@ void TrayWindow::windowThread(std::exception_ptr &ex, CollectionManager* _collec
 		ShowWindow(trayWindow->hWnd(), SW_HIDE);
 		trayWindow->Destroy();
 		Delay::exiting = true;
-		Delay::saveSession(trayWindow->collectionManager->current);
+		Delay::saveSession(trayWindow->collectionManager->pCurrent);
 		Delay::abortDelay();
 		delete trayWindow;
 		trayWindow = nullptr;

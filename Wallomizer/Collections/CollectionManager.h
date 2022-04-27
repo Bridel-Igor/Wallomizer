@@ -10,40 +10,39 @@ class CollectionManager : public BaseCollection
 {
 public:
 	CollectionManager();
+
 	~CollectionManager();
-	CollectionManager(CollectionManager&) = delete;
-	void operator=(const CollectionManager&) = delete;
-	bool saveSettings(FILE* pFile = nullptr);
+	bool saveSettings(FILE* pFile = nullptr) const;
 	bool loadSettings(FILE* pFile = nullptr);
+	void getCollectionName(wchar_t* pwsName, size_t size) const { pwsName[0] = L'\0'; }
+	CollectionType getCollectionType() const { return CollectionType::none; }
+	CategoriesAndPurity getCAP() const { return 0; }
+	Wallpaper* getWallpaperInfo(unsigned int index) const;
+	void openCollectionSettingsWindow() { return; }
+
 	void reloadSettings();
+	void clear();
 	void updateNumber();
 	template <typename T> void addCollection();
 	void eraseCollection(int index);
-	void clear();
-	void loadRandomWallpaper();
-	Wallpaper* getWallpaperInfo(unsigned int index);
-	static bool loadWallpaper(Wallpaper *wallpaper);
 	void loadNextWallpaper();
+	void loadRandomWallpaper();
 	void setLoadedWallpaper(bool setPrevious = false);
 	void setNextWallpaper();
 	void setPreviousWallpaper();
-	bool isPrevious();
-	LPCSTR collectionType() const { return "Collection manager. You shouldn't see this"; }
-	LPCWSTR collectionName() const { return L""; };
-	CollectionType getCollectionType() const { return CollectionType::none; };
-	CategoriesAndPurity getCAP() { return 0; };
-	unsigned int getNumber() { return number; }
-	void openCollectionSettingsWindow() { return; }
 	void openWallpaperExternal();
-	bool isReady() { return bIsReady; }
+	bool hasPrevious() const;
+	bool isReady() const { return m_isReady; }
 
-	std::vector<BaseCollection*> collections;
-	bool bLoading;
-	Wallpaper *current, *next;
+	static bool loadWallpaper(const Wallpaper *pWallpaper);
+	
+	std::vector<BaseCollection*> m_pCollections;
+	bool m_isLoading = false;
+	Wallpaper *pCurrent = nullptr, *pNext = nullptr;
 	
 private:
-	std::list<Wallpaper*> previous;
-	bool bIsReady;
-	std::mt19937 rndGen;
-	std::uniform_int_distribution<int> uid;
+	std::list<Wallpaper*> pPreviousList;
+	bool m_isReady = false;
+	std::mt19937 m_randomGenerator;
+	std::uniform_int_distribution<int> m_uniformIntDistribution;
 };

@@ -69,7 +69,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 {	
 	if (pDIS->hwndItem == btnPrev->hWnd())
 	{
-		if (!s_pCollectionManager->isPrevious())
+		if (!s_pCollectionManager->hasPrevious())
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
@@ -112,7 +112,7 @@ void Player::updateTimer(bool forsed)
 	if ((!(MainWindow::mainWindow && MainWindow::isReady() && IsWindowVisible(MainWindow::mainWindow->hWnd()) ||
 		(TrayWindow::trayWindow && TrayWindow::isReady() && IsWindowVisible(TrayWindow::trayWindow->hWnd())))) && forsed == false)
 		return;
-	if (s_pCollectionManager && s_pCollectionManager->bLoading)
+	if (s_pCollectionManager && s_pCollectionManager->m_isLoading)
 		strcpy_s(timer, "loading...");
 	else
 	{

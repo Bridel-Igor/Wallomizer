@@ -4,32 +4,14 @@
 #include "Settings.h"
 #include "Filesystem.h"
 
-SearchCollection::SearchCollection(CollectionManager* _collectionManager)
-{
-	m_pCollectionManager = _collectionManager;
-	isEnabled = true;
-	number = 0;
-	settings = new SearchCollectionSettings;
-	settings->categoriesAndPurity = S_CATEGORY_GENERAL | S_CATEGORY_ANIME | S_CATEGORY_PEOPLE | S_PURITY_SFW;
-	settings->tag[0] = '\0';
-	settings->resolution[0] = '\0';
-	settings->ratio[0] = '\0';
-	settings->color[0] = '\0';
-}
-
-SearchCollection::~SearchCollection()
-{
-	delete settings;
-}
-
-bool SearchCollection::saveSettings(FILE* pFile)
+bool SearchCollection::saveSettings(FILE* pFile) const
 {
 	if (pFile == NULL)
 		return false;
-	const CollectionType ct = getCollectionType();
-	fwrite(&ct, sizeof(ct), 1, pFile);
-	fwrite(&isEnabled, sizeof(isEnabled), 1, pFile);
-	fwrite(settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
+	const CollectionType collType = getCollectionType();
+	fwrite(&collType, sizeof(collType), 1, pFile);
+	fwrite(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
+	fwrite(&settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
 	return true;
 }
 
@@ -37,46 +19,45 @@ bool SearchCollection::loadSettings(FILE* pFile)
 {
 	if (pFile == NULL)
 		return false;
-	char tmpBuffer[10] = { 0 };
 
-	fread(&isEnabled, sizeof(isEnabled), 1, pFile);
-	fread(settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
+	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
+	fread(&settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
 
-	strcpy_s(searchUrl, "https://wallhaven.cc/api/v1/search?");
+	strcpy_s(m_sSearchUrl, "https://wallhaven.cc/api/v1/search?");
 
-	if (strlen(settings->tag))
+	if (strlen(settings.sTag))
 	{
-		strcat_s(searchUrl, "q=");
-		strcat_s(searchUrl, settings->tag);
-		strcat_s(searchUrl, "&");
+		strcat_s(m_sSearchUrl, "q=");
+		strcat_s(m_sSearchUrl, settings.sTag);
+		strcat_s(m_sSearchUrl, "&");
 	}
 
-	strcat_s(searchUrl, "categories=");
-	strcat_s(searchUrl, settings->categoriesAndPurity & S_CATEGORY_GENERAL ? "1" : "0");
-	strcat_s(searchUrl, settings->categoriesAndPurity & S_CATEGORY_ANIME ? "1" : "0");
-	strcat_s(searchUrl, settings->categoriesAndPurity & S_CATEGORY_PEOPLE ? "1" : "0");
+	strcat_s(m_sSearchUrl, "categories=");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_CATEGORY_GENERAL ? "1" : "0");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_CATEGORY_ANIME ? "1" : "0");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_CATEGORY_PEOPLE ? "1" : "0");
 
-	strcat_s(searchUrl, "&purity=");
-	strcat_s(searchUrl, settings->categoriesAndPurity & S_PURITY_SFW ? "1" : "0");
-	strcat_s(searchUrl, settings->categoriesAndPurity & S_PURITY_SKETCHY ? "1" : "0");
-	strcat_s(searchUrl, settings->categoriesAndPurity & S_PURITY_NSFW ? "1" : "0");
+	strcat_s(m_sSearchUrl, "&purity=");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_PURITY_SFW ? "1" : "0");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_PURITY_SKETCHY ? "1" : "0");
+	strcat_s(m_sSearchUrl, settings.categoriesAndPurity & S_PURITY_NSFW ? "1" : "0");
 
-	strcat_s(searchUrl, settings->resolution);
-	strcat_s(searchUrl, settings->ratio);
-	strcat_s(searchUrl, settings->color);
+	strcat_s(m_sSearchUrl, settings.sResolution);
+	strcat_s(m_sSearchUrl, settings.sRatio);
+	strcat_s(m_sSearchUrl, settings.sColor);
 
 	if (Settings::isApiKeyUsed())
 	{
-		strcat_s(searchUrl, "&apikey=");
-		strcat_s(searchUrl, Settings::getApiKey());
+		strcat_s(m_sSearchUrl, "&apikey=");
+		strcat_s(m_sSearchUrl, Settings::getApiKey());
 	}
 
-	if (!isEnabled)
+	if (!m_isEnabled)
 		return true;
 
 	char* pBuffer = Internet::buffer;
 	Internet::bufferAccess.lock();
-	if (!Internet::URLDownloadToBuffer(searchUrl))
+	if (!Internet::URLDownloadToBuffer(m_sSearchUrl))
 	{
 		Internet::bufferAccess.unlock();
 		return false;
@@ -86,7 +67,7 @@ bool SearchCollection::loadSettings(FILE* pFile)
 		Internet::bufferAccess.unlock();
 		return false;
 	}
-	if (Internet::parse(pBuffer, "\"total\":", &number) == nullptr)
+	if (Internet::parse(pBuffer, "\"total\":", &m_uiNumber) == nullptr)
 	{
 		Internet::bufferAccess.unlock();
 		return false;
@@ -95,83 +76,67 @@ bool SearchCollection::loadSettings(FILE* pFile)
 	return true;
 }
 
-
-Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index)
+void SearchCollection::getCollectionName(wchar_t* pwsName, size_t size) const
 {
-	Wallpaper* wallpaper = nullptr;
-	int PageNum = int(index / per_page);
-	index -= PageNum * per_page;
-	PageNum++;
-	char pageUrl[1024];
-	strcpy_s(pageUrl, searchUrl);
-	strcat_s(pageUrl, "&page=");
-	char curPageNum[15] = "";
-	_itoa_s(PageNum, curPageNum, 10);
-	strcat_s(pageUrl, curPageNum);
+	wcscpy_s(pwsName, 255, L" Search: ");
+
+	if (strlen(settings.sTag))
+	{
+		wchar_t wsTag[255]{ 0 };
+		for (int i = 0; i < strlen(settings.sTag); i++)
+			wsTag[i] = settings.sTag[i];
+		wcscat_s(pwsName, 255, wsTag);
+		wcscat_s(pwsName, 255, L" | ");
+	}
+
+	wcscat_s(pwsName, 255, settings.categoriesAndPurity & S_CATEGORY_GENERAL ? L"General " : L"");
+	wcscat_s(pwsName, 255, settings.categoriesAndPurity & S_CATEGORY_ANIME ? L"Anime " : L"");
+	wcscat_s(pwsName, 255, settings.categoriesAndPurity & S_CATEGORY_PEOPLE ? L"People " : L"");
+}
+
+CategoriesAndPurity SearchCollection::getCAP() const
+{
+	return settings.categoriesAndPurity;
+}
+
+Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
+{
+	Wallpaper* pWallpaper = nullptr;
+	int page = int(index / s_nPerPage);
+	index -= page * s_nPerPage;
+	page++;
+	char sPageUrl[1024];
+	strcpy_s(sPageUrl, m_sSearchUrl);
+	strcat_s(sPageUrl, "&page=");
+	char sCurrentPage[15] = "";
+	_itoa_s(page, sCurrentPage, 10);
+	strcat_s(sPageUrl, sCurrentPage);
 
 	char* pBuffer = Internet::buffer;
 	Internet::bufferAccess.lock();
 
-	if (!Internet::URLDownloadToBuffer(pageUrl))
+	if (!Internet::URLDownloadToBuffer(sPageUrl))
 	{
 		Internet::bufferAccess.unlock();
-		return wallpaper;
+		return pWallpaper;
 	}
 
 	for (unsigned int i = 0; i < index; i++)
 		if ((pBuffer = Internet::parse(pBuffer, "\"path\":", nullptr)) == nullptr)
 		{
 			Internet::bufferAccess.unlock();
-			return wallpaper;
+			return pWallpaper;
 		}
-	wallpaper = new Wallpaper(CollectionType::search);
-	if (Internet::parse(pBuffer, "\"path\":", wallpaper->getPathA()) == nullptr)
+	pWallpaper = new Wallpaper(CollectionType::search);
+	if (Internet::parse(pBuffer, "\"path\":", pWallpaper->getPathA()) == nullptr)
 	{
 		Internet::bufferAccess.unlock();
-		delete wallpaper;
-		return wallpaper;
+		delete pWallpaper;
+		return pWallpaper;
 	}
 	
 	Internet::bufferAccess.unlock();
-	return wallpaper;
-}
-
-bool SearchCollection::loadWallpaper(Wallpaper* wallpaper)
-{
-	wchar_t imgPath[MAX_PATH];
-	Filesystem::getRoamingDir(imgPath);
-	wcscat_s(imgPath, MAX_PATH, L"Loaded wallpaper.dat");
-	return Internet::URLDownloadToFile(wallpaper->getPathA(), imgPath);
-}
-
-LPCWSTR SearchCollection::collectionName() const
-{
-	wchar_t* name;
-	name = new wchar_t[255]{ 0 };
-
-	wcscat_s(name, 255, L" Search: ");
-
-	if (strlen(settings->tag))
-	{
-		wchar_t wtag[255]{ 0 };
-		for (int i = 0; i < strlen(settings->tag); i++)
-			wtag[i] = settings->tag[i];
-		wcscat_s(name, 255, wtag);
-		wcscat_s(name, 255, L" | ");
-	}
-
-	wcscat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_GENERAL ? L"General " : L"");
-	wcscat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_ANIME ? L"Anime " : L"");
-	wcscat_s(name, 255, settings->categoriesAndPurity & S_CATEGORY_PEOPLE ? L"People " : L"");
-
-	return name;
-}
-
-CategoriesAndPurity SearchCollection::getCAP()
-{
-	if (settings)
-		return settings->categoriesAndPurity;
-	return 0;
+	return pWallpaper;
 }
 
 void SearchCollection::openCollectionSettingsWindow()
@@ -179,24 +144,32 @@ void SearchCollection::openCollectionSettingsWindow()
 	SetSearchCollectionWindow::windowThread(this, m_pCollectionManager);
 }
 
-void SearchCollection::openWallpaperExternal(Wallpaper* wallpaper)
+bool SearchCollection::loadWallpaper(const Wallpaper* pWallpaper)
 {
-	char imgUrl[255] = "https://wallhaven.cc/w/";
-	bool dashFound = false;
-	int j = (int)strlen(imgUrl);
-	for (int i = 0; i < strlen(wallpaper->getPathA()); i++)
+	wchar_t wsImgPath[MAX_PATH];
+	Filesystem::getRoamingDir(wsImgPath);
+	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
+	return Internet::URLDownloadToFile(pWallpaper->getPathA(), wsImgPath);
+}
+
+void SearchCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
+{
+	char sImgUrl[255] = "https://wallhaven.cc/w/";
+	bool isDashFound = false;
+	int j = (int)strlen(sImgUrl);
+	for (int i = 0; i < strlen(pWallpaper->getPathA()); i++)
 	{
-		if (dashFound)
+		if (isDashFound)
 		{
-			if (wallpaper->getPathA()[i] == '.')
+			if (pWallpaper->getPathA()[i] == '.')
 				break;
-			imgUrl[j] = wallpaper->getPathA()[i];
+			sImgUrl[j] = pWallpaper->getPathA()[i];
 			j++;
 		}
-		if (wallpaper->getPathA()[i] == '-')
-			dashFound = true;
+		if (pWallpaper->getPathA()[i] == '-')
+			isDashFound = true;
 	}
-	imgUrl[j] = '\0';
+	sImgUrl[j] = '\0';
 
-	ShellExecute(0, 0, imgUrl, 0, 0, SW_SHOW);
+	ShellExecute(0, 0, sImgUrl, 0, 0, SW_SHOW);
 }

@@ -8,41 +8,44 @@
 
 class UserCollection : public BaseCollection
 {
-private:
-	struct UserCollectionSettings
-	{
-		char username[64];
-		char collectionID[16];
-		char collectionName[64];
-		CategoriesAndPurity categoriesAndPurity;
-	};
-
 public:
 	struct UserCollectionInfo
 	{
 		unsigned int id;
-		char label[64];
+		char sLabel[64];
+	};
+
+private:
+	struct UserCollectionSettings
+	{
+		char sUsername[64] = "";
+		char sCollectionID[16] = "";
+		char sCollectionName[64] = "";
+		CategoriesAndPurity categoriesAndPurity = S_PURITY_SFW;
 	};
 
 public:
-	UserCollection(CollectionManager* collectionManager);
-	~UserCollection();
-	bool saveSettings(FILE* pFile);
-	bool loadSettings(FILE* pFile);
-	Wallpaper* getWallpaperInfo(unsigned int index);
-	static bool loadWallpaper(Wallpaper* wallpaper);
-	static std::vector<UserCollectionInfo> loadCollectionList(char* username, char* apiKey);
-	LPCSTR collectionType() const { return "User collection"; }
-	LPCWSTR collectionName() const;
-	CollectionType getCollectionType() const { return CollectionType::user; };
-	CategoriesAndPurity getCAP();
-	void openCollectionSettingsWindow(); 
-	static void openWallpaperExternal(Wallpaper* wallpaper);
+	UserCollection(CollectionManager* collectionManager) :
+		m_pCollectionManager(collectionManager)
+	{}
 
-	UserCollectionSettings* settings;
+	~UserCollection() {};
+	bool saveSettings(FILE* pFile) const;
+	bool loadSettings(FILE* pFile);
+	void getCollectionName(wchar_t* pwsName, size_t size) const;
+	CollectionType getCollectionType() const { return CollectionType::user; }
+	CategoriesAndPurity getCAP() const;
+	Wallpaper* getWallpaperInfo(unsigned int index) const;
+	void openCollectionSettingsWindow(); 
+
+	static bool loadWallpaper(const Wallpaper* pWallpaper);
+	static void openWallpaperExternal(const Wallpaper* pWallpaper);
+	static std::vector<UserCollectionInfo> loadCollectionList(const char* sUsername, const char* sApiKey);
+
+	UserCollectionSettings settings;
 	
 private:
-	int per_page = 24;
-	char collectionUrl[255] = "";
+	static constexpr int s_nPerPage = 24;
 	CollectionManager* m_pCollectionManager = nullptr;
+	char m_sCollectionUrl[255] = "";
 };
