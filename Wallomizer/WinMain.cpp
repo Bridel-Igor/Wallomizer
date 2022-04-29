@@ -12,29 +12,33 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 {
     try
 	{
-		AppMutex appMutex("Wallomizer");
+		AppMutex appMutex("Wallomizer"); // making shure application is opened in only one instance
 		SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 
-		Filesystem::initialize();
-		WindowStyles::initialize();
-		CollectionManager collectionManager;
-
-		std::exception_ptr trayWindowThreadException = nullptr;
-		std::thread trayWindowThread(TrayWindow::windowThread, std::ref(trayWindowThreadException), &collectionManager);
-		unsigned short waitedForTrayWindow = 0;
-		while (!TrayWindow::isReady())
-		{
-			if (waitedForTrayWindow >= 5000)
-				throw std::exception("Wallomizer was unable to start.");
-			Sleep(10);
-			waitedForTrayWindow += 10;
-		}
-
+		Filesystem::initialize(); // checking for all necessary directories
 		Settings::loadSettings();
-		collectionManager.loadSettings();
+		CollectionManager collectionManager;
 		Delay::loadSession(collectionManager.pCurrent);
 
-		while (TrayWindow::isReady())
+		// opening and processing UI in different thread
+		std::exception_ptr trayWindowException = nullptr;
+		std::thread trayWindowThread([&collectionManager, &trayWindowException]()
+		{
+			try
+			{
+				WindowStyles::initialize();
+				TrayWindow trayWindow(&collectionManager);
+				trayWindow.windowLoop();
+				WindowStyles::clear();
+			}
+			catch (...)
+			{	
+				WindowStyles::clear();
+				trayWindowException = std::current_exception();
+			}
+		});
+		
+		while (true)
 		{
 			if (collectionManager.getNumber() == 0)
 			{
@@ -50,9 +54,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		}
 
 		trayWindowThread.join();
-		if (trayWindowThreadException)
-			std::rethrow_exception(trayWindowThreadException);
-		WindowStyles::clear();
+		if (trayWindowException)
+			std::rethrow_exception(trayWindowException);
 		return 0;
 	}
 	catch (const std::exception& e)
@@ -63,6 +66,5 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	{
 		MessageBox(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
-	WindowStyles::clear();
 	return -1;
 }

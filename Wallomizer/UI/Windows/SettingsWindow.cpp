@@ -241,7 +241,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			Settings::saveSettings();
 			if (MainWindow::mainWindow && MainWindow::isReady())
 				MainWindow::mainWindow->player->updateTimer();
-			if (TrayWindow::trayWindow && TrayWindow::isReady())
+			if (TrayWindow::trayWindow && TrayWindow::trayWindow->isReady())
 				TrayWindow::trayWindow->player->updateTimer();
 			DestroyWindow(this->hWnd());
 			return 0;

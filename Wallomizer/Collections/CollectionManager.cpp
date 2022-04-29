@@ -17,6 +17,7 @@ CollectionManager::CollectionManager()
 {
 	m_randomGenerator = std::mt19937(static_cast<unsigned int>(time(0)));
 	m_uniformIntDistribution = std::uniform_int_distribution<int>(0, 0);
+	loadSettings();
 }
 
 CollectionManager::~CollectionManager()
@@ -47,7 +48,7 @@ bool CollectionManager::loadSettings(FILE* pFile)
 	m_isLoading = true;
 	if (MainWindow::mainWindow && MainWindow::isReady())
 		MainWindow::mainWindow->player->updateTimer();
-	if (TrayWindow::trayWindow && TrayWindow::isReady())
+	if (TrayWindow::trayWindow && TrayWindow::trayWindow->isReady())
 		TrayWindow::trayWindow->player->updateTimer();
 	wchar_t wsPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsPath);
@@ -84,12 +85,12 @@ bool CollectionManager::loadSettings(FILE* pFile)
 	m_isReady = true;
 	if (Delay::bRunSlideshow)
 		Delay::abortDelay();
-	if (m_uiNumber == 0 && TrayWindow::trayWindow && TrayWindow::isReady())
+	if (m_uiNumber == 0 && TrayWindow::trayWindow && TrayWindow::trayWindow->isReady())
 		PostMessageA(TrayWindow::trayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::trayWindow->btnSettings->hMenu(), NULL);
 	m_isLoading = false;
 	if (MainWindow::mainWindow && MainWindow::isReady())
 		MainWindow::mainWindow->player->updateTimer();
-	if (TrayWindow::trayWindow && TrayWindow::isReady())
+	if (TrayWindow::trayWindow && TrayWindow::trayWindow->isReady())
 		TrayWindow::trayWindow->player->updateTimer();
 	return true;
 }

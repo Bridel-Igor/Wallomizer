@@ -9,7 +9,48 @@
 #define WM_NOTIFYICONMSG (WM_USER + 2)
 
 TrayWindow *TrayWindow::trayWindow = nullptr;
-bool TrayWindow::s_isReady = false;
+
+TrayWindow::TrayWindow(CollectionManager* collectionManager) :
+	m_pCollectionManager(collectionManager)
+{
+	trayWindow = this;
+	Create("Wallomizer", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 500, 500, width, height, NULL, NULL);
+
+	btnSettings = new Button(this->hWnd(), "Settings",	10,		60,		65,		20);
+	player = new Player(this->hWnd(),					10,		10,
+														10,		35,		140,	20, m_pCollectionManager, SS_CENTER);
+	btnExit = new Button(this->hWnd(), "Exit",			85,		60,		65,		20);
+
+	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+
+	m_isReady = true;
+	ShowWindow(trayWindow->hWnd(), SW_HIDE);
+}
+
+TrayWindow::~TrayWindow()
+{
+	ShowWindow(trayWindow->hWnd(), SW_HIDE);
+	m_isReady = false;
+
+	delete btnSettings;
+	delete btnExit;
+	delete player;
+	
+	Destroy();
+	Delay::exiting = true;
+	Delay::saveSession(m_pCollectionManager->pCurrent);
+	Delay::abortDelay();
+}
+
+void TrayWindow::windowLoop()
+{
+	MSG msg = { };
+	while (GetMessage(&msg, NULL, 0, 0) > 0)
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+}
 
 BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCSTR pszTip)
 {
@@ -74,26 +115,11 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		pszIDStatusIcon = MAKEINTRESOURCE(IDI_APP);
 		hStatusIcon = LoadIcon(GetModuleHandleA(NULL), pszIDStatusIcon);
 		TrayMessage(hWnd, NIM_ADD, 1, hStatusIcon, "Wallomizer");
-
-		player = new Player(this->hWnd(),					10,		10,
-															10,		35,		140,	20, collectionManager, SS_CENTER);
-			
-		btnSettings = new Button(this->hWnd(), "Settings",	10,		60,		65,		20);
-		btnExit = new Button(this->hWnd(), "Exit",			85,		60,		65,		20);
-
-		EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-
-		s_isReady = true;
 	}
 	return 0;
 
 	case WM_DESTROY:
 	{
-		s_isReady = false;
-
-		delete btnSettings;
-		delete btnExit;
-		delete player;
 		DestroyIcon(hStatusIcon);
 		PostQuitMessage(0);
 	}
@@ -124,7 +150,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_QUERYENDSESSION:
 	{
-		Delay::saveSession(collectionManager->pCurrent);
+		Delay::saveSession(m_pCollectionManager->pCurrent);
 		return TRUE;
 	}
 	return 0;
@@ -135,7 +161,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			return 0;
 		if (btnSettings->isClicked(wParam))
 		{
-			std::thread thr(MainWindow::windowThread, collectionManager);
+			std::thread thr(MainWindow::windowThread, m_pCollectionManager);
 			thr.detach();
 			return 0;
 		}
@@ -158,41 +184,4 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		return DefWindowProcA(m_hWnd, uMsg, wParam, lParam);
 	}
 	return TRUE;
-}
-
-void TrayWindow::windowThread(std::exception_ptr &ex, CollectionManager* _collectionManager)
-{
-	try
-	{
-		if (trayWindow)
-			return;
-		trayWindow = new TrayWindow;
-		trayWindow->collectionManager = _collectionManager;
-		trayWindow->Create("Wallomizer", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 500, 500, width, height, NULL, NULL);
-		ShowWindow(trayWindow->hWnd(), SW_HIDE);
-		MSG msg = { };
-		while (GetMessage(&msg, NULL, 0, 0) > 0)
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		ShowWindow(trayWindow->hWnd(), SW_HIDE);
-		trayWindow->Destroy();
-		Delay::exiting = true;
-		Delay::saveSession(trayWindow->collectionManager->pCurrent);
-		Delay::abortDelay();
-		delete trayWindow;
-		trayWindow = nullptr;
-	}
-	catch (...)
-	{
-		TrayWindow::s_isReady = false;
-		ex = std::current_exception();
-		Delay::exiting = true;
-	}
-}
-
-bool TrayWindow::isReady()
-{
-	return s_isReady;
 }

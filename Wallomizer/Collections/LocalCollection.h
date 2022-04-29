@@ -28,3 +28,5 @@ public:
 private:
 	CollectionManager* m_pCollectionManager = nullptr;
 };
+
+// TODO: recursive selection of directories

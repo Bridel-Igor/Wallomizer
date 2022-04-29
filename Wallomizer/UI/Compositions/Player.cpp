@@ -110,7 +110,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 void Player::updateTimer(bool forsed)
 {
 	if ((!(MainWindow::mainWindow && MainWindow::isReady() && IsWindowVisible(MainWindow::mainWindow->hWnd()) ||
-		(TrayWindow::trayWindow && TrayWindow::isReady() && IsWindowVisible(TrayWindow::trayWindow->hWnd())))) && forsed == false)
+		(TrayWindow::trayWindow && TrayWindow::trayWindow->isReady() && IsWindowVisible(TrayWindow::trayWindow->hWnd())))) && forsed == false)
 		return;
 	if (s_pCollectionManager && s_pCollectionManager->m_isLoading)
 		strcpy_s(timer, "loading...");
@@ -141,7 +141,7 @@ void Player::updateTimer(bool forsed)
 		MainWindow::mainWindow->player->updateText();
 		InvalidateRect(MainWindow::mainWindow->player->stDelayRemained->hWnd(), NULL, FALSE);
 	}
-	if (TrayWindow::trayWindow && TrayWindow::isReady() && (forsed || IsWindowVisible(TrayWindow::trayWindow->hWnd())))
+	if (TrayWindow::trayWindow && TrayWindow::trayWindow->isReady() && (forsed || IsWindowVisible(TrayWindow::trayWindow->hWnd())))
 	{
 		TrayWindow::trayWindow->player->updateText();
 		InvalidateRect(TrayWindow::trayWindow->player->stDelayRemained->hWnd(), NULL, FALSE);
@@ -160,7 +160,7 @@ void Player::redrawPlayers()
 		InvalidateRect(MainWindow::mainWindow->player->btnNext->hWnd(), NULL, FALSE);
 		InvalidateRect(MainWindow::mainWindow->player->stDelayRemained->hWnd(), NULL, FALSE);
 	}
-	if (TrayWindow::trayWindow && TrayWindow::isReady() && IsWindowVisible(TrayWindow::trayWindow->hWnd()))
+	if (TrayWindow::trayWindow && TrayWindow::trayWindow->isReady() && IsWindowVisible(TrayWindow::trayWindow->hWnd()))
 	{
 		TrayWindow::trayWindow->player->updateText();
 		InvalidateRect(TrayWindow::trayWindow->hWnd(), NULL, FALSE);
