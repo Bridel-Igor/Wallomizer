@@ -8,15 +8,18 @@
 class IComponent
 {
 public:
-	IComponent& operator=(const IComponent&) = delete;
 	IComponent(const IComponent&) = delete;
+	IComponent(IComponent&&) = delete;
+	IComponent& operator=(const IComponent&) = delete;
+	IComponent& operator=(IComponent&&) = delete;
 	
 	/// @return Handle to window
-	HWND hWnd() { return m_hWnd; }
+	HWND hWnd() const { return m_hWnd; }
 
 protected:
 	/// Protected constructor to prevent allocation of an interface object.
 	IComponent() = default;
+	virtual ~IComponent() = default;
 
 	/// Handle to window
 	HWND m_hWnd = NULL;

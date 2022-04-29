@@ -2,7 +2,7 @@
 
 void IHoverable::mouseHovering(WPARAM wParam)
 {
-	bool isHovering = (HWND)wParam == m_hWnd;
+	const bool isHovering = (HWND)wParam == m_hWnd;
 	if (m_hovering != isHovering)
 	{
 		m_hovering = isHovering;

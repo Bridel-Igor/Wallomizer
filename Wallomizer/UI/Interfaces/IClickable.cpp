@@ -1,9 +1,9 @@
 #include "IClickable.h"
 #include "HMenuGenerator.h"
 
-IClickable::IClickable()
+IClickable::IClickable() :
+	m_hMenu(HMenuGenerator::getNewHMenu())
 {
-	m_hMenu = HMenuGenerator::getNewHMenu();
 }
 
 IClickable::~IClickable()
@@ -11,7 +11,7 @@ IClickable::~IClickable()
 	HMenuGenerator::releaseHMenu(m_hMenu);
 }
 
-bool IClickable::isClicked(WPARAM wParam)
+bool IClickable::isClicked(WPARAM wParam) const
 {
 	return this && ((HMENU)LOWORD(wParam) == m_hMenu) && (HIWORD(wParam) == BN_CLICKED);
 }

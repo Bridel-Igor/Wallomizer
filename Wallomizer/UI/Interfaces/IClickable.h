@@ -9,7 +9,7 @@ class IClickable : public IComponent
 {
 public:
 	/// Handle to menu value of the component that used by WinAPI messaging.
-	HMENU hMenu() {	return m_hMenu; }
+	HMENU hMenu() const { return m_hMenu; }
 
 	/// Method that detects if component has been clicked.
 	/// Should be called in reaction to WM_COMMAND message.
@@ -18,7 +18,7 @@ public:
 	/// @param wParam - WPARAM value that was recieved with WM_COMMAND message
 	/// 
 	/// @return Returns true if click was detected.
-	bool isClicked(WPARAM wParam);
+	bool isClicked(WPARAM wParam) const;
 
 protected:
 	/// Protected constructor to prevent allocation of an interface object.
