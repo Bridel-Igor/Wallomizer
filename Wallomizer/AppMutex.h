@@ -14,9 +14,11 @@ public:
 	AppMutex(const char* appName);
 	~AppMutex();
 
-	/// Deleted as using of copy constructors will throw exception. 
+	/// Deleted as using of copy or move constructors will throw exception. 
 	AppMutex(const AppMutex&) = delete;
+	AppMutex(AppMutex&&) = delete;
 	AppMutex& operator=(const AppMutex&) = delete;
+	AppMutex& operator=(AppMutex&&) = delete;
 	
 private:
 	/// Handle to appliation mutex.
