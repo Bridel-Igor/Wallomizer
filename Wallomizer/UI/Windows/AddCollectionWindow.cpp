@@ -38,22 +38,6 @@ LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, 
 {
 	switch (uMsg)
 	{
-	case WM_CREATE:
-	return 0;
-
-	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
-	}
-	return 0;
-
-	case WM_CLOSE:
-	{
-		DestroyWindow(hWnd);
-		return 0;
-	}
-	return 0;
-
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;

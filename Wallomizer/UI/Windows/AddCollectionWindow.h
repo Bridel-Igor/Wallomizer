@@ -13,7 +13,7 @@ public:
 
 private:
 	CollectionManager* m_pCollectionManager;
-	Button btnAddUserCollection, btnAddLocalCollection, btnAddSearchCollection, btnCancel;
+	Button btnAddLocalCollection, btnAddUserCollection, btnAddSearchCollection, btnCancel;
 
 	static AddCollectionWindow* addCollectionWindow;
 };

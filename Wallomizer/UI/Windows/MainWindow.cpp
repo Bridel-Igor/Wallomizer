@@ -286,9 +286,6 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 {
 	switch (uMsg)
 	{
-	case WM_CREATE:
-	return 0;
-
 	case WM_SHOWWINDOW:
 	{
 		if (wParam == TRUE)
@@ -296,19 +293,6 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			player->updateTimer(true);
 			player->redrawPlayers();
 		}
-	}
-	return 0;
-
-	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
-	}
-	return 0;
-
-	case WM_CLOSE:
-	{
-		DestroyWindow(hWnd);
-		return 0;
 	}
 	return 0;
 

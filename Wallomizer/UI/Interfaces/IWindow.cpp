@@ -75,6 +75,20 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	else
 		pThis = (IWindow*)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
 
+	switch (uMsg)
+	{
+	case WM_CREATE:
+	return 0;
+
+	case WM_DESTROY:
+		PostQuitMessage(0);
+	return 0;
+
+	case WM_CLOSE:
+		DestroyWindow(hWnd);
+	return 0;
+	}
+
 	if (pThis && pThis->m_isReady)
 		return pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
 	else

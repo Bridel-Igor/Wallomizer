@@ -13,7 +13,6 @@ TrayWindow *TrayWindow::trayWindow = nullptr;
 static BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCSTR pszTip)
 {
 	NOTIFYICONDATA tnd;
-
 	tnd.cbSize = sizeof(NOTIFYICONDATA);
 	tnd.hWnd = hDlg;
 	tnd.uID = uID;
@@ -95,15 +94,6 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		if (wParam == FALSE)
 			ShowWindow(trayWindow->hWnd(), SW_HIDE);
-	}
-	return 0;
-
-	case WM_CREATE:
-	return 0;
-
-	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
 	}
 	return 0;
 
