@@ -20,12 +20,12 @@ public:
 
 private: 
 	CollectionManager* m_pCollectionManager;
-	
+
 public:
 	Button btnSettings, btnExit;
-	Player player;
 
 private:
+	Player player;
 	HICON hStatusIcon = nullptr;
 	LPCSTR pszIDStatusIcon = nullptr;
 };

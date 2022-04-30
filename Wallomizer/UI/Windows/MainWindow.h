@@ -46,14 +46,14 @@ public:
 	~MainWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	Player* player;
 	static constexpr int width = 640;
 	static constexpr int height = 480;
 	static MainWindow* mainWindow;
 	static CollectionItemsFrame* collectionItemsFrame;
 	
 private:
-	Static *stCollections = nullptr;
-	Button *btnAdd = nullptr, *btnSettings = nullptr, *btnDonate = nullptr;
-	CollectionManager* m_pCollectionManager = nullptr;
+	CollectionManager* m_pCollectionManager;
+	Static stCollections;
+	Button btnAdd, btnSettings, btnDonate;	
+	Player player;
 };

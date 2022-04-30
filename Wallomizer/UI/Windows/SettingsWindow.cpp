@@ -3,7 +3,6 @@
 #include "SettingsWindow.h"
 #include "Settings.h"
 #include "MainWindow.h"
-#include "TrayWindow.h"
 #include "ResPickerWindow.h"
 
 SettingsWindow* SettingsWindow::settingsWindow = nullptr;
@@ -239,10 +238,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			}
 
 			Settings::saveSettings();
-			if (MainWindow::mainWindow && MainWindow::mainWindow->isReady())
-				MainWindow::mainWindow->player->updateTimer();
-			if (TrayWindow::trayWindow && TrayWindow::trayWindow->isReady())
-				TrayWindow::trayWindow->player.updateTimer();
+			Player::updateTimer(true);
 			DestroyWindow(this->hWnd());
 			return 0;
 		}

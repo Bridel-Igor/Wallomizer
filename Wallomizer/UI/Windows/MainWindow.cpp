@@ -233,7 +233,14 @@ LRESULT MainWindow::CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WP
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////MainWindow
 MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 	IWindow("Wallomizer", "Main Window Class",  WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
-	m_pCollectionManager(pCollectionManager)
+	m_pCollectionManager(pCollectionManager),
+	stCollections(hWnd(), "Collections:",	20,		10,		100,	20),
+	btnAdd(hWnd(), "Add collection..",		530,	10,		100,	20),
+
+	btnSettings(hWnd(), "Settings",			10,		450,	95,		20),
+	player(hWnd(),							250,	450,
+											400,	450,	100,	20, m_pCollectionManager),
+	btnDonate(hWnd(), "Donate",				535,	450,	95,		20)
 {
 	if (mainWindow)
 	{
@@ -244,23 +251,13 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 	while (!m_pCollectionManager->isReady())
 		Sleep(50);
 	mainWindow->centerWindow(GetDesktopWindow());
-
-	stCollections = new Static(this->hWnd(), "Collections:",	20,		10,		100,	20);
-	btnAdd = new Button(this->hWnd(), "Add collection..",		530,	10,		100,	20);
-
-	btnSettings = new Button(this->hWnd(), "Settings",			10,		450,	95,		20);
-	player = new Player(this->hWnd(),							250,	450,
-																400,	450,	100,	20, m_pCollectionManager);
-	btnDonate = new Button(this->hWnd(), "Donate",				535,	450,	95,		20);
-
 	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 
 	collectionItemsFrame = new CollectionItemsFrame;
 	collectionItemsFrame->collectionManager = m_pCollectionManager;
 	collectionItemsFrame->Create("", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, 10, 40, width - 20, CollectionItemsFrame::height, mainWindow->hWnd(), NULL, false);
 	
-	player->updateTimer(true);
-
+	player.updateTimer(true);
 	ShowWindow(mainWindow->hWnd(), SW_SHOWNORMAL);
 	ShowWindow(collectionItemsFrame->hWnd(), SW_SHOWNORMAL);
 }
@@ -268,14 +265,7 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 MainWindow::~MainWindow()
 {
 	mainWindow = nullptr;
-
 	ShowWindow(hWnd(), SW_HIDE);
-
-	delete btnAdd;
-	delete btnSettings;
-	delete btnDonate;
-	delete stCollections;
-	delete player;
 
 	collectionItemsFrame->Destroy();
 	delete collectionItemsFrame;
@@ -290,8 +280,8 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		if (wParam == TRUE)
 		{
-			player->updateTimer(true);
-			player->redrawPlayers();
+			player.updateTimer(true);
+			player.redrawPlayers();
 		}
 	}
 	return 0;
@@ -299,7 +289,7 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	case WM_DRAWITEM:
 	{
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
-		if (player->draw(pDIS))
+		if (player.draw(pDIS))
 			return TRUE;
 	}
 	return 0;
@@ -315,21 +305,21 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_COMMAND:
 	{
-		if (btnAdd->isClicked(wParam))
+		if (btnAdd.isClicked(wParam))
 		{
 			AddCollectionWindow addCollectionWindow(m_pCollectionManager);
 			addCollectionWindow.windowLoop();
 			return 0;
 		}
-		if (player->click(wParam))
+		if (player.click(wParam))
 			return 0;
-		if (btnSettings->isClicked(wParam))
+		if (btnSettings.isClicked(wParam))
 		{
 			SettingsWindow::windowThread();
 			Settings::saveSettings();
 			return 0;
 		}
-		if (btnDonate->isClicked(wParam))
+		if (btnDonate.isClicked(wParam))
 		{
 			ShellExecute(0, 0, "https://donatello.to/IgorBridel", 0, 0, SW_SHOW);
 			return 0;
@@ -355,7 +345,7 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	
 	case WM_SETCURSOR:
 	{
-		player->mouseHovering(wParam);
+		player.mouseHovering(wParam);
 		// Fallthrough. DefWindowProc must be reached anyway.
 	} 
 
