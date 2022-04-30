@@ -333,7 +333,8 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		if (btnAdd->isClicked(wParam))
 		{
-			AddCollectionWindow::windowThread(m_pCollectionManager);
+			AddCollectionWindow addCollectionWindow(m_pCollectionManager);
+			addCollectionWindow.windowLoop();
 			return 0;
 		}
 		if (player->click(wParam))
