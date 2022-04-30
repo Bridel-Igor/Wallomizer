@@ -112,6 +112,9 @@
     <ClCompile Include="AppMutex.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="UI\Interfaces\IWindow.cpp">
+      <Filter>UI\Interfaces</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI\Windows\AddCollectionWindow.h">
@@ -236,6 +239,9 @@
     </ClInclude>
     <ClInclude Include="CategoriesAndPurity.h">
       <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Interfaces\IWindow.h">
+      <Filter>UI\Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,30 +1,31 @@
 #pragma once
 
-#include "BaseWindow.h"
+#include <list>
+
+#include "IWindow.h"
 #include "Button.h"
 #include "Player.h"
 #include "CollectionManager.h"
 
-class TrayWindow : public BaseWindow<TrayWindow>
+class TrayWindow : public IWindow
 {
 public:
-	TrayWindow(CollectionManager* collectionManager);
+	TrayWindow(CollectionManager* pCollectionManager);
 	~TrayWindow();
-	void windowLoop();
-	LPCSTR ClassName() const { return "Tray Window Class"; }
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	bool isReady() const { return m_isReady; }
 	
 	static constexpr int width = 160;
 	static constexpr int height = 90;
 	static TrayWindow *trayWindow;
 
-	Button* btnSettings = nullptr, * btnExit = nullptr;
-	Player* player = nullptr;
+private: 
+	CollectionManager* m_pCollectionManager;
+	
+public:
+	Button btnSettings, btnExit;
+	Player player;
 
 private:
 	HICON hStatusIcon = nullptr;
 	LPCSTR pszIDStatusIcon = nullptr;
-	bool m_isReady = false;
-	CollectionManager* m_pCollectionManager = nullptr;
 };

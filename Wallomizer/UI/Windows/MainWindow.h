@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "BaseWindow.h"
+#include "IWindow.h"
 #include "Static.h"
 #include "Button.h"
 #include "UpDownEdit.h"
@@ -10,8 +10,9 @@
 #include "Edit.h"
 #include "Player.h"
 #include "CollectionManager.h"
+#include "BaseWindow.h"
 
-class MainWindow : public BaseWindow<MainWindow>
+class MainWindow : public IWindow
 {
 private:
 	class CollectionItemsFrame : public BaseWindow<CollectionItemsFrame>
@@ -33,28 +34,26 @@ private:
 
 	public:
 		void updateCollectionItems();
-		LPCSTR ClassName() const { return "CollectionItemsFrameClass"; }
 		LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		LPCSTR ClassName() const { return "CollectionItemsFrameClass"; }
 
 		static constexpr int height = 400;
 		CollectionManager* collectionManager = nullptr;
 	};
 
-private:
-	Static *stCollections;
-	Button *btnAdd, *btnSettings, *btnDonate;
-	CollectionManager* collectionManager = nullptr;
-	
 public:
-	LPCSTR ClassName() const { return "Main Window Class"; }
+	MainWindow(CollectionManager* pCollectionManager);
+	~MainWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static void windowThread(CollectionManager* collectionManager);
-	static bool isReady();
 
 	Player* player;
 	static constexpr int width = 640;
 	static constexpr int height = 480;
 	static MainWindow* mainWindow;
 	static CollectionItemsFrame* collectionItemsFrame;
-	static bool s_isReady;
+	
+private:
+	Static *stCollections = nullptr;
+	Button *btnAdd = nullptr, *btnSettings = nullptr, *btnDonate = nullptr;
+	CollectionManager* m_pCollectionManager = nullptr;
 };

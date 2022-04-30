@@ -46,10 +46,10 @@ bool CollectionManager::saveSettings(FILE* pFile) const
 bool CollectionManager::loadSettings(FILE* pFile)
 {
 	m_isLoading = true;
-	if (MainWindow::mainWindow && MainWindow::isReady())
+	if (MainWindow::mainWindow && MainWindow::mainWindow->isReady())
 		MainWindow::mainWindow->player->updateTimer();
 	if (TrayWindow::trayWindow && TrayWindow::trayWindow->isReady())
-		TrayWindow::trayWindow->player->updateTimer();
+		TrayWindow::trayWindow->player.updateTimer();
 	wchar_t wsPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"CollectionManager.dat");
@@ -80,18 +80,18 @@ bool CollectionManager::loadSettings(FILE* pFile)
 		fclose(pFile);
 	}
 	updateNumber();
-	if (MainWindow::mainWindow && MainWindow::isReady())
+	if (MainWindow::mainWindow && MainWindow::mainWindow->isReady())
 		MainWindow::collectionItemsFrame->updateCollectionItems();
 	m_isReady = true;
 	if (Delay::bRunSlideshow)
 		Delay::abortDelay();
 	if (m_uiNumber == 0 && TrayWindow::trayWindow && TrayWindow::trayWindow->isReady())
-		PostMessageA(TrayWindow::trayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::trayWindow->btnSettings->hMenu(), NULL);
+		PostMessageA(TrayWindow::trayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::trayWindow->btnSettings.hMenu(), NULL);
 	m_isLoading = false;
-	if (MainWindow::mainWindow && MainWindow::isReady())
+	if (MainWindow::mainWindow && MainWindow::mainWindow->isReady())
 		MainWindow::mainWindow->player->updateTimer();
 	if (TrayWindow::trayWindow && TrayWindow::trayWindow->isReady())
-		TrayWindow::trayWindow->player->updateTimer();
+		TrayWindow::trayWindow->player.updateTimer();
 	return true;
 }
 

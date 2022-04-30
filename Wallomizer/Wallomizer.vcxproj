@@ -151,6 +151,7 @@
     <ClCompile Include="AppMutex.cpp" />
     <ClCompile Include="UI\Interfaces\IClickable.cpp" />
     <ClCompile Include="UI\Interfaces\IHoverable.cpp" />
+    <ClCompile Include="UI\Interfaces\IWindow.cpp" />
     <ClCompile Include="UI\Windows\AddCollectionWindow.cpp" />
     <ClCompile Include="UI\Windows\AspRatPickerWindow.cpp" />
     <ClCompile Include="UI\Components\Button.cpp" />
@@ -189,6 +190,7 @@
   <ItemGroup>
     <ClInclude Include="AppMutex.h" />
     <ClInclude Include="CategoriesAndPurity.h" />
+    <ClInclude Include="UI\Interfaces\IWindow.h" />
     <ClInclude Include="UI\Windows\AddCollectionWindow.h" />
     <ClInclude Include="UI\Windows\AspRatPickerWindow.h" />
     <ClInclude Include="Collections\BaseCollection.h" />
