@@ -15,7 +15,6 @@ public:
 private:
 	ColorButton btnClr[30];
 	Button btnOk, btnCancel;
-	static ColorPickerWindow* colorPickerWindow;
 	char* m_sColor;
 	HWND m_hCaller;
 };

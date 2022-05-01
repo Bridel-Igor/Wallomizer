@@ -20,5 +20,4 @@ private:
 	Edit edWidth, edHeight;
 	char* m_sResolution;
 	HWND m_hCaller;
-	static ResPickerWindow* resPickerWindow;
 };

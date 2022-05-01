@@ -14,9 +14,7 @@ public:
 	~TrayWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	
-	static constexpr int width = 160;
-	static constexpr int height = 90;
-	static TrayWindow *trayWindow;
+	static TrayWindow *s_pTrayWindow;
 
 private: 
 	CollectionManager* m_pCollectionManager;

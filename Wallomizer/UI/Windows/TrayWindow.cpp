@@ -8,7 +8,7 @@
 
 #define WM_NOTIFYICONMSG (WM_USER + 2)
 
-TrayWindow *TrayWindow::trayWindow = nullptr;
+TrayWindow *TrayWindow::s_pTrayWindow = nullptr;
 
 static BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCSTR pszTip)
 {
@@ -33,14 +33,14 @@ static BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCST
 
 TrayWindow::TrayWindow(CollectionManager* pCollectionManager) :
 	IWindow("Wallomizer", "Tray Window Class", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 
-												500,	500,	width,	height),
+												500,	500,	160,	90),
 	m_pCollectionManager(pCollectionManager),
 	btnSettings			(hWnd(), "Settings",	10,		60,		65,		20),
 	btnExit				(hWnd(), "Exit",		85,		60,		65,		20),
 	player				(hWnd(),				10,		10,
 												10,		35,		140,	20, m_pCollectionManager, SS_CENTER)
 {
-	trayWindow = this;
+	s_pTrayWindow = this;
 
 	pszIDStatusIcon = MAKEINTRESOURCE(IDI_APP);
 	hStatusIcon = LoadIcon(GetModuleHandleA(NULL), pszIDStatusIcon);
@@ -52,7 +52,7 @@ TrayWindow::TrayWindow(CollectionManager* pCollectionManager) :
 
 TrayWindow::~TrayWindow()
 {
-	trayWindow = nullptr;
+	s_pTrayWindow = nullptr;
 	ShowWindow(hWnd(), SW_HIDE);
 	DestroyIcon(hStatusIcon);
 

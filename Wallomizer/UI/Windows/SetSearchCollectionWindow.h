@@ -24,5 +24,4 @@ private:
 	PurityComponent purCom;
 
 	char tmpRes[255] = "", tmpAR[128] = "", tmpColor[16] = "";
-	static SetSearchCollectionWindow* setSearchCollectionWindow;
 };

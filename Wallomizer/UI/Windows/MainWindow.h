@@ -18,7 +18,7 @@ public:
 
 	static constexpr int width = 640;
 	static constexpr int height = 480;
-	static MainWindow* mainWindow;
+	static MainWindow* s_pMainWindow;
 	CollectionItemsFrame collectionItemsFrame;
 	
 private:

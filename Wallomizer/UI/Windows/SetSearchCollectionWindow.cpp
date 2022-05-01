@@ -4,8 +4,6 @@
 #include "AspRatPickerWindow.h"
 #include "ColorPickerWindow.h"
 
-SetSearchCollectionWindow* SetSearchCollectionWindow::setSearchCollectionWindow = nullptr;
-
 SetSearchCollectionWindow::SetSearchCollectionWindow(SearchCollection* pCollection, CollectionManager* pCollectionManager) :
 	IWindow("Search collection", "Set Search Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 260),
 	m_pCurrentSearchCollection(pCollection),
@@ -35,14 +33,7 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(SearchCollection* pCollecti
 	btnCancel		(hWnd(), "Cancel",													80,		230,	185,	20),
 	btnOk			(hWnd(), "Ok",														275,	230,	185,	20)
 {
-	if (setSearchCollectionWindow)
-	{
-		SetForegroundWindow(setSearchCollectionWindow->hWnd());
-		return;
-	}
-	setSearchCollectionWindow = this;
-
-	EnableWindow(MainWindow::mainWindow->hWnd(), FALSE);
+	EnableWindow(MainWindow::s_pMainWindow->hWnd(), FALSE);
 
 	if (m_pCurrentSearchCollection)
 	{
@@ -56,16 +47,15 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(SearchCollection* pCollecti
 
 	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 
-	centerWindow(MainWindow::mainWindow->hWnd());
+	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
 SetSearchCollectionWindow::~SetSearchCollectionWindow()
 {
 	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(MainWindow::mainWindow->hWnd(), TRUE);
-	SetForegroundWindow(MainWindow::mainWindow->hWnd());
-	setSearchCollectionWindow = nullptr;
+	EnableWindow(MainWindow::s_pMainWindow->hWnd(), TRUE);
+	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
 }
 
 LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

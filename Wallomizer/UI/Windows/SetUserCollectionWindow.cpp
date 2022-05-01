@@ -2,8 +2,6 @@
 #include "MainWindow.h"
 #include "Settings.h"
 
-SetUserCollectionWindow *SetUserCollectionWindow::setUserCollectionWindow = nullptr;
-
 SetUserCollectionWindow::SetUserCollectionWindow(UserCollection* pCollection, CollectionManager* pCollectionManager) :
 	IWindow("User collection", "Set User Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	m_pCurrentUserCollection(pCollection),
@@ -19,16 +17,11 @@ SetUserCollectionWindow::SetUserCollectionWindow(UserCollection* pCollection, Co
 	btnCancel				(hWnd(), "Cancel",			10,		100,	80,		20),
 	btnOk					(hWnd(), "Ok",				100,	100,	240,	20)
 {
+	// Review: how to improve exception handling
 	if (m_pCurrentUserCollection == nullptr)
 		return;
-	if (setUserCollectionWindow)
-	{
-		SetForegroundWindow(setUserCollectionWindow->hWnd());
-		return;
-	}
-	setUserCollectionWindow = this;
 
-	EnableWindow(MainWindow::mainWindow->hWnd(), FALSE);
+	EnableWindow(MainWindow::s_pMainWindow->hWnd(), FALSE);
 		
 	edUsername.setTextA(m_pCurrentUserCollection->settings.sUsername);
 	purCom.setPurity(m_pCurrentUserCollection->settings.categoriesAndPurity);
@@ -54,16 +47,15 @@ SetUserCollectionWindow::SetUserCollectionWindow(UserCollection* pCollection, Co
 
 	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 
-	centerWindow(MainWindow::mainWindow->hWnd());
+	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
 SetUserCollectionWindow::~SetUserCollectionWindow()
 {
 	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(MainWindow::mainWindow->hWnd(), TRUE);
-	SetForegroundWindow(MainWindow::mainWindow->hWnd());
-	setUserCollectionWindow = nullptr;
+	EnableWindow(MainWindow::s_pMainWindow->hWnd(), TRUE);
+	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
 }
 
 LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

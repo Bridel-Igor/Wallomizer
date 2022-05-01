@@ -16,7 +16,6 @@ public:
 
 	static constexpr int width = 400;
 	static constexpr int height = 310;
-	static SettingsWindow* settingsWindow;
 
 private:
 	Static stApplication, stSlideshow, stWallhaven;

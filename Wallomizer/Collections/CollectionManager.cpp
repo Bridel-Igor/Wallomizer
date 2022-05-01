@@ -77,13 +77,13 @@ bool CollectionManager::loadSettings(FILE* pFile)
 		fclose(pFile);
 	}
 	updateNumber();
-	if (MainWindow::mainWindow && MainWindow::mainWindow->isReady())
-		MainWindow::mainWindow->collectionItemsFrame.updateCollectionItems();
+	if (MainWindow::s_pMainWindow && MainWindow::s_pMainWindow->isReady())
+		MainWindow::s_pMainWindow->collectionItemsFrame.updateCollectionItems();
 	m_isReady = true;
 	if (Delay::bRunSlideshow)
 		Delay::abortDelay();
-	if (m_uiNumber == 0 && TrayWindow::trayWindow && TrayWindow::trayWindow->isReady())
-		PostMessageA(TrayWindow::trayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::trayWindow->btnSettings.hMenu(), NULL);
+	if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady())
+		PostMessageA(TrayWindow::s_pTrayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::s_pTrayWindow->btnSettings.hMenu(), NULL);
 	m_isLoading = false;
 	Player::updateTimer(true);
 	return true;

@@ -3,8 +3,6 @@
 #include "ColorPickerWindow.h"
 #include "MainWindow.h"
 
-ColorPickerWindow* ColorPickerWindow::colorPickerWindow = nullptr;
-
 ColorPickerWindow::ColorPickerWindow(char* sColor, HWND hCaller) :
 	IWindow("Color", "Color Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 405, 195),
 	m_sColor(sColor),
@@ -47,12 +45,6 @@ ColorPickerWindow::ColorPickerWindow(char* sColor, HWND hCaller) :
 	btnCancel	(hWnd(), "Cancel",			10,		165,	187,	20),
 	btnOk		(hWnd(), "Ok",				207,	165,	188,	20)
 {
-	if (colorPickerWindow)
-	{
-		SetForegroundWindow(colorPickerWindow->hWnd());
-		return;
-	}
-	colorPickerWindow = this;
 	EnableWindow(m_hCaller, FALSE);
 
 	//initializing
@@ -72,7 +64,7 @@ ColorPickerWindow::ColorPickerWindow(char* sColor, HWND hCaller) :
 
 	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 
-	centerWindow(MainWindow::mainWindow->hWnd());
+	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
@@ -81,7 +73,6 @@ ColorPickerWindow::~ColorPickerWindow()
 	ShowWindow(hWnd(), SW_HIDE);
 	EnableWindow(m_hCaller, TRUE);
 	SetForegroundWindow(m_hCaller);
-	colorPickerWindow = nullptr;
 }
 
 LRESULT ColorPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

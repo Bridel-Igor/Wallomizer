@@ -4,8 +4,6 @@
 #include "LocalCollection.h"
 #include "SearchCollection.h"
 
-AddCollectionWindow* AddCollectionWindow::addCollectionWindow = nullptr;
-
 AddCollectionWindow::AddCollectionWindow(CollectionManager* pCollectionManager) :
 	IWindow("Add collection", "Add Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100,	100,	240,	140),
 	m_pCollectionManager(pCollectionManager),
@@ -14,24 +12,17 @@ AddCollectionWindow::AddCollectionWindow(CollectionManager* pCollectionManager) 
 	btnAddSearchCollection(this->hWnd(), "Add wallhaven search collection",					10,		70,		220,	20),
 	btnCancel(this->hWnd(), "Cancel",														10,		110,	220,	20)
 {
-	if (addCollectionWindow)
-	{
-		SetForegroundWindow(addCollectionWindow->hWnd());
-		return;
-	}
-	addCollectionWindow = this;
-	addCollectionWindow->centerWindow(MainWindow::mainWindow->hWnd());
+	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-	ShowWindow(addCollectionWindow->hWnd(), SW_SHOWNORMAL);
-	EnableWindow(MainWindow::mainWindow->hWnd(), FALSE);		
+	ShowWindow(hWnd(), SW_SHOWNORMAL);
+	EnableWindow(MainWindow::s_pMainWindow->hWnd(), FALSE);		
 }
 
 AddCollectionWindow::~AddCollectionWindow()
 {
-	ShowWindow(addCollectionWindow->hWnd(), SW_HIDE);
-	EnableWindow(MainWindow::mainWindow->hWnd(), TRUE);
-	SetForegroundWindow(MainWindow::mainWindow->hWnd());
-	addCollectionWindow = nullptr;
+	ShowWindow(hWnd(), SW_HIDE);
+	EnableWindow(MainWindow::s_pMainWindow->hWnd(), TRUE);
+	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
 }
 
 LRESULT AddCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

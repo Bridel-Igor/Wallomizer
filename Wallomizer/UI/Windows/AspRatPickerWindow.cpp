@@ -1,8 +1,6 @@
 #include "AspRatPickerWindow.h"
 #include "MainWindow.h"
 
-AspRatPickerWindow* AspRatPickerWindow::aspRatPickerWindow = nullptr;
-
 AspRatPickerWindow::AspRatPickerWindow(char* sAspRat, HWND hCaller) :
 	IWindow("Ratio", "Aspect Ratio Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 315, 195),
 	m_sAspRat(sAspRat),
@@ -28,13 +26,7 @@ AspRatPickerWindow::AspRatPickerWindow(char* sAspRat, HWND hCaller) :
 	btnCancel		(hWnd(), "Cancel",		10,		165,	142,	20),
 	btnOk			(hWnd(), "Ok",			162,	165,	143,	20)
 {
-	if (aspRatPickerWindow)
-	{
-		SetForegroundWindow(aspRatPickerWindow->hWnd());
-		return;
-	}
 	EnableWindow(m_hCaller, FALSE);
-	aspRatPickerWindow = this;
 
 	//initializing
 	if (strstr(m_sAspRat, "landscape") != NULL)
@@ -50,7 +42,7 @@ AspRatPickerWindow::AspRatPickerWindow(char* sAspRat, HWND hCaller) :
 	}
 	
 	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-	centerWindow(MainWindow::mainWindow->hWnd());
+	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
@@ -59,7 +51,6 @@ AspRatPickerWindow::~AspRatPickerWindow()
 	ShowWindow(hWnd(), SW_HIDE);
 	EnableWindow(m_hCaller, TRUE);
 	SetForegroundWindow(m_hCaller);
-	aspRatPickerWindow = nullptr;
 }
 
 LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

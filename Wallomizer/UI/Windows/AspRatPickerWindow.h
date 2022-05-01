@@ -18,7 +18,6 @@ private:
 	PushButton btnAR[12], btnAllWide, btnAllPortrait;
 	Button btnOk, btnCancel;
 
-	static AspRatPickerWindow* aspRatPickerWindow;
 	char* m_sAspRat;
 	HWND m_hCaller;
 };

@@ -5,8 +5,6 @@
 #include "MainWindow.h"
 #include "ResPickerWindow.h"
 
-SettingsWindow* SettingsWindow::settingsWindow = nullptr;
-
 HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, LPCSTR lpszDesc)
 {
 	HRESULT hRes;
@@ -63,14 +61,7 @@ SettingsWindow::SettingsWindow() :
 	btnCancel		(hWnd(), "Cancel",				10,		280,	130,	20),
 	btnOk			(hWnd(), "Ok",					150,	280,	240,	20)
 {
-	if (settingsWindow)
-	{
-		SetForegroundWindow(settingsWindow->hWnd());
-		return;
-	}
-	settingsWindow = this;
-
-	EnableWindow(MainWindow::mainWindow->hWnd(), FALSE);
+	EnableWindow(MainWindow::s_pMainWindow->hWnd(), FALSE);
 
 	edUsername.setTextA(Settings::username);
 	edApiKey.setTextA(Settings::apiKey);
@@ -81,16 +72,15 @@ SettingsWindow::SettingsWindow() :
 	SendMessage(stSlideshow.hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
 	SendMessage(stWallhaven.hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
 
-	centerWindow(MainWindow::mainWindow->hWnd());
+	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
 SettingsWindow::~SettingsWindow()
 {
 	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(MainWindow::mainWindow->hWnd(), TRUE);
-	SetForegroundWindow(MainWindow::mainWindow->hWnd());
-	settingsWindow = nullptr;
+	EnableWindow(MainWindow::s_pMainWindow->hWnd(), TRUE);
+	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
 }
 
 LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

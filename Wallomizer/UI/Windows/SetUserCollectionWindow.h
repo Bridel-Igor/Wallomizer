@@ -29,5 +29,4 @@ private:
 
 	std::vector<UserCollection::UserCollectionInfo> list;
 	bool validCollection = false;
-	static SetUserCollectionWindow *setUserCollectionWindow;
 };

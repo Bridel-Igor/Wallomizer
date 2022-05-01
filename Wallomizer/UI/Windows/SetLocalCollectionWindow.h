@@ -20,6 +20,4 @@ private:
 	Static stPath;
 	Edit edPath;
 	Button btnOk, btnCancel, btnPath;
-
-	static SetLocalCollectionWindow* setLocalCollectionWindow;
 };

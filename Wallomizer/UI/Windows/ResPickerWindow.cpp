@@ -3,8 +3,6 @@
 #include "ResPickerWindow.h"
 #include "MainWindow.h"
 
-ResPickerWindow* ResPickerWindow::resPickerWindow = nullptr;
-
 ResPickerWindow::ResPickerWindow(char* sResolution, HWND hCaller) :
 	IWindow("Resolution", "Res Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 390, 250),
 	m_sResolution(sResolution),
@@ -46,13 +44,7 @@ ResPickerWindow::ResPickerWindow(char* sResolution, HWND hCaller) :
 	btnCancel	(hWnd(), "Cancel",		10,		220,	180,	20),
 	btnOk		(hWnd(), "Ok",			200,	220,	180,	20)
 {
-if (resPickerWindow)
-	{
-		SetForegroundWindow(resPickerWindow->hWnd());
-		return;
-	}
 	EnableWindow(m_hCaller, FALSE);
-	resPickerWindow = this;
 
 	//initializing
 	std::string custom = "";
@@ -89,14 +81,13 @@ if (resPickerWindow)
 	}
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-	centerWindow(MainWindow::mainWindow->hWnd());
+	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
 ResPickerWindow::~ResPickerWindow()
 {
 	ShowWindow(hWnd(), SW_HIDE);
-	resPickerWindow = nullptr;
 	EnableWindow(m_hCaller, TRUE);
 	SetForegroundWindow(m_hCaller);
 }

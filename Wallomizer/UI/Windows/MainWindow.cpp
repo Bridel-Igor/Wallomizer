@@ -7,7 +7,7 @@
 #include "TrayWindow.h"
 #include "Delay.h"
 
-MainWindow* MainWindow::mainWindow = nullptr;
+MainWindow* MainWindow::s_pMainWindow = nullptr;
 
 MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 	IWindow("Wallomizer", "Main Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
@@ -15,14 +15,14 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 	stCollections		(hWnd(), "Collections:",		20,		10,		100,	20),
 	btnAdd				(hWnd(), "Add collection..",	530,	10,		100,	20),
 
-	collectionItemsFrame(hWnd(), pCollectionManager, 10, 40, width - 20, 400),
+	collectionItemsFrame(hWnd(), pCollectionManager,	10,		40, width - 20, 400),
 
 	btnSettings			(hWnd(), "Settings",			10,		450,	95,		20),
 	player				(hWnd(),						250,	450,
 														400,	450,	100,	20, m_pCollectionManager),
 	btnDonate			(hWnd(), "Donate",				535,	450,	95,		20)
 {
-	mainWindow = this;
+	s_pMainWindow = this;
 	while (!m_pCollectionManager->isReady())
 		Sleep(50);
 	centerWindow(GetDesktopWindow());
@@ -37,7 +37,7 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 
 MainWindow::~MainWindow()
 {
-	mainWindow = nullptr;
+	s_pMainWindow = nullptr;
 	ShowWindow(hWnd(), SW_HIDE);
 }
 

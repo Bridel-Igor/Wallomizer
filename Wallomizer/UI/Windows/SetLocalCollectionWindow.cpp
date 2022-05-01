@@ -3,8 +3,6 @@
 #include "SetLocalCollectionWindow.h"
 #include "MainWindow.h"
 
-SetLocalCollectionWindow* SetLocalCollectionWindow::setLocalCollectionWindow = nullptr;
-
 SetLocalCollectionWindow::SetLocalCollectionWindow(LocalCollection* pCollection, CollectionManager* pCollectionManager) :
 	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90),
 	m_pCollectionManager(pCollectionManager),
@@ -16,24 +14,17 @@ SetLocalCollectionWindow::SetLocalCollectionWindow(LocalCollection* pCollection,
 	btnCancel	(hWnd(), "Cancel",						10,		60,		185,	20),
 	btnOk		(hWnd(), "Ok",							205,	60,		185,	20)
 {
-	if (setLocalCollectionWindow)
-	{
-		SetForegroundWindow(setLocalCollectionWindow->hWnd());
-		return;
-	}
-	setLocalCollectionWindow = this;
-	EnableWindow(MainWindow::mainWindow->hWnd(), FALSE);
+	EnableWindow(MainWindow::s_pMainWindow->hWnd(), FALSE);
 	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-	centerWindow(MainWindow::mainWindow->hWnd());
+	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
 SetLocalCollectionWindow::~SetLocalCollectionWindow()
 {
 	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(MainWindow::mainWindow->hWnd(), TRUE);
-	SetForegroundWindow(MainWindow::mainWindow->hWnd());
-	setLocalCollectionWindow = nullptr;
+	EnableWindow(MainWindow::s_pMainWindow->hWnd(), TRUE);
+	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
 }
 
 LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
