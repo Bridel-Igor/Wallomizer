@@ -14,6 +14,7 @@ public:
 	~TrayWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	
+	static constexpr int width = 160, height = 90;
 	static TrayWindow *s_pTrayWindow;
 
 private: 
