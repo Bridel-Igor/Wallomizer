@@ -1,19 +1,21 @@
 #pragma once
 
-#include "BaseWindow.h"
+#include "IWindow.h"
 #include "Button.h"
 #include "ColorButton.h"
 #include "SearchCollection.h"
 
-class ColorPickerWindow : public BaseWindow<ColorPickerWindow>
+class ColorPickerWindow : public IWindow
 {
-	ColorButton *btnClr[30];
-	Button* btnOk, * btnCancel;
-	static ColorPickerWindow* colorPickerWindow;
-	static char* color;
-
 public:
-	LPCSTR ClassName() const { return "Color Picker Window Class"; }
+	ColorPickerWindow(char* sColor, HWND hCaller);
+	~ColorPickerWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static void windowThread(char* _color, HWND caller);
+
+private:
+	ColorButton btnClr[30];
+	Button btnOk, btnCancel;
+	static ColorPickerWindow* colorPickerWindow;
+	char* m_sColor;
+	HWND m_hCaller;
 };

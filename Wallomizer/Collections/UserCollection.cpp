@@ -127,7 +127,8 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 
 void UserCollection::openCollectionSettingsWindow()
 {
-	SetUserCollectionWindow::windowThread(this, m_pCollectionManager);
+	SetUserCollectionWindow setUserCollectionWindow(this, m_pCollectionManager);
+	setUserCollectionWindow.windowLoop();
 }
 
 bool UserCollection::loadWallpaper(const Wallpaper* pWallpaper)

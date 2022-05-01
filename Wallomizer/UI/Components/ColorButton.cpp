@@ -63,7 +63,7 @@ void ColorButton::check(bool state)
 	}
 }
 
-bool ColorButton::isChecked()
+bool ColorButton::isChecked() const
 {
 	return m_checked;
 }

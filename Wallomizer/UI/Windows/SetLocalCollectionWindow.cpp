@@ -4,48 +4,42 @@
 #include "MainWindow.h"
 
 SetLocalCollectionWindow* SetLocalCollectionWindow::setLocalCollectionWindow = nullptr;
-LocalCollection* SetLocalCollectionWindow::currentLocalCollection = nullptr;
+
+SetLocalCollectionWindow::SetLocalCollectionWindow(LocalCollection* pCollection, CollectionManager* pCollectionManager) :
+	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90),
+	m_pCollectionManager(pCollectionManager),
+	m_pCurrentLocalCollection(pCollection),
+	stPath		(hWnd(), "Enter path to directory:",	10,		10,		390,	20),
+	edPath		(hWnd(), m_pCurrentLocalCollection? m_pCurrentLocalCollection->m_wsDirectoryPath:L"",
+														10,		30,		360,	20),
+	btnPath		(hWnd(), "..",							370,	30,		20,		20),
+	btnCancel	(hWnd(), "Cancel",						10,		60,		185,	20),
+	btnOk		(hWnd(), "Ok",							205,	60,		185,	20)
+{
+	if (setLocalCollectionWindow)
+	{
+		SetForegroundWindow(setLocalCollectionWindow->hWnd());
+		return;
+	}
+	setLocalCollectionWindow = this;
+	EnableWindow(MainWindow::mainWindow->hWnd(), FALSE);
+	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	centerWindow(MainWindow::mainWindow->hWnd());
+	ShowWindow(hWnd(), SW_SHOWNORMAL);
+}
+
+SetLocalCollectionWindow::~SetLocalCollectionWindow()
+{
+	ShowWindow(hWnd(), SW_HIDE);
+	EnableWindow(MainWindow::mainWindow->hWnd(), TRUE);
+	SetForegroundWindow(MainWindow::mainWindow->hWnd());
+	setLocalCollectionWindow = nullptr;
+}
 
 LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-	case WM_CREATE:
-	{
-		EnableWindow(MainWindow::mainWindow->hWnd(), FALSE);
-
-		stPath = new Static(this->hWnd(), "Enter path to directory:",	10,		10,		390,	20);
-		edPath = new Edit(this->hWnd(), currentLocalCollection?currentLocalCollection->m_wsDirectoryPath:L"",
-																	10,		30,		360,	20);
-		btnPath = new Button(this->hWnd(), "..",						370,	30,		20,		20);
-		btnCancel = new Button(this->hWnd(), "Cancel",					10,		60,		185,	20);
-		btnOk = new Button(this->hWnd(), "Ok",							205,	60,		185,	20);
-		EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-	}
-	return 0;
-
-	case WM_DESTROY:
-	{
-		currentLocalCollection = nullptr;
-		delete stPath;
-		delete edPath;
-
-		delete btnOk;
-		delete btnCancel;
-		delete btnPath;
-		EnableWindow(MainWindow::mainWindow->hWnd(), TRUE);
-		SetForegroundWindow(MainWindow::mainWindow->hWnd());
-		PostQuitMessage(0);
-	}
-	return 0;
-
-	case WM_CLOSE:
-	{
-		DestroyWindow(hWnd);
-		return 0;
-	}
-	return 0;
-
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
@@ -57,29 +51,29 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 
 	case WM_COMMAND:
 	{
-		if (btnOk->isClicked(wParam))
+		if (btnOk.isClicked(wParam))
 		{
-			if (edPath->isEmpty())
+			if (edPath.isEmpty())
 			{
 				MessageBoxA(nullptr, "Path can't be empty.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
-			edPath->getTextW(currentLocalCollection->m_wsDirectoryPath, 255);
-			if (currentLocalCollection->isValid() == false)
-				currentLocalCollection->setValid(true);
+			edPath.getTextW(m_pCurrentLocalCollection->m_wsDirectoryPath, 255);
+			if (m_pCurrentLocalCollection->isValid() == false)
+				m_pCurrentLocalCollection->setValid(true);
 			else
-				collectionManager->reloadSettings();
+				m_pCollectionManager->reloadSettings();
 			DestroyWindow(hWnd);
 			return 0;
 		}
 
-		if (btnCancel->isClicked(wParam))
+		if (btnCancel.isClicked(wParam))
 		{
 			DestroyWindow(hWnd);
 			return 0;
 		}
 
-		if (btnPath->isClicked(wParam))
+		if (btnPath.isClicked(wParam))
 		{
 			IFileDialog* pfd;
 			LPWSTR g_path;
@@ -100,7 +94,7 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 							MessageBox(NULL, "GetIDListName() failed", NULL, NULL);
 						}
 						else
-							edPath->setTextW(g_path);
+							edPath.setTextW(g_path);
 						psi->Release();
 					}
 				}
@@ -112,33 +106,34 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 	}
 	return 0;
 
+	case WM_CTLCOLORSTATIC:
+	{
+		HWND hWndStatic = (HWND)lParam;
+		HDC hdcStatic = (HDC)wParam;
+		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
+		SetBkMode(hdcStatic, TRANSPARENT);
+		return (LRESULT)WindowStyles::mainBkBrush;
+	}
+	return 0;
+
+	case WM_CTLCOLOREDIT:
+	{
+		HDC hdc = (HDC)wParam;
+		SetTextColor(hdc, WindowStyles::editFontColor);
+		SetBkColor(hdc, WindowStyles::editBkColor);
+		SetDCBrushColor(hdc, WindowStyles::editBkColor);
+		return (LRESULT)GetStockObject(DC_BRUSH);
+	}
+	return 0;
+
+	case WM_CTLCOLORBTN:
+	{
+		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
+	}
+	return 0;
+
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
 	return TRUE;
-}
-
-void SetLocalCollectionWindow::windowThread(LocalCollection *collection, CollectionManager* _collectionManager)
-{
-	if (setLocalCollectionWindow)
-	{
-		SetForegroundWindow(setLocalCollectionWindow->hWnd());
-		return;
-	}
-	currentLocalCollection = collection;
-	setLocalCollectionWindow = new SetLocalCollectionWindow;
-	setLocalCollectionWindow->collectionManager = _collectionManager;
-	setLocalCollectionWindow->Create("Local collection", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90, NULL, NULL);
-	setLocalCollectionWindow->centerWindow(MainWindow::mainWindow->hWnd());
-	ShowWindow(setLocalCollectionWindow->hWnd(), SW_SHOWNORMAL);
-	MSG msg = { };
-	while (GetMessage(&msg, NULL, 0, 0) > 0)
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-	ShowWindow(setLocalCollectionWindow->hWnd(), SW_HIDE);
-	setLocalCollectionWindow->Destroy();
-	delete setLocalCollectionWindow;
-	setLocalCollectionWindow = nullptr;
 }

@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppMutex.cpp" />
+    <ClCompile Include="UI\Compositions\CollectionItemsFrame.cpp" />
     <ClCompile Include="UI\Interfaces\IClickable.cpp" />
     <ClCompile Include="UI\Interfaces\IHoverable.cpp" />
     <ClCompile Include="UI\Interfaces\IWindow.cpp" />
@@ -190,6 +191,7 @@
   <ItemGroup>
     <ClInclude Include="AppMutex.h" />
     <ClInclude Include="CategoriesAndPurity.h" />
+    <ClInclude Include="UI\Compositions\CollectionItemsFrame.h" />
     <ClInclude Include="UI\Interfaces\IWindow.h" />
     <ClInclude Include="UI\Windows\AddCollectionWindow.h" />
     <ClInclude Include="UI\Windows\AspRatPickerWindow.h" />
@@ -227,7 +229,6 @@
     <ClInclude Include="UI\Windows\TrayWindow.h" />
     <ClInclude Include="UI\Components\UpDownEdit.h" />
     <ClInclude Include="Collections\UserCollection.h" />
-    <ClInclude Include="UI\Interfaces\BaseWindow.h" />
     <ClInclude Include="Wallpaper.h" />
     <ClInclude Include="UI\WindowStyles.h" />
   </ItemGroup>

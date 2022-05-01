@@ -5,15 +5,26 @@
 #pragma once
 
 IWindow::IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwExStyle,
-		int x, int y, int nWidth, int nHeight) :
+		int x, int y, int nWidth, int nHeight, HWND hParent) :
 	m_sName(sClassName)
 {
+	// Checking if this window is already exists
+	m_hWnd = FindWindowA(sClassName, nullptr);
+	if (m_hWnd) 
+	{ 
+		// if it exists then highlight it and cease construction of new one
+		SetForegroundWindow(m_hWnd);
+		throw std::exception("Window is already opened!");
+		// HACK: change this to custom exception, or handle this differently!!!
+	}
+
 	WNDCLASS wc = { 0 };
 	wc.lpfnWndProc = WindowProc;
 	wc.hInstance = GetModuleHandleA(NULL);
 	wc.lpszClassName = m_sName;
 	wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_APP));
-	RegisterClass(&wc);
+	if (RegisterClassA(&wc) == 0)
+		throw std::exception("Window creation failed.");
 
 	RECT rc = { 0 };
 	rc.left = x;
@@ -21,10 +32,10 @@ IWindow::IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwE
 	rc.top = y;
 	rc.bottom = y + nHeight;
 	AdjustWindowRect(&rc, dwStyle, FALSE);
+
 	m_hWnd = CreateWindowExA(
 		dwExStyle, m_sName, sWindowName, dwStyle, rc.left, rc.top,
-		rc.right - rc.left, rc.bottom - rc.top, 0, 0, GetModuleHandle(NULL), this);
-
+		rc.right - rc.left, rc.bottom - rc.top, hParent, 0, GetModuleHandle(NULL), this);
 	if (m_hWnd == FALSE)
 		throw std::exception("Window creation failed.");
 }
@@ -38,10 +49,10 @@ void IWindow::windowLoop()
 {
 	m_isReady = true;
 	MSG msg = { };
-	while (GetMessage(&msg, NULL, 0, 0) > 0)
+	while (GetMessageA(&msg, NULL, 0, 0) > 0)
 	{
 		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		DispatchMessageA(&msg);
 	}
 	m_isReady = false;
 }

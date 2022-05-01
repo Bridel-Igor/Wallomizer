@@ -25,7 +25,7 @@ void CheckBox::setChecked(bool state)
 	InvalidateRect(m_hWnd, NULL, FALSE);
 }
 
-bool CheckBox::isChecked()
+bool CheckBox::isChecked() const
 {
 	return m_checked;
 }

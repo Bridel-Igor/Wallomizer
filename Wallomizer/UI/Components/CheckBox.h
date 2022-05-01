@@ -37,7 +37,7 @@ public:
 	/// Check the state of check box.
 	/// 
 	/// @return True if check box is checked, false otherwise.
-	bool isChecked();
+	bool isChecked() const;
 
 	/// Call this method from reaction to WM_DRAWITEM message.
 	/// 

@@ -15,7 +15,7 @@ class IWindow : public IComponent
 public:
 	IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwExStyle = 0,
 		int x = CW_USEDEFAULT, int y = CW_USEDEFAULT,
-		int nWidth = CW_USEDEFAULT, int nHeight = CW_USEDEFAULT);
+		int nWidth = CW_USEDEFAULT, int nHeight = CW_USEDEFAULT, HWND hParent = nullptr);
 	~IWindow();
 	virtual void windowLoop();
 	void centerWindow(HWND hParent);

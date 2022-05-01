@@ -13,16 +13,16 @@ private:
 
 public:
 	CollectionItem(HWND hParent, int x, int y, int width, BaseCollection* collection, HFONT hFont);
-	~CollectionItem();
+	~CollectionItem() {}
 	void updateInfo(BaseCollection* collection);
 	void reposition(int yPos, bool scrollBarISVisible);
 	bool draw(LPDRAWITEMSTRUCT& pDIS);
 	void mouseHovering(WPARAM wParam);
 
-	CheckBox* chboEnabled;
-	Static* stName, * stNumber;
-	IconButton *btnSettings, *btnDelete;
-	BaseCollection* collection;
-	PurityComponent* purity;
-	static int height;
+	CheckBox chboEnabled;
+	Static stName, stNumber;
+	IconButton btnSettings, btnDelete;
+	PurityComponent purity;
+	BaseCollection* m_pCollection;
+	static constexpr int height = 26;
 };

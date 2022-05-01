@@ -32,7 +32,7 @@ public:
 	/// Check the state of color button.
 	/// 
 	/// @return True if color button is checked, false otherwise.
-	bool isChecked();
+	bool isChecked() const;
 
 	/// Call this method from reaction to WM_DRAWITEM message.
 	/// 

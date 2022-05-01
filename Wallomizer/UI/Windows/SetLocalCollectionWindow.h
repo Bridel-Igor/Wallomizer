@@ -1,23 +1,25 @@
 #pragma once
 
 #include "LocalCollection.h"
-#include "BaseWindow.h"
+#include "IWindow.h"
 #include "Static.h"
 #include "Button.h"
 #include "Edit.h"
 #include "CollectionManager.h"
 
-class SetLocalCollectionWindow : public BaseWindow<SetLocalCollectionWindow>
+class SetLocalCollectionWindow : public IWindow
 {
-	Static *stPath;
-	Button *btnOk, *btnCancel, *btnPath;
-	Edit *edPath;
-	static SetLocalCollectionWindow* setLocalCollectionWindow;
-	static LocalCollection *currentLocalCollection;
-	CollectionManager* collectionManager = nullptr;
-
 public:
-	LPCSTR ClassName() const { return "Set Local Collection Window Class"; }
+	SetLocalCollectionWindow(LocalCollection *pCollection, CollectionManager* pCollectionManager);
+	~SetLocalCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static void windowThread(LocalCollection *collection, CollectionManager* collectionManager);
+
+private:
+	CollectionManager* m_pCollectionManager;
+	LocalCollection* m_pCurrentLocalCollection;
+	Static stPath;
+	Edit edPath;
+	Button btnOk, btnCancel, btnPath;
+
+	static SetLocalCollectionWindow* setLocalCollectionWindow;
 };

@@ -77,7 +77,8 @@ Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
 
 void LocalCollection::openCollectionSettingsWindow()
 {
-	SetLocalCollectionWindow::windowThread(this, m_pCollectionManager);
+	SetLocalCollectionWindow setLocalCollectionWindow(this, m_pCollectionManager);
+	setLocalCollectionWindow.windowLoop();
 }
 
 bool LocalCollection::loadWallpaper(const Wallpaper* pWallpaper)

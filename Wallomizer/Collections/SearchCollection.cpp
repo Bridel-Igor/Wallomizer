@@ -142,7 +142,8 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 
 void SearchCollection::openCollectionSettingsWindow()
 {
-	SetSearchCollectionWindow::windowThread(this, m_pCollectionManager);
+	SetSearchCollectionWindow setSearchCollectionWindow(this, m_pCollectionManager);
+	setSearchCollectionWindow.windowLoop();
 }
 
 bool SearchCollection::loadWallpaper(const Wallpaper* pWallpaper)

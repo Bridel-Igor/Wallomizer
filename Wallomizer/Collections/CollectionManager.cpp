@@ -78,7 +78,7 @@ bool CollectionManager::loadSettings(FILE* pFile)
 	}
 	updateNumber();
 	if (MainWindow::mainWindow && MainWindow::mainWindow->isReady())
-		MainWindow::collectionItemsFrame->updateCollectionItems();
+		MainWindow::mainWindow->collectionItemsFrame.updateCollectionItems();
 	m_isReady = true;
 	if (Delay::bRunSlideshow)
 		Delay::abortDelay();

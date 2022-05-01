@@ -34,7 +34,7 @@ public:
 	/// Check the state of push button.
 	/// 
 	/// @return True if push button is checked, false otherwise.
-	bool isChecked();
+	bool isChecked() const;
 
 	/// Call this method from reaction to WM_DRAWITEM message.
 	/// 

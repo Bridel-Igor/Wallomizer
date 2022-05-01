@@ -2,25 +2,27 @@
 
 #include "SearchCollection.h"
 #include "CollectionManager.h"
-#include "BaseWindow.h"
+#include "IWindow.h"
 #include "Button.h"
 #include "Static.h"
 #include "Edit.h"
 
-class SetSearchCollectionWindow : public BaseWindow<SetSearchCollectionWindow>
+class SetSearchCollectionWindow : public IWindow
 {
-	Static* stCategory, * stPurity, *stTag, *stTagInstruct[8], *stFilt;
-	Edit* edTag;
-	Button* btnOk, * btnCancel, *btnRes, *btnAR, *btnColor;
-	CategoryComponent* catCom;
-	PurityComponent* purCom;
-	char tmpRes[255], tmpAR[128], tmpColor[16];
-	static SetSearchCollectionWindow* setSearchCollectionWindow;
-	static SearchCollection* currentSearchCollection;
-	CollectionManager* collectionManager = nullptr;
-
 public:
-	LPCSTR ClassName() const { return "Set Search Collection Window Class"; }
+	SetSearchCollectionWindow(SearchCollection* pCollection, CollectionManager* pCollectionManager);
+	~SetSearchCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static void windowThread(SearchCollection* collection, CollectionManager* collectionManager);
+
+private:
+	CollectionManager* m_pCollectionManager;
+	SearchCollection* m_pCurrentSearchCollection;
+	Static stCategory, stPurity, stTag, stFilt, stTagInstruct[8];
+	Edit edTag;
+	Button btnOk, btnCancel, btnRes, btnAR, btnColor;
+	CategoryComponent catCom;
+	PurityComponent purCom;
+
+	char tmpRes[255] = "", tmpAR[128] = "", tmpColor[16] = "";
+	static SetSearchCollectionWindow* setSearchCollectionWindow;
 };

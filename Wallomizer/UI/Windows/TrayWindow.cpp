@@ -33,12 +33,12 @@ static BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCST
 
 TrayWindow::TrayWindow(CollectionManager* pCollectionManager) :
 	IWindow("Wallomizer", "Tray Window Class", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 
-									500,	500,	width,	height),
+												500,	500,	width,	height),
 	m_pCollectionManager(pCollectionManager),
-	btnSettings(hWnd(), "Settings", 10,		60,		65,		20),
-	btnExit(hWnd(), "Exit",			85,		60,		65,		20),
-	player(hWnd(),					10,		10,
-									10,		35,		140,	20, m_pCollectionManager, SS_CENTER)
+	btnSettings			(hWnd(), "Settings",	10,		60,		65,		20),
+	btnExit				(hWnd(), "Exit",		85,		60,		65,		20),
+	player				(hWnd(),				10,		10,
+												10,		35,		140,	20, m_pCollectionManager, SS_CENTER)
 {
 	trayWindow = this;
 
@@ -47,7 +47,7 @@ TrayWindow::TrayWindow(CollectionManager* pCollectionManager) :
 	TrayMessage(this->hWnd(), NIM_ADD, 1, hStatusIcon, "Wallomizer");
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-	ShowWindow(trayWindow->hWnd(), SW_HIDE);
+	ShowWindow(hWnd(), SW_HIDE);
 }
 
 TrayWindow::~TrayWindow()
@@ -84,8 +84,8 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 			player.updateTimer(true);
 			//player.redrawPlayers();
-			SetWindowPos(trayWindow->hWnd(), HWND_TOPMOST, pt.x, pt.y, width, height, SWP_SHOWWINDOW);
-			SetForegroundWindow(trayWindow->hWnd());
+			SetWindowPos(this->hWnd(), HWND_TOPMOST, pt.x, pt.y, width, height, SWP_SHOWWINDOW);
+			SetForegroundWindow(this->hWnd());
 		}
 	}
 	return 0;
@@ -93,7 +93,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	case WM_NCACTIVATE:
 	{
 		if (wParam == FALSE)
-			ShowWindow(trayWindow->hWnd(), SW_HIDE);
+			ShowWindow(this->hWnd(), SW_HIDE);
 	}
 	return 0;
 
@@ -145,10 +145,10 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		{
 			std::thread mainWindowThread([&]()
 			{
-					MainWindow mainWindow(m_pCollectionManager);
-					mainWindow.windowLoop();
+				MainWindow mainWindow(m_pCollectionManager);
+				mainWindow.windowLoop();
 			});
-			mainWindowThread.detach();
+			mainWindowThread.detach(); // TODO: exception handling. Move thread var to members
 			return 0;
 		}
 		if (btnExit.isClicked(wParam))

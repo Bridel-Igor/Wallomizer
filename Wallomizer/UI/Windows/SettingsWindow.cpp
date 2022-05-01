@@ -9,203 +9,177 @@ SettingsWindow* SettingsWindow::settingsWindow = nullptr;
 
 HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, LPCSTR lpszDesc)
 {
-	HRESULT hres;
+	HRESULT hRes;
 	IShellLink* psl;
 
 	if (!SUCCEEDED(CoInitialize(NULL)))
 		return -1;
-	hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
-	if (SUCCEEDED(hres))
+	hRes = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
+	if (SUCCEEDED(hRes))
 	{
 		IPersistFile* ppf;
 		psl->SetPath(lpszPathObj);
 		psl->SetDescription(lpszDesc);
 		psl->SetWorkingDirectory(lpszDirPath);
-		hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
-		if (SUCCEEDED(hres))
+		hRes = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
+		if (SUCCEEDED(hRes))
 		{
 			WCHAR wsz[MAX_PATH];
 			int ret = MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH);
 			if (ret != 0)
-				hres = ppf->Save(wsz, TRUE);
+				hRes = ppf->Save(wsz, TRUE);
 			ppf->Release();
 		}
 		psl->Release();
 	}
 	CoUninitialize();
-	return hres;
+	return hRes;
+}
+
+SettingsWindow::SettingsWindow() :
+	IWindow("Settings", "Setting Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
+	stApplication	(hWnd(), "Application",			10,		10,		380,	20, SS_CENTER),
+	stVersion		(hWnd(), "Version:",			10,		40,		130,	20, SS_RIGHT),
+	stActVersion	(hWnd(), "1.0.5a",				150,	40,		100,	20),
+	btnUpdate		(hWnd(), "Check for updates",	270,	40,		120,	20),
+	stStartup		(hWnd(), "Load on startup:",	10,		70,		130,	20, SS_RIGHT),
+	cbStartup		(hWnd(),						150,	70,		20,		20),
+
+	stSlideshow		(hWnd(), "Slideshow",			10,		100,	380,	20, SS_CENTER),
+	stDelay			(hWnd(), "Delay:",				10,		150,	130,	20, SS_RIGHT),
+	stHours			(hWnd(), "Hours",				150,	130,	74,		20, SS_CENTER),
+	stMinutes		(hWnd(), "Minutes",				233,	130,	74,		20, SS_CENTER),
+	stSeconds		(hWnd(), "Seconds",				316,	130,	74,		20, SS_CENTER),
+	udeHours		(hWnd(),						150,	150,	74,		20, 0, 999, int((Settings::delay / 1000) / 3600)),
+	udeMinutes		(hWnd(),						233,	150,	74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60),
+	udeSeconds		(hWnd(),						316,	150,	74,		20, 0, 59, int(Settings::delay / 1000) % 60),
+
+	stWallhaven		(hWnd(), "Wallhaven",			10,		180,	380,	20, SS_CENTER),
+	stApiKey		(hWnd(), "Api key:",			10,		210,	130,	20, SS_RIGHT),
+	edApiKey		(hWnd(), "",					150,	210,	240,	20, ES_PASSWORD),
+	stUsername		(hWnd(), "Default username:",	10,		240,	130,	20, SS_RIGHT),
+	edUsername		(hWnd(), "",					150,	240,	240,	20),
+
+	btnCancel		(hWnd(), "Cancel",				10,		280,	130,	20),
+	btnOk			(hWnd(), "Ok",					150,	280,	240,	20)
+{
+	if (settingsWindow)
+	{
+		SetForegroundWindow(settingsWindow->hWnd());
+		return;
+	}
+	settingsWindow = this;
+
+	EnableWindow(MainWindow::mainWindow->hWnd(), FALSE);
+
+	edUsername.setTextA(Settings::username);
+	edApiKey.setTextA(Settings::apiKey);
+	cbStartup.setChecked(Settings::loadOnStartup);
+
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	SendMessage(stApplication.hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
+	SendMessage(stSlideshow.hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
+	SendMessage(stWallhaven.hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
+
+	centerWindow(MainWindow::mainWindow->hWnd());
+	ShowWindow(hWnd(), SW_SHOWNORMAL);
+}
+
+SettingsWindow::~SettingsWindow()
+{
+	ShowWindow(hWnd(), SW_HIDE);
+	EnableWindow(MainWindow::mainWindow->hWnd(), TRUE);
+	SetForegroundWindow(MainWindow::mainWindow->hWnd());
+	settingsWindow = nullptr;
 }
 
 LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-	case WM_CREATE:
-	{
-		EnableWindow(MainWindow::mainWindow->hWnd(), FALSE);
-
-		stApplication = new Static(this->hWnd(), "Application",		10,		10,		380,	20, SS_CENTER);
-		stVersion = new Static(this->hWnd(), "Version:",			10,		40,		130,	20, SS_RIGHT);
-		stActVersion = new Static(this->hWnd(), "1.0.5a",			150,	40,		100,	20);
-		btnUpdate = new Button(this->hWnd(), "Check for updates",	270,	40,		120,	20);
-		stStartup = new Static(this->hWnd(), "Load on startup:",	10,		70,		130,	20, SS_RIGHT);
-		cbStartup = new CheckBox(this->hWnd(),						150,	70,		20,		20);
-		
-		stSlideshow = new Static(this->hWnd(), "Slideshow",			10,		100,	380,	20, SS_CENTER);
-		stDelay = new Static(this->hWnd(), "Delay:",				10,		150,	130,	20, SS_RIGHT);
-		stHours = new Static(this->hWnd(), "Hours",					150,	130,	74,		20, SS_CENTER);
-		stMinutes = new Static(this->hWnd(), "Minutes",				233,	130,	74,		20, SS_CENTER);
-		stSeconds = new Static(this->hWnd(), "Seconds",				316,	130,	74,		20, SS_CENTER);
-		udeHours = new UpDownEdit(this->hWnd(),						150,	150,	74,		20, 0, 999, int((Settings::delay / 1000) / 3600));
-		udeMinutes = new UpDownEdit(this->hWnd(),					233,	150,	74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60);
-		udeSeconds = new UpDownEdit(this->hWnd(),					316,	150,	74,		20, 0, 59, int(Settings::delay / 1000) % 60);
-			
-		stWallhaven = new Static(this->hWnd(), "Wallhaven",			10,		180,	380,	20, SS_CENTER);
-		stApiKey = new Static(this->hWnd(), "Api key:",				10,		210,	130,	20, SS_RIGHT);
-		edApiKey = new Edit(this->hWnd(), "",						150,	210,	240,	20, ES_PASSWORD);
-		stUsername = new Static(this->hWnd(), "Default username:",	10,		240,	130,	20, SS_RIGHT);
-		edUsername = new Edit(this->hWnd(), "",						150,	240,	240,	20);
-		
-		btnCancel = new Button(this->hWnd(), "Cancel",				10,		280,	130,	20);
-		btnOk = new Button(this->hWnd(), "Ok",						150,	280,	240,	20);
-
-		edUsername->setTextA(Settings::username);
-		edApiKey->setTextA(Settings::apiKey);
-		cbStartup->setChecked(Settings::loadOnStartup);
-
-		EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-		SendMessage(stApplication->hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
-		SendMessage(stSlideshow->hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
-		SendMessage(stWallhaven->hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
-	}
-	return 0;
-
-	case WM_DESTROY:
-	{
-		delete stApplication;
-		delete stSlideshow;
-		delete stWallhaven;
-
-		delete btnOk;
-		delete btnCancel;
-		delete btnUpdate;
-
-		delete stHours;
-		delete stMinutes;
-		delete stSeconds;
-		delete stDelay;
-		delete stApiKey;
-		delete stUsername;
-		delete stStartup;
-		delete stVersion;
-		delete stActVersion;
-
-		delete edApiKey;
-		delete edUsername;
-
-		delete udeHours;
-		delete udeMinutes;
-		delete udeSeconds;
-
-		delete cbStartup;
-
-		EnableWindow(MainWindow::mainWindow->hWnd(), TRUE);
-		SetForegroundWindow(MainWindow::mainWindow->hWnd());
-
-		PostQuitMessage(0);
-	}
-	return 0;
-
-	case WM_CLOSE:
-	{
-		DestroyWindow(hWnd);
-		return 0;
-	}
-	return 0;
-
 	case WM_COMMAND:
 	{
 		if (HIWORD(wParam) == EN_UPDATE)
 		{
-			if (udeSeconds != nullptr && (HWND)lParam == udeSeconds->m_edithWnd)
+			if ((HWND)lParam == udeSeconds.m_edithWnd)
 			{
 				char buf[10];
-				udeSeconds->getTextA(buf, 10);
+				udeSeconds.getTextA(buf, 10);
 				int res = atoi(buf);
 				if (res <= 59 && res >= 0)
 				{
-					udeSeconds->m_invalid = false;
+					udeSeconds.m_invalid = false;
 				}
 				else
-					udeSeconds->m_invalid = true;
+					udeSeconds.m_invalid = true;
 			}
-			if (udeMinutes != nullptr && (HWND)lParam == udeMinutes->m_edithWnd)
+			if ((HWND)lParam == udeMinutes.m_edithWnd)
 			{
 				char buf[10];
-				udeMinutes->getTextA(buf, 10);
+				udeMinutes.getTextA(buf, 10);
 				int res = atoi(buf);
 				if (res <= 59 && res >= 0)
 				{
-					udeMinutes->m_invalid = false;
+					udeMinutes.m_invalid = false;
 				}
 				else
-					udeMinutes->m_invalid = true;
+					udeMinutes.m_invalid = true;
 			}
-			if (udeHours != nullptr && (HWND)lParam == udeHours->m_edithWnd)
+			if ((HWND)lParam == udeHours.m_edithWnd)
 			{
 				char buf[10];
-				udeHours->getTextA(buf, 10);
+				udeHours.getTextA(buf, 10);
 				int res = atoi(buf);
 				if (res <= 999 && res >= 0)
 				{
-					udeHours->m_invalid = false;
+					udeHours.m_invalid = false;
 				}
 				else
-					udeHours->m_invalid = true;
+					udeHours.m_invalid = true;
 			}
 		}
 		if (HIWORD(wParam) == EN_KILLFOCUS)
 		{
-			if (udeSeconds != nullptr && (HWND)lParam == udeSeconds->m_edithWnd)
+			if ((HWND)lParam == udeSeconds.m_edithWnd)
 			{
 				char buf[10];
-				udeSeconds->getTextA(buf, 10);
+				udeSeconds.getTextA(buf, 10);
 				int res = atoi(buf);
 				if (res <= 59 && res >= 0)
-					udeSeconds->setPos(res);
+					udeSeconds.setPos(res);
 				if (res > 59)
-					udeSeconds->setPos(59);
+					udeSeconds.setPos(59);
 				if (res < 0)
-					udeSeconds->setPos(0);
+					udeSeconds.setPos(0);
 			}
-			if (udeMinutes != nullptr && (HWND)lParam == udeMinutes->m_edithWnd)
+			if ((HWND)lParam == udeMinutes.m_edithWnd)
 			{
 				char buf[10];
-				udeMinutes->getTextA(buf, 10);
+				udeMinutes.getTextA(buf, 10);
 				int res = atoi(buf);
 				if (res <= 59 && res >= 0)
-					udeMinutes->setPos(res);
+					udeMinutes.setPos(res);
 				if (res > 59)
-					udeMinutes->setPos(59);
+					udeMinutes.setPos(59);
 				if (res < 0)
-					udeMinutes->setPos(0);
+					udeMinutes.setPos(0);
 			}
-			if (udeHours != nullptr && (HWND)lParam == udeHours->m_edithWnd)
+			if ((HWND)lParam == udeHours.m_edithWnd)
 			{
 				char buf[10];
-				udeHours->getTextA(buf, 10);
+				udeHours.getTextA(buf, 10);
 				int res = atoi(buf);
 				if (res <= 999 && res >= 0)
-					udeHours->setPos(res);
+					udeHours.setPos(res);
 				if (res > 999)
-					udeHours->setPos(999);
+					udeHours.setPos(999);
 				if (res < 0)
-					udeHours->setPos(0);
+					udeHours.setPos(0);
 			}
 		}
-		if (btnOk->isClicked(wParam))
+		if (btnOk.isClicked(wParam))
 		{
-			unsigned long delay = (udeSeconds->getPos() + (udeMinutes->getPos() * 60) + (udeHours->getPos() * 3600)) * 1000;
+			unsigned long delay = (udeSeconds.getPos() + (udeMinutes.getPos() * 60) + (udeHours.getPos() * 3600)) * 1000;
 
 			if (delay < 10000)
 			{
@@ -214,15 +188,15 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			}
 
 			Settings::delay = delay;
-			edUsername->getTextA(Settings::username, 64);
-			edApiKey->getTextA(Settings::apiKey, 128);
+			edUsername.getTextA(Settings::username, 64);
+			edApiKey.getTextA(Settings::apiKey, 128);
 
 			char startupPath[260];
 			HRESULT hr = SHGetFolderPathA(NULL, CSIDL_STARTUP, 0, NULL, startupPath); // if target win Vista and later use SHGetKnownFolderPath()
 			strcat_s(startupPath, "\\Wallomizer.lnk");
 			if (SUCCEEDED(hr))
 			{
-				if (cbStartup->isChecked())
+				if (cbStartup.isChecked())
 				{
 					char currentPath[260], currentDirectory[260];
 					GetModuleFileNameA(NULL, currentPath, 260);
@@ -242,19 +216,19 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 			DestroyWindow(this->hWnd());
 			return 0;
 		}
-		if (btnCancel->isClicked(wParam))
+		if (btnCancel.isClicked(wParam))
 		{
 			DestroyWindow(this->hWnd());
 			return 0;
 		}
-		if (btnUpdate->isClicked(wParam))
+		if (btnUpdate.isClicked(wParam))
 		{
 			ShellExecute(0, 0, "https://github.com/Bridel-Igor/Wallomizer/releases", 0, 0, SW_SHOW);
 			return 0;
 		}
-		if (cbStartup->isClicked(wParam))
+		if (cbStartup.isClicked(wParam))
 		{
-			cbStartup->click();
+			cbStartup.click();
 			return 0;
 		}
 	}
@@ -263,7 +237,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	case WM_DRAWITEM:
 	{
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
-		if (cbStartup->draw(pDIS, WindowStyles::mainBkBrush))
+		if (cbStartup.draw(pDIS, WindowStyles::mainBkBrush))
 			return TRUE;
 	}
 	return 0;
@@ -281,7 +255,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	{
 		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
-		if ((HWND)lParam == stApplication->hWnd() || (HWND)lParam == stSlideshow->hWnd() || (HWND)lParam == stWallhaven->hWnd())
+		if ((HWND)lParam == stApplication.hWnd() || (HWND)lParam == stSlideshow.hWnd() || (HWND)lParam == stWallhaven.hWnd())
 			SetTextColor(hdcStatic, WindowStyles::titleFontColor);
 		else
 			SetTextColor(hdcStatic, WindowStyles::mainFontColor);
@@ -296,9 +270,9 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		SetTextColor(hdc, WindowStyles::editFontColor);
 		SetBkColor(hdc, WindowStyles::editBkColor);
 		SetDCBrushColor(hdc, WindowStyles::editBkColor);
-		if ((udeSeconds != nullptr && (HWND)lParam == udeSeconds->m_edithWnd && udeSeconds->m_invalid) ||
-			(udeMinutes != nullptr && (HWND)lParam == udeMinutes->m_edithWnd && udeMinutes->m_invalid) ||
-			(udeHours != nullptr && (HWND)lParam == udeHours->m_edithWnd && udeHours->m_invalid))
+		if ((HWND)lParam == udeSeconds.m_edithWnd && udeSeconds.m_invalid ||
+			(HWND)lParam == udeMinutes.m_edithWnd && udeMinutes.m_invalid ||
+			(HWND)lParam == udeHours.m_edithWnd && udeHours.m_invalid)
 				SetBkColor(hdc, WindowStyles::editBkInvalidColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
@@ -311,7 +285,7 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 	case WM_SETCURSOR:
 	{
-		cbStartup->mouseHovering(wParam);
+		cbStartup.mouseHovering(wParam);
 		// Fallthrough. DefWindowProc must be reached anyway.
 	}
 
@@ -319,27 +293,4 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
 	return TRUE;
-}
-
-void SettingsWindow::windowThread()
-{
-	if (settingsWindow)
-	{
-		SetForegroundWindow(settingsWindow->hWnd());
-		return;
-	}
-	settingsWindow = new SettingsWindow;
-	settingsWindow->Create("Settings", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height, NULL, NULL, false);
-	settingsWindow->centerWindow(MainWindow::mainWindow->hWnd());
-	ShowWindow(settingsWindow->hWnd(), SW_SHOWNORMAL);
-	MSG msg = { };
-	while (GetMessage(&msg, NULL, 0, 0) > 0)
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-	ShowWindow(settingsWindow->hWnd(), SW_HIDE);
-	settingsWindow->Destroy();
-	delete settingsWindow;
-	settingsWindow = nullptr;
 }

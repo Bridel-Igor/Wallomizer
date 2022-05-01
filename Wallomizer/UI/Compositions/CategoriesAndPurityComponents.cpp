@@ -1,48 +1,41 @@
 #include "CategoriesAndPurityComponents.h"
 
-PurityComponent::PurityComponent(HWND hParent, int x, int y, int width, int height)
+PurityComponent::PurityComponent(HWND hParent, int x, int y, int width, int height) :
+	pbSFW		(hParent, "SFW",		x,							y, width / 3 - 1,	height, 0, 0, RGB(85,150,85), RGB(55,88,55)),
+	pbSketchy	(hParent, "Sketchy",	x + width / 3,				y, width / 3,		height, 0, 0, RGB(150,150,85), RGB(88,88,55)),
+	pbNSFW		(hParent, "NSFW",		1 + x + (2 * width / 3),	y, width / 3 - 1,	height, 0, 0, RGB(150,85,85), RGB(88,55,55))
 {
-	pbSFW = new PushButton(hParent, "SFW",			x,							y, width / 3 - 1,	height, 0, 0, RGB(85,150,85), RGB(55,88,55));
-	pbSketchy = new PushButton(hParent, "Sketchy",	x + width / 3,				y, width / 3,		height, 0, 0, RGB(150,150,85), RGB(88,88,55));
-	pbNSFW = new PushButton(hParent, "NSFW",		1 + x + (2 * width / 3),	y, width / 3 - 1,	height, 0, 0, RGB(150,85,85), RGB(88,55,55));
-}
-
-PurityComponent::~PurityComponent()
-{
-	delete pbSFW;
-	delete pbSketchy;
-	delete pbNSFW;
 }
 
 void PurityComponent::setPurity(CategoriesAndPurity cap)
 {
-	pbSFW->check(cap & CAP::puritySFW);
-	pbSketchy->check(cap & CAP::puritySketchy);
-	pbNSFW->check(cap & CAP::purityNSFW);
+	pbSFW.check(cap & CAP::puritySFW);
+	pbSketchy.check(cap & CAP::puritySketchy);
+	pbNSFW.check(cap & CAP::purityNSFW);
 }
 
-CategoriesAndPurity PurityComponent::getPurity()
+CategoriesAndPurity PurityComponent::getPurity() const
 {
-	return	CAP::puritySFW * pbSFW->isChecked() |
-			CAP::puritySketchy * pbSketchy->isChecked() |
-			CAP::purityNSFW * pbNSFW->isChecked();
+	return	CAP::puritySFW * pbSFW.isChecked() |
+			CAP::puritySketchy * pbSketchy.isChecked() |
+			CAP::purityNSFW * pbNSFW.isChecked();
 }
 
 bool PurityComponent::draw(LPDRAWITEMSTRUCT &pDIS)
 {
-	if (pDIS->hwndItem == pbSFW->hWnd())
+	if (pDIS->hwndItem == pbSFW.hWnd())
 	{
-		pbSFW->draw(pDIS);
+		pbSFW.draw(pDIS);
 		return true;
 	}
-	if (pDIS->hwndItem == pbSketchy->hWnd())
+	if (pDIS->hwndItem == pbSketchy.hWnd())
 	{
-		pbSketchy->draw(pDIS);
+		pbSketchy.draw(pDIS);
 		return true;
 	}
-	if (pDIS->hwndItem == pbNSFW->hWnd())
+	if (pDIS->hwndItem == pbNSFW.hWnd())
 	{
-		pbNSFW->draw(pDIS);
+		pbNSFW.draw(pDIS);
 		return true;
 	}
 	return false;
@@ -50,19 +43,19 @@ bool PurityComponent::draw(LPDRAWITEMSTRUCT &pDIS)
 
 bool PurityComponent::click(WPARAM wParam)
 {
-	if (pbSFW->isClicked(wParam))
+	if (pbSFW.isClicked(wParam))
 	{
-		pbSFW->check(!pbSFW->isChecked());
+		pbSFW.check(!pbSFW.isChecked());
 		return true;
 	}
-	if (pbSketchy->isClicked(wParam))
+	if (pbSketchy.isClicked(wParam))
 	{
-		pbSketchy->check(!pbSketchy->isChecked());
+		pbSketchy.check(!pbSketchy.isChecked());
 		return true;
 	}
-	if (pbNSFW->isClicked(wParam))
+	if (pbNSFW.isClicked(wParam))
 	{
-		pbNSFW->check(!pbNSFW->isChecked());
+		pbNSFW.check(!pbNSFW.isChecked());
 		return true;
 	}
 	return false;
@@ -70,63 +63,56 @@ bool PurityComponent::click(WPARAM wParam)
 
 void PurityComponent::moveComponent(int x, int y, int width, int height)
 {
-	MoveWindow(pbSFW->hWnd(),		x,							y, width / 3 - 1,	height, FALSE);
-	MoveWindow(pbSketchy->hWnd(),	x + width / 3,				y, width / 3,		height, FALSE);
-	MoveWindow(pbNSFW->hWnd(),		1 + x + (2 * width / 3),	y, width / 3 - 1,	height, FALSE);
+	MoveWindow(pbSFW.hWnd(),		x,							y, width / 3 - 1,	height, FALSE);
+	MoveWindow(pbSketchy.hWnd(),	x + width / 3,				y, width / 3,		height, FALSE);
+	MoveWindow(pbNSFW.hWnd(),		1 + x + (2 * width / 3),	y, width / 3 - 1,	height, FALSE);
 }
 
 void PurityComponent::mouseHovering(WPARAM wParam)
 {
-	pbSFW->mouseHovering(wParam);
-	pbSketchy->mouseHovering(wParam);
-	pbNSFW->mouseHovering(wParam);
+	pbSFW.mouseHovering(wParam);
+	pbSketchy.mouseHovering(wParam);
+	pbNSFW.mouseHovering(wParam);
 }
 
 // CategoryComponent section
 
-CategoryComponent::CategoryComponent(HWND hParent, int x, int y, int width, int height)
+CategoryComponent::CategoryComponent(HWND hParent, int x, int y, int width, int height) :
+	pbGeneral	(hParent, "General",	x,						y,	width / 3 - 1,	height),
+	pbAnime		(hParent, "Anime",		x + width / 3,			y,	width / 3,		height),
+	pbPeople	(hParent, "People",		1+x + (2 * width / 3),	y,	width / 3-1,	height)
 {
-	pbGeneral = new PushButton(hParent, "General", x, y, width / 3 - 1, height);
-	pbAnime = new PushButton(hParent, "Anime", x + width / 3, y, width / 3, height);
-	pbPeople = new PushButton(hParent, "People", 1+x + (2 * width / 3), y, width / 3-1, height);
-}
-
-CategoryComponent::~CategoryComponent()
-{
-	delete pbGeneral;
-	delete pbAnime;
-	delete pbPeople;
 }
 
 void CategoryComponent::setCategory(CategoriesAndPurity cap)
 {
-	pbGeneral->check(cap & CAP::categoryGeneral);
-	pbAnime->check(cap & CAP::categoryAnime);
-	pbPeople->check(cap & CAP::categoryPeople);
+	pbGeneral.check(cap & CAP::categoryGeneral);
+	pbAnime.check(cap & CAP::categoryAnime);
+	pbPeople.check(cap & CAP::categoryPeople);
 }
 
-CategoriesAndPurity CategoryComponent::getCategory()
+CategoriesAndPurity CategoryComponent::getCategory() const
 {
-	return	CAP::categoryGeneral * pbGeneral->isChecked() |
-			CAP::categoryAnime * pbAnime->isChecked() |
-			CAP::categoryPeople * pbPeople->isChecked();
+	return	CAP::categoryGeneral * pbGeneral.isChecked() |
+			CAP::categoryAnime * pbAnime.isChecked() |
+			CAP::categoryPeople * pbPeople.isChecked();
 }
 
 bool CategoryComponent::draw(LPDRAWITEMSTRUCT& pDIS)
 {
-	if (pDIS->hwndItem == pbGeneral->hWnd())
+	if (pDIS->hwndItem == pbGeneral.hWnd())
 	{
-		pbGeneral->draw(pDIS);
+		pbGeneral.draw(pDIS);
 		return true;
 	}
-	if (pDIS->hwndItem == pbAnime->hWnd())
+	if (pDIS->hwndItem == pbAnime.hWnd())
 	{
-		pbAnime->draw(pDIS);
+		pbAnime.draw(pDIS);
 		return true;
 	}
-	if (pDIS->hwndItem == pbPeople->hWnd())
+	if (pDIS->hwndItem == pbPeople.hWnd())
 	{
-		pbPeople->draw(pDIS);
+		pbPeople.draw(pDIS);
 		return true;
 	}
 	return false;
@@ -134,19 +120,19 @@ bool CategoryComponent::draw(LPDRAWITEMSTRUCT& pDIS)
 
 bool CategoryComponent::click(WPARAM wParam)
 {
-	if (pbGeneral->isClicked(wParam))
+	if (pbGeneral.isClicked(wParam))
 	{
-		pbGeneral->check(!pbGeneral->isChecked());
+		pbGeneral.check(!pbGeneral.isChecked());
 		return true;
 	}
-	if (pbAnime->isClicked(wParam))
+	if (pbAnime.isClicked(wParam))
 	{
-		pbAnime->check(!pbAnime->isChecked());
+		pbAnime.check(!pbAnime.isChecked());
 		return true;
 	}
-	if (pbPeople->isClicked(wParam))
+	if (pbPeople.isClicked(wParam))
 	{
-		pbPeople->check(!pbPeople->isChecked());
+		pbPeople.check(!pbPeople.isChecked());
 		return true;
 	}
 	return false;
@@ -154,7 +140,7 @@ bool CategoryComponent::click(WPARAM wParam)
 
 void CategoryComponent::mouseHovering(WPARAM wParam)
 {
-	pbGeneral->mouseHovering(wParam);
-	pbAnime->mouseHovering(wParam);
-	pbPeople->mouseHovering(wParam);
+	pbGeneral.mouseHovering(wParam);
+	pbAnime.mouseHovering(wParam);
+	pbPeople.mouseHovering(wParam);
 }

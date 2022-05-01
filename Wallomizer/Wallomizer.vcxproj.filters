@@ -77,13 +77,13 @@
       <Filter>UI\Components\Source</Filter>
     </ClCompile>
     <ClCompile Include="UI\Compositions\CategoriesAndPurityComponents.cpp">
-      <Filter>UI\Clusters</Filter>
+      <Filter>UI\Compositions</Filter>
     </ClCompile>
     <ClCompile Include="UI\Compositions\CollectionItem.cpp">
-      <Filter>UI\Clusters</Filter>
+      <Filter>UI\Compositions</Filter>
     </ClCompile>
     <ClCompile Include="UI\Compositions\Player.cpp">
-      <Filter>UI\Clusters</Filter>
+      <Filter>UI\Compositions</Filter>
     </ClCompile>
     <ClCompile Include="UI\Interfaces\HMenuGenerator.cpp">
       <Filter>UI\Interfaces</Filter>
@@ -115,6 +115,9 @@
     <ClCompile Include="UI\Interfaces\IWindow.cpp">
       <Filter>UI\Interfaces</Filter>
     </ClCompile>
+    <ClCompile Include="UI\Compositions\CollectionItemsFrame.cpp">
+      <Filter>UI\Compositions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI\Windows\AddCollectionWindow.h">
@@ -139,9 +142,6 @@
       <Filter>UI\Windows\Headers</Filter>
     </ClInclude>
     <ClInclude Include="UI\Windows\SetUserCollectionWindow.h">
-      <Filter>UI\Windows\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\Interfaces\BaseWindow.h">
       <Filter>UI\Windows\Headers</Filter>
     </ClInclude>
     <ClInclude Include="Collections\BaseCollection.h">
@@ -220,13 +220,13 @@
       <Filter>UI\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="UI\Compositions\CategoriesAndPurityComponents.h">
-      <Filter>UI\Clusters</Filter>
+      <Filter>UI\Compositions</Filter>
     </ClInclude>
     <ClInclude Include="UI\Compositions\Player.h">
-      <Filter>UI\Clusters</Filter>
+      <Filter>UI\Compositions</Filter>
     </ClInclude>
     <ClInclude Include="UI\Compositions\CollectionItem.h">
-      <Filter>UI\Clusters</Filter>
+      <Filter>UI\Compositions</Filter>
     </ClInclude>
     <ClInclude Include="UI\Interfaces\HMenuGenerator.h">
       <Filter>UI\Interfaces</Filter>
@@ -242,6 +242,9 @@
     </ClInclude>
     <ClInclude Include="UI\Interfaces\IWindow.h">
       <Filter>UI\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Compositions\CollectionItemsFrame.h">
+      <Filter>UI\Compositions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -358,14 +361,14 @@
     <Filter Include="UI\Components\Source">
       <UniqueIdentifier>{39690463-42b8-4720-b77b-254c301003de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\Clusters">
-      <UniqueIdentifier>{0f39ba96-79b1-4093-af73-0703a38c8327}</UniqueIdentifier>
-    </Filter>
     <Filter Include="UI\Resources">
       <UniqueIdentifier>{5ca111ee-2caa-4b9c-b9cd-29d436f46d02}</UniqueIdentifier>
     </Filter>
     <Filter Include="UI\Interfaces">
       <UniqueIdentifier>{874cfa02-970e-4584-9a3a-f66887a7fb27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Compositions">
+      <UniqueIdentifier>{0f39ba96-79b1-4093-af73-0703a38c8327}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

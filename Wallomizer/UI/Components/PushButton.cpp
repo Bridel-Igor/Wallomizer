@@ -21,7 +21,7 @@ void PushButton::check(bool state)
 	}
 }
 
-bool PushButton::isChecked()
+bool PushButton::isChecked() const
 {
 	return m_checked;
 }
