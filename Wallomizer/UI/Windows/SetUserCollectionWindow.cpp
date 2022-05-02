@@ -1,11 +1,11 @@
 #include "SetUserCollectionWindow.h"
-#include "MainWindow.h"
 #include "Settings.h"
 
-SetUserCollectionWindow::SetUserCollectionWindow(UserCollection* pCollection, CollectionManager* pCollectionManager) : // add caller
+SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, UserCollection* pCollection) :
 	IWindow("User collection", "Set User Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
-	m_pCurrentUserCollection(pCollection),
+	m_hCaller(hCaller),
 	m_pCollectionManager	(pCollectionManager),
+	m_pCurrentUserCollection(pCollection),
 	stUsername				(hWnd(), "Username:",		10,		10,		80,		20, SS_RIGHT),
 	edUsername				(hWnd(), "",				100,	10,		240,	20),
 	stCollectionID			(hWnd(), "Collection ID:",	10,		40,		80,		20, SS_RIGHT),
@@ -21,7 +21,7 @@ SetUserCollectionWindow::SetUserCollectionWindow(UserCollection* pCollection, Co
 	if (m_pCurrentUserCollection == nullptr)
 		return;
 
-	EnableWindow(MainWindow::s_pMainWindow->hWnd(), FALSE);
+	EnableWindow(m_hCaller, FALSE);
 		
 	edUsername.setTextA(m_pCurrentUserCollection->settings.sUsername);
 	purCom.setPurity(m_pCurrentUserCollection->settings.categoriesAndPurity);
@@ -47,15 +47,15 @@ SetUserCollectionWindow::SetUserCollectionWindow(UserCollection* pCollection, Co
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 
-	centerWindow(MainWindow::s_pMainWindow->hWnd());
+	centerWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
 SetUserCollectionWindow::~SetUserCollectionWindow()
 {
 	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(MainWindow::s_pMainWindow->hWnd(), TRUE);
-	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
+	EnableWindow(m_hCaller, TRUE);
+	SetForegroundWindow(m_hCaller);
 }
 
 LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)

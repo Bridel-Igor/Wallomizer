@@ -1,9 +1,9 @@
 #include "AspRatPickerWindow.h"
 
-AspRatPickerWindow::AspRatPickerWindow(char* sAspRat, HWND hCaller) :
+AspRatPickerWindow::AspRatPickerWindow(HWND hCaller, char* sAspRat) :
 	IWindow("Ratio", "Aspect Ratio Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 315, 195),
-	m_sAspRat(sAspRat),
 	m_hCaller(hCaller),
+	m_sAspRat(sAspRat),
 	btnAllWide		(hWnd(), "All Wide",	10,		35,		145,	20),
 	btnAllPortrait	(hWnd(), "All Portrait",160,	35,		70,		20),
 	stWide			(hWnd(), "Wide",		10,		10,		70,		20, SS_CENTER),

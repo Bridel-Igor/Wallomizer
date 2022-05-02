@@ -9,15 +9,14 @@
 class AspRatPickerWindow : public IWindow
 {
 public:
-	AspRatPickerWindow(char* sAspRat, HWND hCaller);
+	AspRatPickerWindow(HWND hCaller, char* sAspRat);
 	~AspRatPickerWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
+	HWND m_hCaller;
+	char* m_sAspRat;
 	Static stWide, stUltrawide, stPortrait, stSquare;
 	PushButton btnAR[12], btnAllWide, btnAllPortrait;
-	Button btnOk, btnCancel;
-
-	char* m_sAspRat;
-	HWND m_hCaller;
+	Button btnOk, btnCancel;	
 };

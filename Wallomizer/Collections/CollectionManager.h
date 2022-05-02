@@ -19,12 +19,12 @@ public:
 	CollectionType getCollectionType() const { return CollectionType::none; }
 	CategoriesAndPurity getCAP() const { return 0; }
 	Wallpaper* getWallpaperInfo(unsigned int index) const;
-	void openCollectionSettingsWindow() { return; }
+	void openCollectionSettingsWindow(HWND = nullptr);
 
 	void reloadSettings();
 	void clear();
 	void updateNumber();
-	template <typename T> void addCollection();
+	void addCollection(CollectionType collectionType);
 	void eraseCollection(int index);
 	void loadNextWallpaper();
 	void loadRandomWallpaper();

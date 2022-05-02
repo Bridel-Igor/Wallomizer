@@ -2,10 +2,10 @@
 
 #include "ResPickerWindow.h"
 
-ResPickerWindow::ResPickerWindow(char* sResolution, HWND hCaller) :
+ResPickerWindow::ResPickerWindow(HWND hCaller, char* sResolution) :
 	IWindow("Resolution", "Res Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 390, 250),
-	m_sResolution(sResolution),
 	m_hCaller(hCaller),
+	m_sResolution(sResolution),
 	btnAtLeast	(hWnd(), "At least",	10,		10,		180,	20),
 	btnExactly	(hWnd(), "Exactly",		200,	10,		180,	20),
 	stUltrawide	(hWnd(), "Ultrawide",	10,		35,		70,		20, SS_CENTER),

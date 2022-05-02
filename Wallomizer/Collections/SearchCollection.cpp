@@ -140,9 +140,9 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 	return pWallpaper;
 }
 
-void SearchCollection::openCollectionSettingsWindow()
+void SearchCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetSearchCollectionWindow setSearchCollectionWindow(this, m_pCollectionManager);
+	SetSearchCollectionWindow setSearchCollectionWindow(hCaller, m_pCollectionManager, this);
 	setSearchCollectionWindow.windowLoop();
 }
 

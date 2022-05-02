@@ -1,13 +1,13 @@
 #include "SetSearchCollectionWindow.h"
-#include "MainWindow.h"
 #include "ResPickerWindow.h"
 #include "AspRatPickerWindow.h"
 #include "ColorPickerWindow.h"
 
-SetSearchCollectionWindow::SetSearchCollectionWindow(SearchCollection* pCollection, CollectionManager* pCollectionManager) : // add caller
+SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, SearchCollection* pCollection) :
 	IWindow("Search collection", "Set Search Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 260),
-	m_pCurrentSearchCollection(pCollection),
+	m_hCaller(hCaller),
 	m_pCollectionManager(pCollectionManager),
+	m_pCurrentSearchCollection(pCollection),
 	stCategory		(hWnd(), "Category:",												10,		10,		60,		20),
 	catCom			(hWnd(),															80,		10,		159,	20),
 
@@ -33,7 +33,7 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(SearchCollection* pCollecti
 	btnCancel		(hWnd(), "Cancel",													80,		230,	185,	20),
 	btnOk			(hWnd(), "Ok",														275,	230,	185,	20)
 {
-	EnableWindow(MainWindow::s_pMainWindow->hWnd(), FALSE);
+	EnableWindow(m_hCaller, FALSE);
 
 	if (m_pCurrentSearchCollection)
 	{
@@ -47,15 +47,15 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(SearchCollection* pCollecti
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 
-	centerWindow(MainWindow::s_pMainWindow->hWnd());
+	centerWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
 SetSearchCollectionWindow::~SetSearchCollectionWindow()
 {
 	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(MainWindow::s_pMainWindow->hWnd(), TRUE);
-	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
+	EnableWindow(m_hCaller, TRUE);
+	SetForegroundWindow(m_hCaller);
 }
 
 LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -89,19 +89,19 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 			return 0;
 		if (btnRes.isClicked(wParam))
 		{
-			ResPickerWindow resPickerWindow(tmpRes, hWnd());
+			ResPickerWindow resPickerWindow(hWnd(), tmpRes);
 			resPickerWindow.windowLoop();
 			return 0;
 		}
 		if (btnAR.isClicked(wParam))
 		{
-			AspRatPickerWindow aspRatPickerWindow(tmpAR, hWnd());
+			AspRatPickerWindow aspRatPickerWindow(hWnd(), tmpAR);
 			aspRatPickerWindow.windowLoop();
 			return 0;
 		}
 		if (btnColor.isClicked(wParam))
 		{
-			ColorPickerWindow colorPickerWindow(tmpColor, hWnd());
+			ColorPickerWindow colorPickerWindow(hWnd(), tmpColor);
 			colorPickerWindow.windowLoop();
 			return 0;
 		}

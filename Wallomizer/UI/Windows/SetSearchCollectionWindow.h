@@ -10,11 +10,12 @@
 class SetSearchCollectionWindow : public IWindow
 {
 public:
-	SetSearchCollectionWindow(SearchCollection* pCollection, CollectionManager* pCollectionManager);
+	SetSearchCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, SearchCollection* pCollection);
 	~SetSearchCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
+	HWND m_hCaller;
 	CollectionManager* m_pCollectionManager;
 	SearchCollection* m_pCurrentSearchCollection;
 	Static stCategory, stPurity, stTag, stFilt, stTagInstruct[8];

@@ -10,7 +10,7 @@
 class SettingsWindow : public IWindow
 {
 public:
-	SettingsWindow();
+	SettingsWindow(HWND hCaller);
 	~SettingsWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -18,6 +18,7 @@ public:
 	static constexpr int height = 310;
 
 private:
+	HWND m_hCaller;
 	Static stApplication, stSlideshow, stWallhaven;
 	Static stVersion, stActVersion, stHours, stMinutes, stSeconds, stDelay, stApiKey, stUsername, stStartup;
 	Edit edApiKey, edUsername;

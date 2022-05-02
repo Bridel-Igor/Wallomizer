@@ -76,7 +76,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (btnAdd.isClicked(wParam))
 		{
-			AddCollectionWindow addCollectionWindow(m_pCollectionManager);
+			AddCollectionWindow addCollectionWindow(hWnd(), m_pCollectionManager);
 			addCollectionWindow.windowLoop();
 			return 0;
 		}
@@ -84,7 +84,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		if (btnSettings.isClicked(wParam))
 		{
-			SettingsWindow settingsWindow;
+			SettingsWindow settingsWindow(hWnd());
 			settingsWindow.windowLoop();
 			Settings::saveSettings();
 			return 0;

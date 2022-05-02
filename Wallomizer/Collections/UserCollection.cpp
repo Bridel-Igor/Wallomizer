@@ -125,9 +125,9 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 	return pWallpaper;
 }
 
-void UserCollection::openCollectionSettingsWindow()
+void UserCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetUserCollectionWindow setUserCollectionWindow(this, m_pCollectionManager);
+	SetUserCollectionWindow setUserCollectionWindow(hCaller, m_pCollectionManager, this);
 	setUserCollectionWindow.windowLoop();
 }
 

@@ -18,7 +18,7 @@ public:
 	CollectionType getCollectionType() const { return CollectionType::local; }
 	CategoriesAndPurity getCAP() const { return 0; }
 	Wallpaper* getWallpaperInfo(unsigned int index) const;
-	void openCollectionSettingsWindow();
+	void openCollectionSettingsWindow(HWND hCaller);
 
 	static bool loadWallpaper(const Wallpaper* pWallpaper);
 	static void openWallpaperExternal(const Wallpaper* pWallpaper);

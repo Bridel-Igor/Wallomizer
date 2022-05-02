@@ -10,11 +10,12 @@
 class SetLocalCollectionWindow : public IWindow
 {
 public:
-	SetLocalCollectionWindow(LocalCollection *pCollection, CollectionManager* pCollectionManager);
+	SetLocalCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, LocalCollection *pCollection);
 	~SetLocalCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
+	HWND m_hCaller;
 	CollectionManager* m_pCollectionManager;
 	LocalCollection* m_pCurrentLocalCollection;
 	Static stPath;

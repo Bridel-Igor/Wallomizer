@@ -107,6 +107,16 @@ Wallpaper* CollectionManager::getWallpaperInfo(unsigned int _index) const
 	return nullptr;
 }
 
+void CollectionManager::openCollectionSettingsWindow(HWND)
+{ 
+	std::thread mainWindowThread([&]()
+		{
+			MainWindow mainWindow(this);
+			mainWindow.windowLoop();
+		});
+	mainWindowThread.detach(); // TODO: exception handling. Move thread var to members
+}
+
 void CollectionManager::reloadSettings()
 {
 	beginImageModification();
@@ -136,11 +146,19 @@ void CollectionManager::updateNumber()
 		m_uniformIntDistribution = std::uniform_int_distribution<int>(0, m_uiNumber-1);
 }
 
-template <typename T> void CollectionManager::addCollection()
+void CollectionManager::addCollection(CollectionType collectionType)
 {
-	BaseCollection* pCollection = new T(this);
+	BaseCollection* pCollection = nullptr;
+	switch (collectionType)
+	{
+	case CollectionType::local:		pCollection = new LocalCollection(this);	break;
+	case CollectionType::user:		pCollection = new UserCollection(this);		break;
+	case CollectionType::search:	pCollection = new SearchCollection(this);	break;
+	}
+	if (pCollection == nullptr)
+		return;
 	m_pCollections.push_back(pCollection);
-	m_pCollections.back()->openCollectionSettingsWindow();
+	m_pCollections.back()->openCollectionSettingsWindow(MainWindow::s_pMainWindow->hWnd());
 	if (!m_pCollections.back()->isValid())
 	{
 		delete m_pCollections.back();
@@ -149,9 +167,6 @@ template <typename T> void CollectionManager::addCollection()
 	else
 		reloadSettings();
 }
-template void CollectionManager::addCollection<LocalCollection>();
-template void CollectionManager::addCollection<UserCollection>();
-template void CollectionManager::addCollection<SearchCollection>();
 
 void CollectionManager::eraseCollection(int index)
 {

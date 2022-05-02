@@ -1,10 +1,10 @@
 #include <ShObjIdl.h>
 
 #include "SetLocalCollectionWindow.h"
-#include "MainWindow.h"
 
-SetLocalCollectionWindow::SetLocalCollectionWindow(LocalCollection* pCollection, CollectionManager* pCollectionManager) : // add caller
+SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, LocalCollection* pCollection) :
 	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90),
+	m_hCaller(hCaller),
 	m_pCollectionManager(pCollectionManager),
 	m_pCurrentLocalCollection(pCollection),
 	stPath		(hWnd(), "Enter path to directory:",	10,		10,		390,	20),
@@ -14,17 +14,17 @@ SetLocalCollectionWindow::SetLocalCollectionWindow(LocalCollection* pCollection,
 	btnCancel	(hWnd(), "Cancel",						10,		60,		185,	20),
 	btnOk		(hWnd(), "Ok",							205,	60,		185,	20)
 {
-	EnableWindow(MainWindow::s_pMainWindow->hWnd(), FALSE);
+	EnableWindow(m_hCaller, FALSE);
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-	centerWindow(MainWindow::s_pMainWindow->hWnd());
+	centerWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
 SetLocalCollectionWindow::~SetLocalCollectionWindow()
 {
 	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(MainWindow::s_pMainWindow->hWnd(), TRUE);
-	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
+	EnableWindow(m_hCaller, TRUE);
+	SetForegroundWindow(m_hCaller);
 }
 
 LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

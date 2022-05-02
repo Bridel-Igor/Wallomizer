@@ -75,9 +75,9 @@ Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
 	return pWallpaper;
 }
 
-void LocalCollection::openCollectionSettingsWindow()
+void LocalCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetLocalCollectionWindow setLocalCollectionWindow(this, m_pCollectionManager);
+	SetLocalCollectionWindow setLocalCollectionWindow(hCaller, m_pCollectionManager, this);
 	setLocalCollectionWindow.windowLoop();
 }
 

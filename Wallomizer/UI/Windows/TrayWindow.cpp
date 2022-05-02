@@ -2,7 +2,6 @@
 
 #include "TrayWindow.h"
 #include "resource.h"
-#include "MainWindow.h"
 #include "Settings.h"
 #include "Delay.h"
 
@@ -137,12 +136,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		if (btnSettings.isClicked(wParam))
 		{
-			std::thread mainWindowThread([&]()
-			{
-				MainWindow mainWindow(m_pCollectionManager);
-				mainWindow.windowLoop();
-			});
-			mainWindowThread.detach(); // TODO: exception handling. Move thread var to members
+			m_pCollectionManager->openCollectionSettingsWindow();
 			return 0;
 		}
 		if (btnExit.isClicked(wParam))

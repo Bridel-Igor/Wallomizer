@@ -11,7 +11,7 @@
 class SetUserCollectionWindow : public IWindow
 {
 public:
-	SetUserCollectionWindow(UserCollection *pCollection, CollectionManager* pCollectionManager);
+	SetUserCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, UserCollection *pCollection);
 	~SetUserCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -19,6 +19,7 @@ public:
 	static constexpr int height = 130;
 
 private:
+	HWND m_hCaller;
 	CollectionManager* m_pCollectionManager;
 	UserCollection* m_pCurrentUserCollection;
 	Static stUsername, stCollectionID, stPurity;

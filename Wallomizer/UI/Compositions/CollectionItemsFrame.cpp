@@ -104,7 +104,7 @@ LRESULT CollectionItemsFrame::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPAR
 		{
 			if (collectionItems[i]->btnSettings.isClicked(wParam))
 			{
-				m_pCollectionManager->m_pCollections[i]->openCollectionSettingsWindow();
+				m_pCollectionManager->m_pCollections[i]->openCollectionSettingsWindow(GetParent(hWnd()));
 				return 0;
 			}
 			if (collectionItems[i]->btnDelete.isClicked(wParam))

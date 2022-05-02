@@ -2,8 +2,7 @@
 
 #include "SettingsWindow.h"
 #include "Settings.h"
-#include "MainWindow.h"
-#include "ResPickerWindow.h"
+#include "Player.h"
 
 HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, LPCSTR lpszDesc)
 {
@@ -34,8 +33,9 @@ HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, 
 	return hRes;
 }
 
-SettingsWindow::SettingsWindow() : // add caller
+SettingsWindow::SettingsWindow(HWND hCaller) :
 	IWindow("Settings", "Setting Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
+	m_hCaller(hCaller),
 	stApplication	(hWnd(), "Application",			10,		10,		380,	20, SS_CENTER),
 	stVersion		(hWnd(), "Version:",			10,		40,		130,	20, SS_RIGHT),
 	stActVersion	(hWnd(), "1.0.5a",				150,	40,		100,	20),
@@ -61,7 +61,7 @@ SettingsWindow::SettingsWindow() : // add caller
 	btnCancel		(hWnd(), "Cancel",				10,		280,	130,	20),
 	btnOk			(hWnd(), "Ok",					150,	280,	240,	20)
 {
-	EnableWindow(MainWindow::s_pMainWindow->hWnd(), FALSE);
+	EnableWindow(m_hCaller, FALSE);
 
 	edUsername.setTextA(Settings::username);
 	edApiKey.setTextA(Settings::apiKey);
@@ -72,15 +72,15 @@ SettingsWindow::SettingsWindow() : // add caller
 	SendMessage(stSlideshow.hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
 	SendMessage(stWallhaven.hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
 
-	centerWindow(MainWindow::s_pMainWindow->hWnd());
+	centerWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
 SettingsWindow::~SettingsWindow()
 {
 	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(MainWindow::s_pMainWindow->hWnd(), TRUE);
-	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
+	EnableWindow(m_hCaller, TRUE);
+	SetForegroundWindow(m_hCaller);
 }
 
 LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -22,7 +22,7 @@ public:
 	virtual CollectionType getCollectionType() const = 0;
 	virtual CategoriesAndPurity getCAP() const = 0;
 	virtual Wallpaper* getWallpaperInfo(unsigned int index) const = 0;
-	virtual void openCollectionSettingsWindow() = 0;
+	virtual void openCollectionSettingsWindow(HWND hWnd) = 0;
 
 	unsigned int getNumber() const	{ return m_uiNumber; }
 	bool isEnabled() const			{ return m_isEnabled; }

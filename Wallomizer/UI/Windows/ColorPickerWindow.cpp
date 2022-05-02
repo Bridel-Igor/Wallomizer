@@ -1,11 +1,9 @@
-#include <string>
-
 #include "ColorPickerWindow.h"
 
-ColorPickerWindow::ColorPickerWindow(char* sColor, HWND hCaller) :
+ColorPickerWindow::ColorPickerWindow(HWND hCaller, char* sColor) :
 	IWindow("Color", "Color Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 405, 195),
-	m_sColor(sColor),
 	m_hCaller(hCaller),
+	m_sColor(sColor),
 	btnClr     {{hWnd(), 0x66, 0x00, 0x00,	10,		10,		60,		25},
 				{hWnd(), 0x99, 0x00, 0x00,	75,		10,		60,		25},
 				{hWnd(), 0xcc, 0x00, 0x00,	140,	10,		60,		25},
