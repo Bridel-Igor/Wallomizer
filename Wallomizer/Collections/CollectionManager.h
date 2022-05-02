@@ -42,9 +42,6 @@ public:
 	Wallpaper *pCurrent = nullptr, *pNext = nullptr;
 	
 private:
-	void beginImageModification();
-	void endImageModification();
-
 	std::list<Wallpaper*> pPreviousList;
 	bool m_isReady = false;
 	std::mt19937 m_randomGenerator;

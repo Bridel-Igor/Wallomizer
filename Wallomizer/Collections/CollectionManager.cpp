@@ -119,14 +119,14 @@ void CollectionManager::openCollectionSettingsWindow(HWND)
 
 void CollectionManager::reloadSettings()
 {
-	beginImageModification();
+	imageModification.lock();
 	saveSettings();
 	loadSettings();
 	wchar_t wsPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
-	endImageModification();
+	imageModification.unlock();
 	Delay::replayDelay();
 }
 
@@ -175,12 +175,12 @@ void CollectionManager::eraseCollection(int index)
 	m_pCollections.erase(CollectionManager::m_pCollections.begin() + index);
 	saveSettings();
 	updateNumber();
-	beginImageModification();
+	imageModification.lock();
 	wchar_t wsPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
-	endImageModification();
+	imageModification.unlock();
 	Delay::abortDelay();
 }
 
@@ -193,11 +193,11 @@ void CollectionManager::loadRandomWallpaper()
 {
 	if (m_uiNumber <= 0)
 		return;
-	beginImageModification();
+	imageModification.lock();
 	const int randomFromAll = m_uniformIntDistribution(m_randomGenerator);
 	pNext = getWallpaperInfo(randomFromAll);
 	loadWallpaper(pNext);
-	endImageModification();
+	imageModification.unlock();
 }
 
 void CollectionManager::setLoadedWallpaper(bool setPrevious)
@@ -213,7 +213,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 		Delay::abortDelay();
 		return;
 	}
-	beginImageModification();
+	imageModification.lock();
 	if (!setPrevious)
 	{
 		if (pCurrent != nullptr)
@@ -230,7 +230,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	DeleteFileW(wsCurrentPath);
 	if (MoveFileW(wsLoadedPath, wsCurrentPath) == 0)
 	{
-		endImageModification();
+		imageModification.unlock();
 		return;
 	}
 	wchar_t wsCurrentPathNative[MAX_PATH];
@@ -238,7 +238,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	wcscat_s(wsCurrentPathNative, MAX_PATH, L"Current wallpaper.jpg");
 	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, wsCurrentPathNative, SPIF_UPDATEINIFILE);
 	Player::redrawPlayers();
-	endImageModification();
+	imageModification.unlock();
 }
 
 void CollectionManager::setNextWallpaper()
@@ -299,15 +299,4 @@ bool CollectionManager::loadWallpaper(const Wallpaper* pWallpaper)
 	default:
 		return false;
 	}
-}
-
-void CollectionManager::beginImageModification()
-{
-	imageModification.lock();
-}
-
-void CollectionManager::endImageModification()
-{
-	if (!imageModification.try_lock())
-		imageModification.unlock();
 }
