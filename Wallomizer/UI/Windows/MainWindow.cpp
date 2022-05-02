@@ -26,7 +26,7 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 	while (!m_pCollectionManager->isReady())
 		Sleep(50);
 	centerWindow(GetDesktopWindow());
-	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	player.updateTimer(true);
 	// HACK: Redo this loop in the same thread or force thread to end on destruction. Thread leeks memory as it doesn't end...
 	std::thread thr([&]() {collectionItemsFrame.windowLoop(); });
@@ -41,7 +41,7 @@ MainWindow::~MainWindow()
 	ShowWindow(hWnd(), SW_HIDE);
 }
 
-LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -99,19 +99,14 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_CTLCOLORSTATIC:
 	{
-		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LRESULT)WindowStyles::mainBkBrush;
 	}
-	return 0;
 
 	case WM_CTLCOLORBTN:
-	{	
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-	}
-	return 0;
+	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 	
 	case WM_SETCURSOR:
 	{
@@ -122,5 +117,4 @@ LRESULT MainWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
-	return TRUE;
 }

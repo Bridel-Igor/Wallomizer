@@ -8,9 +8,6 @@
 
 class CollectionItem
 {
-private:
-	int x, y, width;
-
 public:
 	CollectionItem(HWND hParent, int x, int y, int width, BaseCollection* collection, HFONT hFont);
 	~CollectionItem() {}
@@ -25,4 +22,7 @@ public:
 	PurityComponent purity;
 	BaseCollection* m_pCollection;
 	static constexpr int height = 26;
+
+private:
+	int x, y, width;
 };

@@ -1,7 +1,6 @@
 #include <string>
 
 #include "ResPickerWindow.h"
-#include "MainWindow.h"
 
 ResPickerWindow::ResPickerWindow(char* sResolution, HWND hCaller) :
 	IWindow("Resolution", "Res Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 390, 250),
@@ -72,8 +71,8 @@ ResPickerWindow::ResPickerWindow(char* sResolution, HWND hCaller) :
 	if (custom.find("x") != std::string::npos)
 	{
 		char buf[8] = { 0 };
-		int n = static_cast<int>(custom.find("x"));
-		for (int i = 0; i < n; i++)
+		size_t n = custom.find("x");
+		for (size_t i = 0; i < n; i++)
 			buf[i] = custom[i];
 		edWidth.setTextA(buf);
 		custom.erase(0, n + 1);
@@ -81,7 +80,7 @@ ResPickerWindow::ResPickerWindow(char* sResolution, HWND hCaller) :
 	}
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-	centerWindow(MainWindow::s_pMainWindow->hWnd());
+	centerWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
@@ -92,7 +91,7 @@ ResPickerWindow::~ResPickerWindow()
 	SetForegroundWindow(m_hCaller);
 }
 
-LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT ResPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -189,7 +188,7 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 						GetWindowTextA(btnRes[i].hWnd(), buf, 15);
 						strcpy_s(m_sResolution, 255, "&atleast=");
 						strcat_s(m_sResolution, 255, buf);
-						DestroyWindow(this->hWnd());
+						DestroyWindow(hWnd());
 						return 0;
 					}
 				}
@@ -202,7 +201,7 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 					strcat_s(m_sResolution, 255, "x");
 					edHeight.getTextA(buf, 15);
 					strcat_s(m_sResolution, 255, buf);
-					DestroyWindow(this->hWnd());
+					DestroyWindow(hWnd());
 					return 0;
 				}
 			}
@@ -239,12 +238,12 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 					strcat_s(m_sResolution, 255, buf);
 				}
 			}
-			DestroyWindow(this->hWnd());
+			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnCancel.isClicked(wParam))
 		{
-			DestroyWindow(this->hWnd());
+			DestroyWindow(hWnd());
 			return 0;
 		}
 	}
@@ -252,13 +251,11 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 	case WM_CTLCOLORSTATIC:
 	{
-		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LRESULT)WindowStyles::mainBkBrush;
 	}
-	return 0;
 
 	case WM_CTLCOLOREDIT:
 	{
@@ -268,13 +265,9 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		SetDCBrushColor(hdc, WindowStyles::editBkColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
-	return 0;
 
 	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-	}
-	return 0;
+	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 
 	case WM_SETCURSOR:
 	{
@@ -288,5 +281,4 @@ LRESULT ResPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
-	return TRUE;
 }

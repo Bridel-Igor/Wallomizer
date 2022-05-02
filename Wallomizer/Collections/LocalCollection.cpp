@@ -56,7 +56,7 @@ void LocalCollection::getCollectionName(wchar_t* pwsName, size_t size) const
 Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
 {
 	Wallpaper* pWallpaper = nullptr;
-	if (m_wsDirectoryPath == L"" || m_uiNumber <= 0)
+	if (m_wsDirectoryPath[0] == L'\0' || m_uiNumber <= 0)
 		return pWallpaper;
 	unsigned int i = 0;
 	std::experimental::filesystem::path dirPath{ m_wsDirectoryPath };
@@ -93,7 +93,7 @@ bool LocalCollection::loadWallpaper(const Wallpaper* pWallpaper)
 	_wfopen_s(&pDestination, path, L"wb");
 	if (pSource == nullptr || pDestination == nullptr)
 		return false;
-	while (size = fread(buf, 1, BUFSIZ, pSource))
+	while ((size = fread(buf, 1, BUFSIZ, pSource)) != 0)
 		fwrite(buf, 1, size, pDestination);
 	fclose(pSource);
 	fclose(pDestination);

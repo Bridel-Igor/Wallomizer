@@ -2,7 +2,7 @@
 #include "MainWindow.h"
 #include "Settings.h"
 
-SetUserCollectionWindow::SetUserCollectionWindow(UserCollection* pCollection, CollectionManager* pCollectionManager) :
+SetUserCollectionWindow::SetUserCollectionWindow(UserCollection* pCollection, CollectionManager* pCollectionManager) : // add caller
 	IWindow("User collection", "Set User Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	m_pCurrentUserCollection(pCollection),
 	m_pCollectionManager	(pCollectionManager),
@@ -45,7 +45,7 @@ SetUserCollectionWindow::SetUserCollectionWindow(UserCollection* pCollection, Co
 		validCollection = true;
 	}
 
-	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 
 	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
@@ -58,7 +58,7 @@ SetUserCollectionWindow::~SetUserCollectionWindow()
 	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
 }
 
-LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -147,13 +147,13 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 				m_pCurrentUserCollection->setValid(true);
 			else
 				m_pCollectionManager->reloadSettings();
-			DestroyWindow(hWnd);
+			DestroyWindow(hWnd());
 			return 0;
 		}
 		
 		if (btnCancel.isClicked(wParam))
 		{
-			DestroyWindow(hWnd);
+			DestroyWindow(hWnd());
 			return 0;
 		}
 	}
@@ -167,13 +167,11 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 
 	case WM_CTLCOLORSTATIC:
 	{
-		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LRESULT)WindowStyles::mainBkBrush;
 	}
-	return 0;
 
 	case WM_CTLCOLOREDIT:
 	{
@@ -183,16 +181,11 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPar
 		SetDCBrushColor(hdc, WindowStyles::editBkColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
-	return 0;
 
 	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-	}
-	return 0;
+	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
-	return TRUE;
 }

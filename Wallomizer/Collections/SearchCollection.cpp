@@ -89,9 +89,9 @@ void SearchCollection::getCollectionName(wchar_t* pwsName, size_t size) const
 		wcscat_s(pwsName, 255, L" | ");
 	}
 
-	wcscat_s(pwsName, 255, settings.categoriesAndPurity & CAP::categoryGeneral ? L"General " : L"");
-	wcscat_s(pwsName, 255, settings.categoriesAndPurity & CAP::categoryAnime ? L"Anime " : L"");
-	wcscat_s(pwsName, 255, settings.categoriesAndPurity & CAP::categoryPeople ? L"People " : L"");
+	wcscat_s(pwsName, size, settings.categoriesAndPurity & CAP::categoryGeneral ? L"General " : L"");
+	wcscat_s(pwsName, size, settings.categoriesAndPurity & CAP::categoryAnime ? L"Anime " : L"");
+	wcscat_s(pwsName, size, settings.categoriesAndPurity & CAP::categoryPeople ? L"People " : L"");
 }
 
 CategoriesAndPurity SearchCollection::getCAP() const

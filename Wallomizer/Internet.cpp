@@ -62,20 +62,20 @@ bool Internet::URLDownloadToFile(const char* URL, const wchar_t* path)
 	}
 
 	const DWORD tmpBufferSize = 1024;
-	char buffer[tmpBufferSize];
+	char tmpBuffer[tmpBufferSize];
 
 	DWORD dwTemp;
 	HANDLE hFile = CreateFileW(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	bool result = false;
-	while (InternetReadFile(hURL, (LPSTR)buffer, tmpBufferSize, &dwBytesRead))
+	while (InternetReadFile(hURL, (LPSTR)tmpBuffer, tmpBufferSize, &dwBytesRead))
 	{
 		if (dwBytesRead == 0)
 		{
 			result = true;
 			break;
 		}
-		WriteFile(hFile, buffer, dwBytesRead, &dwTemp, NULL);
+		WriteFile(hFile, tmpBuffer, dwBytesRead, &dwTemp, NULL);
 	}
 
 	CloseHandle(hFile);
@@ -84,11 +84,11 @@ bool Internet::URLDownloadToFile(const char* URL, const wchar_t* path)
 	return result;
 }
 
-char* Internet::parse(char* buffer, const char* key, nullptr_t value)
+char* Internet::parse(char* _buffer, const char* key, nullptr_t)
 {
-	if (buffer == nullptr)
+	if (_buffer == nullptr)
 		return nullptr;
-	char* pBuffer = buffer;
+	char* pBuffer = _buffer;
 	pBuffer = strstr(pBuffer, key);
 	if (pBuffer == nullptr)
 		return nullptr;
@@ -96,9 +96,9 @@ char* Internet::parse(char* buffer, const char* key, nullptr_t value)
 	return pBuffer;
 }
 
-char* Internet::parse(char* buffer, const char* key, char* value)
+char* Internet::parse(char* _buffer, const char* key, char* value)
 {
-	char* pBuffer = parse(buffer, key, nullptr);
+	char* pBuffer = parse(_buffer, key, nullptr);
 	if (pBuffer == nullptr)
 		return nullptr;
 	pBuffer++;
@@ -118,9 +118,9 @@ char* Internet::parse(char* buffer, const char* key, char* value)
 	return pBuffer;
 }
 
-char* Internet::parse(char* buffer, const char* key, unsigned int* value)
+char* Internet::parse(char* _buffer, const char* key, unsigned int* value)
 {
-	char* pBuffer = parse(buffer, key, nullptr);
+	char* pBuffer = parse(_buffer, key, nullptr);
 	if (pBuffer == nullptr)
 		return nullptr;
 	char search[64] = "";

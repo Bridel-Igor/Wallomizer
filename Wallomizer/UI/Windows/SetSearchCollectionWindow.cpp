@@ -4,7 +4,7 @@
 #include "AspRatPickerWindow.h"
 #include "ColorPickerWindow.h"
 
-SetSearchCollectionWindow::SetSearchCollectionWindow(SearchCollection* pCollection, CollectionManager* pCollectionManager) :
+SetSearchCollectionWindow::SetSearchCollectionWindow(SearchCollection* pCollection, CollectionManager* pCollectionManager) : // add caller
 	IWindow("Search collection", "Set Search Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 260),
 	m_pCurrentSearchCollection(pCollection),
 	m_pCollectionManager(pCollectionManager),
@@ -45,7 +45,7 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(SearchCollection* pCollecti
 		strcpy_s(tmpColor, m_pCurrentSearchCollection->settings.sColor);
 	}
 
-	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 
 	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
@@ -58,7 +58,7 @@ SetSearchCollectionWindow::~SetSearchCollectionWindow()
 	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
 }
 
-LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -89,19 +89,19 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 			return 0;
 		if (btnRes.isClicked(wParam))
 		{
-			ResPickerWindow resPickerWindow(tmpRes, this->hWnd());
+			ResPickerWindow resPickerWindow(tmpRes, hWnd());
 			resPickerWindow.windowLoop();
 			return 0;
 		}
 		if (btnAR.isClicked(wParam))
 		{
-			AspRatPickerWindow aspRatPickerWindow(tmpAR, this->hWnd());
+			AspRatPickerWindow aspRatPickerWindow(tmpAR, hWnd());
 			aspRatPickerWindow.windowLoop();
 			return 0;
 		}
 		if (btnColor.isClicked(wParam))
 		{
-			ColorPickerWindow colorPickerWindow(tmpColor, this->hWnd());
+			ColorPickerWindow colorPickerWindow(tmpColor, hWnd());
 			colorPickerWindow.windowLoop();
 			return 0;
 		}
@@ -117,12 +117,12 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 				m_pCurrentSearchCollection->setValid(true);
 			else
 				m_pCollectionManager->reloadSettings();
-			DestroyWindow(hWnd);
+			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnCancel.isClicked(wParam))
 		{
-			DestroyWindow(hWnd);
+			DestroyWindow(hWnd());
 			return 0;
 		}
 	}
@@ -137,13 +137,11 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 
 	case WM_CTLCOLORSTATIC:
 	{
-		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LRESULT)WindowStyles::mainBkBrush;
 	}
-	return 0;
 
 	case WM_CTLCOLOREDIT:
 	{
@@ -153,16 +151,11 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wP
 		SetDCBrushColor(hdc, WindowStyles::editBkColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
-	return 0;
 
 	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-	}
-	return 0;
+	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
-	return TRUE;
 }

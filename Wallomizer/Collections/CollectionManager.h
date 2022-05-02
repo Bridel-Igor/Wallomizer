@@ -15,7 +15,7 @@ public:
 	~CollectionManager();
 	bool saveSettings(FILE* pFile = nullptr) const;
 	bool loadSettings(FILE* pFile = nullptr);
-	void getCollectionName(wchar_t* pwsName, size_t size) const { pwsName[0] = L'\0'; }
+	void getCollectionName(wchar_t*, size_t) const {}
 	CollectionType getCollectionType() const { return CollectionType::none; }
 	CategoriesAndPurity getCAP() const { return 0; }
 	Wallpaper* getWallpaperInfo(unsigned int index) const;

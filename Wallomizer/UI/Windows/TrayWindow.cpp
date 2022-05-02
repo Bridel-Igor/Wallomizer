@@ -44,7 +44,7 @@ TrayWindow::TrayWindow(CollectionManager* pCollectionManager) :
 
 	pszIDStatusIcon = MAKEINTRESOURCE(IDI_APP);
 	hStatusIcon = LoadIcon(GetModuleHandleA(NULL), pszIDStatusIcon);
-	TrayMessage(this->hWnd(), NIM_ADD, 1, hStatusIcon, "Wallomizer");
+	TrayMessage(hWnd(), NIM_ADD, 1, hStatusIcon, "Wallomizer");
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	ShowWindow(hWnd(), SW_HIDE);
@@ -61,7 +61,7 @@ TrayWindow::~TrayWindow()
 	Delay::abortDelay();
 }
 
-LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -84,8 +84,8 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 			player.updateTimer(true);
 			//player.redrawPlayers();
-			SetWindowPos(this->hWnd(), HWND_TOPMOST, pt.x, pt.y, width, height, SWP_SHOWWINDOW);
-			SetForegroundWindow(this->hWnd());
+			SetWindowPos(hWnd(), HWND_TOPMOST, pt.x, pt.y, width, height, SWP_SHOWWINDOW);
+			SetForegroundWindow(hWnd());
 		}
 	}
 	return 0;
@@ -93,7 +93,7 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	case WM_NCACTIVATE:
 	{
 		if (wParam == FALSE)
-			ShowWindow(this->hWnd(), SW_HIDE);
+			ShowWindow(hWnd(), SW_HIDE);
 	}
 	return 0;
 
@@ -116,26 +116,20 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 	case WM_CTLCOLORSTATIC:
 	{
-		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LRESULT)WindowStyles::mainBkBrush;
 	}
-	return 0;
 
 	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-	}
-	return 0;
+	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 
 	case WM_QUERYENDSESSION:
 	{
 		Delay::saveSession(m_pCollectionManager->pCurrent);
 		return TRUE;
 	}
-	return 0;
 
 	case WM_COMMAND:
 	{
@@ -153,8 +147,8 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 		}
 		if (btnExit.isClicked(wParam))
 		{
-			TrayMessage(hWnd, NIM_DELETE, 1, hStatusIcon, "Wallomizer");
-			DestroyWindow(hWnd);
+			TrayMessage(hWnd(), NIM_DELETE, 1, hStatusIcon, "Wallomizer");
+			DestroyWindow(hWnd());
 			return 0;
 		}
 	}
@@ -169,5 +163,4 @@ LRESULT TrayWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 	default:
 		return DefWindowProcA(m_hWnd, uMsg, wParam, lParam);
 	}
-	return TRUE;
 }

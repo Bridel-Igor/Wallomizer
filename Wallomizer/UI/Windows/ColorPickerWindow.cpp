@@ -1,7 +1,6 @@
 #include <string>
 
 #include "ColorPickerWindow.h"
-#include "MainWindow.h"
 
 ColorPickerWindow::ColorPickerWindow(char* sColor, HWND hCaller) :
 	IWindow("Color", "Color Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 405, 195),
@@ -62,9 +61,9 @@ ColorPickerWindow::ColorPickerWindow(char* sColor, HWND hCaller) :
 			}
 		}
 
-	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 
-	centerWindow(MainWindow::s_pMainWindow->hWnd());
+	centerWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
@@ -75,7 +74,7 @@ ColorPickerWindow::~ColorPickerWindow()
 	SetForegroundWindow(m_hCaller);
 }
 
-LRESULT ColorPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT ColorPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -105,8 +104,8 @@ LRESULT ColorPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		for (int i = 0; i < 30; i++)
 			if (btnClr[i].isClicked(wParam))
 			{
-				for (int i = 0; i < 30; i++)
-					btnClr[i].check(false);
+				for (int j = 0; j < 30; j++)
+					btnClr[j].check(false);
 				btnClr[i].check(true);
 				return 0;
 			}
@@ -120,22 +119,19 @@ LRESULT ColorPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 					btnClr[i].getColor(m_sColor, 16);
 					break;
 				}
-			DestroyWindow(this->hWnd());
+			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnCancel.isClicked(wParam))
 		{
-			DestroyWindow(this->hWnd());
+			DestroyWindow(hWnd());
 			return 0;
 		}
 	}
 	return 0;
 
 	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-	}
-	return 0;
+	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 
 	case WM_SETCURSOR:
 	{
@@ -147,5 +143,4 @@ LRESULT ColorPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
-	return TRUE;
 }

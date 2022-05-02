@@ -1,5 +1,4 @@
 #include "AspRatPickerWindow.h"
-#include "MainWindow.h"
 
 AspRatPickerWindow::AspRatPickerWindow(char* sAspRat, HWND hCaller) :
 	IWindow("Ratio", "Aspect Ratio Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 315, 195),
@@ -41,8 +40,8 @@ AspRatPickerWindow::AspRatPickerWindow(char* sAspRat, HWND hCaller) :
 			btnAR[i].check(true);
 	}
 	
-	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-	centerWindow(MainWindow::s_pMainWindow->hWnd());
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	centerWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
@@ -53,7 +52,7 @@ AspRatPickerWindow::~AspRatPickerWindow()
 	SetForegroundWindow(m_hCaller);
 }
 
-LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -121,7 +120,7 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			}
 			if (empty)
 			{
-				DestroyWindow(this->hWnd());
+				DestroyWindow(hWnd());
 				return 0;
 			}
 			strcpy_s(m_sAspRat, 128, "&ratios=");
@@ -129,7 +128,7 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 				strcat_s(m_sAspRat, 128, "landscape");
 			if (btnAllPortrait.isChecked())
 				strcat_s(m_sAspRat, 128, ",portrait");
-			for (int i = 0; i < 12; i++)
+			for (i = 0; i < 12; i++)
 				if (btnAR[i].isChecked())
 				{
 					strcat_s(m_sAspRat, 128, ",");
@@ -137,12 +136,12 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 					GetWindowTextA(btnAR[i].hWnd(), buf, 15);
 					strcat_s(m_sAspRat, 128, buf);
 				}
-			DestroyWindow(this->hWnd());
+			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnCancel.isClicked(wParam))
 		{
-			DestroyWindow(this->hWnd());
+			DestroyWindow(hWnd());
 			return 0;
 		}
 	}
@@ -150,19 +149,14 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 
 	case WM_CTLCOLORSTATIC:
 	{
-		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LRESULT)WindowStyles::mainBkBrush;
 	}
-	return 0;
 
 	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-	}
-	return 0;
+	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 
 	case WM_SETCURSOR:
 	{
@@ -176,5 +170,4 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, L
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
-	return TRUE;
 }

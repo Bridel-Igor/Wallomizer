@@ -3,7 +3,7 @@
 #include "SetLocalCollectionWindow.h"
 #include "MainWindow.h"
 
-SetLocalCollectionWindow::SetLocalCollectionWindow(LocalCollection* pCollection, CollectionManager* pCollectionManager) :
+SetLocalCollectionWindow::SetLocalCollectionWindow(LocalCollection* pCollection, CollectionManager* pCollectionManager) : // add caller
 	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90),
 	m_pCollectionManager(pCollectionManager),
 	m_pCurrentLocalCollection(pCollection),
@@ -15,7 +15,7 @@ SetLocalCollectionWindow::SetLocalCollectionWindow(LocalCollection* pCollection,
 	btnOk		(hWnd(), "Ok",							205,	60,		185,	20)
 {
 	EnableWindow(MainWindow::s_pMainWindow->hWnd(), FALSE);
-	EnumChildWindows(this->hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	centerWindow(MainWindow::s_pMainWindow->hWnd());
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
@@ -99,13 +99,11 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 
 	case WM_CTLCOLORSTATIC:
 	{
-		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LRESULT)WindowStyles::mainBkBrush;
 	}
-	return 0;
 
 	case WM_CTLCOLOREDIT:
 	{
@@ -115,16 +113,11 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 		SetDCBrushColor(hdc, WindowStyles::editBkColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
-	return 0;
 
 	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-	}
-	return 0;
+	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
-	return TRUE;
 }

@@ -34,7 +34,7 @@ HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, 
 	return hRes;
 }
 
-SettingsWindow::SettingsWindow() :
+SettingsWindow::SettingsWindow() : // add caller
 	IWindow("Settings", "Setting Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	stApplication	(hWnd(), "Application",			10,		10,		380,	20, SS_CENTER),
 	stVersion		(hWnd(), "Version:",			10,		40,		130,	20, SS_RIGHT),
@@ -83,7 +83,7 @@ SettingsWindow::~SettingsWindow()
 	SetForegroundWindow(MainWindow::s_pMainWindow->hWnd());
 }
 
-LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -203,12 +203,12 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 			Settings::saveSettings();
 			Player::updateTimer(true);
-			DestroyWindow(this->hWnd());
+			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnCancel.isClicked(wParam))
 		{
-			DestroyWindow(this->hWnd());
+			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnUpdate.isClicked(wParam))
@@ -243,7 +243,6 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 	case WM_CTLCOLORSTATIC:
 	{
-		HWND hWndStatic = (HWND)lParam;
 		HDC hdcStatic = (HDC)wParam;
 		if ((HWND)lParam == stApplication.hWnd() || (HWND)lParam == stSlideshow.hWnd() || (HWND)lParam == stWallhaven.hWnd())
 			SetTextColor(hdcStatic, WindowStyles::titleFontColor);
@@ -252,7 +251,6 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		SetBkMode(hdcStatic, TRANSPARENT);
 		return (LRESULT)WindowStyles::mainBkBrush;
 	}
-	return 0;
 
 	case WM_CTLCOLOREDIT:
 	{
@@ -266,12 +264,9 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 				SetBkColor(hdc, WindowStyles::editBkInvalidColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
-	return 0;
 
 	case WM_CTLCOLORBTN:
-	{
-		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-	}
+	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 
 	case WM_SETCURSOR:
 	{
@@ -282,5 +277,4 @@ LRESULT SettingsWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	default:
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
-	return TRUE;
 }

@@ -73,10 +73,10 @@ void UserCollection::getCollectionName(wchar_t* pwsName, size_t size) const
 	wchar_t wsCollectionName[64]{ 0 };
 	mbstowcs_s(nullptr, wsCollectionName, settings.sCollectionName, 64);
 
-	wcscpy_s(pwsName, 255, L" ");
-	wcscat_s(pwsName, 255, wsUsername);
-	wcscat_s(pwsName, 255, L": ");
-	wcscat_s(pwsName, 255, wsCollectionName);
+	wcscpy_s(pwsName, size, L" ");
+	wcscat_s(pwsName, size, wsUsername);
+	wcscat_s(pwsName, size, L": ");
+	wcscat_s(pwsName, size, wsCollectionName);
 }
 
 CategoriesAndPurity UserCollection::getCAP() const

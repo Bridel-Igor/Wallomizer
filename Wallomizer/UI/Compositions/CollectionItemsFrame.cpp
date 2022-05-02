@@ -70,7 +70,7 @@ void CollectionItemsFrame::updateScroll()
 	EnableScrollBar(hWnd(), SB_VERT, itemListHeight <= m_height ? ESB_DISABLE_BOTH : ESB_ENABLE_BOTH);
 }
 
-LRESULT CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CollectionItemsFrame::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -208,7 +208,6 @@ LRESULT CollectionItemsFrame::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam,
 		SetBkColor(hdcStatic, WindowStyles::collItemBkColor);
 		return (LRESULT)WindowStyles::collItemBkBrush;
 	}
-	return 0;
 
 	case WM_SETCURSOR:
 	{
