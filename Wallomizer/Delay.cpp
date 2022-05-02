@@ -83,8 +83,7 @@ void Delay::delay()
 			uDelayed = 0;
 			continue;
 		}
-		using namespace std::literals::chrono_literals;
-		std::this_thread::sleep_for(100ms);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		if (isSlideshowRunning)
 			uDelayed += 100;
 		if (uDelayed % 1000 == 0)
