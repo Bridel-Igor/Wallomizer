@@ -10,6 +10,8 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "WindowStyles.h"
 #include "resource.h"
 
+#define RESULT_DEFAULT -1
+
 class IWindow : public IComponent
 {
 public:

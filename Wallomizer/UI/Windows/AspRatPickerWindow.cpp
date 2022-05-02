@@ -78,15 +78,6 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM
 	}
 	return 0;
 
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
-		EndPaint(m_hWnd, &ps);
-	}
-	return 0;
-
 	case WM_COMMAND:
 	{
 		if (btnAllWide.isClicked(wParam))
@@ -147,17 +138,6 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM
 	}
 	return 0;
 
-	case WM_CTLCOLORSTATIC:
-	{
-		HDC hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
-		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)WindowStyles::mainBkBrush;
-	}
-
-	case WM_CTLCOLORBTN:
-	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-
 	case WM_SETCURSOR:
 	{
 		btnAllWide.mouseHovering(wParam);
@@ -168,6 +148,6 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM
 	}
 
 	default:
-		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+		return RESULT_DEFAULT;
 	}
 }

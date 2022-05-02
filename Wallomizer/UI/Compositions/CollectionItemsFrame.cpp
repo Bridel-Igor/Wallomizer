@@ -217,7 +217,7 @@ LRESULT CollectionItemsFrame::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPAR
 	}
 
 	default:
-		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+		return DefWindowProcA(hWnd(), uMsg, wParam, lParam);
 	}
-	return TRUE;
+	return DefWindowProcA(hWnd(), uMsg, wParam, lParam);
 }

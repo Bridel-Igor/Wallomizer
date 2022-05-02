@@ -70,15 +70,6 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 	}
 	return 0;
 
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
-		EndPaint(m_hWnd, &ps);
-	}
-	return 0;
-
 	case WM_COMMAND:
 	{
 		if (purCom.click(wParam))
@@ -165,27 +156,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 		// Fallthrough. DefWindowProc must be reached anyway.
 	}
 
-	case WM_CTLCOLORSTATIC:
-	{
-		HDC hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
-		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)WindowStyles::mainBkBrush;
-	}
-
-	case WM_CTLCOLOREDIT:
-	{
-		HDC hdc = (HDC)wParam;
-		SetTextColor(hdc, WindowStyles::editFontColor);
-		SetBkColor(hdc, WindowStyles::editBkColor);
-		SetDCBrushColor(hdc, WindowStyles::editBkColor);
-		return (LRESULT)GetStockObject(DC_BRUSH);
-	}
-
-	case WM_CTLCOLORBTN:
-	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-
 	default:
-		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+		return RESULT_DEFAULT;
 	}
 }

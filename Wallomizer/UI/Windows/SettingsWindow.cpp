@@ -232,15 +232,6 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 	}
 	return 0;
 
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
-		EndPaint(m_hWnd, &ps);
-	}
-	return 0;
-
 	case WM_CTLCOLORSTATIC:
 	{
 		HDC hdcStatic = (HDC)wParam;
@@ -265,9 +256,6 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
 
-	case WM_CTLCOLORBTN:
-	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-
 	case WM_SETCURSOR:
 	{
 		cbStartup.mouseHovering(wParam);
@@ -275,6 +263,6 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 	}
 
 	default:
-		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+		return RESULT_DEFAULT;
 	}
 }

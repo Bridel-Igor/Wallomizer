@@ -82,7 +82,6 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			pt.y = pt.y + int(height / 2) > wrkArea.bottom	? wrkArea.bottom - height	: pt.y;
 
 			player.updateTimer(true);
-			//player.redrawPlayers();
 			SetWindowPos(hWnd(), HWND_TOPMOST, pt.x, pt.y, width, height, SWP_SHOWWINDOW);
 			SetForegroundWindow(hWnd());
 		}
@@ -103,26 +102,6 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return TRUE;
 	}
 	return 0;
-
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
-		EndPaint(m_hWnd, &ps);
-	}
-	return 0;
-
-	case WM_CTLCOLORSTATIC:
-	{
-		HDC hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
-		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)WindowStyles::mainBkBrush;
-	}
-
-	case WM_CTLCOLORBTN:
-	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 
 	case WM_QUERYENDSESSION:
 	{
@@ -155,6 +134,6 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	default:
-		return DefWindowProcA(m_hWnd, uMsg, wParam, lParam);
+		return RESULT_DEFAULT;
 	}
 }

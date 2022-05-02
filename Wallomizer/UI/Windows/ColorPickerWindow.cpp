@@ -88,15 +88,6 @@ LRESULT ColorPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM 
 	}
 	return 0;
 
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
-		EndPaint(m_hWnd, &ps);
-	}
-	return 0;
-
 	case WM_COMMAND:
 	{
 		for (int i = 0; i < 30; i++)
@@ -128,9 +119,6 @@ LRESULT ColorPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM 
 	}
 	return 0;
 
-	case WM_CTLCOLORBTN:
-	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
-
 	case WM_SETCURSOR:
 	{
 		for (int i = 0; i < 30; i++)
@@ -139,6 +127,6 @@ LRESULT ColorPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM 
 	}
 
 	default:
-		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
+		return RESULT_DEFAULT;
 	}
 }

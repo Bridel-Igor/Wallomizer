@@ -1,8 +1,8 @@
+#pragma once
+
 #include <exception>
 
 #include "IWindow.h"
-
-#pragma once
 
 IWindow::IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwExStyle,
 		int x, int y, int nWidth, int nHeight, HWND hParent) :
@@ -101,7 +101,43 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	}
 
 	if (pThis && pThis->m_isReady)
-		return pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
-	else
-		return DefWindowProcA(hWnd, uMsg, wParam, lParam);
+	{
+		LRESULT result = pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
+		if (result != RESULT_DEFAULT)
+			return result;
+	}
+
+	switch (uMsg)
+	{
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hWnd, &ps);
+		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
+		EndPaint(hWnd, &ps);
+	}
+	return 0;
+
+	case WM_CTLCOLOREDIT:
+	{
+		HDC hdc = (HDC)wParam;
+		SetTextColor(hdc, WindowStyles::editFontColor);
+		SetBkColor(hdc, WindowStyles::editBkColor);
+		SetDCBrushColor(hdc, WindowStyles::editBkColor);
+		return (LRESULT)GetStockObject(DC_BRUSH);
+	}
+
+	case WM_CTLCOLORSTATIC:
+	{
+		HDC hdcStatic = (HDC)wParam;
+		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
+		SetBkMode(hdcStatic, TRANSPARENT);
+		return (LRESULT)WindowStyles::mainBkBrush;
+	}
+
+	case WM_CTLCOLORBTN:
+	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
+	}
+
+	return DefWindowProcA(hWnd, uMsg, wParam, lParam);
 }
