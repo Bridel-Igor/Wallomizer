@@ -14,10 +14,12 @@ SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, CollectionManag
 	btnCancel	(hWnd(), "Cancel",						10,		60,		185,	20),
 	btnOk		(hWnd(), "Ok",							205,	60,		185,	20)
 {
-	EnableWindow(m_hCaller, FALSE);
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
 	centerWindow(m_hCaller);
+	EnableWindow(m_hCaller, FALSE);
+	SetForegroundWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
+	SetForegroundWindow(hWnd());
 }
 
 SetLocalCollectionWindow::~SetLocalCollectionWindow()

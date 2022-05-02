@@ -17,12 +17,6 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, CollectionManager
 	btnCancel				(hWnd(), "Cancel",			10,		100,	80,		20),
 	btnOk					(hWnd(), "Ok",				100,	100,	240,	20)
 {
-	// Review: how to improve exception handling
-	if (m_pCurrentUserCollection == nullptr)
-		return;
-
-	EnableWindow(m_hCaller, FALSE);
-		
 	edUsername.setTextA(m_pCurrentUserCollection->settings.sUsername);
 	purCom.setPurity(m_pCurrentUserCollection->settings.categoriesAndPurity);
 
@@ -46,9 +40,11 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, CollectionManager
 	}
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-
 	centerWindow(m_hCaller);
+	EnableWindow(m_hCaller, FALSE);
+	SetForegroundWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
+	SetForegroundWindow(hWnd());
 }
 
 SetUserCollectionWindow::~SetUserCollectionWindow()

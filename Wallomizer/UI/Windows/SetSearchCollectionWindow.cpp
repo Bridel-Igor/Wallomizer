@@ -33,8 +33,6 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionMan
 	btnCancel		(hWnd(), "Cancel",													80,		230,	185,	20),
 	btnOk			(hWnd(), "Ok",														275,	230,	185,	20)
 {
-	EnableWindow(m_hCaller, FALSE);
-
 	if (m_pCurrentSearchCollection)
 	{
 		catCom.setCategory(m_pCurrentSearchCollection->settings.categoriesAndPurity);
@@ -46,9 +44,11 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionMan
 	}
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-
 	centerWindow(m_hCaller);
+	EnableWindow(m_hCaller, FALSE);
+	SetForegroundWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
+	SetForegroundWindow(hWnd());
 }
 
 SetSearchCollectionWindow::~SetSearchCollectionWindow()
@@ -82,18 +82,24 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 		{
 			ResPickerWindow resPickerWindow(hWnd(), tmpRes);
 			resPickerWindow.windowLoop();
+			SetForegroundWindow(m_hCaller);
+			SetForegroundWindow(hWnd());
 			return 0;
 		}
 		if (btnAR.isClicked(wParam))
 		{
 			AspRatPickerWindow aspRatPickerWindow(hWnd(), tmpAR);
 			aspRatPickerWindow.windowLoop();
+			SetForegroundWindow(m_hCaller);
+			SetForegroundWindow(hWnd());
 			return 0;
 		}
 		if (btnColor.isClicked(wParam))
 		{
 			ColorPickerWindow colorPickerWindow(hWnd(), tmpColor);
 			colorPickerWindow.windowLoop();
+			SetForegroundWindow(m_hCaller);
+			SetForegroundWindow(hWnd());
 			return 0;
 		}
 		if (btnOk.isClicked(wParam))
