@@ -80,7 +80,7 @@ bool CollectionManager::loadSettings(FILE* pFile)
 	if (MainWindow::s_pMainWindow && MainWindow::s_pMainWindow->isReady())
 		MainWindow::s_pMainWindow->collectionItemsFrame.updateCollectionItems();
 	m_isReady = true;
-	if (Delay::bRunSlideshow)
+	if (Delay::isSlideshowRunning)
 		Delay::abortDelay();
 	if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady())
 		PostMessageA(TrayWindow::s_pTrayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::s_pTrayWindow->btnSettings.hMenu(), NULL);
@@ -109,14 +109,14 @@ Wallpaper* CollectionManager::getWallpaperInfo(unsigned int _index) const
 
 void CollectionManager::reloadSettings()
 {
-	Delay::beginImageModification();
+	beginImageModification();
 	saveSettings();
 	loadSettings();
 	wchar_t wsPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
-	Delay::endImageModification();
+	endImageModification();
 	Delay::replayDelay();
 }
 
@@ -160,12 +160,12 @@ void CollectionManager::eraseCollection(int index)
 	m_pCollections.erase(CollectionManager::m_pCollections.begin() + index);
 	saveSettings();
 	updateNumber();
-	Delay::beginImageModification();
+	beginImageModification();
 	wchar_t wsPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
-	Delay::endImageModification();
+	endImageModification();
 	Delay::abortDelay();
 }
 
@@ -178,11 +178,11 @@ void CollectionManager::loadRandomWallpaper()
 {
 	if (m_uiNumber <= 0)
 		return;
-	Delay::beginImageModification();
+	beginImageModification();
 	const int randomFromAll = m_uniformIntDistribution(m_randomGenerator);
 	pNext = getWallpaperInfo(randomFromAll);
 	loadWallpaper(pNext);
-	Delay::endImageModification();
+	endImageModification();
 }
 
 void CollectionManager::setLoadedWallpaper(bool setPrevious)
@@ -198,7 +198,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 		Delay::abortDelay();
 		return;
 	}
-	Delay::beginImageModification();
+	beginImageModification();
 	if (!setPrevious)
 	{
 		if (pCurrent != nullptr)
@@ -215,7 +215,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	DeleteFileW(wsCurrentPath);
 	if (MoveFileW(wsLoadedPath, wsCurrentPath) == 0)
 	{
-		Delay::endImageModification();
+		endImageModification();
 		return;
 	}
 	wchar_t wsCurrentPathNative[MAX_PATH];
@@ -223,7 +223,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	wcscat_s(wsCurrentPathNative, MAX_PATH, L"Current wallpaper.jpg");
 	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, wsCurrentPathNative, SPIF_UPDATEINIFILE);
 	Player::redrawPlayers();
-	Delay::endImageModification();
+	endImageModification();
 }
 
 void CollectionManager::setNextWallpaper()
@@ -284,4 +284,15 @@ bool CollectionManager::loadWallpaper(const Wallpaper* pWallpaper)
 	default:
 		return false;
 	}
+}
+
+void CollectionManager::beginImageModification()
+{
+	imageModification.lock();
+}
+
+void CollectionManager::endImageModification()
+{
+	if (!imageModification.try_lock())
+		imageModification.unlock();
 }

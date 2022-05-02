@@ -33,7 +33,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			}
 			catch (...)
 			{	
-				WindowStyles::clear();
+				WindowStyles::clear(); 
 				trayWindowException = std::current_exception();
 			}
 		});
@@ -45,7 +45,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 				Sleep(100);
 				continue;
 			}
-			std::thread delayThread(Delay::Delay);
+			std::thread delayThread(Delay::delay);
 			collectionManager.loadNextWallpaper();
 			delayThread.join();
 			if (Delay::exiting)

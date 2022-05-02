@@ -5,16 +5,14 @@
 namespace Delay
 {
 	extern bool exiting;
-	extern bool bRunSlideshow;
+	extern bool isSlideshowRunning;
 
-	void saveSession(Wallpaper *current = nullptr);
-	void loadSession(Wallpaper *&current);
+	void saveSession(Wallpaper *pCurrent = nullptr);
+	void loadSession(Wallpaper *&pCurrent);
+	void delay();
 	unsigned long getRemainingDelay();
-	void Delay();
 	void abortDelay();
 	void replayDelay();
 	void startSlideshow();
 	void pauseSlideshow();
-	void beginImageModification();
-	void endImageModification();
 }

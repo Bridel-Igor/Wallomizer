@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <mutex>
 
 #include "Delay.h"
 #include "Settings.h"
@@ -7,105 +6,96 @@
 #include "Player.h"
 
 bool Delay::exiting = false;
-bool Delay::bRunSlideshow = true;
+bool Delay::isSlideshowRunning = true;
 
 namespace Delay
 {
-	std::mutex loadingImage;
 	bool bAbortDelay = false;
 	bool bReplayDelay = false;
-	unsigned long delayed = 0;
+	unsigned long uDelayed = 0;
 }
 
-void Delay::saveSession(Wallpaper *current)
+void Delay::saveSession(Wallpaper *pCurrent)
 {
-	wchar_t path[MAX_PATH];
-	Filesystem::getRoamingDir(path);
-	wcscat_s(path, MAX_PATH, L"Session.dat\0");
+	wchar_t wsPath[MAX_PATH];
+	Filesystem::getRoamingDir(wsPath);
+	wcscat_s(wsPath, MAX_PATH, L"Session.dat\0");
 	FILE* pFile;
-	_wfopen_s(&pFile, path, L"wb");
-	if (pFile != NULL)
+	_wfopen_s(&pFile, wsPath, L"wb");
+	if (pFile == NULL)
+		return;
+	fwrite(&isSlideshowRunning, sizeof(isSlideshowRunning), 1, pFile);
+	fwrite(&uDelayed, sizeof(uDelayed), 1, pFile);
+	CollectionType type = CollectionType::none;
+	if (pCurrent)
+		type = pCurrent->getType();
+	fwrite(&type, sizeof(CollectionType), 1, pFile);
+	switch (type)
 	{
-		fwrite(&bRunSlideshow, sizeof(bRunSlideshow), 1, pFile);
-		fwrite(&delayed, sizeof(delayed), 1, pFile);
-		unsigned char type;
-		if (current != nullptr)
-		{
-			type = static_cast<unsigned char>(current->getType());
-			fwrite(&type, sizeof(CollectionType), 1, pFile);
-			if (current->getType() == CollectionType::local)
-				fwrite(current->getPathW(), sizeof(wchar_t), MAX_PATH, pFile);
-			if (current->getType() == CollectionType::user)
-				fwrite(current->getPathA(), sizeof(char), 255, pFile);
-			if (current->getType() == CollectionType::search)
-				fwrite(current->getPathA(), sizeof(char), 1024, pFile);
-		}
-		else
-		{
-			type = static_cast<unsigned char>(CollectionType::none);
-			fwrite(&type, sizeof(CollectionType), 1, pFile);
-		}
-		fclose(pFile);
+	case CollectionType::local:		fwrite(pCurrent->getPathW(), sizeof(wchar_t), MAX_PATH, pFile);	break;
+	case CollectionType::user:		fwrite(pCurrent->getPathA(), sizeof(char), 255, pFile);			break;
+	case CollectionType::search:	fwrite(pCurrent->getPathA(), sizeof(char), 1024, pFile);		break;
 	}
+	fclose(pFile);
 }
 
-void Delay::loadSession(Wallpaper*& current)
+void Delay::loadSession(Wallpaper*& pCurrent)
 {
-	wchar_t path[MAX_PATH];
-	Filesystem::getRoamingDir(path);
-	wcscat_s(path, MAX_PATH, L"Session.dat\0");
+	wchar_t wsPath[MAX_PATH];
+	Filesystem::getRoamingDir(wsPath);
+	wcscat_s(wsPath, MAX_PATH, L"Session.dat\0");
 	FILE* pFile;
-	_wfopen_s(&pFile, path, L"rb");
-	if (pFile != NULL)
+	_wfopen_s(&pFile, wsPath, L"rb");
+	if (pFile == NULL)
+		return;
+	fread(&isSlideshowRunning, sizeof(isSlideshowRunning), 1, pFile);
+	fread(&uDelayed, sizeof(uDelayed), 1, pFile);
+	if (pCurrent == nullptr)
 	{
-		fread(&bRunSlideshow, sizeof(bRunSlideshow), 1, pFile);
-		fread(&delayed, sizeof(delayed), 1, pFile);
-		if (current == nullptr)
+		CollectionType type;
+		fread(&type, sizeof(CollectionType), 1, pFile);
+		pCurrent = new Wallpaper(type);
+		switch (type)
 		{
-			unsigned char type;
-			fread(&type, sizeof(CollectionType), 1, pFile);
-			current = new Wallpaper(static_cast<CollectionType>(type));
-			if (current->getType() == CollectionType::local)
-				fread(current->getPathW(), sizeof(wchar_t), MAX_PATH, pFile);
-			if (current->getType() == CollectionType::user)
-				fread(current->getPathA(), sizeof(char), 255, pFile);
-			if (current->getType() == CollectionType::search)
-				fread(current->getPathA(), sizeof(char), 1024, pFile);
+		case CollectionType::local:		fread(pCurrent->getPathW(), sizeof(wchar_t), MAX_PATH, pFile);	break;
+		case CollectionType::user:		fread(pCurrent->getPathA(), sizeof(char), 255, pFile);			break;
+		case CollectionType::search:	fread(pCurrent->getPathA(), sizeof(char), 1024, pFile);			break;
 		}
-		fclose(pFile);
-		bAbortDelay = false;
 	}
-	DeleteFileW(path);
+	fclose(pFile);
+	bAbortDelay = false;
+	DeleteFileW(wsPath);
 }
 
-unsigned long Delay::getRemainingDelay()
+void Delay::delay()
 {
-	return Settings::delay > delayed ? Settings::delay - delayed : 0;
-}
-
-void Delay::Delay()
-{
-	while (delayed < Settings::delay)
+	while (uDelayed < Settings::delay)
 	{
 		if (bAbortDelay)
 		{
 			bAbortDelay = false;
-			delayed = 0;
+			uDelayed = 0;
 			return;
 		}
 		if (bReplayDelay)
 		{
 			bReplayDelay = false;
-			delayed = 0;
+			uDelayed = 0;
 			continue;
 		}
-		Sleep(100);
-		if (bRunSlideshow)
-			delayed += 100;
-		if (delayed % 1000 == 0)
+		using namespace std::literals::chrono_literals;
+		std::this_thread::sleep_for(100ms);
+		if (isSlideshowRunning)
+			uDelayed += 100;
+		if (uDelayed % 1000 == 0)
 			Player::updateTimer();
 	}
-	delayed = 0;
+	uDelayed = 0;
+}
+
+unsigned long Delay::getRemainingDelay()
+{
+	return Settings::delay > uDelayed ? Settings::delay - uDelayed : 0;
 }
 
 void Delay::abortDelay()
@@ -120,20 +110,10 @@ void Delay::replayDelay()
 
 void Delay::startSlideshow()
 {
-	bRunSlideshow = true;
+	isSlideshowRunning = true;
 }
 
 void Delay::pauseSlideshow()
 {
-	bRunSlideshow = false;
-}
-
-void Delay::beginImageModification()
-{
-	Delay::loadingImage.lock();
-}
-
-void Delay::endImageModification()
-{
-	Delay::loadingImage.unlock();
+	isSlideshowRunning = false;
 }

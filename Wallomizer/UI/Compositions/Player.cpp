@@ -77,7 +77,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 		return true;
 	if (pDIS->hwndItem == btnPlay.hWnd())
 	{
-		if (Delay::bRunSlideshow)
+		if (Delay::isSlideshowRunning)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIPlayActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -88,7 +88,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	}
 	if (pDIS->hwndItem == btnPause.hWnd())
 	{
-		if (!Delay::bRunSlideshow)
+		if (!Delay::isSlideshowRunning)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
