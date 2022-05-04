@@ -7,8 +7,8 @@
 HICON CollectionItem::Resources::hIOptions, CollectionItem::Resources::hIOptionsHover, 
 	CollectionItem::Resources::hIDelete, CollectionItem::Resources::hIDeleteHover;
 HBRUSH CollectionItem::Resources::collItemBkBrush;
-COLORREF CollectionItem::Resources::collItemFontColor;
-COLORREF CollectionItem::Resources::collItemBkColor;
+COLORREF CollectionItem::Resources::collItemFontColor = RGB(200, 200, 200);
+COLORREF CollectionItem::Resources::collItemBkColor = RGB(36, 36, 36);
 
 unsigned char CollectionItem::Resources::refCount = 0;
 
@@ -16,8 +16,6 @@ CollectionItem::Resources::Resources()
 {
 	if (refCount++) // Loading icons only if this is the first player creating
 		return;
-	collItemFontColor = RGB(200, 200, 200);
-	collItemBkColor = RGB(36, 36, 36);
 	collItemBkBrush = CreateSolidBrush(collItemBkColor);
 	hIDelete =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_DELETE),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 	hIDeleteHover =		(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_DELETE_HOVER),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
@@ -70,7 +68,7 @@ void CollectionItem::reposition(int yPos, bool sb)
 	MoveWindow(chboEnabled.hWnd(),	x,										y - yPos,	22,									height, FALSE);
 	MoveWindow(stName.hWnd(),		x + 23,									y - yPos,	width - height * 3 - 121 - sb * 18,	height, FALSE);
 	purity.moveComponent(			x + width - height * 3 - 97 - sb * 18,	y - yPos,	height * 3,							height);
-	MoveWindow(stNumber.hWnd(),	x + width - 96 - sb * 18,				y - yPos,	50,									height, FALSE);
+	MoveWindow(stNumber.hWnd(),		x + width - 96 - sb * 18,				y - yPos,	50,									height, FALSE);
 	MoveWindow(btnSettings.hWnd(),	x + width - 45 - sb * 18,				y - yPos,	22,									height, FALSE);
 	MoveWindow(btnDelete.hWnd(),	x + width - 22 - sb * 18,				y - yPos,	22,									height, FALSE);
 }

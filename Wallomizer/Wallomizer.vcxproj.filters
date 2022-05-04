@@ -112,8 +112,8 @@
     <ClCompile Include="UI\Interfaces\IWindow.cpp">
       <Filter>UI\Interfaces</Filter>
     </ClCompile>
-    <ClCompile Include="UI\Compositions\CollectionItemsFrame.cpp">
-      <Filter>UI\Compositions</Filter>
+    <ClCompile Include="UI\Components\Panel.cpp">
+      <Filter>UI\Components\Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -237,8 +237,8 @@
     <ClInclude Include="UI\Interfaces\IWindow.h">
       <Filter>UI\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="UI\Compositions\CollectionItemsFrame.h">
-      <Filter>UI\Compositions</Filter>
+    <ClInclude Include="UI\Components\Panel.h">
+      <Filter>UI\Components\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

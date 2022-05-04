@@ -42,10 +42,9 @@ public:
 protected:
 	virtual LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 	static BOOL CALLBACK SetChildFont(HWND hChild, LPARAM lParam);
+	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
-	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	
 	LPCSTR m_sName;
 	bool m_isReady = false;
 };

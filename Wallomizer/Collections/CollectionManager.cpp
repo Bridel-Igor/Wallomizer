@@ -78,11 +78,11 @@ bool CollectionManager::loadSettings(FILE* pFile)
 	}
 	updateNumber();
 	if (MainWindow::s_pMainWindow && MainWindow::s_pMainWindow->isReady())
-		MainWindow::s_pMainWindow->collectionItemsFrame.updateCollectionItems();
+		MainWindow::s_pMainWindow->updateCollectionItems();
 	m_isReady = true;
 	if (Delay::isSlideshowRunning)
 		Delay::abortDelay();
-	if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady())
+	if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady()) // BUG: this thread rust faster than tray
 		PostMessageA(TrayWindow::s_pTrayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::s_pTrayWindow->btnSettings.hMenu(), NULL);
 	m_isLoading = false;
 	Player::updateTimer(true);
