@@ -21,13 +21,6 @@ HBRUSH WindowStyles::collFrameBkBrush;
 HICON	WindowStyles::hIOptions, WindowStyles::hIOptionsHover, 
 		WindowStyles::hIDelete, WindowStyles::hIDeleteHover;
 
-// player icons
-HICON	WindowStyles::hIPlay, WindowStyles::hIPlayHover, WindowStyles::hIPlayActive, 
-		WindowStyles::hIPause, WindowStyles::hIPauseHover, WindowStyles::hIPauseActive, 
-		WindowStyles::hIPrev, WindowStyles::hIPrevHover, WindowStyles::hIPrevDisabled,
-		WindowStyles::hINext, WindowStyles::hINextHover,
-		WindowStyles::hIOpenExternal, WindowStyles::hIOpenExternalHover;
-
 // check box
 HICON	WindowStyles::hICheckBox, WindowStyles::hICheckBoxChecked, 
 		WindowStyles::hICheckBoxHover, WindowStyles::hICheckBoxCheckedHover;
@@ -56,21 +49,6 @@ void WindowStyles::initialize()
 	hIOptions =					(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPTIONS),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 	hIOptionsHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPTIONS_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 
-	// player icons
-	hIPlay =					(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PLAY),						IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIPlayHover =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PLAY_HOVER),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIPlayActive =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PLAY_ACTIVE),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIPause =					(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PAUSE),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIPauseHover =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PAUSE_HOVER),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIPauseActive =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PAUSE_ACTIVE),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIPrev =					(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PREV),						IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIPrevHover =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PREV_HOVER),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIPrevDisabled =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PREV_DISABLED),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hINext =					(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_NEXT),						IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hINextHover =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_NEXT_HOVER),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIOpenExternal =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPEN_EXTERNAL),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hIOpenExternalHover =		(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPEN_EXTERNAL_HOVER),		IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-
 	// check box
 	hICheckBox =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 	hICheckBoxChecked =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX_CHECKED),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
@@ -84,20 +62,6 @@ void WindowStyles::clear()
 	DestroyIcon(hICheckBoxHover);
 	DestroyIcon(hICheckBoxChecked);
 	DestroyIcon(hICheckBox);
-
-	DestroyIcon(hIPlay);
-	DestroyIcon(hIPlayHover);
-	DestroyIcon(hIPlayActive);
-	DestroyIcon(hIPause);
-	DestroyIcon(hIPauseHover);
-	DestroyIcon(hIPauseActive);
-	DestroyIcon(hIPrev);
-	DestroyIcon(hIPrevHover);
-	DestroyIcon(hIPrevDisabled);
-	DestroyIcon(hINext); 
-	DestroyIcon(hINextHover);
-	DestroyIcon(hIOpenExternal);
-	DestroyIcon(hIOpenExternalHover);
 
 	DestroyIcon(hIDelete);
 	DestroyIcon(hIDeleteHover);

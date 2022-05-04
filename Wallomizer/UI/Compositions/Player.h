@@ -8,6 +8,23 @@
 
 class Player
 {
+private:
+	/// Class manages resources (de)allocation for all player components.
+	class Resources
+	{
+	public:
+		Resources();
+		~Resources();
+		
+		static HICON	hIPlay,			hIPlayHover,		hIPlayActive,
+						hIPause,		hIPauseHover,		hIPauseActive,
+						hIPrev,			hIPrevHover,		hIPrevDisabled,
+						hINext,			hINextHover,
+						hIOpenExternal, hIOpenExternalHover;
+	private:
+		static unsigned char refCount;
+	}resources;
+
 public:
 	Player(HWND hParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, CollectionManager* pCollectionManager, DWORD additionalStyles = 0UL);
 	~Player();

@@ -1,17 +1,63 @@
 #include "Player.h"
 #include "Delay.h"
 #include "WindowStyles.h"
+#include "resource.h"
 
 char Player::sTimer[16];
 CollectionManager* Player::s_pCollectionManager = nullptr;
 std::list<Player*> Player::pPlayers;
+HICON	Player::Resources::hIPlay,			Player::Resources::hIPlayHover,			Player::Resources::hIPlayActive,
+		Player::Resources::hIPause,			Player::Resources::hIPauseHover,		Player::Resources::hIPauseActive,
+		Player::Resources::hIPrev,			Player::Resources::hIPrevHover,			Player::Resources::hIPrevDisabled,
+		Player::Resources::hINext,			Player::Resources::hINextHover,
+		Player::Resources::hIOpenExternal,	Player::Resources::hIOpenExternalHover;
+unsigned char Player::Resources::refCount = 0;
+
+Player::Resources::Resources()
+{
+	if (refCount++) // Loading icons only if this is the first player creating
+		return;
+	hIPlay =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PLAY),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPlayHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PLAY_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPlayActive =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PLAY_ACTIVE),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPause =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PAUSE),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPauseHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PAUSE_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPauseActive =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PAUSE_ACTIVE),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPrev =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PREV),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPrevHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PREV_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIPrevDisabled =		(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PREV_DISABLED),		IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hINext =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_NEXT),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hINextHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_NEXT_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIOpenExternal =		(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPEN_EXTERNAL),		IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIOpenExternalHover =	(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPEN_EXTERNAL_HOVER),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	
+}
+
+Player::Resources::~Resources()
+{
+	if (--refCount) // Destroying icons only if this is the last player destroying
+		return;
+	DestroyIcon(hIPlay);
+	DestroyIcon(hIPlayHover);
+	DestroyIcon(hIPlayActive);
+	DestroyIcon(hIPause);
+	DestroyIcon(hIPauseHover);
+	DestroyIcon(hIPauseActive);
+	DestroyIcon(hIPrev);
+	DestroyIcon(hIPrevHover);
+	DestroyIcon(hIPrevDisabled);
+	DestroyIcon(hINext);
+	DestroyIcon(hINextHover);
+	DestroyIcon(hIOpenExternal);
+	DestroyIcon(hIOpenExternalHover);
+}
 
 Player::Player(HWND hParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, CollectionManager* pCollectionManager, DWORD additionalStyles) :
-	btnPrev(hParent,			xPlayer,		yPlayer,	20,		20, WindowStyles::hIPrev, WindowStyles::hIPrevHover),
-	btnOpenExternal(hParent,	xPlayer + 30,	yPlayer,	20,		20, WindowStyles::hIOpenExternal, WindowStyles::hIOpenExternalHover),
-	btnPlay(hParent,			xPlayer + 60,	yPlayer,	20,		20, WindowStyles::hIPlay, WindowStyles::hIPlayHover),
-	btnPause(hParent,			xPlayer + 90,	yPlayer,	20,		20, WindowStyles::hIPause, WindowStyles::hIPauseHover),
-	btnNext(hParent,			xPlayer + 120,	yPlayer,	20,		20, WindowStyles::hINext, WindowStyles::hINextHover),
+	btnPrev(hParent,			xPlayer,		yPlayer,	20,		20, resources.hIPrev, resources.hIPrevHover),
+	btnOpenExternal(hParent,	xPlayer + 30,	yPlayer,	20,		20, resources.hIOpenExternal, resources.hIOpenExternalHover),
+	btnPlay(hParent,			xPlayer + 60,	yPlayer,	20,		20, resources.hIPlay, resources.hIPlayHover),
+	btnPause(hParent,			xPlayer + 90,	yPlayer,	20,		20, resources.hIPause, resources.hIPauseHover),
+	btnNext(hParent,			xPlayer + 120,	yPlayer,	20,		20, resources.hINext, resources.hINextHover),
 	stDelayRemained(hParent, "",xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles)
 {	
 	s_pCollectionManager = pCollectionManager;
@@ -67,7 +113,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 		if (s_pCollectionManager && !s_pCollectionManager->hasPrevious())
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
+			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
 			return true;
 		}
 		if (btnPrev.draw(pDIS, WindowStyles::mainBkBrush))
@@ -80,7 +126,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 		if (Delay::isSlideshowRunning)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIPlayActive, 0, 0, 0, NULL, DI_NORMAL);
+			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPlayActive, 0, 0, 0, NULL, DI_NORMAL);
 			return true;
 		}
 		if (btnPlay.draw(pDIS, WindowStyles::mainBkBrush))
@@ -91,7 +137,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 		if (!Delay::isSlideshowRunning)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, WindowStyles::hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
+			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
 			return true;
 		}
 		if (btnPause.draw(pDIS, WindowStyles::mainBkBrush))
