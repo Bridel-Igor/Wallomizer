@@ -37,6 +37,7 @@ Panel::Panel(HWND hParent, LPCSTR className, int x, int y, int width, int height
 
 Panel::~Panel()
 {
+	DestroyWindow(m_hWnd);
 	UnregisterClassA(m_sName, GetModuleHandleA(NULL));
 }
 
