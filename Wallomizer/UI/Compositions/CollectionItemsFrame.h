@@ -6,6 +6,18 @@
 
 class CollectionItemsFrame : public IWindow
 {
+private:
+	/// Class manages resources (de)allocation for all CheckBox resources.
+	class Resources
+	{
+	public:
+		Resources();
+		~Resources();
+
+		static HBRUSH bkBrush;
+	private:
+		static unsigned char refCount;
+	}resources;
 public:
 	CollectionItemsFrame(HWND hParent, CollectionManager* pCollectionManager, int x, int y, int width, int height);
 	~CollectionItemsFrame();

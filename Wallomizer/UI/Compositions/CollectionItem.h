@@ -9,6 +9,21 @@
 class CollectionItem
 {
 public:
+	/// Class manages resources (de)allocation for all CollectionItem resources.
+	class Resources
+	{
+	public:
+		Resources();
+		~Resources();
+
+		static HICON hIOptions, hIOptionsHover, hIDelete, hIDeleteHover;
+		static HBRUSH collItemBkBrush;
+		static COLORREF collItemFontColor;
+		static COLORREF collItemBkColor;
+	private:
+		static unsigned char refCount;
+	}resources;
+public:
 	CollectionItem(HWND hParent, int x, int y, int width, BaseCollection* collection, HFONT hFont);
 	~CollectionItem() {}
 	void updateInfo(BaseCollection* collection);

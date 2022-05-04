@@ -13,11 +13,4 @@ namespace WindowStyles
 	extern COLORREF mainFontColor;
 	extern COLORREF titleFontColor;
 	extern HBRUSH mainBkBrush;
-
-	// collection items frame style
-	extern COLORREF collItemFontColor;
-	extern COLORREF collItemBkColor;
-	extern HBRUSH collItemBkBrush;
-	extern HBRUSH collFrameBkBrush;
-	extern HICON hIOptions, hIOptionsHover, hIDelete, hIDeleteHover;
 }

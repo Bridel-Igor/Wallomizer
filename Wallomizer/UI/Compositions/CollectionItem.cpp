@@ -3,6 +3,39 @@
 
 #include "CollectionItem.h"
 #include "WindowStyles.h"
+#include "resource.h"
+
+HICON CollectionItem::Resources::hIOptions, CollectionItem::Resources::hIOptionsHover, 
+	CollectionItem::Resources::hIDelete, CollectionItem::Resources::hIDeleteHover;
+HBRUSH CollectionItem::Resources::collItemBkBrush;
+COLORREF CollectionItem::Resources::collItemFontColor;
+COLORREF CollectionItem::Resources::collItemBkColor;
+
+unsigned char CollectionItem::Resources::refCount = 0;
+
+CollectionItem::Resources::Resources()
+{
+	if (refCount++) // Loading icons only if this is the first player creating
+		return;
+	collItemFontColor = RGB(200, 200, 200);
+	collItemBkColor = RGB(36, 36, 36);
+	collItemBkBrush = CreateSolidBrush(collItemBkColor);
+	hIDelete =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_DELETE),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIDeleteHover =		(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_DELETE_HOVER),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIOptions =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPTIONS),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIOptionsHover =	(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPTIONS_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+}
+
+CollectionItem::Resources::~Resources()
+{
+	if (--refCount) // Destroying icons only if this is the last player destroying
+		return;
+	DeleteObject(collItemBkBrush);
+	DestroyIcon(hIDelete);
+	DestroyIcon(hIDeleteHover);
+	DestroyIcon(hIOptions);
+	DestroyIcon(hIOptionsHover);
+}
 
 CollectionItem::CollectionItem(HWND hParent, int _x, int _y, int _width, BaseCollection* pCollection, HFONT hFont)
 	: x(_x), y(_y), width(_width), m_pCollection(pCollection),
@@ -10,8 +43,8 @@ CollectionItem::CollectionItem(HWND hParent, int _x, int _y, int _width, BaseCol
 	stName(hParent, L"",	0, 0, 0, 0, 0),
 	purity(hParent,			0, 0, 0, 0),
 	stNumber(hParent, "0",	0, 0, 0, 0, SS_CENTER),
-	btnSettings(hParent,	0, 0, 0, height, WindowStyles::hIOptions, WindowStyles::hIOptionsHover),
-	btnDelete(hParent,		0, 0, 0, height, WindowStyles::hIDelete, WindowStyles::hIDeleteHover)
+	btnSettings(hParent,	0, 0, 0, height, resources.hIOptions, resources.hIOptionsHover),
+	btnDelete(hParent,		0, 0, 0, height, resources.hIDelete, resources.hIDeleteHover)
 {
 	SendMessage(stName.hWnd(), WM_SETFONT, (LPARAM)hFont, TRUE);
 	SendMessage(stNumber.hWnd(), WM_SETFONT, (LPARAM)hFont, TRUE);
@@ -45,13 +78,13 @@ void CollectionItem::reposition(int yPos, bool sb)
 
 bool CollectionItem::draw(LPDRAWITEMSTRUCT& pDIS)
 {
-	if (chboEnabled.draw(pDIS, WindowStyles::collItemBkBrush))
+	if (chboEnabled.draw(pDIS, resources.collItemBkBrush))
 		return true;
 	if (purity.draw(pDIS))
 		return true;
-	if (btnSettings.draw(pDIS, WindowStyles::collItemBkBrush, 1, (height - 20) / 2))
+	if (btnSettings.draw(pDIS, resources.collItemBkBrush, 1, (height - 20) / 2))
 		return true;
-	if (btnDelete.draw(pDIS, WindowStyles::collItemBkBrush, 1, (height - 20) / 2))
+	if (btnDelete.draw(pDIS, resources.collItemBkBrush, 1, (height - 20) / 2))
 		return true;
 	return false;
 }

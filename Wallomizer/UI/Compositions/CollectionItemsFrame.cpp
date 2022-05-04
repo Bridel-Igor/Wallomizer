@@ -1,6 +1,23 @@
 #include "CollectionItemsFrame.h"
 #include "WindowStyles.h"
 
+HBRUSH CollectionItemsFrame::Resources::bkBrush;
+unsigned char CollectionItemsFrame::Resources::refCount = 0;
+
+CollectionItemsFrame::Resources::Resources()
+{
+	if (refCount++) // Loading icons only if this is the first player creating
+		return;
+	bkBrush = CreateSolidBrush(RGB(15, 15, 15));
+}
+
+CollectionItemsFrame::Resources::~Resources()
+{
+	if (--refCount) // Destroying icons only if this is the last player destroying
+		return;
+	DeleteObject(bkBrush);
+}
+
 CollectionItemsFrame::CollectionItemsFrame(HWND hParent, CollectionManager* pCollectionManager, int x, int y, int width, int height) :
 	IWindow("", "Collection Items Frame Class", WS_CHILD | WS_BORDER | WS_VSCROLL, NULL, x, y, width, height, hParent),
 	m_width(width), m_height(height),
@@ -84,7 +101,7 @@ LRESULT CollectionItemsFrame::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPAR
 	case WM_PAINT:
 	{
 		hdc = BeginPaint(m_hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, WindowStyles::collFrameBkBrush);
+		FillRect(hdc, &ps.rcPaint, resources.bkBrush);
 		EndPaint(m_hWnd, &ps);
 	}
 	return 0;
@@ -191,22 +208,22 @@ LRESULT CollectionItemsFrame::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPAR
 			if (hWndStatic == collectionItems[i]->stNumber.hWnd())
 			{
 				if (collectionItems[i]->chboEnabled.isChecked())
-					SetTextColor(hdcStatic, WindowStyles::collItemFontColor);
+					SetTextColor(hdcStatic, CollectionItem::Resources::collItemFontColor);
 				else
 					SetTextColor(hdcStatic, RGB(80, 80, 80));
-				SetBkColor(hdcStatic, WindowStyles::collItemBkColor);
-				return (LRESULT)WindowStyles::collItemBkBrush;
+				SetBkColor(hdcStatic, CollectionItem::Resources::collItemBkColor);
+				return (LRESULT)CollectionItem::Resources::collItemBkBrush;
 			}
 
 		if (hWndStatic == stEmpty.hWnd())
 		{
-			SetTextColor(hdcStatic, WindowStyles::collItemFontColor);
+			SetTextColor(hdcStatic, CollectionItem::Resources::collItemFontColor);
 			SetBkMode(hdcStatic, TRANSPARENT);
-			return (LRESULT)WindowStyles::collFrameBkBrush;
+			return (LRESULT)resources.bkBrush;
 		}
-		SetTextColor(hdcStatic, WindowStyles::collItemFontColor);
-		SetBkColor(hdcStatic, WindowStyles::collItemBkColor);
-		return (LRESULT)WindowStyles::collItemBkBrush;
+		SetTextColor(hdcStatic, CollectionItem::Resources::collItemFontColor);
+		SetBkColor(hdcStatic, CollectionItem::Resources::collItemBkColor);
+		return (LRESULT)CollectionItem::Resources::collItemBkBrush;
 	}
 
 	case WM_SETCURSOR:
