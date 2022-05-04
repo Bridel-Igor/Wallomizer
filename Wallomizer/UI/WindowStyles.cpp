@@ -8,11 +8,6 @@ HBRUSH WindowStyles::mainBkBrush;
 COLORREF WindowStyles::mainFontColor;
 COLORREF WindowStyles::titleFontColor;
 
-// edit style
-COLORREF WindowStyles::editFontColor;
-COLORREF WindowStyles::editBkColor;
-COLORREF WindowStyles::editBkInvalidColor;
-
 // collection items frame style
 COLORREF WindowStyles::collItemFontColor;
 COLORREF WindowStyles::collItemBkColor;
@@ -33,11 +28,6 @@ void WindowStyles::initialize()
 	mainFontColor = RGB(129, 193, 193);
 	titleFontColor = RGB(220, 220, 220);
 	mainBkBrush = CreateSolidBrush(RGB(26, 26, 26));
-
-	// edit style
-	editFontColor = RGB(0, 0, 0);
-	editBkColor = RGB(200, 200, 200);
-	editBkInvalidColor = RGB(200, 50, 50);
 
 	// collection items frame style
 	collItemFontColor = RGB(200, 200, 200);
@@ -63,6 +53,8 @@ void WindowStyles::clear()
 	DestroyIcon(hICheckBoxChecked);
 	DestroyIcon(hICheckBox);
 
+	DeleteObject(collItemBkBrush);
+	DeleteObject(collFrameBkBrush);
 	DestroyIcon(hIDelete);
 	DestroyIcon(hIDeleteHover);
 	DestroyIcon(hIOptions);
@@ -71,7 +63,4 @@ void WindowStyles::clear()
 	DeleteObject(mainBkBrush);
 	DeleteObject(mainFont);
 	DeleteObject(titleFont);
-
-	DeleteObject(collItemBkBrush);
-	DeleteObject(collFrameBkBrush);
 }

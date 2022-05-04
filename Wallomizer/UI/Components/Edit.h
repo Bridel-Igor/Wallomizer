@@ -47,4 +47,6 @@ public:
 	/// 
 	/// @return True if edit is empty, false otherwise.
 	bool isEmpty();
+
+	static COLORREF fontColor,	bkColor, bkInvalidColor;
 };

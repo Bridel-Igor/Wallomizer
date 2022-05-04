@@ -3,6 +3,7 @@
 #include <exception>
 
 #include "IWindow.h"
+#include "Edit.h"
 
 IWindow::IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwExStyle,
 		int x, int y, int nWidth, int nHeight, HWND hParent) :
@@ -121,9 +122,9 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	case WM_CTLCOLOREDIT:
 	{
 		HDC hdc = (HDC)wParam;
-		SetTextColor(hdc, WindowStyles::editFontColor);
-		SetBkColor(hdc, WindowStyles::editBkColor);
-		SetDCBrushColor(hdc, WindowStyles::editBkColor);
+		SetTextColor(hdc, Edit::fontColor);
+		SetBkColor(hdc, Edit::bkColor);
+		SetDCBrushColor(hdc, Edit::bkColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
 

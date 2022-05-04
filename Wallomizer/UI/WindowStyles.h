@@ -14,11 +14,6 @@ namespace WindowStyles
 	extern COLORREF titleFontColor;
 	extern HBRUSH mainBkBrush;
 
-	// edit style
-	extern COLORREF editFontColor;
-	extern COLORREF editBkColor;
-	extern COLORREF editBkInvalidColor;
-
 	// collection items frame style
 	extern COLORREF collItemFontColor;
 	extern COLORREF collItemBkColor;

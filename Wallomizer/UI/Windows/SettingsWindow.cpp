@@ -246,13 +246,13 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 	case WM_CTLCOLOREDIT:
 	{
 		HDC hdc = (HDC)wParam;
-		SetTextColor(hdc, WindowStyles::editFontColor);
-		SetBkColor(hdc, WindowStyles::editBkColor);
-		SetDCBrushColor(hdc, WindowStyles::editBkColor);
+		SetTextColor(hdc, Edit::fontColor);
+		SetBkColor(hdc, Edit::bkColor);
+		SetDCBrushColor(hdc, Edit::bkColor);
 		if ((HWND)lParam == udeSeconds.m_edithWnd && udeSeconds.m_invalid ||
 			(HWND)lParam == udeMinutes.m_edithWnd && udeMinutes.m_invalid ||
 			(HWND)lParam == udeHours.m_edithWnd && udeHours.m_invalid)
-				SetBkColor(hdc, WindowStyles::editBkInvalidColor);
+				SetBkColor(hdc, Edit::bkInvalidColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
 	}
 

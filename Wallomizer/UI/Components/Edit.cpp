@@ -1,5 +1,9 @@
 #include "Edit.h"
 
+COLORREF Edit::fontColor =		RGB(0, 0, 0);
+COLORREF Edit::bkColor =		RGB(200, 200, 200);
+COLORREF Edit::bkInvalidColor = RGB(200, 50, 50);
+
 Edit::Edit(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles)
 {
 	m_hWnd = CreateWindowExA(WS_EX_CLIENTEDGE, TEXT("Edit"), text, WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | additionalStyles, x, y, width, height, hParent, NULL, NULL, NULL);
