@@ -45,7 +45,7 @@ TrayWindow::TrayWindow(CollectionManager* pCollectionManager) :
 	hStatusIcon = LoadIcon(GetModuleHandleA(NULL), pszIDStatusIcon);
 	TrayMessage(hWnd(), NIM_ADD, 1, hStatusIcon, "Wallomizer");
 
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	ShowWindow(hWnd(), SW_HIDE);
 }
 

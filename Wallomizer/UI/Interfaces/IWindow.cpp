@@ -5,6 +5,34 @@
 #include "IWindow.h"
 #include "Edit.h"
 
+COLORREF IWindow::Resources::mainFontColor;
+COLORREF IWindow::Resources::titleFontColor;
+HFONT IWindow::Resources::mainFont;
+HFONT IWindow::Resources::titleFont;
+HBRUSH IWindow::Resources::mainBkBrush;
+
+unsigned char IWindow::Resources::refCount = 0;
+
+IWindow::Resources::Resources()
+{
+	if (refCount++) // Loading icons only if this is the first player creating
+		return;
+	mainFont = CreateFontA(15, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
+	titleFont = CreateFontA(15, 0, 0, 0, FW_SEMIBOLD, FALSE, TRUE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, "Arial");
+	mainFontColor = RGB(129, 193, 193);
+	titleFontColor = RGB(220, 220, 220);
+	mainBkBrush = CreateSolidBrush(RGB(26, 26, 26));
+}
+
+IWindow::Resources::~Resources()
+{
+	if (--refCount) // Destroying objects only if this is the last player destroying
+		return;
+	DeleteObject(mainBkBrush);
+	DeleteObject(mainFont);
+	DeleteObject(titleFont);
+}
+
 IWindow::IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwExStyle,
 		int x, int y, int nWidth, int nHeight, HWND hParent) :
 	m_sName(sClassName)
@@ -114,7 +142,7 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, WindowStyles::mainBkBrush);
+		FillRect(hdc, &ps.rcPaint, Resources::mainBkBrush);
 		EndPaint(hWnd, &ps);
 	}
 	return 0;
@@ -131,9 +159,9 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	case WM_CTLCOLORSTATIC:
 	{
 		HDC hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, WindowStyles::mainFontColor);
+		SetTextColor(hdcStatic, Resources::mainFontColor);
 		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)WindowStyles::mainBkBrush;
+		return (LRESULT)Resources::mainBkBrush;
 	}
 
 	case WM_CTLCOLORBTN:

@@ -100,9 +100,6 @@
     <ClCompile Include="UI\Components\Button.cpp">
       <Filter>UI\Components\Source</Filter>
     </ClCompile>
-    <ClCompile Include="UI\WindowStyles.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="UI\Interfaces\IClickable.cpp">
       <Filter>UI\Interfaces</Filter>
     </ClCompile>
@@ -230,9 +227,6 @@
     </ClInclude>
     <ClInclude Include="UI\Interfaces\HMenuGenerator.h">
       <Filter>UI\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="UI\WindowStyles.h">
-      <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="AppMutex.h">
       <Filter>Headers</Filter>

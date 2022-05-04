@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "Delay.h"
-#include "WindowStyles.h"
 #include "resource.h"
+#include "IWindow.h"
 
 char Player::sTimer[16];
 CollectionManager* Player::s_pCollectionManager = nullptr;
@@ -112,38 +112,38 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	{
 		if (s_pCollectionManager && !s_pCollectionManager->hasPrevious())
 		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
 			return true;
 		}
-		if (btnPrev.draw(pDIS, WindowStyles::mainBkBrush))
+		if (btnPrev.draw(pDIS, IWindow::Resources::mainBkBrush))
 			return true;
 	}
-	if (btnOpenExternal.draw(pDIS, WindowStyles::mainBkBrush))
+	if (btnOpenExternal.draw(pDIS, IWindow::Resources::mainBkBrush))
 		return true;
 	if (pDIS->hwndItem == btnPlay.hWnd())
 	{
 		if (Delay::isSlideshowRunning)
 		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPlayActive, 0, 0, 0, NULL, DI_NORMAL);
 			return true;
 		}
-		if (btnPlay.draw(pDIS, WindowStyles::mainBkBrush))
+		if (btnPlay.draw(pDIS, IWindow::Resources::mainBkBrush))
 			return true;
 	}
 	if (pDIS->hwndItem == btnPause.hWnd())
 	{
 		if (!Delay::isSlideshowRunning)
 		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
 			return true;
 		}
-		if (btnPause.draw(pDIS, WindowStyles::mainBkBrush))
+		if (btnPause.draw(pDIS, IWindow::Resources::mainBkBrush))
 			return true;
 	}
-	if (btnNext.draw(pDIS, WindowStyles::mainBkBrush))
+	if (btnNext.draw(pDIS, IWindow::Resources::mainBkBrush))
 		return true;
 	return false;
 }

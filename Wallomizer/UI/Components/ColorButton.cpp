@@ -1,6 +1,6 @@
 #include "ColorButton.h"
-#include "WindowStyles.h"
 #include "resource.h"
+#include "IWindow.h"
 
 unsigned char ColorButton::s_refCount = 0;
 HPEN	ColorButton::s_checkedPenWhite = NULL, 
@@ -70,7 +70,7 @@ bool ColorButton::isChecked() const
 
 void ColorButton::draw(LPDRAWITEMSTRUCT& pDIS)
 {
-	FillRect(pDIS->hDC, &pDIS->rcItem, WindowStyles::mainBkBrush);
+	FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 	SelectObject(pDIS->hDC, s_nullPen);
 	SelectObject(pDIS->hDC, m_brush);
 	RoundRect(pDIS->hDC, pDIS->rcItem.left, pDIS->rcItem.top, pDIS->rcItem.right, pDIS->rcItem.bottom, 5, 5);
@@ -89,10 +89,10 @@ void ColorButton::draw(LPDRAWITEMSTRUCT& pDIS)
 		RECT tmp;
 		tmp.left = pDIS->rcItem.left, tmp.right = tmp.left + 1;
 		tmp.top = pDIS->rcItem.bottom, tmp.bottom = tmp.top - 1;
-		FillRect(pDIS->hDC, &tmp, WindowStyles::mainBkBrush);
+		FillRect(pDIS->hDC, &tmp, IWindow::Resources::mainBkBrush);
 		tmp.left = pDIS->rcItem.right, tmp.right = tmp.left - 1;
 		tmp.top = pDIS->rcItem.bottom, tmp.bottom = tmp.top - 1;
-		FillRect(pDIS->hDC, &tmp, WindowStyles::mainBkBrush);
+		FillRect(pDIS->hDC, &tmp, IWindow::Resources::mainBkBrush);
 	}
 	if (m_checked)
 		DrawIconEx(pDIS->hDC, (pDIS->rcItem.right - 20) / 2, (pDIS->rcItem.bottom - 20) / 2,

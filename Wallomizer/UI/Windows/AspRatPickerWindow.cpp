@@ -40,7 +40,7 @@ AspRatPickerWindow::AspRatPickerWindow(HWND hCaller, char* sAspRat) :
 			btnAR[i].check(true);
 	}
 	
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	centerWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }

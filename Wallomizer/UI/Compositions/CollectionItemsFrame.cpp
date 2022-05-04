@@ -1,5 +1,4 @@
 #include "CollectionItemsFrame.h"
-#include "WindowStyles.h"
 
 HBRUSH CollectionItemsFrame::Resources::bkBrush;
 unsigned char CollectionItemsFrame::Resources::refCount = 0;
@@ -24,7 +23,7 @@ CollectionItemsFrame::CollectionItemsFrame(HWND hParent, CollectionManager* pCol
 	m_pCollectionManager(pCollectionManager),
 	stEmpty(hWnd(), "Collection list is empty. Click \"Add collection..\" button to add one.", 5, 0, 480, 20)
 {
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)IWindow::Resources::mainFont);
 	updateCollectionItems();
 }
 
@@ -48,7 +47,7 @@ void CollectionItemsFrame::updateCollectionItems()
 
 	for (size_t i = collectionItems.size(); i < m_pCollectionManager->m_pCollections.size(); i++) // creation
 		if (m_pCollectionManager->m_pCollections[i] != nullptr)
-			collectionItems.push_back(new CollectionItem(hWnd(), 0, (int)(i * (CollectionItem::height + 1)), m_width, m_pCollectionManager->m_pCollections[i], WindowStyles::mainFont));
+			collectionItems.push_back(new CollectionItem(hWnd(), 0, (int)(i * (CollectionItem::height + 1)), m_width, m_pCollectionManager->m_pCollections[i], IWindow::Resources::mainFont));
 
 	updateScroll();
 	for (auto p : collectionItems) // placing according to the scrollbar

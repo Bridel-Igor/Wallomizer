@@ -2,7 +2,6 @@
 #include <CommCtrl.h>
 
 #include "CollectionItem.h"
-#include "WindowStyles.h"
 #include "resource.h"
 
 HICON CollectionItem::Resources::hIOptions, CollectionItem::Resources::hIOptionsHover, 

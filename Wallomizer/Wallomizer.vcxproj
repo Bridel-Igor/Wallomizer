@@ -189,7 +189,6 @@
     <ClCompile Include="Collections\UserCollection.cpp" />
     <ClCompile Include="UI\Windows\SetUserCollectionWindow.cpp" />
     <ClCompile Include="Wallpaper.cpp" />
-    <ClCompile Include="UI\WindowStyles.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -234,7 +233,6 @@
     <ClInclude Include="UI\Components\UpDownEdit.h" />
     <ClInclude Include="Collections\UserCollection.h" />
     <ClInclude Include="Wallpaper.h" />
-    <ClInclude Include="UI\WindowStyles.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Wallomizer.rc" />

@@ -4,7 +4,6 @@
 #include "TrayWindow.h"
 #include "CollectionManager.h"
 #include "Settings.h"
-#include "WindowStyles.h"
 #include "Filesystem.h"
 #include "Delay.h"
 
@@ -26,14 +25,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		{
 			try
 			{
-				WindowStyles::initialize();
 				TrayWindow trayWindow(&collectionManager);
 				trayWindow.windowLoop();
-				WindowStyles::clear();
 			}
 			catch (...)
 			{
-				WindowStyles::clear(); 
 				trayWindowException = std::current_exception();
 			}
 		});

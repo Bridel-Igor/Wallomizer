@@ -67,10 +67,10 @@ SettingsWindow::SettingsWindow(HWND hCaller) :
 	edApiKey.setTextA(Settings::apiKey);
 	cbStartup.setChecked(Settings::loadOnStartup);
 
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
-	SendMessage(stApplication.hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
-	SendMessage(stSlideshow.hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
-	SendMessage(stWallhaven.hWnd(), WM_SETFONT, (WPARAM)WindowStyles::titleFont, TRUE);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
+	SendMessage(stApplication.hWnd(), WM_SETFONT, (WPARAM)resources.titleFont, TRUE);
+	SendMessage(stSlideshow.hWnd(), WM_SETFONT, (WPARAM)resources.titleFont, TRUE);
+	SendMessage(stWallhaven.hWnd(), WM_SETFONT, (WPARAM)resources.titleFont, TRUE);
 
 	centerWindow(m_hCaller);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
@@ -227,7 +227,7 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 	case WM_DRAWITEM:
 	{
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
-		if (cbStartup.draw(pDIS, WindowStyles::mainBkBrush))
+		if (cbStartup.draw(pDIS, resources.mainBkBrush))
 			return TRUE;
 	}
 	return 0;
@@ -236,11 +236,11 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 	{
 		HDC hdcStatic = (HDC)wParam;
 		if ((HWND)lParam == stApplication.hWnd() || (HWND)lParam == stSlideshow.hWnd() || (HWND)lParam == stWallhaven.hWnd())
-			SetTextColor(hdcStatic, WindowStyles::titleFontColor);
+			SetTextColor(hdcStatic, resources.titleFontColor);
 		else
-			SetTextColor(hdcStatic, WindowStyles::mainFontColor);
+			SetTextColor(hdcStatic, resources.mainFontColor);
 		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)WindowStyles::mainBkBrush;
+		return (LRESULT)resources.mainBkBrush;
 	}
 
 	case WM_CTLCOLOREDIT:

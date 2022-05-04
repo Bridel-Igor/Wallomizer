@@ -26,7 +26,7 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 	while (!m_pCollectionManager->isReady())
 		Sleep(50);
 	centerWindow(GetDesktopWindow());
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	player.updateTimer(true);
 	// HACK: Redo this loop in the same thread or force thread to end on destruction. Thread leeks memory as it doesn't end...
 	std::thread thr([&]() {collectionItemsFrame.windowLoop(); });

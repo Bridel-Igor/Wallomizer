@@ -13,7 +13,7 @@ AddCollectionWindow::AddCollectionWindow(HWND hCaller, CollectionManager* pColle
 	btnCancel(hWnd(), "Cancel",														10,		110,	220,	20)
 {
 	centerWindow(m_hCaller);
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 	EnableWindow(m_hCaller, FALSE);
 }

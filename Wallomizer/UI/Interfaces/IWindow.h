@@ -7,13 +7,29 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include <Windows.h>
 
 #include "IComponent.h"
-#include "WindowStyles.h"
 #include "resource.h"
 
 #define RESULT_DEFAULT -1
 
 class IWindow : public IComponent
 {
+public:
+	/// Class manages resources (de)allocation for all CollectionItem resources.
+	class Resources
+	{
+	public:
+		Resources();
+		~Resources();
+
+		static HFONT mainFont;
+		static HFONT titleFont;
+		static COLORREF mainFontColor;
+		static COLORREF titleFontColor;
+		static HBRUSH mainBkBrush;
+	private:
+		static unsigned char refCount;
+	}resources;
+
 public:
 	IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwExStyle = 0,
 		int x = CW_USEDEFAULT, int y = CW_USEDEFAULT,

@@ -39,7 +39,7 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, CollectionManager
 		validCollection = true;
 	}
 
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)WindowStyles::mainFont);
+	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	centerWindow(m_hCaller);
 	EnableWindow(m_hCaller, FALSE);
 	SetForegroundWindow(m_hCaller);
