@@ -16,10 +16,6 @@ HBRUSH WindowStyles::collFrameBkBrush;
 HICON	WindowStyles::hIOptions, WindowStyles::hIOptionsHover, 
 		WindowStyles::hIDelete, WindowStyles::hIDeleteHover;
 
-// check box
-HICON	WindowStyles::hICheckBox, WindowStyles::hICheckBoxChecked, 
-		WindowStyles::hICheckBoxHover, WindowStyles::hICheckBoxCheckedHover;
-
 void WindowStyles::initialize()
 {
 	// main style
@@ -38,21 +34,10 @@ void WindowStyles::initialize()
 	hIDeleteHover =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_DELETE_HOVER),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 	hIOptions =					(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPTIONS),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 	hIOptionsHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPTIONS_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-
-	// check box
-	hICheckBox =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hICheckBoxChecked =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX_CHECKED),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hICheckBoxHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	hICheckBoxCheckedHover =	(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX_CHECKED_HOVER),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 }
 
 void WindowStyles::clear()
 {
-	DestroyIcon(hICheckBoxCheckedHover);
-	DestroyIcon(hICheckBoxHover);
-	DestroyIcon(hICheckBoxChecked);
-	DestroyIcon(hICheckBox);
-
 	DeleteObject(collItemBkBrush);
 	DeleteObject(collFrameBkBrush);
 	DestroyIcon(hIDelete);

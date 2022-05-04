@@ -13,6 +13,18 @@
 /// To process hovering events you should call mouseHovering method in response to WM_SETCURSOR message.
 class CheckBox : public IHoverable
 {
+private:
+	/// Class manages resources (de)allocation for all CheckBox resources.
+	class Resources
+	{
+	public:
+		Resources();
+		~Resources();
+
+		static HICON hICheckBox, hICheckBoxChecked, hICheckBoxHover, hICheckBoxCheckedHover;
+	private:
+		static unsigned char refCount;
+	}resources;
 public:
 	/// Check box component construction.
 	/// 

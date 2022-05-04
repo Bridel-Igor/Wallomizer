@@ -20,7 +20,4 @@ namespace WindowStyles
 	extern HBRUSH collItemBkBrush;
 	extern HBRUSH collFrameBkBrush;
 	extern HICON hIOptions, hIOptionsHover, hIDelete, hIDeleteHover;
-
-	// check box
-	extern HICON hICheckBox, hICheckBoxChecked, hICheckBoxHover, hICheckBoxCheckedHover;
 }

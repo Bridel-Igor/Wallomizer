@@ -9,7 +9,7 @@
 class Player
 {
 private:
-	/// Class manages resources (de)allocation for all player components.
+	/// Class manages resources (de)allocation for all player resources.
 	class Resources
 	{
 	public:

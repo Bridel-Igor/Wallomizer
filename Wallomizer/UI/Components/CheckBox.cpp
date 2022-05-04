@@ -2,6 +2,32 @@
 
 #include "CheckBox.h"
 #include "WindowStyles.h"
+#include "resource.h"
+
+HICON CheckBox::Resources::hICheckBox, CheckBox::Resources::hICheckBoxChecked, 
+	CheckBox::Resources::hICheckBoxHover, CheckBox::Resources::hICheckBoxCheckedHover;
+unsigned char CheckBox::Resources::refCount = 0;
+
+CheckBox::Resources::Resources()
+{
+	if (refCount++) // Loading icons only if this is the first player creating
+		return;
+	hICheckBox =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hICheckBoxChecked =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX_CHECKED),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hICheckBoxHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hICheckBoxCheckedHover =	(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECKBOX_CHECKED_HOVER),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+
+}
+
+CheckBox::Resources::~Resources()
+{
+	if (--refCount) // Destroying icons only if this is the last player destroying
+		return;
+	DestroyIcon(hICheckBoxCheckedHover);
+	DestroyIcon(hICheckBoxHover);
+	DestroyIcon(hICheckBoxChecked);
+	DestroyIcon(hICheckBox);
+}
 
 CheckBox::CheckBox(HWND hParent, int x, int y, int width, int height, bool isChecked, DWORD additionalStyles, DWORD additionalExStyles)
 {
@@ -37,7 +63,7 @@ bool CheckBox::draw(LPDRAWITEMSTRUCT& pDIS, HBRUSH bkgrnd)
 	FillRect(pDIS->hDC, &pDIS->rcItem, bkgrnd);
 
 	DrawIconEx(pDIS->hDC, (pDIS->rcItem.right - 20) / 2, (pDIS->rcItem.bottom - 20) / 2,
-		m_checked ? (m_hovering ? WindowStyles::hICheckBoxCheckedHover : WindowStyles::hICheckBoxChecked) : (m_hovering ? WindowStyles::hICheckBoxHover : WindowStyles::hICheckBox)
+		m_checked ? (m_hovering ? resources.hICheckBoxCheckedHover : resources.hICheckBoxChecked) : (m_hovering ? resources.hICheckBoxHover : resources.hICheckBox)
 		, 0, 0, 0, NULL, DI_NORMAL);
 	return true;
 }
