@@ -1,6 +1,7 @@
 #include <exception>
 
 #include "Panel.h"
+#include "IWindow.h"
 
 Panel::Panel(HWND hParent, LPCSTR className, int x, int y, int width, int height, HBRUSH bkBrush) :
 	m_hParent(hParent),
@@ -78,12 +79,14 @@ LRESULT Panel::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	case WM_COMMAND:
 	case WM_DRAWITEM:
-	case WM_SETCURSOR:
 	case WM_CTLCOLORBTN:
 	case WM_CTLCOLORSTATIC:
 	case WM_VSCROLL:
 	case WM_MOUSEWHEEL:
-		return SendMessageA(m_hParent, uMsg, wParam, lParam);
+	case WM_SETCURSOR:
+		LRESULT res = SendMessageA(m_hParent, uMsg, wParam, lParam);
+		if (res != RESULT_DEFAULT)
+			return res;
 	}
 	return DefWindowProcA(hWnd, uMsg, wParam, lParam);
 }

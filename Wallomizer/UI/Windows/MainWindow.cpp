@@ -14,11 +14,10 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 	m_pCollectionManager(pCollectionManager),
 	stCollections		(hWnd(), "Collections:",		20,		10,		100,	20),
 	btnAdd				(hWnd(), "Add collection..",	530,	10,		100,	20),
-
 	fX(10), fY(40), fWidth(width - 20), fHeight(400), bkColor(RGB(15, 15, 15)), bkBrush(CreateSolidBrush(bkColor)),
 	collectionsPanel	(hWnd(), "CollectionPanelClass",fX,		fY,		fWidth, fHeight, bkBrush),
-	stEmpty				(collectionsPanel.hWnd(), "Collection list is empty. Click \"Add collection..\" button to add one.", 5, 0, 480, 20),
-
+	stEmpty				(collectionsPanel.hWnd(), "Collection list is empty. Click \"Add collection..\" button to add one.", 
+														5,		0,		480,	20),
 	btnSettings			(hWnd(), "Settings",			10,		450,	95,		20),
 	player				(hWnd(),						250,	450,
 														400,	450,	100,	20, m_pCollectionManager),
@@ -27,8 +26,6 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 	s_pMainWindow = this;
 	while (!m_pCollectionManager->isReady())
 		Sleep(50);
-	
-
 	centerWindow(GetDesktopWindow());
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)IWindow::Resources::mainFont);
 	player.updateTimer(true);
@@ -63,8 +60,8 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
 		if (player.draw(pDIS))
 			return TRUE;
-		for (auto item : collectionItems)
-			if (item->draw(pDIS))
+		for (auto& item : collectionItems)
+			if (item.draw(pDIS))
 				return TRUE;
 	}
 	return 0;
@@ -91,30 +88,32 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			ShellExecute(0, 0, "https://donatello.to/IgorBridel", 0, 0, SW_SHOW);
 			return 0;
 		}
-		for (int i=0; i<collectionItems.size(); i++)
+		int i = 0;
+		for (auto& collectionItem : collectionItems)
 		{
-			if (collectionItems[i]->btnSettings.isClicked(wParam))
+			if (collectionItem.btnSettings.isClicked(wParam))
 			{
 				m_pCollectionManager->m_pCollections[i]->openCollectionSettingsWindow(hWnd());
 				return 0;
 			}
-			if (collectionItems[i]->btnDelete.isClicked(wParam))
+			if (collectionItem.btnDelete.isClicked(wParam))
 			{
 				m_pCollectionManager->eraseCollection(i);
 				updateCollectionItems();
 				InvalidateRect(collectionsPanel.hWnd(), nullptr, TRUE);
 				return 0;
 			}
-			if (collectionItems[i]->chboEnabled.isClicked(wParam))
+			if (collectionItem.chboEnabled.isClicked(wParam))
 			{
 				if (HIWORD(wParam) == BN_CLICKED)
 				{
-					collectionItems[i]->chboEnabled.click();
-					m_pCollectionManager->m_pCollections[i]->setEnabled(collectionItems[i]->chboEnabled.isChecked());
+					collectionItem.chboEnabled.click();
+					m_pCollectionManager->m_pCollections[i]->setEnabled(collectionItem.chboEnabled.isChecked());
 					m_pCollectionManager->reloadSettings();
 					return 0;
 				}
 			}
+			i++;
 		}
 	}
 	return 0;
@@ -164,8 +163,8 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		yCurrentScroll = yNewPos;
 
 		updateScroll();
-		for (auto p : collectionItems) // placing according to the scrollbar
-			p->reposition(yCurrentScroll, scrollBarIsVisible);
+		for (auto& p : collectionItems) // placing according to the scrollbar
+			p.reposition(yCurrentScroll, scrollBarIsVisible);
 
 		ScrollWindowEx(collectionsPanel.hWnd(), 0, -yDelta, nullptr, nullptr, (HRGN)NULL, (PRECT)NULL, SW_INVALIDATE);
 		UpdateWindow(collectionsPanel.hWnd());
@@ -177,20 +176,20 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		HWND hWnd = (HWND)lParam;
 		HDC hdc = (HDC)wParam;
-		for (auto item : collectionItems)
+		for (auto& item : collectionItems)
 		{
-			if (hWnd == item->stNumber.hWnd() || hWnd == item->stName.hWnd())
+			if (hWnd == item.stNumber.hWnd() || hWnd == item.stName.hWnd())
 			{
-				if (item->chboEnabled.isChecked())
+				if (item.chboEnabled.isChecked())
 					SetTextColor(hdc, CollectionItem::Resources::collItemFontColor);
 				else
 					SetTextColor(hdc, RGB(80, 80, 80));
 				SetBkColor(hdc, CollectionItem::Resources::collItemBkColor);
 				return (LRESULT)CollectionItem::Resources::collItemBkBrush;
 			}
-			if (hWnd == item->chboEnabled.hWnd() ||
-				hWnd == item->btnDelete.hWnd() ||
-				hWnd == item->btnSettings.hWnd())
+			if (hWnd == item.chboEnabled.hWnd() ||
+				hWnd == item.btnDelete.hWnd() ||
+				hWnd == item.btnSettings.hWnd())
 			{
 				SetTextColor(hdc, CollectionItem::Resources::collItemFontColor);
 				SetBkColor(hdc, CollectionItem::Resources::collItemBkColor);
@@ -214,8 +213,8 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_SETCURSOR:
 	{
 		player.mouseHovering(wParam);
-		for (auto item : collectionItems)
-			item->mouseHovering(wParam);
+		for (auto& item : collectionItems)
+			item.mouseHovering(wParam);
 		// Fallthrough. DefWindowProc must be reached anyway.
 	} 
 	}
@@ -226,22 +225,21 @@ void MainWindow::updateCollectionItems()
 {
 	ShowWindow(stEmpty.hWnd(), SW_HIDE);
 
-	for (size_t i = m_pCollectionManager->m_pCollections.size(); i < collectionItems.size(); i++) //deleting excess items
-	{
-		delete collectionItems.back();
+	size_t i;
+	for (i = m_pCollectionManager->m_pCollections.size(); i < collectionItems.size(); i++) //deleting excess items
 		collectionItems.pop_back();
-	}
 
-	for (size_t i = 0; i < collectionItems.size(); i++) // updating those which won't be created
-		collectionItems[i]->updateInfo(m_pCollectionManager->m_pCollections[i]);
+	i = 0;
+	for (auto& collectionItem : collectionItems) // updating those which won't be created
+		collectionItem.updateInfo(m_pCollectionManager->m_pCollections[i++]);
 
-	for (size_t i = collectionItems.size(); i < m_pCollectionManager->m_pCollections.size(); i++) // creation
+	for (i = collectionItems.size(); i < m_pCollectionManager->m_pCollections.size(); i++) // creation
 		if (m_pCollectionManager->m_pCollections[i] != nullptr)
-			collectionItems.push_back(new CollectionItem(collectionsPanel.hWnd(), 0, (int)(i * (CollectionItem::height + 1)), fWidth, m_pCollectionManager->m_pCollections[i], IWindow::Resources::mainFont));
+			collectionItems.emplace_back(collectionsPanel.hWnd(), 0, (int)(i * (CollectionItem::height + 1)), fWidth, m_pCollectionManager->m_pCollections[i], IWindow::Resources::mainFont);
 
 	updateScroll();
-	for (auto p : collectionItems) // placing according to the scrollbar
-		p->reposition(yCurrentScroll, scrollBarIsVisible);
+	for (auto& collectionItem : collectionItems) // placing according to the scrollbar
+		collectionItem.reposition(yCurrentScroll, scrollBarIsVisible);
 
 	if (collectionItems.size() == 0)
 		ShowWindow(stEmpty.hWnd(), SW_SHOW);
@@ -251,8 +249,6 @@ void MainWindow::updateCollectionItems()
 
 void MainWindow::destroyCollectionItems()
 {
-	for (auto p : collectionItems)
-		delete p;
 	collectionItems.clear();
 	updateScroll();
 }

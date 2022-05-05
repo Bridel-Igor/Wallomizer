@@ -37,8 +37,7 @@ private:
 	Button btnAdd, btnSettings, btnDonate;	
 	Player player;
 	
-	// 
-	std::vector<CollectionItem*> collectionItems;
+	std::list<CollectionItem> collectionItems;
 	SCROLLINFO si;
 	int yMinScroll = 0;
 	int yCurrentScroll = 0;
