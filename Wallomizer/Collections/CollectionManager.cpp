@@ -119,14 +119,13 @@ void CollectionManager::openCollectionSettingsWindow(HWND)
 
 void CollectionManager::reloadSettings()
 {
-	imageModification.lock();
+	std::lock_guard<std::mutex> lock(imageModification);
 	saveSettings();
 	loadSettings();
 	wchar_t wsPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
-	imageModification.unlock();
 	Delay::replayDelay();
 }
 
@@ -175,17 +174,17 @@ void CollectionManager::eraseCollection(int index)
 	m_pCollections.erase(CollectionManager::m_pCollections.begin() + index);
 	saveSettings();
 	updateNumber();
-	imageModification.lock();
+	std::lock_guard<std::mutex> lock(imageModification);
 	wchar_t wsPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
-	imageModification.unlock();
 	Delay::abortDelay();
 }
 
 void CollectionManager::loadNextWallpaper()
 {
+	std::lock_guard<std::mutex> lock(imageModification);
 	loadRandomWallpaper();
 }
 
@@ -193,27 +192,24 @@ void CollectionManager::loadRandomWallpaper()
 {
 	if (m_uiNumber <= 0)
 		return;
-	imageModification.lock();
 	const int randomFromAll = m_uniformIntDistribution(m_randomGenerator);
 	pNext = getWallpaperInfo(randomFromAll);
 	loadWallpaper(pNext);
-	imageModification.unlock();
 }
 
 void CollectionManager::setLoadedWallpaper(bool setPrevious)
 {
+	std::lock_guard<std::mutex> lock(imageModification);
 	wchar_t wsLoadedPath[MAX_PATH], wsCurrentPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsLoadedPath);
 	Filesystem::getRoamingDir(wsCurrentPath);
 	wcscat_s(wsLoadedPath, MAX_PATH, L"Loaded wallpaper.dat");
 	wcscat_s(wsCurrentPath, MAX_PATH, L"Current wallpaper.jpg");
-
 	if (!std::experimental::filesystem::exists(wsLoadedPath))
 	{
 		Delay::abortDelay();
 		return;
 	}
-	imageModification.lock();
 	if (!setPrevious)
 	{
 		if (pCurrent != nullptr)
@@ -230,7 +226,6 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	DeleteFileW(wsCurrentPath);
 	if (MoveFileW(wsLoadedPath, wsCurrentPath) == 0)
 	{
-		imageModification.unlock();
 		return;
 	}
 	wchar_t wsCurrentPathNative[MAX_PATH];
@@ -238,7 +233,6 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	wcscat_s(wsCurrentPathNative, MAX_PATH, L"Current wallpaper.jpg");
 	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, wsCurrentPathNative, SPIF_UPDATEINIFILE);
 	Player::redrawPlayers();
-	imageModification.unlock();
 }
 
 void CollectionManager::setNextWallpaper()
