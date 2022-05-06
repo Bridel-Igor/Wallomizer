@@ -161,7 +161,7 @@ void UserCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
 	ShellExecute(0, 0, sImgUrl, 0, 0, SW_SHOW);
 }
 
-std::vector<UserCollection::UserCollectionInfo> UserCollection::loadCollectionList(const char* sUsername, const char* sApiKey)
+void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, const char* sUsername, const char* sApiKey)
 {
 	char sCollectionInfoURL[255];
 	strcpy_s(sCollectionInfoURL, "https://wallhaven.cc/api/v1/collections/");
@@ -174,31 +174,23 @@ std::vector<UserCollection::UserCollectionInfo> UserCollection::loadCollectionLi
 	}
 
 	Internet::bufferAccess.lock();
-	std::vector<UserCollectionInfo> list;
 	char* pBuffer = Internet::buffer;
 
 	if (!Internet::URLDownloadToBuffer(sCollectionInfoURL))
 	{
 		Internet::bufferAccess.unlock();
-		return list;
+		return;
 	}
 
+	UserCollectionInfo uci;
 	while (true)
 	{
-		UserCollectionInfo* uci = new UserCollectionInfo;
-		if ((pBuffer = Internet::parse(pBuffer, "\"id\":", &uci->id)) == nullptr)
-		{
-			delete uci;
+		if ((pBuffer = Internet::parse(pBuffer, "\"id\":", &uci.id)) == nullptr)
 			break;
-		}
-		if ((pBuffer = Internet::parse(pBuffer, "\"label\":", uci->sLabel)) == nullptr)
-		{
-			delete uci;
+		if ((pBuffer = Internet::parse(pBuffer, "\"label\":", uci.sLabel)) == nullptr)
 			break;
-		}
-		list.push_back(*uci);
+		vector.push_back(uci);
 	}
 
 	Internet::bufferAccess.unlock();
-	return list;
 }

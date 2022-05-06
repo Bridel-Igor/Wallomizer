@@ -28,13 +28,13 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, CollectionManager
 
 	if (m_pCurrentUserCollection->settings.sCollectionID!=0 && strlen(m_pCurrentUserCollection->settings.sCollectionName)!=0)
 	{
-		list.clear();
+		uciList.clear();
 		UserCollection::UserCollectionInfo info;
 		info.id = atoi(m_pCurrentUserCollection->settings.sCollectionID);
 		strcpy_s(info.sLabel, m_pCurrentUserCollection->settings.sCollectionName);
-		list.push_back(info);
+		uciList.push_back(info);
 		SendMessageA(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
-		SendMessageA(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)list[0].sLabel);
+		SendMessageA(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)uciList.begin()->sLabel);
 		SendMessageA(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 		validCollection = true;
 	}
@@ -82,8 +82,12 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 		if ((HWND)lParam == cbCollections.hWnd() && HIWORD(wParam) == CBN_DROPDOWN)
 		{
 			char prevName[64] = {0};
-			if (!list.empty() && validCollection)
-				strcpy_s(prevName, list[cbCollections.getSelectedItem()].sLabel);
+			if (!uciList.empty() && validCollection)
+			{
+				auto uci = uciList.begin();
+				std::advance(uci, cbCollections.getSelectedItem());
+				strcpy_s(prevName, uci->sLabel);
+			}
 
 			validCollection = false;
 			SendMessageA(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
@@ -91,18 +95,18 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 			SendMessageA(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 			char tmpUsername[64];
 			edUsername.getTextA(tmpUsername, 64);
-			list.clear();
-			list = UserCollection::loadCollectionList(tmpUsername, Settings::apiKey);
+			uciList.clear();
+			UserCollection::loadCollectionList(uciList, tmpUsername, Settings::apiKey);
 			SendMessageA(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
-			if (list.empty())
+			if (uciList.empty())
 			{
 				SendMessageA(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)"Empty");
 				SendMessageA(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 				validCollection = false;
 				return 0;
 			}
-			for (size_t i=0;i<list.size(); i++)
-				SendMessageA(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)list[i].sLabel);
+			for (const auto& item : uciList)
+				SendMessageA(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)item.sLabel);
 
 			int index = 0;
 			if (strlen(prevName))
@@ -123,9 +127,12 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 				MessageBoxA(nullptr, "Invalid data", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
-			strcpy_s(m_pCurrentUserCollection->settings.sCollectionName, list[cbCollections.getSelectedItem()].sLabel);
+
+			auto uci = uciList.begin();
+			std::advance(uci, cbCollections.getSelectedItem());
+			strcpy_s(m_pCurrentUserCollection->settings.sCollectionName, uci->sLabel);
 			char cid[16] = { 0 };
-			_itoa_s(list[cbCollections.getSelectedItem()].id, cid, 10);
+			_itoa_s(uci->id, cid, 10);
 			strcpy_s(m_pCurrentUserCollection->settings.sCollectionID, cid);
 
 			edUsername.getTextA(m_pCurrentUserCollection->settings.sUsername, 64);

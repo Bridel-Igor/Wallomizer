@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include "BaseCollection.h"
 #include "CategoriesAndPurityComponents.h"
 #include "CollectionManager.h"
@@ -40,7 +38,7 @@ public:
 
 	static bool loadWallpaper(const Wallpaper* pWallpaper);
 	static void openWallpaperExternal(const Wallpaper* pWallpaper);
-	static std::vector<UserCollectionInfo> loadCollectionList(const char* sUsername, const char* sApiKey);
+	static void loadCollectionList(std::list<UserCollectionInfo>& list, const char* sUsername, const char* sApiKey);
 
 	UserCollectionSettings settings;
 	

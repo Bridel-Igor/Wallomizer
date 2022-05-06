@@ -28,6 +28,6 @@ private:
 	Button btnOk, btnCancel;
 	PurityComponent purCom;
 
-	std::vector<UserCollection::UserCollectionInfo> list;
+	std::list<UserCollection::UserCollectionInfo> uciList;
 	bool validCollection = false;
 };
