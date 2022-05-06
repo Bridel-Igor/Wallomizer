@@ -56,23 +56,13 @@ bool SearchCollection::loadSettings(FILE* pFile)
 		return true;
 
 	char* pBuffer = Internet::buffer;
-	Internet::bufferAccess.lock();
+	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
 	if (!Internet::URLDownloadToBuffer(m_sSearchUrl))
-	{
-		Internet::bufferAccess.unlock();
 		return false;
-	}
 	if ((pBuffer = Internet::parse(pBuffer, "\"meta\"", nullptr)) == nullptr)
-	{
-		Internet::bufferAccess.unlock();
 		return false;
-	}
 	if (Internet::parse(pBuffer, "\"total\":", &m_uiNumber) == nullptr)
-	{
-		Internet::bufferAccess.unlock();
 		return false;
-	}
-	Internet::bufferAccess.unlock();
 	return true;
 }
 
@@ -113,30 +103,21 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 	strcat_s(sPageUrl, sCurrentPage);
 
 	char* pBuffer = Internet::buffer;
-	Internet::bufferAccess.lock();
+	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
 
 	if (!Internet::URLDownloadToBuffer(sPageUrl))
-	{
-		Internet::bufferAccess.unlock();
 		return pWallpaper;
-	}
 
 	for (unsigned int i = 0; i < index; i++)
 		if ((pBuffer = Internet::parse(pBuffer, "\"path\":", nullptr)) == nullptr)
-		{
-			Internet::bufferAccess.unlock();
 			return pWallpaper;
-		}
 	pWallpaper = new Wallpaper(CollectionType::search);
 	if (Internet::parse(pBuffer, "\"path\":", pWallpaper->getPathA()) == nullptr)
 	{
-		Internet::bufferAccess.unlock();
 		delete pWallpaper;
 		pWallpaper = nullptr;
 		return pWallpaper;
 	}
-	
-	Internet::bufferAccess.unlock();
 	return pWallpaper;
 }
 

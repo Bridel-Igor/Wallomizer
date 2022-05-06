@@ -44,24 +44,14 @@ bool UserCollection::loadSettings(FILE* pFile)
 		return true;
 
 	// Getting the META
+	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
 	char* pBuffer = Internet::buffer;
-	Internet::bufferAccess.lock();
 	if (!Internet::URLDownloadToBuffer(m_sCollectionUrl))
-	{
-		Internet::bufferAccess.unlock();
 		return false;
-	}
 	if ((pBuffer = Internet::parse(pBuffer, "\"meta\"", nullptr)) == nullptr)
-	{
-		Internet::bufferAccess.unlock();
 		return false;
-	}
 	if (Internet::parse(pBuffer, "\"total\":", &m_uiNumber) == nullptr)
-	{
-		Internet::bufferAccess.unlock();
 		return false;
-	}
-	Internet::bufferAccess.unlock();
 	return true;
 }
 
@@ -97,31 +87,20 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 	_itoa_s(page, sCurrentPage, 10);
 	strcat_s(sPageUrl, sCurrentPage);
 
-	Internet::bufferAccess.lock();
-
+	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
 	if (!Internet::URLDownloadToBuffer(sPageUrl))
-	{
-		Internet::bufferAccess.unlock();
 		return pWallpaper;
-	}
-
 	char *pBuffer = Internet::buffer;
 	for (unsigned int i = 1; i < index; i++)
 		if ((pBuffer = Internet::parse(pBuffer, "\"path\":", nullptr)) == nullptr)
-		{
-			Internet::bufferAccess.unlock();
 			return pWallpaper;
-		}
 	pWallpaper = new Wallpaper(CollectionType::user);
 	if (Internet::parse(pBuffer, "\"path\":", pWallpaper->getPathA()) == nullptr)
 	{
-		Internet::bufferAccess.unlock();
 		delete pWallpaper;
 		pWallpaper = nullptr;
 		return pWallpaper;
 	}
-	
-	Internet::bufferAccess.unlock();
 	return pWallpaper;
 }
 
@@ -166,22 +145,16 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 	char sCollectionInfoURL[255];
 	strcpy_s(sCollectionInfoURL, "https://wallhaven.cc/api/v1/collections/");
 	strcat_s(sCollectionInfoURL, sUsername);
-
 	if (strlen(sApiKey))
 	{
 		strcat_s(sCollectionInfoURL, "?apikey=");
 		strcat_s(sCollectionInfoURL, Settings::getApiKey());
 	}
 
-	Internet::bufferAccess.lock();
+	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
 	char* pBuffer = Internet::buffer;
-
 	if (!Internet::URLDownloadToBuffer(sCollectionInfoURL))
-	{
-		Internet::bufferAccess.unlock();
 		return;
-	}
-
 	UserCollectionInfo uci;
 	while (true)
 	{
@@ -191,6 +164,4 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 			break;
 		list.push_back(uci);
 	}
-
-	Internet::bufferAccess.unlock();
 }

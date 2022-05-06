@@ -82,8 +82,8 @@ bool CollectionManager::loadSettings(FILE* pFile)
 	m_isReady = true;
 	if (Delay::isSlideshowRunning)
 		Delay::abortDelay();
-	if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady()) // BUG: this thread rust faster than tray
-		PostMessageA(TrayWindow::s_pTrayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::s_pTrayWindow->btnSettings.hMenu(), NULL);
+	//if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady()) // BUG: this thread rust faster than tray
+	//	PostMessageA(TrayWindow::s_pTrayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::s_pTrayWindow->btnSettings.hMenu(), NULL);
 	m_isLoading = false;
 	Player::updateTimer(true);
 	return true;
