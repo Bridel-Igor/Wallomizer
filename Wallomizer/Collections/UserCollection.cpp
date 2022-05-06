@@ -189,7 +189,7 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 			break;
 		if ((pBuffer = Internet::parse(pBuffer, "\"label\":", uci.sLabel)) == nullptr)
 			break;
-		vector.push_back(uci);
+		list.push_back(uci);
 	}
 
 	Internet::bufferAccess.unlock();
