@@ -13,6 +13,21 @@
 /// To process hovering events you should call mouseHovering method in response to WM_SETCURSOR message.
 class ColorButton : public IHoverable
 {
+private:
+	/// Class manages resources (de)allocation for all ColorButton resources.
+	class Resources
+	{
+	public:
+		Resources();
+		~Resources();
+
+		/// Handles to pens to draw outlines.
+		static HPEN s_checkedPenWhite, s_checkedPenBlack, s_nullPen;
+		/// Handles to icons that holds bitmaps of check mark and appearence of empty color button.
+		static HICON s_hICheckWhite, s_hICheckBlack, s_hIColorEmpty;
+	private:
+		static unsigned char s_refCount;
+	}resources;
 public:
 	/// Color button component construction.
 	/// 
@@ -60,15 +75,4 @@ private:
 	bool m_checkedPenIsWhite;
 	/// Handle for brush which holds the color of the button. Used for drawing.
 	HBRUSH m_brush;
-
-	/// Resource management section
-
-	/// Reference count of object, that are using resources. 
-	/// When it gets > 0 resources are allocated. 
-	/// When it reaches 0 resources are released.
-	static unsigned char s_refCount;
-	/// Handles to pens to draw outlines.
-	static HPEN s_checkedPenWhite, s_checkedPenBlack, s_nullPen;
-	/// Handles to icons that holds bitmaps of check mark and appearence of empty color button.
-	static HICON s_hICheckWhite, s_hICheckBlack, s_hIColorEmpty;
 };

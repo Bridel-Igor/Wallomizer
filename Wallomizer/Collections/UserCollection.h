@@ -45,5 +45,5 @@ public:
 private:
 	static constexpr int s_nPerPage = 24;
 	CollectionManager* m_pCollectionManager = nullptr;
-	char m_sCollectionUrl[255] = "";
+	char m_sCollectionUrl[255] = ""; // TODO: wchat_t
 };

@@ -71,6 +71,7 @@ IWindow::IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwE
 
 IWindow::~IWindow()
 {
+	DestroyWindow(m_hWnd);
 	UnregisterClassA(m_sName, GetModuleHandleA(NULL));
 }
 
