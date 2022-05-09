@@ -5,9 +5,9 @@
 enum class CollectionType : unsigned char
 {
 	none,
-	local,	/// uses wide char from CharX union
-	user,	/// uses ansi char from CharX union
-	search	/// uses ansi char from CharX union
+	local,
+	user,
+	search
 };
 
 /// Class that contains wallpaper info.
@@ -28,10 +28,6 @@ public:
 	/// @return One of the values of CollectionType enum that corresponds to collection class.
 	CollectionType getType() const;
 
-	/// Get path or URL for current wallpaper.
-	/// 
-	/// @return Pointer to char array, that contains path or URL.
-	char* getPathA() const;
 
 	/// Get path or URL for current wallpaper.
 	/// 
@@ -39,12 +35,6 @@ public:
 	wchar_t* getPathW() const;
 
 private:
-	/// Union that contains wide and ansi char pointers. 
-	/// One is chosen on construction and used until destruction.
-	union CharX
-	{
-		wchar_t* w;
-		char* a;
-	}charX;
+	wchar_t* m_wsParameter;
 	CollectionType type; /// Collection type of current wallpaper.
 };

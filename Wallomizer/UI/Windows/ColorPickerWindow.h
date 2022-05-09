@@ -8,13 +8,13 @@
 class ColorPickerWindow : public IWindow
 {
 public:
-	ColorPickerWindow(HWND hCaller, char* sColor);
+	ColorPickerWindow(HWND hCaller, wchar_t* wsColor);
 	~ColorPickerWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
 	HWND m_hCaller;
-	char* m_sColor;
+	wchar_t* m_sColor;
 	ColorButton btnClr[30];
 	Button btnOk, btnCancel;
 };

@@ -62,7 +62,7 @@ public:
 	/// 
 	/// @param buffer - pointer to char array
 	/// @param size - size of the char array
-	void getColor(char* buffer, int size);
+	void getColor(wchar_t* buffer, int size);
 
 private:
 	/// Holds the current state of check box.

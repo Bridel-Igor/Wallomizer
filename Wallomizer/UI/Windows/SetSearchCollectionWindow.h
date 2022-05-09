@@ -24,5 +24,5 @@ private:
 	CategoryComponent catCom;
 	PurityComponent purCom;
 
-	char tmpRes[255] = "", tmpAR[128] = "", tmpColor[16] = "";
+	wchar_t tmpRes[255] = L"", tmpAR[128] = L"", tmpColor[16] = L"";
 };

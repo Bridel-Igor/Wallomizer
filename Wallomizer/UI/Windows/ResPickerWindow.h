@@ -9,13 +9,13 @@
 class ResPickerWindow : public IWindow
 {
 public:
-	ResPickerWindow(HWND hCaller, char *sResolution);
+	ResPickerWindow(HWND hCaller, wchar_t *sResolution);
 	~ResPickerWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
 	HWND m_hCaller;
-	char* m_sResolution;
+	wchar_t* m_wsResolution;
 	Static stUltrawide, st169, st1610, st43, st54, stCustom, stX;
 	PushButton btnRes[23], btnAtLeast, btnExactly;
 	Button btnOk, btnCancel;

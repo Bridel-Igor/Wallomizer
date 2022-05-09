@@ -1,6 +1,6 @@
 #include "AspRatPickerWindow.h"
 
-AspRatPickerWindow::AspRatPickerWindow(HWND hCaller, char* sAspRat) :
+AspRatPickerWindow::AspRatPickerWindow(HWND hCaller, wchar_t* sAspRat) :
 	IWindow("Ratio", "Aspect Ratio Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 315, 195),
 	m_hCaller(hCaller),
 	m_sAspRat(sAspRat),
@@ -28,15 +28,15 @@ AspRatPickerWindow::AspRatPickerWindow(HWND hCaller, char* sAspRat) :
 	EnableWindow(m_hCaller, FALSE);
 
 	//initializing
-	if (strstr(m_sAspRat, "landscape") != NULL)
+	if (wcsstr(m_sAspRat, L"landscape") != NULL)
 		btnAllWide.check(true);
-	if (strstr(m_sAspRat, "portrait") != NULL)
+	if (wcsstr(m_sAspRat, L"portrait") != NULL)
 		btnAllPortrait.check(true);
 	for (int i = 0; i < 12; i++)
 	{
-		char buf[16] = { 0 };
-		GetWindowTextA(btnAR[i].hWnd(), buf, 15);
-		if (strstr(m_sAspRat, buf) != NULL)
+		wchar_t buf[16] = { 0 };
+		GetWindowTextW(btnAR[i].hWnd(), buf, 15);
+		if (wcsstr(m_sAspRat, buf) != NULL)
 			btnAR[i].check(true);
 	}
 	
@@ -98,7 +98,7 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM
 			}
 		if (btnOk.isClicked(wParam))
 		{
-			strcpy_s(m_sAspRat, 128, "");
+			wcscpy_s(m_sAspRat, 128, L"");
 			bool empty = true;
 			if (btnAllWide.isChecked() || btnAllPortrait.isChecked())
 				empty = false;
@@ -114,18 +114,18 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM
 				DestroyWindow(hWnd());
 				return 0;
 			}
-			strcpy_s(m_sAspRat, 128, "&ratios=");
+			wcscpy_s(m_sAspRat, 128, L"&ratios=");
 			if (btnAllWide.isChecked())
-				strcat_s(m_sAspRat, 128, "landscape");
+				wcscat_s(m_sAspRat, 128, L"landscape");
 			if (btnAllPortrait.isChecked())
-				strcat_s(m_sAspRat, 128, ",portrait");
+				wcscat_s(m_sAspRat, 128, L",portrait");
 			for (i = 0; i < 12; i++)
 				if (btnAR[i].isChecked())
 				{
-					strcat_s(m_sAspRat, 128, ",");
-					char buf[16] = { 0 };
-					GetWindowTextA(btnAR[i].hWnd(), buf, 15);
-					strcat_s(m_sAspRat, 128, buf);
+					wcscat_s(m_sAspRat, 128, L",");
+					wchar_t buf[16] = { 0 };
+					GetWindowTextW(btnAR[i].hWnd(), buf, 15);
+					wcscat_s(m_sAspRat, 128, buf);
 				}
 			DestroyWindow(hWnd());
 			return 0;

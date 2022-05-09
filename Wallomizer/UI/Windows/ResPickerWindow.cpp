@@ -2,10 +2,10 @@
 
 #include "ResPickerWindow.h"
 
-ResPickerWindow::ResPickerWindow(HWND hCaller, char* sResolution) :
+ResPickerWindow::ResPickerWindow(HWND hCaller, wchar_t* wsResolution) :
 	IWindow("Resolution", "Res Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 390, 250),
 	m_hCaller(hCaller),
-	m_sResolution(sResolution),
+	m_wsResolution(wsResolution),
 	btnAtLeast	(hWnd(), "At least",	10,		10,		180,	20),
 	btnExactly	(hWnd(), "Exactly",		200,	10,		180,	20),
 	stUltrawide	(hWnd(), "Ultrawide",	10,		35,		70,		20, SS_CENTER),
@@ -37,46 +37,46 @@ ResPickerWindow::ResPickerWindow(HWND hCaller, char* sResolution) :
 				{hWnd(), "2560x2048",	310,	135,	70,		20},
 				{hWnd(), "3840x3072",	310,	160,	70,		20}},
 	stCustom	(hWnd(), "Custom resolution:", 20, 190, 110,	20),
-	edWidth		(hWnd(), "",			140,	190,	105,	20, ES_NUMBER),
+	edWidth		(hWnd(), L"",			140,	190,	105,	20, ES_NUMBER),
 	stX			(hWnd(), "x",			245,	190,	20,		20, SS_CENTER),
-	edHeight	(hWnd(), "",			265,	190,	105,	20, ES_NUMBER),
+	edHeight	(hWnd(), L"",			265,	190,	105,	20, ES_NUMBER),
 	btnCancel	(hWnd(), "Cancel",		10,		220,	180,	20),
 	btnOk		(hWnd(), "Ok",			200,	220,	180,	20)
 {
 	EnableWindow(m_hCaller, FALSE);
 
 	//initializing
-	std::string custom = "";
-	custom.append(m_sResolution);
-	if (strstr(m_sResolution, "&resolutions=") != NULL)
+	std::wstring custom = L"";
+	custom.append(m_wsResolution);
+	if (wcswcs(m_wsResolution, L"&resolutions=") != NULL)
 		btnExactly.check(true);
 	else
 		btnAtLeast.check(true);
 	for (int i = 0; i < 23; i++)
 	{
-		char buf[16] = { 0 };
-		GetWindowTextA(btnRes[i].hWnd(), buf, 15);
-		if (strstr(m_sResolution, buf) != NULL)
+		wchar_t buf[16] = { 0 };
+		GetWindowTextW(btnRes[i].hWnd(), buf, 15);
+		if (wcswcs(m_wsResolution, buf) != NULL)
 		{
-			custom.erase(custom.find(buf), strlen(buf));
+			custom.erase(custom.find(buf), wcslen(buf));
 			btnRes[i].check(true);
 		}
 	}
-	if (custom.find("&resolutions=") != std::string::npos)
-		custom.erase(custom.find("&resolutions="), strlen("&resolutions="));
-	if (custom.find("&atleast=") != std::string::npos)
-		custom.erase(custom.find("&atleast="), strlen("&atleast="));
-	while (custom.find(",") != std::string::npos)
-		custom.erase(custom.find(","), strlen(","));
-	if (custom.find("x") != std::string::npos)
+	if (custom.find(L"&resolutions=") != std::string::npos)
+		custom.erase(custom.find(L"&resolutions="), wcslen(L"&resolutions="));
+	if (custom.find(L"&atleast=") != std::string::npos)
+		custom.erase(custom.find(L"&atleast="), wcslen(L"&atleast="));
+	while (custom.find(L",") != std::string::npos)
+		custom.erase(custom.find(L","), wcslen(L","));
+	if (custom.find(L"x") != std::string::npos)
 	{
-		char buf[8] = { 0 };
-		size_t n = custom.find("x");
+		wchar_t buf[8] = { 0 };
+		size_t n = custom.find(L"x");
 		for (size_t i = 0; i < n; i++)
 			buf[i] = custom[i];
-		edWidth.setTextA(buf);
+		edWidth.setTextW(buf);
 		custom.erase(0, n + 1);
-		edHeight.setTextA(custom.c_str());
+		edHeight.setTextW(custom.c_str());
 	}
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
@@ -168,30 +168,30 @@ LRESULT ResPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lP
 				btnRes[i].check(false);
 		if (btnOk.isClicked(wParam))
 		{
-			strcpy_s(m_sResolution, 255, "");
+			wcscpy_s(m_wsResolution, 255, L"");
 			if (btnAtLeast.isChecked())
 			{
 				for (int i = 0; i < 23; i++)
 				{
 					if (btnRes[i].isChecked())
 					{
-						char buf[16] = {0};
-						GetWindowTextA(btnRes[i].hWnd(), buf, 15);
-						strcpy_s(m_sResolution, 255, "&atleast=");
-						strcat_s(m_sResolution, 255, buf);
+						wchar_t buf[16] = {0};
+						GetWindowTextW(btnRes[i].hWnd(), buf, 15);
+						wcscpy_s(m_wsResolution, 255, L"&atleast=");
+						wcscat_s(m_wsResolution, 255, buf);
 						DestroyWindow(hWnd());
 						return 0;
 					}
 				}
 				if (!edWidth.isEmpty() && !edHeight.isEmpty())
 				{
-					char buf[16] = { 0 };
-					strcpy_s(m_sResolution, 255, "&atleast=");
-					edWidth.getTextA(buf, 15);
-					strcat_s(m_sResolution, 255, buf);
-					strcat_s(m_sResolution, 255, "x");
-					edHeight.getTextA(buf, 15);
-					strcat_s(m_sResolution, 255, buf);
+					wchar_t buf[16] = { 0 };
+					wcscpy_s(m_wsResolution, 255, L"&atleast=");
+					edWidth.getTextW(buf, 15);
+					wcscat_s(m_wsResolution, 255, buf);
+					wcscat_s(m_wsResolution, 255, L"x");
+					edHeight.getTextW(buf, 15);
+					wcscat_s(m_wsResolution, 255, buf);
 					DestroyWindow(hWnd());
 					return 0;
 				}
@@ -203,30 +203,30 @@ LRESULT ResPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lP
 				{
 					if (btnRes[i].isChecked())
 					{
-						char buf[16] = { 0 };
-						GetWindowTextA(btnRes[i].hWnd(), buf, 15);
+						wchar_t buf[16] = { 0 };
+						GetWindowTextW(btnRes[i].hWnd(), buf, 15);
 						if (first)
 						{
-							strcpy_s(m_sResolution, 255, "&resolutions=");
+							wcscpy_s(m_wsResolution, 255, L"&resolutions=");
 							first = false;
 						}
 						else
-							strcat_s(m_sResolution, 255, ",");
-						strcat_s(m_sResolution, 255, buf);
+							wcscat_s(m_wsResolution, 255, L",");
+						wcscat_s(m_wsResolution, 255, buf);
 					}
 				}
 				if (!edWidth.isEmpty() && !edHeight.isEmpty())
 				{
 					if (first)
-						strcpy_s(m_sResolution, 255, "&resolutions=");
+						wcscpy_s(m_wsResolution, 255, L"&resolutions=");
 					else
-						strcat_s(m_sResolution, 255, ",");
-					char buf[16] = { 0 };
-					edWidth.getTextA(buf, 15);
-					strcat_s(m_sResolution, 255, buf);
-					strcat_s(m_sResolution, 255, "x");
-					edHeight.getTextA(buf, 15);
-					strcat_s(m_sResolution, 255, buf);
+						wcscat_s(m_wsResolution, 255, L",");
+					wchar_t buf[16] = { 0 };
+					edWidth.getTextW(buf, 15);
+					wcscat_s(m_wsResolution, 255, buf);
+					wcscat_s(m_wsResolution, 255, L"x");
+					edHeight.getTextW(buf, 15);
+					wcscat_s(m_wsResolution, 255, buf);
 				}
 			}
 			DestroyWindow(hWnd());

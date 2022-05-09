@@ -1,9 +1,9 @@
 #include "ColorPickerWindow.h"
 
-ColorPickerWindow::ColorPickerWindow(HWND hCaller, char* sColor) :
+ColorPickerWindow::ColorPickerWindow(HWND hCaller, wchar_t* wsColor) :
 	IWindow("Color", "Color Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 405, 195),
 	m_hCaller(hCaller),
-	m_sColor(sColor),
+	m_sColor(wsColor),
 	btnClr     {{hWnd(), 0x66, 0x00, 0x00,	10,		10,		60,		25},
 				{hWnd(), 0x99, 0x00, 0x00,	75,		10,		60,		25},
 				{hWnd(), 0xcc, 0x00, 0x00,	140,	10,		60,		25},
@@ -45,14 +45,14 @@ ColorPickerWindow::ColorPickerWindow(HWND hCaller, char* sColor) :
 	EnableWindow(m_hCaller, FALSE);
 
 	//initializing
-	if (strstr(m_sColor, "&colors=") == NULL)
+	if (wcsstr(m_sColor, L"&colors=") == NULL)
 		btnClr[29].check(true);
 	else
 		for (int i = 0; i < 29; i++)
 		{
-			char sBuf[16] = { 0 };
+			wchar_t sBuf[16] = { 0 };
 			btnClr[i].getColor(sBuf, 15);
-			if (strstr(m_sColor, sBuf) != NULL)
+			if (wcsstr(m_sColor, sBuf) != NULL)
 			{
 				btnClr[i].check(true);
 				break;
@@ -100,11 +100,11 @@ LRESULT ColorPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM 
 			}
 		if (btnOk.isClicked(wParam))
 		{
-			strcpy_s(m_sColor, 16, "");
+			wcscpy_s(m_sColor, 16, L"");
 			for (int i = 0; i < 29; i++)
 				if (btnClr[i].isChecked())
 				{
-					strcpy_s(m_sColor, 16, "&colors=");
+					wcscpy_s(m_sColor, 16, L"&colors=");
 					btnClr[i].getColor(m_sColor, 16);
 					break;
 				}

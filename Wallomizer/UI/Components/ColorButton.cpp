@@ -94,31 +94,31 @@ void ColorButton::draw(LPDRAWITEMSTRUCT& pDIS)
 					0, 0, 0, NULL, DI_NORMAL);
 }
 
-void ColorButton::getColor(char* buffer, int size)
+void ColorButton::getColor(wchar_t* buffer, int size)
 {
-	char c[3] = { 0 };
-	_itoa_s(m_red, c, 16);
-	if (strlen(c) == 1)
+	wchar_t c[3] = { 0 };
+	_itow_s(m_red, c, 16);
+	if (wcslen(c) == 1)
 	{
 		c[1] = c[0];
-		c[0] = '0';
-		c[2] = '\0';
+		c[0] = L'0';
+		c[2] = L'\0';
 	}
-	strcat_s(buffer, size, c);
-	_itoa_s(m_green, c, 16);
-	if (strlen(c) == 1)
+	wcscat_s(buffer, size, c);
+	_itow_s(m_green, c, 16);
+	if (wcslen(c) == 1)
 	{
 		c[1] = c[0];
-		c[0] = '0';
-		c[2] = '\0';
+		c[0] = L'0';
+		c[2] = L'\0';
 	}
-	strcat_s(buffer, size, c);
-	_itoa_s(m_blue, c, 16);
-	if (strlen(c) == 1)
+	wcscat_s(buffer, size, c);
+	_itow_s(m_blue, c, 16);
+	if (wcslen(c) == 1)
 	{
 		c[1] = c[0];
-		c[0] = '0';
-		c[2] = '\0';
+		c[0] = L'0';
+		c[2] = L'\0';
 	}
-	strcat_s(buffer, size, c);
+	wcscat_s(buffer, size, c);
 }

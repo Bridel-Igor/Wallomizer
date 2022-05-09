@@ -20,7 +20,7 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionMan
 	btnColor		(hWnd(), "Pick color",												340,	40,		120,	20),
 
 	stTag			(hWnd(), "Tags:",													10,		70,		60,		20),
-	edTag			(hWnd(), "",														80,		70,		380,	20),
+	edTag			(hWnd(), L"",														80,		70,		380,	20),
 	stTagInstruct { {hWnd(), "tagname - search fuzzily for a tag/keyword",				80,		100,	380,	15},
 					{hWnd(), "- tagname - exclude a tag / keyword",						80,		115,	380,	15},
 					{hWnd(), "+ tag1 + tag2 - must have tag1 and tag2",					80,		130,	380,	15},
@@ -37,10 +37,10 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionMan
 	{
 		catCom.setCategory(m_pCurrentSearchCollection->settings.categoriesAndPurity);
 		purCom.setPurity(m_pCurrentSearchCollection->settings.categoriesAndPurity);
-		edTag.setTextA(m_pCurrentSearchCollection->settings.sTag);
-		strcpy_s(tmpRes, m_pCurrentSearchCollection->settings.sResolution);
-		strcpy_s(tmpAR, m_pCurrentSearchCollection->settings.sRatio);
-		strcpy_s(tmpColor, m_pCurrentSearchCollection->settings.sColor);
+		edTag.setTextW(m_pCurrentSearchCollection->settings.wsTag);
+		wcscpy_s(tmpRes, m_pCurrentSearchCollection->settings.wsResolution);
+		wcscpy_s(tmpAR, m_pCurrentSearchCollection->settings.wsRatio);
+		wcscpy_s(tmpColor, m_pCurrentSearchCollection->settings.wsColor);
 	}
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
@@ -106,10 +106,10 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 		{
 			m_pCurrentSearchCollection->settings.categoriesAndPurity = 0;
 			m_pCurrentSearchCollection->settings.categoriesAndPurity = catCom.getCategory() | purCom.getPurity();
-			edTag.getTextA(m_pCurrentSearchCollection->settings.sTag, 255);
-			strcpy_s(m_pCurrentSearchCollection->settings.sResolution, tmpRes);
-			strcpy_s(m_pCurrentSearchCollection->settings.sRatio, tmpAR);
-			strcpy_s(m_pCurrentSearchCollection->settings.sColor, tmpColor);
+			edTag.getTextW(m_pCurrentSearchCollection->settings.wsTag, 255);
+			wcscpy_s(m_pCurrentSearchCollection->settings.wsResolution, tmpRes);
+			wcscpy_s(m_pCurrentSearchCollection->settings.wsRatio, tmpAR);
+			wcscpy_s(m_pCurrentSearchCollection->settings.wsColor, tmpColor);
 			if (m_pCurrentSearchCollection->isValid() == false)
 				m_pCurrentSearchCollection->setValid(true);
 			else

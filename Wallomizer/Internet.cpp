@@ -6,7 +6,7 @@
 char Internet::buffer[bufferSize];
 std::mutex Internet::bufferAccess;
 // TODO: no internet exception handler
-bool Internet::URLDownloadToBuffer(const char* URL, char* _buffer, DWORD _bufferSize) 
+bool Internet::URLDownloadToBuffer(const wchar_t* URL, char* _buffer, DWORD _bufferSize)
 {
 	HINTERNET hInternetSession;
 	HINTERNET hURL;
@@ -16,7 +16,7 @@ bool Internet::URLDownloadToBuffer(const char* URL, char* _buffer, DWORD _buffer
 	if (!hInternetSession)
 		return false;
 	
-	hURL = InternetOpenUrlA(hInternetSession, URL, NULL, 0, INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+	hURL = InternetOpenUrlW(hInternetSession, URL, NULL, 0, INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 	if (!hURL)
 	{
 		InternetCloseHandle(hInternetSession);
@@ -44,7 +44,7 @@ bool Internet::URLDownloadToBuffer(const char* URL, char* _buffer, DWORD _buffer
 	return result;
 }
 
-bool Internet::URLDownloadToFile(const char* URL, const wchar_t* path)
+bool Internet::URLDownloadToFile(const wchar_t* URL, const wchar_t* path)
 {
 	HINTERNET hInternetSession;
 	HINTERNET hURL;
@@ -54,7 +54,7 @@ bool Internet::URLDownloadToFile(const char* URL, const wchar_t* path)
 	if (!hInternetSession)
 		return false;
 
-	hURL = InternetOpenUrlA(hInternetSession, URL, NULL, 0, INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+	hURL = InternetOpenUrlW(hInternetSession, URL, NULL, 0, INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 	if (!hURL)
 	{
 		InternetCloseHandle(hInternetSession);
@@ -84,43 +84,51 @@ bool Internet::URLDownloadToFile(const char* URL, const wchar_t* path)
 	return result;
 }
 
-char* Internet::parse(char* _buffer, const char* key, nullptr_t)
+char* Internet::parse(char* _pBuffer, const char* sKey, nullptr_t)
 {
-	if (_buffer == nullptr)
+	if (_pBuffer == nullptr)
 		return nullptr;
-	char* pBuffer = _buffer;
-	pBuffer = strstr(pBuffer, key);
+	char* pBuffer = _pBuffer;
+	pBuffer = strstr(pBuffer, sKey);
 	if (pBuffer == nullptr)
 		return nullptr;
-	pBuffer += strlen(key);
+	pBuffer += strlen(sKey);
 	return pBuffer;
 }
 
-char* Internet::parse(char* _buffer, const char* key, char* value)
+char* Internet::parse(char* _pBuffer, const char* sKey, wchar_t* wsValue)
 {
-	char* pBuffer = parse(_buffer, key, nullptr);
+	char* pBuffer = parse(_pBuffer, sKey, nullptr);
 	if (pBuffer == nullptr)
 		return nullptr;
 	pBuffer++;
 	int slide = 0, i = 0;
 	while (pBuffer != nullptr && pBuffer[i] != '"')
 	{
-		if (pBuffer[i] == 92)
+		if (pBuffer[i] == '\\') // special symbols
 		{
+			// removing '\' symbol. This also converts path separators from '\/' to '/'.
 			slide++;
 			i++;
+			if (pBuffer[i] == 'u') // unicode symbol decoding
+			{
+				const char code[5]{ pBuffer[i + 1], pBuffer[i + 2], pBuffer[i + 3], pBuffer[i + 4], '\0' };
+				wsValue[i - slide] = (wchar_t)strtol(code, NULL, 16);
+				slide += 4;
+				i += 5;
+			}
 			continue;
 		}
-		value[i - slide] = pBuffer[i];
+		wsValue[i - slide] = pBuffer[i];
 		i++;
 	}
-	value[i - slide] = '\0';
+	wsValue[i - slide] = '\0';
 	return pBuffer;
 }
 
-char* Internet::parse(char* _buffer, const char* key, unsigned int* value)
+char* Internet::parse(char* _pBuffer, const char* key, unsigned int* value)
 {
-	char* pBuffer = parse(_buffer, key, nullptr);
+	char* pBuffer = parse(_pBuffer, key, nullptr);
 	if (pBuffer == nullptr)
 		return nullptr;
 	char search[64] = "";

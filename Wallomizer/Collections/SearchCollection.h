@@ -10,10 +10,10 @@ private:
 	struct SearchCollectionSettings
 	{
 		CategoriesAndPurity categoriesAndPurity = CAP::categoryGeneral | CAP::categoryAnime | CAP::categoryPeople | CAP::puritySFW;
-		char sTag[255] = "";
-		char sResolution[255] = "";
-		char sRatio[128] = "";
-		char sColor[16] = "";
+		wchar_t wsTag[255] = L"";
+		wchar_t wsResolution[255] = L"";
+		wchar_t wsRatio[128] = L"";
+		wchar_t wsColor[16] = L"";
 	};
 
 public:
@@ -38,5 +38,5 @@ public:
 private:
 	static constexpr int s_nPerPage = 24;
 	CollectionManager* m_pCollectionManager = nullptr;
-	char m_sSearchUrl[1024] = "";	
+	wchar_t m_wsSearchUrl[1024] = L"";	
 };

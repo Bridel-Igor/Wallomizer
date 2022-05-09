@@ -6,8 +6,8 @@
 
 unsigned int Settings::prevCount = 5;
 unsigned long Settings::delay = 300000;
-char Settings::username[64];
-char Settings::apiKey[128];
+wchar_t Settings::username[64];
+wchar_t Settings::apiKey[128];
 bool Settings::loadOnStartup = false;
 
 namespace Settings
@@ -64,17 +64,17 @@ void Settings::loadSettings()
 	saveSettings();
 }
 
-void Settings::setApiKey(const char* _apiKey)
+void Settings::setApiKey(const wchar_t* _apiKey)
 {
-	strcpy_s(apiKey, 64, _apiKey);
+	wcscpy_s(apiKey, 64, _apiKey);
 }
 
-char* Settings::getApiKey()
+wchar_t* Settings::getApiKey()
 {
 	return apiKey;
 }
 
 bool Settings::isApiKeyUsed()
 {
-	return strlen(apiKey);
+	return wcslen(apiKey);
 }

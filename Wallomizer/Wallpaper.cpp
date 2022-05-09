@@ -5,28 +5,28 @@
 Wallpaper::Wallpaper(CollectionType _type)
 {
 	type = CollectionType::none;
-	charX.a = nullptr;
+	m_wsParameter = nullptr;
 
 	switch (_type)
 	{
 		case CollectionType::local:
 		{
-			charX.w = new wchar_t[MAX_PATH];
-			if (charX.w != nullptr)
+			m_wsParameter = new wchar_t[MAX_PATH];
+			if (m_wsParameter != nullptr)
 				type = _type;
 		}
 		break;
 		case CollectionType::user:
 		{
-			charX.a = new char[255];
-			if (charX.a != nullptr)
+			m_wsParameter = new wchar_t[255];
+			if (m_wsParameter != nullptr)
 				type = _type;
 		}
 		break;
 		case CollectionType::search:
 		{
-			charX.a = new char[1024];
-			if (charX.a != nullptr)
+			m_wsParameter = new wchar_t[1024];
+			if (m_wsParameter != nullptr)
 				type = _type;
 		}
 		break;
@@ -36,15 +36,10 @@ Wallpaper::Wallpaper(CollectionType _type)
 Wallpaper::~Wallpaper()
 {
 	type = CollectionType::none;
-	if (charX.w != nullptr)
+	if (m_wsParameter != nullptr)
 	{
-		delete[] charX.w;
-		charX.w = nullptr;
-	}
-	if (charX.a != nullptr)
-	{
-		delete[] charX.a;
-		charX.a = nullptr;
+		delete[] m_wsParameter;
+		m_wsParameter = nullptr;
 	}
 }
 
@@ -55,16 +50,9 @@ CollectionType Wallpaper::getType() const
 	return type;
 }
 
-char* Wallpaper::getPathA() const
-{
-	if (this == nullptr)
-		return nullptr;
-	return charX.a;
-}
-
 wchar_t* Wallpaper::getPathW() const
 {
 	if (this == nullptr)
 		return nullptr;
-	return charX.w;
+	return m_wsParameter;
 }

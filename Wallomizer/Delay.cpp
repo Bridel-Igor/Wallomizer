@@ -33,8 +33,8 @@ void Delay::saveSession(Wallpaper *pCurrent)
 	switch (type)
 	{
 	case CollectionType::local:		fwrite(pCurrent->getPathW(), sizeof(wchar_t), MAX_PATH, pFile);	break;
-	case CollectionType::user:		fwrite(pCurrent->getPathA(), sizeof(char), 255, pFile);			break;
-	case CollectionType::search:	fwrite(pCurrent->getPathA(), sizeof(char), 1024, pFile);		break;
+	case CollectionType::user:		fwrite(pCurrent->getPathW(), sizeof(wchar_t), 255, pFile);		break;
+	case CollectionType::search:	fwrite(pCurrent->getPathW(), sizeof(wchar_t), 1024, pFile);		break;
 	}
 	fclose(pFile);
 }
@@ -58,8 +58,8 @@ void Delay::loadSession(Wallpaper*& pCurrent)
 		switch (type)
 		{
 		case CollectionType::local:		fread(pCurrent->getPathW(), sizeof(wchar_t), MAX_PATH, pFile);	break;
-		case CollectionType::user:		fread(pCurrent->getPathA(), sizeof(char), 255, pFile);			break;
-		case CollectionType::search:	fread(pCurrent->getPathA(), sizeof(char), 1024, pFile);			break;
+		case CollectionType::user:		fread(pCurrent->getPathW(), sizeof(wchar_t), 255, pFile);		break;
+		case CollectionType::search:	fread(pCurrent->getPathW(), sizeof(wchar_t), 1024, pFile);		break;
 		}
 	}
 	fclose(pFile);

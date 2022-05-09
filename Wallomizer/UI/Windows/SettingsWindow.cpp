@@ -63,8 +63,8 @@ SettingsWindow::SettingsWindow(HWND hCaller) :
 {
 	EnableWindow(m_hCaller, FALSE);
 
-	edUsername.setTextA(Settings::username);
-	edApiKey.setTextA(Settings::apiKey);
+	edUsername.setTextW(Settings::username);
+	edApiKey.setTextW(Settings::apiKey);
 	cbStartup.setChecked(Settings::loadOnStartup);
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
@@ -178,8 +178,8 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 			}
 
 			Settings::delay = delay;
-			edUsername.getTextA(Settings::username, 64);
-			edApiKey.getTextA(Settings::apiKey, 128);
+			edUsername.getTextW(Settings::username, 64);
+			edApiKey.getTextW(Settings::apiKey, 128);
 
 			char startupPath[260];
 			HRESULT hr = SHGetFolderPathA(NULL, CSIDL_STARTUP, 0, NULL, startupPath); // if target win Vista and later use SHGetKnownFolderPath()

@@ -41,7 +41,7 @@ public:
 	/// Set wide text to edit component.
 	/// 
 	/// @param text - pointer to wchar_t buffer.
-	void setTextW(LPWSTR text);
+	void setTextW(LPCWSTR text);
 
 	/// Check for emptiness of an edit component.
 	/// 

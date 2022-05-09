@@ -34,7 +34,7 @@ void Edit::setTextA(LPCSTR text)
 	SetWindowTextA(m_hWnd, text);
 }
 
-void Edit::setTextW(LPWSTR text)
+void Edit::setTextW(LPCWSTR text)
 {
 	SetWindowTextW(m_hWnd, text);
 }

@@ -10,15 +10,15 @@ public:
 	struct UserCollectionInfo
 	{
 		unsigned int id;
-		char sLabel[64];
+		wchar_t wsLabel[64];
 	};
 
 private:
 	struct UserCollectionSettings
 	{
-		char sUsername[64] = "";
-		char sCollectionID[16] = "";
-		char sCollectionName[64] = "";
+		wchar_t wsUsername[64] = L"";
+		wchar_t wsCollectionID[16] = L"";
+		wchar_t wsCollectionName[64] = L"";
 		CategoriesAndPurity categoriesAndPurity = CAP::puritySFW;
 	};
 
@@ -38,12 +38,12 @@ public:
 
 	static bool loadWallpaper(const Wallpaper* pWallpaper);
 	static void openWallpaperExternal(const Wallpaper* pWallpaper);
-	static void loadCollectionList(std::list<UserCollectionInfo>& list, const char* sUsername, const char* sApiKey);
+	static void loadCollectionList(std::list<UserCollectionInfo>& list, const wchar_t* sUsername, const wchar_t* sApiKey);
 
 	UserCollectionSettings settings;
 	
 private:
 	static constexpr int s_nPerPage = 24;
 	CollectionManager* m_pCollectionManager = nullptr;
-	char m_sCollectionUrl[255] = ""; // TODO: wchat_t
+	wchar_t m_wsCollectionUrl[255] = L"";
 };

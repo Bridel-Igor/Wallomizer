@@ -24,20 +24,20 @@ bool UserCollection::loadSettings(FILE* pFile)
 	fread(&settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
 
 	// Forming collection URL
-	strcpy_s(m_sCollectionUrl, "https://wallhaven.cc/api/v1/collections/");
-	strcat_s(m_sCollectionUrl, settings.sUsername);
-	strcat_s(m_sCollectionUrl, "/");
-	strcat_s(m_sCollectionUrl, settings.sCollectionID);
+	wcscpy_s(m_wsCollectionUrl, L"https://wallhaven.cc/api/v1/collections/");
+	wcscat_s(m_wsCollectionUrl, settings.wsUsername);
+	wcscat_s(m_wsCollectionUrl, L"/");
+	wcscat_s(m_wsCollectionUrl, settings.wsCollectionID);
 
-	strcat_s(m_sCollectionUrl, "?purity=");
-	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & CAP::puritySFW ? "1" : "0");
-	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & CAP::puritySketchy ? "1" : "0");
-	strcat_s(m_sCollectionUrl, settings.categoriesAndPurity & CAP::purityNSFW ? "1" : "0");
+	wcscat_s(m_wsCollectionUrl, L"?purity=");
+	wcscat_s(m_wsCollectionUrl, settings.categoriesAndPurity & CAP::puritySFW ? L"1" : L"0");
+	wcscat_s(m_wsCollectionUrl, settings.categoriesAndPurity & CAP::puritySketchy ? L"1" : L"0");
+	wcscat_s(m_wsCollectionUrl, settings.categoriesAndPurity & CAP::purityNSFW ? L"1" : L"0");
 
 	if (Settings::isApiKeyUsed())
 	{
-		strcat_s(m_sCollectionUrl, "&apikey=");
-		strcat_s(m_sCollectionUrl, Settings::getApiKey());
+		wcscat_s(m_wsCollectionUrl, L"&apikey=");
+		wcscat_s(m_wsCollectionUrl, Settings::getApiKey());
 	}
 
 	if (!m_isEnabled)
@@ -46,7 +46,7 @@ bool UserCollection::loadSettings(FILE* pFile)
 	// Getting the META
 	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
 	char* pBuffer = Internet::buffer;
-	if (!Internet::URLDownloadToBuffer(m_sCollectionUrl))
+	if (!Internet::URLDownloadToBuffer(m_wsCollectionUrl))
 		return false;
 	if ((pBuffer = Internet::parse(pBuffer, "\"meta\"", nullptr)) == nullptr)
 		return false;
@@ -55,18 +55,12 @@ bool UserCollection::loadSettings(FILE* pFile)
 	return true;
 }
 
-void UserCollection::getCollectionName(wchar_t* pwsName, size_t size) const
+void UserCollection::getCollectionName(wchar_t* wsName, size_t size) const
 {
-	wchar_t wsUsername[64]{ 0 };
-	mbstowcs_s(nullptr, wsUsername, settings.sUsername, 64);
-
-	wchar_t wsCollectionName[64]{ 0 };
-	mbstowcs_s(nullptr, wsCollectionName, settings.sCollectionName, 64);
-
-	wcscpy_s(pwsName, size, L" ");
-	wcscat_s(pwsName, size, wsUsername);
-	wcscat_s(pwsName, size, L": ");
-	wcscat_s(pwsName, size, wsCollectionName);
+	wcscpy_s(wsName, size, L" ");
+	wcscat_s(wsName, size, settings.wsUsername);
+	wcscat_s(wsName, size, L": ");
+	wcscat_s(wsName, size, settings.wsCollectionName);
 }
 
 CategoriesAndPurity UserCollection::getCAP() const
@@ -80,22 +74,22 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 	int page = int(index / s_nPerPage);
 	index -= page * s_nPerPage;
 	page++;
-	char sPageUrl[255];
-	strcpy_s(sPageUrl, m_sCollectionUrl);
-	strcat_s(sPageUrl, "&page=");
-	char sCurrentPage[15] = "";
-	_itoa_s(page, sCurrentPage, 10);
-	strcat_s(sPageUrl, sCurrentPage);
+	wchar_t wsPageUrl[255];
+	wcscpy_s(wsPageUrl, m_wsCollectionUrl);
+	wcscat_s(wsPageUrl, L"&page=");
+	wchar_t wsCurrentPage[15] = L"";
+	_itow_s(page, wsCurrentPage, 10);
+	wcscat_s(wsPageUrl, wsCurrentPage);
 
 	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
-	if (!Internet::URLDownloadToBuffer(sPageUrl))
+	if (!Internet::URLDownloadToBuffer(wsPageUrl))
 		return pWallpaper;
 	char *pBuffer = Internet::buffer;
 	for (unsigned int i = 1; i < index; i++)
 		if ((pBuffer = Internet::parse(pBuffer, "\"path\":", nullptr)) == nullptr)
 			return pWallpaper;
 	pWallpaper = new Wallpaper(CollectionType::user);
-	if (Internet::parse(pBuffer, "\"path\":", pWallpaper->getPathA()) == nullptr)
+	if (Internet::parse(pBuffer, "\"path\":", pWallpaper->getPathW()) == nullptr)
 	{
 		delete pWallpaper;
 		pWallpaper = nullptr;
@@ -115,52 +109,52 @@ bool UserCollection::loadWallpaper(const Wallpaper* pWallpaper)
 	wchar_t wsImgPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsImgPath);
 	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
-	return Internet::URLDownloadToFile(pWallpaper->getPathA(), wsImgPath);
+	return Internet::URLDownloadToFile(pWallpaper->getPathW(), wsImgPath);
 }
 
 void UserCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
 {
-	char sImgUrl[255] = "https://wallhaven.cc/w/";
+	wchar_t wsImgUrl[255] = L"https://wallhaven.cc/w/";
 	bool isDashFound = false;
-	int j = (int)strlen(sImgUrl);
-	for (int i = 0; i < strlen(pWallpaper->getPathA()); i++)
+	int j = (int)wcslen(wsImgUrl);
+	for (int i = 0; i < wcslen(pWallpaper->getPathW()); i++)
 	{
 		if (isDashFound)
 		{
-			if (pWallpaper->getPathA()[i] == '.')
+			if (pWallpaper->getPathW()[i] == '.')
 				break;
-			sImgUrl[j] = pWallpaper->getPathA()[i];
+			wsImgUrl[j] = pWallpaper->getPathW()[i];
 			j++;
 		}
-		if (pWallpaper->getPathA()[i] == '-')
+		if (pWallpaper->getPathW()[i] == '-')
 			isDashFound = true;
 	}
-	sImgUrl[j] = '\0';
+	wsImgUrl[j] = '\0';
 
-	ShellExecute(0, 0, sImgUrl, 0, 0, SW_SHOW);
+	ShellExecuteW(0, 0, wsImgUrl, 0, 0, SW_SHOW);
 }
 
-void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, const char* sUsername, const char* sApiKey)
+void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, const wchar_t* wsUsername, const wchar_t* wsApiKey)
 {
-	char sCollectionInfoURL[255];
-	strcpy_s(sCollectionInfoURL, "https://wallhaven.cc/api/v1/collections/");
-	strcat_s(sCollectionInfoURL, sUsername);
-	if (strlen(sApiKey))
+	wchar_t wsCollectionInfoURL[255];
+	wcscpy_s(wsCollectionInfoURL, L"https://wallhaven.cc/api/v1/collections/");
+	wcscat_s(wsCollectionInfoURL, wsUsername);
+	if (wcslen(wsApiKey))
 	{
-		strcat_s(sCollectionInfoURL, "?apikey=");
-		strcat_s(sCollectionInfoURL, Settings::getApiKey());
+		wcscat_s(wsCollectionInfoURL, L"?apikey=");
+		wcscat_s(wsCollectionInfoURL, Settings::getApiKey());
 	}
 
 	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
 	char* pBuffer = Internet::buffer;
-	if (!Internet::URLDownloadToBuffer(sCollectionInfoURL))
+	if (!Internet::URLDownloadToBuffer(wsCollectionInfoURL))
 		return;
 	UserCollectionInfo uci;
 	while (true)
 	{
 		if ((pBuffer = Internet::parse(pBuffer, "\"id\":", &uci.id)) == nullptr)
 			break;
-		if ((pBuffer = Internet::parse(pBuffer, "\"label\":", uci.sLabel)) == nullptr)
+		if ((pBuffer = Internet::parse(pBuffer, "\"label\":", uci.wsLabel)) == nullptr)
 			break;
 		list.push_back(uci);
 	}
