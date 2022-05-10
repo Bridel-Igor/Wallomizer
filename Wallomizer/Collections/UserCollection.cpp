@@ -93,7 +93,6 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 	{
 		delete pWallpaper;
 		pWallpaper = nullptr;
-		return pWallpaper;
 	}
 	return pWallpaper;
 }

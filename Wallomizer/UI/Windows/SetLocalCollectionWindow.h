@@ -5,6 +5,7 @@
 #include "Static.h"
 #include "Button.h"
 #include "Edit.h"
+#include "CheckBox.h"
 #include "CollectionManager.h"
 
 class SetLocalCollectionWindow : public IWindow
@@ -18,7 +19,8 @@ private:
 	HWND m_hCaller;
 	CollectionManager* m_pCollectionManager;
 	LocalCollection* m_pCurrentLocalCollection;
-	Static stPath;
+	Static stPath, stRecursive;
 	Edit edPath;
+	CheckBox cbRecursive;
 	Button btnOk, btnCancel, btnPath;
 };

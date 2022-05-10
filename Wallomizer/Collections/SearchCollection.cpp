@@ -66,22 +66,22 @@ bool SearchCollection::loadSettings(FILE* pFile)
 	return true;
 }
 
-void SearchCollection::getCollectionName(wchar_t* pwsName, size_t size) const
+void SearchCollection::getCollectionName(wchar_t* wsName, size_t size) const
 {
-	wcscpy_s(pwsName, 255, L" Search: ");
+	wcscpy_s(wsName, 255, L" Search: ");
 
 	if (wcslen(settings.wsTag))
 	{
 		wchar_t wsTag[255]{ 0 };
 		for (int i = 0; i < wcslen(settings.wsTag); i++)
 			wsTag[i] = settings.wsTag[i];
-		wcscat_s(pwsName, 255, wsTag);
-		wcscat_s(pwsName, 255, L" | ");
+		wcscat_s(wsName, 255, wsTag);
+		wcscat_s(wsName, 255, L" | ");
 	}
 
-	wcscat_s(pwsName, size, settings.categoriesAndPurity & CAP::categoryGeneral ? L"General " : L"");
-	wcscat_s(pwsName, size, settings.categoriesAndPurity & CAP::categoryAnime ? L"Anime " : L"");
-	wcscat_s(pwsName, size, settings.categoriesAndPurity & CAP::categoryPeople ? L"People " : L"");
+	wcscat_s(wsName, size, settings.categoriesAndPurity & CAP::categoryGeneral ? L"General " : L"");
+	wcscat_s(wsName, size, settings.categoriesAndPurity & CAP::categoryAnime ? L"Anime " : L"");
+	wcscat_s(wsName, size, settings.categoriesAndPurity & CAP::categoryPeople ? L"People " : L"");
 }
 
 CategoriesAndPurity SearchCollection::getCAP() const
@@ -116,7 +116,6 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 	{
 		delete pWallpaper;
 		pWallpaper = nullptr;
-		return pWallpaper;
 	}
 	return pWallpaper;
 }

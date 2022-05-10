@@ -9,12 +9,12 @@
 #include "Settings.h"
 #include "Filesystem.h"
 
-bool isImage(std::experimental::filesystem::v1::directory_entry path)
+bool isImage(std::experimental::filesystem::path path)
 {
 	const char* extensions[] = { ".jpg", ".jpeg", ".bmp", ".dib", ".png", ".jfif", ".jpe", ".gif", ".tif", ".tiff",
 								".wdp", ".heic", ".heif", ".heics", ".heifs", ".avci", ".avcs", ".avif", ".avifs" };
 	for (auto extension : extensions)
-		if (path.path().extension().compare((std::experimental::filesystem::path)extension) == 0)
+		if (path.extension().compare((std::experimental::filesystem::path)extension) == 0)
 			return true;
 	return false;
 }
@@ -26,7 +26,7 @@ bool LocalCollection::saveSettings(FILE* pFile) const
 	const CollectionType collType = getCollectionType();
 	fwrite(&collType, sizeof(collType), 1, pFile);
 	fwrite(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
-	fwrite(&m_wsDirectoryPath, sizeof(m_wsDirectoryPath), 1, pFile);
+	fwrite(&settings, sizeof(LocalCollection::LocalCollectionSettings), 1, pFile);
 	return true;
 }
 
@@ -36,42 +36,73 @@ bool LocalCollection::loadSettings(FILE* pFile)
 		return false;
 	
 	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
-	fread(&m_wsDirectoryPath, sizeof(m_wsDirectoryPath), 1, pFile);
+	fread(&settings, sizeof(LocalCollection::LocalCollectionSettings), 1, pFile);
 
-	std::experimental::filesystem::path dirPath{ m_wsDirectoryPath };
+	std::experimental::filesystem::path dirPath{ settings.wsDirectoryPath };
 	m_uiNumber = 0;
 	if (m_isEnabled)
-		for (auto& path : std::experimental::filesystem::directory_iterator(dirPath))
-			if (isImage(path))
-				m_uiNumber++;
+	{
+		if (settings.bRecursive)
+		{
+			for (auto& path : std::experimental::filesystem::recursive_directory_iterator(dirPath))
+				if (isImage(path))
+					m_uiNumber++;
+		}
+		else
+		{
+			for (auto& path : std::experimental::filesystem::directory_iterator(dirPath))
+				if (isImage(path))
+					m_uiNumber++;
+		}
+	}
 	return true;
 }
 
 void LocalCollection::getCollectionName(wchar_t* pwsName, size_t size) const
 {
 	wcscpy_s(pwsName, size, L" Local: ");
-	wcscat_s(pwsName, 255, m_wsDirectoryPath);
+	wcscat_s(pwsName, 255, settings.wsDirectoryPath);
 }
 
 Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
 {
 	Wallpaper* pWallpaper = nullptr;
-	if (m_wsDirectoryPath[0] == L'\0' || m_uiNumber <= 0)
+	if (settings.wsDirectoryPath[0] == L'\0' || m_uiNumber <= 0)
 		return pWallpaper;
 	unsigned int i = 0;
-	std::experimental::filesystem::path dirPath{ m_wsDirectoryPath };
-	for (auto& path : std::experimental::filesystem::directory_iterator(dirPath))
-		if (isImage(path))
-		{
-			if (i == index)
+	std::experimental::filesystem::path dirPath{ settings.wsDirectoryPath };
+
+	if (settings.bRecursive)
+	{
+		for (auto& path : std::experimental::filesystem::recursive_directory_iterator(dirPath))
+			if (isImage(path))
 			{
-				pWallpaper = new Wallpaper(CollectionType::local);
-				wcscpy_s(pWallpaper->getPathW(), MAX_PATH, path.path().generic_wstring().c_str());
-				pWallpaper->getPathW()[wcslen(pWallpaper->getPathW())] = '\0';
-				return pWallpaper;
+				if (i == index)
+				{
+					pWallpaper = new Wallpaper(CollectionType::local);
+					wcscpy_s(pWallpaper->getPathW(), MAX_PATH, path.path().generic_wstring().c_str());
+					pWallpaper->getPathW()[wcslen(pWallpaper->getPathW())] = '\0';
+					return pWallpaper;
+				}
+				i++;
 			}
-			i++;
-		}
+	}
+	else
+	{
+		for (auto& path : std::experimental::filesystem::directory_iterator(dirPath))
+			if (isImage(path))
+			{
+				if (i == index)
+				{
+					pWallpaper = new Wallpaper(CollectionType::local);
+					wcscpy_s(pWallpaper->getPathW(), MAX_PATH, path.path().generic_wstring().c_str());
+					pWallpaper->getPathW()[wcslen(pWallpaper->getPathW())] = '\0';
+					return pWallpaper;
+				}
+				i++;
+			}
+	}
+
 	return pWallpaper;
 }
 

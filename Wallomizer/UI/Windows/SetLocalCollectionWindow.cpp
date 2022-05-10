@@ -3,16 +3,19 @@
 #include "SetLocalCollectionWindow.h"
 
 SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, LocalCollection* pCollection) :
-	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 90),
+	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 120),
 	m_hCaller(hCaller),
 	m_pCollectionManager(pCollectionManager),
 	m_pCurrentLocalCollection(pCollection),
 	stPath		(hWnd(), "Enter path to directory:",	10,		10,		390,	20),
-	edPath		(hWnd(), m_pCurrentLocalCollection? m_pCurrentLocalCollection->m_wsDirectoryPath:L"",
+	edPath		(hWnd(), m_pCurrentLocalCollection? m_pCurrentLocalCollection->settings.wsDirectoryPath :L"",
 														10,		30,		360,	20),
 	btnPath		(hWnd(), "..",							370,	30,		20,		20),
-	btnCancel	(hWnd(), "Cancel",						10,		60,		185,	20),
-	btnOk		(hWnd(), "Ok",							205,	60,		185,	20)
+	cbRecursive (hWnd(),								15,		60,		20,		20, 
+				m_pCurrentLocalCollection ? m_pCurrentLocalCollection->settings.bRecursive : false),
+	stRecursive (hWnd(), "and all subdirectories.",		40,		60,		150,	20),
+	btnCancel	(hWnd(), "Cancel",						10,		90,		185,	20),
+	btnOk		(hWnd(), "Ok",							205,	90,		185,	20)
 {
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	centerWindow(m_hCaller);
@@ -29,7 +32,7 @@ SetLocalCollectionWindow::~SetLocalCollectionWindow()
 	SetForegroundWindow(m_hCaller);
 }
 
-LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM)
+LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -42,7 +45,8 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 				MessageBoxA(nullptr, "Path can't be empty.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
-			edPath.getTextW(m_pCurrentLocalCollection->m_wsDirectoryPath, 255);
+			edPath.getTextW(m_pCurrentLocalCollection->settings.wsDirectoryPath, 255);
+			m_pCurrentLocalCollection->settings.bRecursive = cbRecursive.isChecked();
 			if (m_pCurrentLocalCollection->isValid() == false)
 				m_pCurrentLocalCollection->setValid(true);
 			else
@@ -86,9 +90,27 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 			}
 			return 0;
 		}
-		
+		if (cbRecursive.isClicked(wParam))
+		{
+			cbRecursive.click();
+			return 0;
+		}
 	}
 	return 0;
+
+	case WM_DRAWITEM:
+	{
+		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
+		if (cbRecursive.draw(pDIS, resources.mainBkBrush))
+			return TRUE;
+	}
+	return 0;
+
+	case WM_SETCURSOR:
+	{
+		cbRecursive.mouseHovering(wParam);
+		// Fallthrough. DefWindowProc must be reached anyway.
+	}
 
 	default:
 		return RESULT_DEFAULT;

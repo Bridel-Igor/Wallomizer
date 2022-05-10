@@ -6,6 +6,13 @@
 
 class LocalCollection : public BaseCollection
 {
+private:
+	struct LocalCollectionSettings
+	{
+		wchar_t wsDirectoryPath[255] = L"";
+		bool bRecursive = false;
+	};
+
 public:
 	LocalCollection(CollectionManager* pCollectionManager) : 
 		m_pCollectionManager(pCollectionManager) 
@@ -23,10 +30,8 @@ public:
 	static bool loadWallpaper(const Wallpaper* pWallpaper);
 	static void openWallpaperExternal(const Wallpaper* pWallpaper);
 
-	wchar_t m_wsDirectoryPath[255] = L"";
+	LocalCollectionSettings settings;
 
 private:
 	CollectionManager* m_pCollectionManager = nullptr;
 };
-
-// TODO: recursive selection of directories
