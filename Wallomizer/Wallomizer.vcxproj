@@ -153,9 +153,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppMutex.cpp" />
-    <ClCompile Include="IComponent.cpp" />
     <ClCompile Include="UI\Components\Panel.cpp" />
     <ClCompile Include="UI\Interfaces\IClickable.cpp" />
+    <ClCompile Include="UI\Interfaces\IComponent.cpp" />
     <ClCompile Include="UI\Interfaces\IHoverable.cpp" />
     <ClCompile Include="UI\Interfaces\IWindow.cpp" />
     <ClCompile Include="UI\Windows\AddCollectionWindow.cpp" />
