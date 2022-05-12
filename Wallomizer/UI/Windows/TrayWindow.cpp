@@ -83,6 +83,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			player.updateTimer(true);
 			SetWindowPos(hWnd(), HWND_TOPMOST, pt.x, pt.y, width, height, SWP_SHOWWINDOW);
+			ShowWindow(hWnd(), SW_SHOW);
 			SetForegroundWindow(hWnd());
 		}
 	}
