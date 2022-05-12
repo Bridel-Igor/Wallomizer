@@ -14,6 +14,7 @@ public:
 	CategoriesAndPurity getPurity() const;	
 	bool draw(LPDRAWITEMSTRUCT &pDIS);
 	bool click(WPARAM wParam);
+	void enable(bool enable);
 	void moveComponent(int x, int y, int width, int height);
 
 private:

@@ -61,6 +61,13 @@ bool PurityComponent::click(WPARAM wParam)
 	return false;
 }
 
+void PurityComponent::enable(bool enable)
+{
+	EnableWindow(pbSFW.hWnd(), enable);
+	EnableWindow(pbSketchy.hWnd(), enable);
+	EnableWindow(pbNSFW.hWnd(), enable);
+}
+
 void PurityComponent::moveComponent(int x, int y, int width, int height)
 {
 	MoveWindow(pbSFW.hWnd(),		x,							y, width / 3 - 1,	height, FALSE);

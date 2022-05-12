@@ -45,6 +45,7 @@ CollectionItem::CollectionItem(IComponent* pParent, int _x, int _y, int _width, 
 {
 	SendMessage(stName.hWnd(), WM_SETFONT, (LPARAM)hFont, TRUE);
 	SendMessage(stNumber.hWnd(), WM_SETFONT, (LPARAM)hFont, TRUE);
+	purity.enable(false);
 	updateInfo(m_pCollection);
 }
 
