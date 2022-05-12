@@ -14,7 +14,7 @@ class ComboBox : public IComponent
 public:
 	/// Combo box component construction.
 	/// 
-	/// @param hParent - HWND of parent window.
+	/// @param pParent - pointer to parent component
 	/// @param text - text that will be displayed.
 	/// @param x, y - coordinates, relative to parent window.
 	/// @param width, height - size of button in pixels.
@@ -22,7 +22,7 @@ public:
 	/// @param items - pointer to first element of two dimensional char array that holds items for check box. Can be ignored.
 	/// @param selectedItem - number of item to be selected after combo box creation. Can be ignored.
 	/// @param additionalStyles - WinAPI style flags that will be added to CBS_DROPDOWNLIST, CBS_HASSTRINGS, WS_CHILD, WS_OVERLAPPED, WS_VISIBLE and WS_VSCROLL flags. Can be ignored.
-	ComboBox(HWND hParent, LPCSTR text, int x, int y, int width, int height, int nOfItems = 0, int lenOfItems = 0, CHAR* items = nullptr, int selectedItem = 0, DWORD additionalStyles = 0);
+	ComboBox(IComponent* pParent, LPCSTR text, int x, int y, int width, int height, int nOfItems = 0, int lenOfItems = 0, CHAR* items = nullptr, int selectedItem = 0, DWORD additionalStyles = 0);
 	~ComboBox();
 
 	/// Get number of selected item.

@@ -4,14 +4,16 @@ COLORREF Edit::fontColor =		RGB(0, 0, 0);
 COLORREF Edit::bkColor =		RGB(200, 200, 200);
 COLORREF Edit::bkInvalidColor = RGB(200, 50, 50);
 
-Edit::Edit(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles)
+Edit::Edit(IComponent* pParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles) :
+	IComponent(pParent)
 {
-	m_hWnd = CreateWindowExA(WS_EX_CLIENTEDGE, TEXT("Edit"), text, WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | additionalStyles, x, y, width, height, hParent, NULL, NULL, NULL);
+	m_hWnd = CreateWindowExA(WS_EX_CLIENTEDGE, TEXT("Edit"), text, WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | additionalStyles, x, y, width, height, m_pParent->hWnd(), NULL, NULL, NULL);
 }
 
-Edit::Edit(HWND hParent, LPCWSTR text, int x, int y, int width, int height, DWORD additionalStyles)
+Edit::Edit(IComponent* pParent, LPCWSTR text, int x, int y, int width, int height, DWORD additionalStyles) :
+	IComponent(pParent)
 {
-	m_hWnd = CreateWindowExW(WS_EX_CLIENTEDGE, TEXT(L"Edit"), text, WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | additionalStyles, x, y, width, height, hParent, NULL, NULL, NULL);
+	m_hWnd = CreateWindowExW(WS_EX_CLIENTEDGE, TEXT(L"Edit"), text, WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | additionalStyles, x, y, width, height, m_pParent->hWnd(), NULL, NULL, NULL);
 }
 
 Edit::~Edit()

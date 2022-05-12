@@ -7,15 +7,15 @@ SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, CollectionManag
 	m_hCaller(hCaller),
 	m_pCollectionManager(pCollectionManager),
 	m_pCurrentLocalCollection(pCollection),
-	stPath		(hWnd(), "Enter path to directory:",	10,		10,		390,	20),
-	edPath		(hWnd(), m_pCurrentLocalCollection? m_pCurrentLocalCollection->settings.wsDirectoryPath :L"",
+	stPath		(this, "Enter path to directory:",	10,		10,		390,	20),
+	edPath		(this, m_pCurrentLocalCollection? m_pCurrentLocalCollection->settings.wsDirectoryPath :L"",
 														10,		30,		360,	20),
-	btnPath		(hWnd(), "..",							370,	30,		20,		20),
-	cbRecursive (hWnd(),								15,		60,		20,		20, 
+	btnPath		(this, "..",							370,	30,		20,		20),
+	cbRecursive (this,									15,		60,		20,		20, 
 				m_pCurrentLocalCollection ? m_pCurrentLocalCollection->settings.bRecursive : false),
-	stRecursive (hWnd(), "and all subdirectories.",		40,		60,		150,	20),
-	btnCancel	(hWnd(), "Cancel",						10,		90,		185,	20),
-	btnOk		(hWnd(), "Ok",							205,	90,		185,	20)
+	stRecursive (this, "and all subdirectories.",		40,		60,		150,	20),
+	btnCancel	(this, "Cancel",						10,		90,		185,	20),
+	btnOk		(this, "Ok",							205,	90,		185,	20)
 {
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	centerWindow(m_hCaller);
@@ -105,12 +105,6 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 			return TRUE;
 	}
 	return 0;
-
-	case WM_SETCURSOR:
-	{
-		cbRecursive.mouseHovering(wParam);
-		// Fallthrough. DefWindowProc must be reached anyway.
-	}
 
 	default:
 		return RESULT_DEFAULT;

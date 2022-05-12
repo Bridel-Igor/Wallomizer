@@ -33,7 +33,7 @@ public:
 public:
 	IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwExStyle = 0,
 		int x = CW_USEDEFAULT, int y = CW_USEDEFAULT,
-		int nWidth = CW_USEDEFAULT, int nHeight = CW_USEDEFAULT, HWND hParent = nullptr);
+		int nWidth = CW_USEDEFAULT, int nHeight = CW_USEDEFAULT, IComponent* pParent = nullptr);
 	~IWindow();
 	virtual void windowLoop();
 	void centerWindow(HWND hParent);

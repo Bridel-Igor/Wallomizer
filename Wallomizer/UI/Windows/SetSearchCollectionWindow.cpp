@@ -8,30 +8,30 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionMan
 	m_hCaller(hCaller),
 	m_pCollectionManager(pCollectionManager),
 	m_pCurrentSearchCollection(pCollection),
-	stCategory		(hWnd(), "Category:",												10,		10,		60,		20),
-	catCom			(hWnd(),															80,		10,		159,	20),
+	stCategory		(this, "Category:",												10,		10,		60,		20),
+	catCom			(this,																80,		10,		159,	20),
 
-	stPurity		(hWnd(), "Purity:",													254,	10,		40,		20),
-	purCom			(hWnd(),															301,	10,		159,	20),
+	stPurity		(this, "Purity:",													254,	10,		40,		20),
+	purCom			(this,																301,	10,		159,	20),
 
-	stFilt			(hWnd(), "Filters:",												10,		40,		60,		20),
-	btnRes			(hWnd(), "Pick resolution",											80,		40,		120,	20),
-	btnAR			(hWnd(), "Pick ratio",												210,	40,		120,	20),
-	btnColor		(hWnd(), "Pick color",												340,	40,		120,	20),
+	stFilt			(this, "Filters:",												10,		40,		60,		20),
+	btnRes			(this, "Pick resolution",											80,		40,		120,	20),
+	btnAR			(this, "Pick ratio",												210,	40,		120,	20),
+	btnColor		(this, "Pick color",												340,	40,		120,	20),
 
-	stTag			(hWnd(), "Tags:",													10,		70,		60,		20),
-	edTag			(hWnd(), L"",														80,		70,		380,	20),
-	stTagInstruct { {hWnd(), "tagname - search fuzzily for a tag/keyword",				80,		100,	380,	15},
-					{hWnd(), "- tagname - exclude a tag / keyword",						80,		115,	380,	15},
-					{hWnd(), "+ tag1 + tag2 - must have tag1 and tag2",					80,		130,	380,	15},
-					{hWnd(), "+ tag1 - tag2 - must have tag1 and NOT tag2",				80,		145,	380,	15},
-					{hWnd(), "@username - user uploads",								80,		160,	380,	15},
-					{hWnd(), "id : 123 - Exact tag search(can not be combined)",		80,		175,	380,	15},
-					{hWnd(), "type : {png / jpg} - Search for file type(jpg = jpeg)",	80,		190,	380,	15},
-					{hWnd(), "like : wallpaper ID - Find wallpapers with similar tags",	80,		205,	380,	15} },
+	stTag			(this, "Tags:",													10,		70,		60,		20),
+	edTag			(this, L"",														80,		70,		380,	20),
+	stTagInstruct { {this, "tagname - search fuzzily for a tag/keyword",				80,		100,	380,	15},
+					{this, "- tagname - exclude a tag / keyword",						80,		115,	380,	15},
+					{this, "+ tag1 + tag2 - must have tag1 and tag2",					80,		130,	380,	15},
+					{this, "+ tag1 - tag2 - must have tag1 and NOT tag2",				80,		145,	380,	15},
+					{this, "@username - user uploads",								80,		160,	380,	15},
+					{this, "id : 123 - Exact tag search(can not be combined)",		80,		175,	380,	15},
+					{this, "type : {png / jpg} - Search for file type(jpg = jpeg)",	80,		190,	380,	15},
+					{this, "like : wallpaper ID - Find wallpapers with similar tags",	80,		205,	380,	15} },
 
-	btnCancel		(hWnd(), "Cancel",													80,		230,	185,	20),
-	btnOk			(hWnd(), "Ok",														275,	230,	185,	20)
+	btnCancel		(this, "Cancel",													80,		230,	185,	20),
+	btnOk			(this, "Ok",														275,	230,	185,	20)
 {
 	if (m_pCurrentSearchCollection)
 	{
@@ -124,13 +124,6 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 		}
 	}
 	return 0;
-
-	case WM_SETCURSOR:
-	{
-		catCom.mouseHovering(wParam);
-		purCom.mouseHovering(wParam);
-		// Fallthrough. DefWindowProc must be reached anyway.
-	}
 
 	default:
 		return RESULT_DEFAULT;

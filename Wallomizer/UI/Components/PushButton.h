@@ -16,14 +16,14 @@ class PushButton : public IHoverable
 public:
 	/// Push button component construction.
 	/// 
-	/// @param hParent - HWND of parent window.
+	/// @param pParent - pointer to parent component
 	/// @param text - text that will be displayed.
 	/// @param x, y - coordinates, relative to parent window.
 	/// @param width, height - size of button in pixels.
 	/// @param additionalStyles - WinAPI style flags that will be added to WS_CHILD, WS_VISIBLE and BS_OWNERDRAW flags. Can be ignored.
 	/// @param additionalExStyles - WinAPI extended style flags. Can be ignored.
 	/// @param checkedColorTop, checkedColorBottom - color of top and bottom sides of the button in checked state. Draw methods do gradient between these colors. Can be ignored.
-	PushButton(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0, DWORD additionalExStyles = 0, COLORREF checkedColorTop = RGB(130, 130, 130), COLORREF checkedColorBottom = RGB(80, 80, 80));
+	PushButton(IComponent* pParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0, DWORD additionalExStyles = 0, COLORREF checkedColorTop = RGB(130, 130, 130), COLORREF checkedColorBottom = RGB(80, 80, 80));
 	~PushButton();
 
 	/// Changes state of push button.

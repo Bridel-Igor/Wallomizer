@@ -11,14 +11,14 @@ class Edit : public IComponent
 public:
 	/// Edit component construction.
 	/// 
-	/// @param hParent - HWND of parent window.
+	/// @param pParent - pointer to parent component
 	/// @param text - text that will fill edit initially.
 	/// @param x, y - coordinates, relative to parent window.
 	/// @param width, height - size of button in pixels.
 	/// @param additionalStyles - WinAPI style flags that will be added to WS_CHILD, WS_VISIBLE and ES_AUTOHSCROLL flags. Can be ignored.
 	/// @param additionalExStyles - WinAPI extended style flags. Can be ignored.
-	Edit(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0);
-	Edit(HWND hParent, LPCWSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0);
+	Edit(IComponent* pParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0);
+	Edit(IComponent* pParent, LPCWSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0);
 	~Edit();
 
 	/// Get an ASCII text from edit component. You should provide char array to write it to.

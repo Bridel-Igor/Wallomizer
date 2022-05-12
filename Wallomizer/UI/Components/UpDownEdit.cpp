@@ -2,13 +2,14 @@
 
 #include <CommCtrl.h>
 
-UpDownEdit::UpDownEdit(HWND hParent, int x, int y, int width, int height, int minPos, int maxPos, int pos)
+UpDownEdit::UpDownEdit(IComponent* pParent, int x, int y, int width, int height, int minPos, int maxPos, int pos) :
+    IComponent(pParent)
 {
     m_edithWnd = CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, NULL, WS_CHILDWINDOW | WS_VISIBLE | WS_BORDER | ES_NUMBER,
-        x, y, width, height, hParent, NULL, NULL, NULL);
+        x, y, width, height, m_pParent->hWnd(), NULL, NULL, NULL);
 
     m_hWnd = CreateWindowEx(WS_EX_LEFT | WS_EX_LTRREADING, UPDOWN_CLASS, NULL, WS_CHILDWINDOW | WS_VISIBLE | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_ARROWKEYS | UDS_HOTTRACK,
-        0, 0, 0, 0, hParent, NULL, NULL, NULL);
+        0, 0, 0, 0, m_pParent->hWnd(), NULL, NULL, NULL);
 
     SendMessageA(m_hWnd, UDM_SETBUDDY, (WPARAM)m_edithWnd, NULL);
     SendMessageA(m_hWnd, UDM_SETRANGE32, (WPARAM)minPos, (LPARAM)maxPos);

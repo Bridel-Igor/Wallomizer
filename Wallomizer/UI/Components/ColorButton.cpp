@@ -34,10 +34,11 @@ ColorButton::Resources::~Resources()
 	DestroyIcon(s_hIColorEmpty);
 }
 
-ColorButton::ColorButton(HWND hParent, BYTE red, BYTE green, BYTE blue, int x, int y, int width, int height, bool empty):
+ColorButton::ColorButton(IComponent* pParent, BYTE red, BYTE green, BYTE blue, int x, int y, int width, int height, bool empty) :
+	IHoverable(pParent),
 	m_empty(empty), m_red(red), m_green(green), m_blue(blue)
 {
-	m_hWnd = CreateWindowExA(NULL, TEXT("Button"), "", WS_CHILD | WS_VISIBLE | BS_OWNERDRAW, x, y, width, height, hParent, m_hMenu, NULL, NULL);
+	m_hWnd = CreateWindowExA(NULL, TEXT("Button"), "", WS_CHILD | WS_VISIBLE | BS_OWNERDRAW, x, y, width, height, m_pParent->hWnd(), m_hMenu, NULL, NULL);
 	m_brush = CreateSolidBrush(RGB(m_red, m_green, m_blue));
 	m_checkedPenIsWhite = m_red + m_green + m_blue < 255;
 }

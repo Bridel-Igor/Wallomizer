@@ -34,10 +34,10 @@ TrayWindow::TrayWindow(CollectionManager* pCollectionManager) :
 	IWindow("Wallomizer", "Tray Window Class", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 
 												500,	500,	width,	height),
 	m_pCollectionManager(pCollectionManager),
-	btnSettings			(hWnd(), "Settings",	10,		60,		65,		20),
-	btnExit				(hWnd(), "Exit",		85,		60,		65,		20),
-	player				(hWnd(),				10,		10,
-												10,		35,		140,	20, m_pCollectionManager, SS_CENTER)
+	btnSettings			(this, "Settings",	10,		60,		65,		20),
+	btnExit				(this, "Exit",		85,		60,		65,		20),
+	player				(this,				10,		10,
+											10,		35,		140,	20, m_pCollectionManager, SS_CENTER)
 {
 	s_pTrayWindow = this;
 
@@ -126,12 +126,6 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 	return 0;
-
-	case WM_SETCURSOR:
-	{
-		player.mouseHovering(wParam);
-		// Fallthrough. DefWindowProc must be reached anyway.
-	}
 
 	default:
 		return RESULT_DEFAULT;

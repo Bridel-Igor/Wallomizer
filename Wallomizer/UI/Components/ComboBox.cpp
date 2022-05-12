@@ -1,8 +1,9 @@
 #include "ComboBox.h"
 
-ComboBox::ComboBox(HWND hParent, LPCSTR text, int x, int y, int width, int height, int nOfItems, int lenOfItems, CHAR* items, int selectedItem, DWORD additionalStyles)
+ComboBox::ComboBox(IComponent* pParent, LPCSTR text, int x, int y, int width, int height, int nOfItems, int lenOfItems, CHAR* items, int selectedItem, DWORD additionalStyles) :
+	IComponent(pParent)
 {
-	m_hWnd = CreateWindowA("COMBOBOX", text, CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE | WS_VSCROLL | additionalStyles, x, y, width, height, hParent, NULL, NULL, NULL);
+	m_hWnd = CreateWindowA("COMBOBOX", text, CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE | WS_VSCROLL | additionalStyles, x, y, width, height, m_pParent->hWnd(), NULL, NULL, NULL);
 
 	for (int i = 0; i < nOfItems; i++)
 	{

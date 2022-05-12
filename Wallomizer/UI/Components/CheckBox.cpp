@@ -27,9 +27,10 @@ CheckBox::Resources::~Resources()
 	DestroyIcon(hICheckBox);
 }
 
-CheckBox::CheckBox(HWND hParent, int x, int y, int width, int height, bool isChecked, DWORD additionalStyles, DWORD additionalExStyles)
+CheckBox::CheckBox(IComponent* pParent, int x, int y, int width, int height, bool isChecked, DWORD additionalStyles, DWORD additionalExStyles) :
+	IHoverable(pParent)
 {
-	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), TEXT(""), WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, hParent, m_hMenu, NULL, NULL);
+	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), TEXT(""), WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, m_pParent->hWnd(), m_hMenu, NULL, NULL);
 	m_checked = isChecked;
 }
 

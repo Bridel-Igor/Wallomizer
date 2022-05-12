@@ -22,7 +22,9 @@ public:
 
 protected:
 	/// Protected constructor to prevent allocation of an interface object.
-	IClickable();
+	/// 
+	/// @param pParent - pointer to parent component
+	IClickable(IComponent* pParent);
 	~IClickable();
 
 	/// Handle to menu value of the component that used by WinAPI messaging.

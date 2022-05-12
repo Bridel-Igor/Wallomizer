@@ -14,12 +14,12 @@ class Button : public IClickable
 public:
 	/// Button component construction.
 	/// 
-	/// @param hParent - HWND of parent window.
+	/// @param pParent - pointer to parent component
 	/// @param text - text that will be displayed on button.
 	/// @param x, y - coordinates, relative to parent window.
 	/// @param width, height - size of button in pixels.
 	/// @param additionalStyles - WinAPI style flags that will be added to WS_CHILD and WS_VISIBLE flags. Can be ignored.
 	/// @param additionalExStyles - WinAPI extended style flags. Can be ignored.
-	Button(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
+	Button(IComponent* pParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
 	~Button();
 };

@@ -12,16 +12,16 @@ MainWindow* MainWindow::s_pMainWindow = nullptr;
 MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 	IWindow("Wallomizer", "Main Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	m_pCollectionManager(pCollectionManager),
-	stCollections		(hWnd(), "Collections:",		20,		10,		100,	20),
-	btnAdd				(hWnd(), "Add collection..",	530,	10,		100,	20),
+	stCollections		(this, "Collections:",			20,		10,		100,	20),
+	btnAdd				(this, "Add collection..",		530,	10,		100,	20),
 	fX(10), fY(40), fWidth(width - 20), fHeight(400), bkColor(RGB(15, 15, 15)), bkBrush(CreateSolidBrush(bkColor)),
-	collectionsPanel	(hWnd(), "CollectionPanelClass",fX,		fY,		fWidth, fHeight, bkBrush),
-	stEmpty				(collectionsPanel.hWnd(), "Collection list is empty. Click \"Add collection..\" button to add one.", 
+	collectionsPanel	(this, "CollectionPanelClass",	fX,		fY,		fWidth, fHeight, bkBrush),
+	stEmpty				(&collectionsPanel, "Collection list is empty. Click \"Add collection..\" button to add one.", 
 														5,		0,		480,	20),
-	btnSettings			(hWnd(), "Settings",			10,		450,	95,		20),
-	player				(hWnd(),						250,	450,
+	btnSettings			(this, "Settings",				10,		450,	95,		20),
+	player				(this,							250,	450,
 														400,	450,	100,	20, m_pCollectionManager),
-	btnDonate			(hWnd(), "Donate",				535,	450,	95,		20)
+	btnDonate			(this, "Donate",				535,	450,	95,		20)
 {
 	s_pMainWindow = this;
 	while (!m_pCollectionManager->isReady())
@@ -209,14 +209,6 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		// Don't return so IWindow could process another components
 	}
-
-	case WM_SETCURSOR:
-	{
-		player.mouseHovering(wParam);
-		for (auto& item : collectionItems)
-			item.mouseHovering(wParam);
-		// Fallthrough. DefWindowProc must be reached anyway.
-	} 
 	}
 	return RESULT_DEFAULT;
 }
@@ -235,7 +227,7 @@ void MainWindow::updateCollectionItems()
 
 	for (i = collectionItems.size(); i < m_pCollectionManager->m_pCollections.size(); i++) // creation
 		if (m_pCollectionManager->m_pCollections[i] != nullptr)
-			collectionItems.emplace_back(collectionsPanel.hWnd(), 0, (int)(i * (CollectionItem::height + 1)), fWidth, m_pCollectionManager->m_pCollections[i], IWindow::Resources::mainFont);
+			collectionItems.emplace_back(&collectionsPanel, 0, (int)(i * (CollectionItem::height + 1)), fWidth, m_pCollectionManager->m_pCollections[i], IWindow::Resources::mainFont);
 
 	updateScroll();
 	for (auto& collectionItem : collectionItems) // placing according to the scrollbar

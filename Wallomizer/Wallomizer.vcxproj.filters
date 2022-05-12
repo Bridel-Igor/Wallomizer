@@ -115,6 +115,9 @@
     <ClCompile Include="UI\Components\Panel.cpp">
       <Filter>UI\Components\Source</Filter>
     </ClCompile>
+    <ClCompile Include="IComponent.cpp">
+      <Filter>UI\Interfaces</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI\Windows\AddCollectionWindow.h">

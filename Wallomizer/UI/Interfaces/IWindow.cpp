@@ -1,8 +1,10 @@
 #pragma once
 
+#include <stack>
 #include <exception>
 
 #include "IWindow.h"
+#include "IHoverable.h"
 #include "Edit.h"
 
 COLORREF IWindow::Resources::mainFontColor;
@@ -34,7 +36,8 @@ IWindow::Resources::~Resources()
 }
 
 IWindow::IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwExStyle,
-		int x, int y, int nWidth, int nHeight, HWND hParent) :
+		int x, int y, int nWidth, int nHeight, IComponent* pParent) :
+	IComponent(pParent),
 	m_sName(sClassName)
 {
 	// Checking if this window is already exists
@@ -64,7 +67,7 @@ IWindow::IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwE
 
 	m_hWnd = CreateWindowExA(
 		dwExStyle, m_sName, sWindowName, dwStyle, rc.left, rc.top,
-		rc.right - rc.left, rc.bottom - rc.top, hParent, 0, GetModuleHandle(NULL), this);
+		rc.right - rc.left, rc.bottom - rc.top, m_pParent ? m_pParent->hWnd() : nullptr, 0, GetModuleHandle(NULL), this);
 	if (m_hWnd == FALSE)
 		throw std::exception("Window creation failed.");
 }
@@ -132,6 +135,20 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 	if (pThis && pThis->m_isReady)
 	{
+		switch (uMsg)
+		{
+		case WM_SETCURSOR:
+		{
+			pThis->traverseChildren([&wParam](IComponent* pComponent) 
+			{
+				IHoverable* pHoverable = nullptr;
+				if ((pHoverable = dynamic_cast<IHoverable*>(pComponent)) != nullptr)
+					pHoverable->mouseHovering(wParam);
+			});
+			// Fallthrough. Don't return as defWindowProc must be executed anyway.
+		}
+		}
+
 		LRESULT result = pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
 		if (result != RESULT_DEFAULT)
 			return result;

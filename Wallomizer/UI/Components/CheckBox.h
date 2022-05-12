@@ -28,13 +28,13 @@ private:
 public:
 	/// Check box component construction.
 	/// 
-	/// @param hParent - HWND of parent window.
+	/// @param pParent - pointer to parent component
 	/// @param x, y - coordinates, relative to parent window.
 	/// @param width, height - size of button in pixels.
 	/// @param isChecked - initial state of component. Can be ignored.
 	/// @param additionalStyles - WinAPI style flags that will be added to WS_CHILD, WS_VISIBLE and BS_OWNERDRAW flags. Can be ignored.
 	/// @param additionalExStyles - WinAPI extended style flags. Can be ignored.
-	CheckBox(HWND hParent, int x, int y, int width, int height, bool isChecked = false, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
+	CheckBox(IComponent* pParent, int x, int y, int width, int height, bool isChecked = false, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
 	~CheckBox();
 
 	/// Flips state of check box. 

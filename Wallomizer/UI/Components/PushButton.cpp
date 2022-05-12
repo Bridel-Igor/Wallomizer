@@ -1,8 +1,9 @@
 #include "PushButton.h"
 
-PushButton::PushButton(HWND hParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles, DWORD additionalExStyles, COLORREF color1, COLORREF color2)
+PushButton::PushButton(IComponent* pParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles, DWORD additionalExStyles, COLORREF color1, COLORREF color2) :
+	IHoverable(pParent)
 {
-	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), text, WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, hParent, m_hMenu, NULL, NULL);
+	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), text, WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, m_pParent->hWnd(), m_hMenu, NULL, NULL);
 	m_checkedColorTop = color1;
 	m_checkedColorBottom = color2;
 }

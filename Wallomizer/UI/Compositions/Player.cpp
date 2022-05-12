@@ -52,13 +52,13 @@ Player::Resources::~Resources()
 	DestroyIcon(hIOpenExternalHover);
 }
 
-Player::Player(HWND hParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, CollectionManager* pCollectionManager, DWORD additionalStyles) :
-	btnPrev(hParent,			xPlayer,		yPlayer,	20,		20, resources.hIPrev, resources.hIPrevHover),
-	btnOpenExternal(hParent,	xPlayer + 30,	yPlayer,	20,		20, resources.hIOpenExternal, resources.hIOpenExternalHover),
-	btnPlay(hParent,			xPlayer + 60,	yPlayer,	20,		20, resources.hIPlay, resources.hIPlayHover),
-	btnPause(hParent,			xPlayer + 90,	yPlayer,	20,		20, resources.hIPause, resources.hIPauseHover),
-	btnNext(hParent,			xPlayer + 120,	yPlayer,	20,		20, resources.hINext, resources.hINextHover),
-	stDelayRemained(hParent, "",xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles)
+Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, CollectionManager* pCollectionManager, DWORD additionalStyles) :
+	btnPrev(pParent,				xPlayer,		yPlayer,	20,		20, resources.hIPrev, resources.hIPrevHover),
+	btnOpenExternal(pParent,		xPlayer + 30,	yPlayer,	20,		20, resources.hIOpenExternal, resources.hIOpenExternalHover),
+	btnPlay(pParent,				xPlayer + 60,	yPlayer,	20,		20, resources.hIPlay, resources.hIPlayHover),
+	btnPause(pParent,				xPlayer + 90,	yPlayer,	20,		20, resources.hIPause, resources.hIPauseHover),
+	btnNext(pParent,				xPlayer + 120,	yPlayer,	20,		20, resources.hINext, resources.hINextHover),
+	stDelayRemained(pParent, "",	xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles)
 {	
 	s_pCollectionManager = pCollectionManager;
 	updateTimer(true);
@@ -146,15 +146,6 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	if (btnNext.draw(pDIS, IWindow::Resources::mainBkBrush))
 		return true;
 	return false;
-}
-
-void Player::mouseHovering(WPARAM wParam)
-{
-	btnPrev.mouseHovering(wParam);
-	btnOpenExternal.mouseHovering(wParam);
-	btnPlay.mouseHovering(wParam);
-	btnPause.mouseHovering(wParam);
-	btnNext.mouseHovering(wParam);
 }
 
 void Player::updateTimer(bool isForced)

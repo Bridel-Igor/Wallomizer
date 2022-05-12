@@ -6,42 +6,42 @@ ResPickerWindow::ResPickerWindow(HWND hCaller, wchar_t* wsResolution) :
 	IWindow("Resolution", "Res Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 390, 250),
 	m_hCaller(hCaller),
 	m_wsResolution(wsResolution),
-	btnAtLeast	(hWnd(), "At least",	10,		10,		180,	20),
-	btnExactly	(hWnd(), "Exactly",		200,	10,		180,	20),
-	stUltrawide	(hWnd(), "Ultrawide",	10,		35,		70,		20, SS_CENTER),
-	st169		(hWnd(), "16:9",		85,		35,		70,		20, SS_CENTER),
-	st1610		(hWnd(), "16:10",		160,	35,		70,		20, SS_CENTER),
-	st43		(hWnd(), "4:3",			235,	35,		70,		20, SS_CENTER),
-	st54		(hWnd(), "5:4",			310,	35,		70,		20, SS_CENTER),
-	btnRes	   {{hWnd(), "2560x1080",	10,		60,		70,		20}, //Ultrawide
-				{hWnd(), "3440x1440",	10,		85,		70,		20},
-				{hWnd(), "3840x1600",	10,		110,	70,		20},
-				{hWnd(), "1280x720",	85,		60,		70,		20}, //16:9
-				{hWnd(), "1600x900",	85,		85,		70,		20},
-				{hWnd(), "1920x1080",	85,		110,	70,		20},
-				{hWnd(), "2560x1440",	85,		135,	70,		20},
-				{hWnd(), "3840x2160",	85,		160,	70,		20},
-				{hWnd(), "1280x800",	160,	60,		70,		20}, //16:10
-				{hWnd(), "1600x1000",	160,	85,		70,		20},
-				{hWnd(), "1920x1200",	160,	110,	70,		20},
-				{hWnd(), "2560x1600",	160,	135,	70,		20},
-				{hWnd(), "3840x2400",	160,	160,	70,		20},
-				{hWnd(), "1280x960",	235,	60,		70,		20}, //4:3
-				{hWnd(), "1600x1200",	235,	85,		70,		20},
-				{hWnd(), "1920x1440",	235,	110,	70,		20},
-				{hWnd(), "2560x1920",	235,	135,	70,		20},
-				{hWnd(), "3840x2880",	235,	160,	70,		20},
-				{hWnd(), "1280x1024",	310,	60,		70,		20}, //5:4
-				{hWnd(), "1600x1280",	310,	85,		70,		20},
-				{hWnd(), "1920x1536",	310,	110,	70,		20},
-				{hWnd(), "2560x2048",	310,	135,	70,		20},
-				{hWnd(), "3840x3072",	310,	160,	70,		20}},
-	stCustom	(hWnd(), "Custom resolution:", 20, 190, 110,	20),
-	edWidth		(hWnd(), L"",			140,	190,	105,	20, ES_NUMBER),
-	stX			(hWnd(), "x",			245,	190,	20,		20, SS_CENTER),
-	edHeight	(hWnd(), L"",			265,	190,	105,	20, ES_NUMBER),
-	btnCancel	(hWnd(), "Cancel",		10,		220,	180,	20),
-	btnOk		(hWnd(), "Ok",			200,	220,	180,	20)
+	btnAtLeast	(this, "At least",	10,		10,		180,	20),
+	btnExactly	(this, "Exactly",		200,	10,		180,	20),
+	stUltrawide	(this, "Ultrawide",	10,		35,		70,		20, SS_CENTER),
+	st169		(this, "16:9",		85,		35,		70,		20, SS_CENTER),
+	st1610		(this, "16:10",		160,	35,		70,		20, SS_CENTER),
+	st43		(this, "4:3",			235,	35,		70,		20, SS_CENTER),
+	st54		(this, "5:4",			310,	35,		70,		20, SS_CENTER),
+	btnRes	   {{this, "2560x1080",	10,		60,		70,		20}, //Ultrawide
+				{this, "3440x1440",	10,		85,		70,		20},
+				{this, "3840x1600",	10,		110,	70,		20},
+				{this, "1280x720",	85,		60,		70,		20}, //16:9
+				{this, "1600x900",	85,		85,		70,		20},
+				{this, "1920x1080",	85,		110,	70,		20},
+				{this, "2560x1440",	85,		135,	70,		20},
+				{this, "3840x2160",	85,		160,	70,		20},
+				{this, "1280x800",	160,	60,		70,		20}, //16:10
+				{this, "1600x1000",	160,	85,		70,		20},
+				{this, "1920x1200",	160,	110,	70,		20},
+				{this, "2560x1600",	160,	135,	70,		20},
+				{this, "3840x2400",	160,	160,	70,		20},
+				{this, "1280x960",	235,	60,		70,		20}, //4:3
+				{this, "1600x1200",	235,	85,		70,		20},
+				{this, "1920x1440",	235,	110,	70,		20},
+				{this, "2560x1920",	235,	135,	70,		20},
+				{this, "3840x2880",	235,	160,	70,		20},
+				{this, "1280x1024",	310,	60,		70,		20}, //5:4
+				{this, "1600x1280",	310,	85,		70,		20},
+				{this, "1920x1536",	310,	110,	70,		20},
+				{this, "2560x2048",	310,	135,	70,		20},
+				{this, "3840x3072",	310,	160,	70,		20}},
+	stCustom	(this, "Custom resolution:", 20, 190, 110,	20),
+	edWidth		(this, L"",			140,	190,	105,	20, ES_NUMBER),
+	stX			(this, "x",			245,	190,	20,		20, SS_CENTER),
+	edHeight	(this, L"",			265,	190,	105,	20, ES_NUMBER),
+	btnCancel	(this, "Cancel",		10,		220,	180,	20),
+	btnOk		(this, "Ok",			200,	220,	180,	20)
 {
 	EnableWindow(m_hCaller, FALSE);
 
@@ -239,15 +239,6 @@ LRESULT ResPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lP
 		}
 	}
 	return 0;
-
-	case WM_SETCURSOR:
-	{
-		btnAtLeast.mouseHovering(wParam);
-		btnExactly.mouseHovering(wParam);
-		for (int i = 0; i < 23; i++)
-			btnRes[i].mouseHovering(wParam);
-		// Fallthrough. DefWindowProc must be reached anyway.
-	}
 
 	default:
 		return RESULT_DEFAULT;

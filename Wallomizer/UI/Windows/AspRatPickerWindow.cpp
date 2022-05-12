@@ -4,26 +4,26 @@ AspRatPickerWindow::AspRatPickerWindow(HWND hCaller, wchar_t* sAspRat) :
 	IWindow("Ratio", "Aspect Ratio Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 315, 195),
 	m_hCaller(hCaller),
 	m_sAspRat(sAspRat),
-	btnAllWide		(hWnd(), "All Wide",	10,		35,		145,	20),
-	btnAllPortrait	(hWnd(), "All Portrait",160,	35,		70,		20),
-	stWide			(hWnd(), "Wide",		10,		10,		70,		20, SS_CENTER),
-	stUltrawide		(hWnd(), "Ultrawide",	85,		10,		70,		20, SS_CENTER),
-	stPortrait		(hWnd(), "Portrait",	160,	10,		70,		20, SS_CENTER),
-	stSquare		(hWnd(), "Square",		235,	10,		70,		20, SS_CENTER),
-	btnAR /*Wide*/ {{hWnd(), "16x9",		10,		60,		70,		20},
-					{hWnd(), "16x10",		10,		85,		70,		20},
-	/*Ultrawide*/	{hWnd(), "21x9",		85,		60,		70,		20},
-					{hWnd(), "32x9",		85,		85,		70,		20},
-					{hWnd(), "48x9",		85,		110,	70,		20},
-	/*Portrait*/	{hWnd(), "9x16",		160,	60,		70,		20},
-					{hWnd(), "10x16",		160,	85,		70,		20},
-					{hWnd(), "9x18",		160,	110,	70,		20},
-	/*Square*/		{hWnd(), "1x1",			235,	60,		70,		20},
-					{hWnd(), "3x2",			235,	85,		70,		20},
-					{hWnd(), "4x3",			235,	110,	70,		20},
-					{hWnd(), "5x4",			235,	135,	70,		20}},
-	btnCancel		(hWnd(), "Cancel",		10,		165,	142,	20),
-	btnOk			(hWnd(), "Ok",			162,	165,	143,	20)
+	btnAllWide		(this, "All Wide",		10,		35,		145,	20),
+	btnAllPortrait	(this, "All Portrait",	160,	35,		70,		20),
+	stWide			(this, "Wide",			10,		10,		70,		20, SS_CENTER),
+	stUltrawide		(this, "Ultrawide",		85,		10,		70,		20, SS_CENTER),
+	stPortrait		(this, "Portrait",		160,	10,		70,		20, SS_CENTER),
+	stSquare		(this, "Square",		235,	10,		70,		20, SS_CENTER),
+	btnAR /*Wide*/ {{this, "16x9",			10,		60,		70,		20},
+					{this, "16x10",			10,		85,		70,		20},
+	/*Ultrawide*/	{this, "21x9",			85,		60,		70,		20},
+					{this, "32x9",			85,		85,		70,		20},
+					{this, "48x9",			85,		110,	70,		20},
+	/*Portrait*/	{this, "9x16",			160,	60,		70,		20},
+					{this, "10x16",			160,	85,		70,		20},
+					{this, "9x18",			160,	110,	70,		20},
+	/*Square*/		{this, "1x1",			235,	60,		70,		20},
+					{this, "3x2",			235,	85,		70,		20},
+					{this, "4x3",			235,	110,	70,		20},
+					{this, "5x4",			235,	135,	70,		20}},
+	btnCancel		(this, "Cancel",		10,		165,	142,	20),
+	btnOk			(this, "Ok",			162,	165,	143,	20)
 {
 	EnableWindow(m_hCaller, FALSE);
 
@@ -137,15 +137,6 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM
 		}
 	}
 	return 0;
-
-	case WM_SETCURSOR:
-	{
-		btnAllWide.mouseHovering(wParam);
-		btnAllPortrait.mouseHovering(wParam);
-		for (int i = 0; i < 12; i++)
-			btnAR[i].mouseHovering(wParam);
-		// Fallthrough. DefWindowProc must be reached anyway.
-	}
 
 	default:
 		return RESULT_DEFAULT;

@@ -34,14 +34,14 @@ CollectionItem::Resources::~Resources()
 	DestroyIcon(hIOptionsHover);
 }
 
-CollectionItem::CollectionItem(HWND hParent, int _x, int _y, int _width, BaseCollection* pCollection, HFONT hFont)
+CollectionItem::CollectionItem(IComponent* pParent, int _x, int _y, int _width, BaseCollection* pCollection, HFONT hFont)
 	: x(_x), y(_y), width(_width), m_pCollection(pCollection),
-	chboEnabled(hParent,	0, 0, 0, 0, 0, BS_NOTIFY | BS_OWNERDRAW),
-	stName(hParent, L"",	0, 0, 0, 0, 0),
-	purity(hParent,			0, 0, 0, 0),
-	stNumber(hParent, "0",	0, 0, 0, 0, SS_CENTER),
-	btnSettings(hParent,	0, 0, 0, height, resources.hIOptions, resources.hIOptionsHover),
-	btnDelete(hParent,		0, 0, 0, height, resources.hIDelete, resources.hIDeleteHover)
+	chboEnabled(pParent,			0, 0, 0, 0, 0, BS_NOTIFY | BS_OWNERDRAW),
+	stName(pParent, L"",			0, 0, 0, 0, 0),
+	purity(pParent,					0, 0, 0, 0),
+	stNumber(pParent, "0",			0, 0, 0, 0, SS_CENTER),
+	btnSettings(pParent,			0, 0, 0, height, resources.hIOptions, resources.hIOptionsHover),
+	btnDelete(pParent,				0, 0, 0, height, resources.hIDelete, resources.hIDeleteHover)
 {
 	SendMessage(stName.hWnd(), WM_SETFONT, (LPARAM)hFont, TRUE);
 	SendMessage(stNumber.hWnd(), WM_SETFONT, (LPARAM)hFont, TRUE);
@@ -84,11 +84,4 @@ bool CollectionItem::draw(LPDRAWITEMSTRUCT& pDIS)
 	if (btnDelete.draw(pDIS, resources.collItemBkBrush, 1, (height - 20) / 2))
 		return true;
 	return false;
-}
-
-void CollectionItem::mouseHovering(WPARAM wParam)
-{
-	chboEnabled.mouseHovering(wParam);
-	btnSettings.mouseHovering(wParam);
-	btnDelete.mouseHovering(wParam);
 }

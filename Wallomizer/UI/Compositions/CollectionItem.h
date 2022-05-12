@@ -24,12 +24,11 @@ public:
 		static unsigned char refCount;
 	}resources;
 public:
-	CollectionItem(HWND hParent, int x, int y, int width, BaseCollection* collection, HFONT hFont);
+	CollectionItem(IComponent* pParent, int x, int y, int width, BaseCollection* collection, HFONT hFont);
 	~CollectionItem() {}
 	void updateInfo(BaseCollection* collection);
 	void reposition(int yPos, bool scrollBarISVisible);
 	bool draw(LPDRAWITEMSTRUCT& pDIS);
-	void mouseHovering(WPARAM wParam);
 
 	CheckBox chboEnabled;
 	Static stName, stNumber;

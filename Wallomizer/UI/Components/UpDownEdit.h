@@ -11,12 +11,12 @@ class UpDownEdit : public IComponent
 public:
     /// Up down edit component construction.
     /// 
-    /// @param hParent 
+    /// @param pParent - pointer to parent component
     /// @param x, y - coordinates, relative to parent window.
     /// @param width, height - size of button in pixels.
     /// @param minPos, maxPos - range of possible values.
     /// @param pos - initial value.
-    UpDownEdit(HWND hParent, int x, int y, int width, int height, int minPos = 0, int maxPos = 100, int pos = 1);
+    UpDownEdit(IComponent* pParent, int x, int y, int width, int height, int minPos = 0, int maxPos = 100, int pos = 1);
     ~UpDownEdit();
 
     /// Sets current value of component.

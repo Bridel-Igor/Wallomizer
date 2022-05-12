@@ -12,6 +12,8 @@ bool Internet::URLDownloadToBuffer(const wchar_t* URL, char* _buffer, DWORD _buf
 	HINTERNET hURL;
 	DWORD dwBytesRead;
 
+	memset(buffer, 0, bufferSize);
+
 	hInternetSession = InternetOpenA("Wallomizer", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 	if (!hInternetSession)
 		return false;

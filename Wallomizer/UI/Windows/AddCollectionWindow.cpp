@@ -7,10 +7,10 @@ AddCollectionWindow::AddCollectionWindow(HWND hCaller, CollectionManager* pColle
 	IWindow("Add collection", "Add Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100,	100,	240,	140),
 	m_hCaller(hCaller),
 	m_pCollectionManager(pCollectionManager),
-	btnAddLocalCollection(hWnd(), "Add local collection",								10,		10,		220,	20),
-	btnAddUserCollection(hWnd(), "Add wallhaven user collection",						10,		40,		220,	20),
-	btnAddSearchCollection(hWnd(), "Add wallhaven search collection",					10,		70,		220,	20),
-	btnCancel(hWnd(), "Cancel",														10,		110,	220,	20)
+	btnAddLocalCollection(this, "Add local collection",					10,		10,		220,	20),
+	btnAddUserCollection(this, "Add wallhaven user collection",		10,		40,		220,	20),
+	btnAddSearchCollection(this, "Add wallhaven search collection",	10,		70,		220,	20),
+	btnCancel(this, "Cancel",											10,		110,	220,	20)
 {
 	centerWindow(m_hCaller);
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);

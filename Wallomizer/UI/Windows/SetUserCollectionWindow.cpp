@@ -6,16 +6,16 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, CollectionManager
 	m_hCaller(hCaller),
 	m_pCollectionManager	(pCollectionManager),
 	m_pCurrentUserCollection(pCollection),
-	stUsername				(hWnd(), "Username:",		10,		10,		80,		20, SS_RIGHT),
-	edUsername				(hWnd(), "",				100,	10,		240,	20),
-	stCollectionID			(hWnd(), "Collection ID:",	10,		40,		80,		20, SS_RIGHT),
-	cbCollections			(hWnd(), "",				100,	40,		240,	20),
+	stUsername				(this, "Username:",			10,		10,		80,		20, SS_RIGHT),
+	edUsername				(this, "",					100,	10,		240,	20),
+	stCollectionID			(this, "Collection ID:",	10,		40,		80,		20, SS_RIGHT),
+	cbCollections			(this, "",					100,	40,		240,	20),
 
-	stPurity				(hWnd(), "Purity:",			10,		70,		80,		20, SS_RIGHT),
-	purCom					(hWnd(),					100,	70,		240,	20),
+	stPurity				(this, "Purity:",			10,		70,		80,		20, SS_RIGHT),
+	purCom					(this,						100,	70,		240,	20),
 
-	btnCancel				(hWnd(), "Cancel",			10,		100,	80,		20),
-	btnOk					(hWnd(), "Ok",				100,	100,	240,	20)
+	btnCancel				(this, "Cancel",			10,		100,	80,		20),
+	btnOk					(this, "Ok",				100,	100,	240,	20)
 {
 	edUsername.setTextW(m_pCurrentUserCollection->settings.wsUsername);
 	purCom.setPurity(m_pCurrentUserCollection->settings.categoriesAndPurity);
@@ -24,6 +24,10 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, CollectionManager
 	{
 		edUsername.setTextW(Settings::username);
 		wcscpy_s(m_pCurrentUserCollection->settings.wsUsername, Settings::username);
+		SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
+		SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)L"Click to update");
+		SendMessageW(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+		validCollection = false;
 	}
 
 	if (m_pCurrentUserCollection->settings.wsCollectionID!=0 && wcslen(m_pCurrentUserCollection->settings.wsCollectionName)!=0)
@@ -72,9 +76,9 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 			return 0;
 		if ((HWND)lParam==edUsername.hWnd() && HIWORD(wParam) == EN_CHANGE)
 		{
-			SendMessageA(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
-			SendMessageA(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)"Click to update");
-			SendMessageA(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+			SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
+			SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)L"Click to update");
+			SendMessageW(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 			validCollection = false;
 			return 0;
 		}
@@ -89,18 +93,18 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 			}
 
 			validCollection = false;
-			SendMessageA(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
-			SendMessageA(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)"Updating...");
-			SendMessageA(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+			SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
+			SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)L"Updating...");
+			SendMessageW(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 			wchar_t tmpUsername[64];
 			edUsername.getTextW(tmpUsername, 64);
 			uciList.clear();
 			UserCollection::loadCollectionList(uciList, tmpUsername, Settings::apiKey);
-			SendMessageA(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
+			SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
 			if (uciList.empty())
 			{
-				SendMessageA(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)"Empty");
-				SendMessageA(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+				SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)L"Empty");
+				SendMessageW(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 				validCollection = false;
 				return 0;
 			}
@@ -110,7 +114,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 			int index = 0;
 			if (wcslen(prevName))
 			{
-				index = (int)SendMessageA(cbCollections.hWnd(), CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)prevName);
+				index = (int)SendMessageW(cbCollections.hWnd(), CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)prevName);
 				if (index == CB_ERR)
 					index = 0;
 			}
@@ -151,12 +155,6 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 		}
 	}
 	return 0;
-
-	case WM_SETCURSOR:
-	{
-		purCom.mouseHovering(wParam);
-		// Fallthrough. DefWindowProc must be reached anyway.
-	}
 
 	default:
 		return RESULT_DEFAULT;

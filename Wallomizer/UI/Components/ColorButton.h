@@ -31,12 +31,12 @@ private:
 public:
 	/// Color button component construction.
 	/// 
-	/// @param hParent - HWND of parent window.
+	/// @param pParent - pointer to parent component
 	/// @param red, green, blue - value of color chanels in range [0, 255].
 	/// @param x, y - coordinates, relative to parent window.
 	/// @param width, height - size of button in pixels.
 	/// @param empty - flag if no color on button needs to be set. Can be ignored.
-	ColorButton(HWND hParent, BYTE red, BYTE green, BYTE blue, int x, int y, int width, int height, bool empty = false);
+	ColorButton(IComponent *pParent, BYTE red, BYTE green, BYTE blue, int x, int y, int width, int height, bool empty = false);
 	~ColorButton();
 
 	/// Changes state of color button.

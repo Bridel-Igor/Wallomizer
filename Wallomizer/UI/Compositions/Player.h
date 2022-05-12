@@ -26,11 +26,10 @@ private:
 	}resources;
 
 public:
-	Player(HWND hParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, CollectionManager* pCollectionManager, DWORD additionalStyles = 0UL);
+	Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, CollectionManager* pCollectionManager, DWORD additionalStyles = 0UL);
 	~Player();
 	bool click(WPARAM& wParam);
 	bool draw(LPDRAWITEMSTRUCT& pDIS);
-	void mouseHovering(WPARAM wParam);
 	static void updateTimer(bool isForced = false);
 	static void redrawPlayers();
 	

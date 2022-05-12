@@ -1,7 +1,8 @@
 #include "IClickable.h"
 #include "HMenuGenerator.h"
 
-IClickable::IClickable() :
+IClickable::IClickable(IComponent* pParent) :
+	IComponent(pParent),
 	m_hMenu(HMenuGenerator::getNewHMenu())
 {
 }

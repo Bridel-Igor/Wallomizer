@@ -2,9 +2,10 @@
 
 #include "Panel.h"
 #include "IWindow.h"
+#include "IHoverable.h"
 
-Panel::Panel(HWND hParent, LPCSTR className, int x, int y, int width, int height, HBRUSH bkBrush) :
-	m_hParent(hParent),
+Panel::Panel(IComponent* pParent, LPCSTR className, int x, int y, int width, int height, HBRUSH bkBrush) :
+	IComponent(pParent),
 	m_sName(className),
 	m_bkBrush(bkBrush)
 {
@@ -31,7 +32,7 @@ Panel::Panel(HWND hParent, LPCSTR className, int x, int y, int width, int height
 
 	m_hWnd = CreateWindowExA(
 		NULL, m_sName, "", WS_CHILD | WS_BORDER | WS_VSCROLL, rc.left, rc.top,
-		rc.right - rc.left, rc.bottom - rc.top, m_hParent, 0, GetModuleHandle(NULL), this);
+		rc.right - rc.left, rc.bottom - rc.top, m_pParent->hWnd(), 0, GetModuleHandle(NULL), this);
 	if (m_hWnd == FALSE)
 		throw std::exception("Panel creation failed.");
 }
@@ -76,15 +77,14 @@ LRESULT Panel::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		FillRect(hdc, &ps.rcPaint, m_bkBrush);
 		EndPaint(hWnd, &ps);
 		return 0;
-	}
+	}	
 	case WM_COMMAND:
 	case WM_DRAWITEM:
 	case WM_CTLCOLORBTN:
 	case WM_CTLCOLORSTATIC:
 	case WM_VSCROLL:
 	case WM_MOUSEWHEEL:
-	case WM_SETCURSOR:
-		LRESULT res = SendMessageA(m_hParent, uMsg, wParam, lParam);
+		LRESULT res = SendMessageA(m_pParent->hWnd(), uMsg, wParam, lParam);
 		if (res != RESULT_DEFAULT)
 			return res;
 	}

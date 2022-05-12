@@ -17,7 +17,9 @@ public:
 
 protected:
 	/// Protected constructor to prevent allocation of an interface object.
-	IHoverable() = default;
+	/// 
+	/// @param pParent - pointer to parent component
+	IHoverable(IComponent* pParent) : IClickable(pParent) {}
 
 	/// Indicates mouse hovering status.
 	/// Changed by the mouseHovering method.

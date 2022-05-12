@@ -36,30 +36,30 @@ HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, 
 SettingsWindow::SettingsWindow(HWND hCaller) :
 	IWindow("Settings", "Setting Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	m_hCaller(hCaller),
-	stApplication	(hWnd(), "Application",			10,		10,		380,	20, SS_CENTER),
-	stVersion		(hWnd(), "Version:",			10,		40,		130,	20, SS_RIGHT),
-	stActVersion	(hWnd(), "1.0.5a",				150,	40,		100,	20),
-	btnUpdate		(hWnd(), "Check for updates",	270,	40,		120,	20),
-	stStartup		(hWnd(), "Load on startup:",	10,		70,		130,	20, SS_RIGHT),
-	cbStartup		(hWnd(),						150,	70,		20,		20),
+	stApplication	(this, "Application",		10,		10,		380,	20, SS_CENTER),
+	stVersion		(this, "Version:",			10,		40,		130,	20, SS_RIGHT),
+	stActVersion	(this, "1.0.5a",			150,	40,		100,	20),
+	btnUpdate		(this, "Check for updates",	270,	40,		120,	20),
+	stStartup		(this, "Load on startup:",	10,		70,		130,	20, SS_RIGHT),
+	cbStartup		(this,						150,	70,		20,		20),
 
-	stSlideshow		(hWnd(), "Slideshow",			10,		100,	380,	20, SS_CENTER),
-	stDelay			(hWnd(), "Delay:",				10,		150,	130,	20, SS_RIGHT),
-	stHours			(hWnd(), "Hours",				150,	130,	74,		20, SS_CENTER),
-	stMinutes		(hWnd(), "Minutes",				233,	130,	74,		20, SS_CENTER),
-	stSeconds		(hWnd(), "Seconds",				316,	130,	74,		20, SS_CENTER),
-	udeHours		(hWnd(),						150,	150,	74,		20, 0, 999, int((Settings::delay / 1000) / 3600)),
-	udeMinutes		(hWnd(),						233,	150,	74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60),
-	udeSeconds		(hWnd(),						316,	150,	74,		20, 0, 59, int(Settings::delay / 1000) % 60),
+	stSlideshow		(this, "Slideshow",			10,		100,	380,	20, SS_CENTER),
+	stDelay			(this, "Delay:",			10,		150,	130,	20, SS_RIGHT),
+	stHours			(this, "Hours",				150,	130,	74,		20, SS_CENTER),
+	stMinutes		(this, "Minutes",			233,	130,	74,		20, SS_CENTER),
+	stSeconds		(this, "Seconds",			316,	130,	74,		20, SS_CENTER),
+	udeHours		(this,						150,	150,	74,		20, 0, 999, int((Settings::delay / 1000) / 3600)),
+	udeMinutes		(this,						233,	150,	74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60),
+	udeSeconds		(this,						316,	150,	74,		20, 0, 59, int(Settings::delay / 1000) % 60),
 
-	stWallhaven		(hWnd(), "Wallhaven",			10,		180,	380,	20, SS_CENTER),
-	stApiKey		(hWnd(), "Api key:",			10,		210,	130,	20, SS_RIGHT),
-	edApiKey		(hWnd(), "",					150,	210,	240,	20, ES_PASSWORD),
-	stUsername		(hWnd(), "Default username:",	10,		240,	130,	20, SS_RIGHT),
-	edUsername		(hWnd(), "",					150,	240,	240,	20),
+	stWallhaven		(this, "Wallhaven",			10,		180,	380,	20, SS_CENTER),
+	stApiKey		(this, "Api key:",			10,		210,	130,	20, SS_RIGHT),
+	edApiKey		(this, "",					150,	210,	240,	20, ES_PASSWORD),
+	stUsername		(this, "Default username:",	10,		240,	130,	20, SS_RIGHT),
+	edUsername		(this, "",					150,	240,	240,	20),
 
-	btnCancel		(hWnd(), "Cancel",				10,		280,	130,	20),
-	btnOk			(hWnd(), "Ok",					150,	280,	240,	20)
+	btnCancel		(this, "Cancel",			10,		280,	130,	20),
+	btnOk			(this, "Ok",				150,	280,	240,	20)
 {
 	EnableWindow(m_hCaller, FALSE);
 
@@ -254,12 +254,6 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 			(HWND)lParam == udeHours.m_edithWnd && udeHours.m_invalid)
 				SetBkColor(hdc, Edit::bkInvalidColor);
 		return (LRESULT)GetStockObject(DC_BRUSH);
-	}
-
-	case WM_SETCURSOR:
-	{
-		cbStartup.mouseHovering(wParam);
-		// Fallthrough. DefWindowProc must be reached anyway.
 	}
 
 	default:
