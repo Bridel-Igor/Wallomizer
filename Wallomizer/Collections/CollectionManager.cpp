@@ -13,6 +13,8 @@
 #include "Filesystem.h"
 #include "Delay.h"
 
+constexpr unsigned short COLLECTION_MANAGER_FILE_VERSION = 1U;
+
 CollectionManager::CollectionManager()
 {
 	m_randomGenerator = std::mt19937(static_cast<unsigned int>(time(0)));
@@ -33,6 +35,7 @@ bool CollectionManager::saveSettings(FILE* pFile) const
 	_wfopen_s(&pFile, wsPath, L"wb");
 	if (pFile != NULL)
 	{
+		fwrite(&COLLECTION_MANAGER_FILE_VERSION, sizeof(COLLECTION_MANAGER_FILE_VERSION), 1, pFile);
 		const size_t size = m_pCollections.size();
 		fwrite(&size, sizeof(size_t), 1, pFile);
 		for (auto pCollection : m_pCollections)
@@ -54,27 +57,38 @@ bool CollectionManager::loadSettings(FILE* pFile)
 	_wfopen_s(&pFile, wsPath, L"rb");
 	if (pFile != NULL)
 	{
-		clear();
-		size_t nCollections;
-		fread(&nCollections, sizeof(nCollections), 1, pFile);
-		BaseCollection* pTmpCollection;
-		for (unsigned int i = 0; i < nCollections; i++)
+		unsigned short fileVersion = 0;
+		fread(&fileVersion, sizeof(fileVersion), 1, pFile);
+		if (fileVersion != COLLECTION_MANAGER_FILE_VERSION)
 		{
-			CollectionType collectionType;
-			fread(&collectionType, sizeof(collectionType), 1, pFile);
-			if (collectionType == CollectionType::local)
-				pTmpCollection = new LocalCollection(this);
-			else if (collectionType == CollectionType::user)
-				pTmpCollection = new UserCollection(this);
-			else if (collectionType == CollectionType::search)
-				pTmpCollection = new SearchCollection(this);
-			else
-				break;
-			pTmpCollection->loadSettings(pFile);
-			pTmpCollection->setValid(true);
-			m_pCollections.push_back(pTmpCollection);
+			fclose(pFile);
+			saveSettings();
+			MessageBox(NULL, "Incompatible collection list file. Collection list was reset.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 		}
-		fclose(pFile);
+		else
+		{
+			clear();
+			size_t nCollections;
+			fread(&nCollections, sizeof(nCollections), 1, pFile);
+			BaseCollection* pTmpCollection;
+			for (unsigned int i = 0; i < nCollections; i++)
+			{
+				CollectionType collectionType;
+				fread(&collectionType, sizeof(collectionType), 1, pFile);
+				if (collectionType == CollectionType::local)
+					pTmpCollection = new LocalCollection(this);
+				else if (collectionType == CollectionType::user)
+					pTmpCollection = new UserCollection(this);
+				else if (collectionType == CollectionType::search)
+					pTmpCollection = new SearchCollection(this);
+				else
+					break;
+				pTmpCollection->loadSettings(pFile);
+				pTmpCollection->setValid(true);
+				m_pCollections.push_back(pTmpCollection);
+			}
+			fclose(pFile);
+		}
 	}
 	updateNumber();
 	if (MainWindow::s_pMainWindow && MainWindow::s_pMainWindow->isReady())
@@ -82,7 +96,8 @@ bool CollectionManager::loadSettings(FILE* pFile)
 	m_isReady = true;
 	if (Delay::isSlideshowRunning)
 		Delay::abortDelay();
-	//if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady()) // BUG: this thread rust faster than tray
+	// BUG: this thread runs faster than tray's thread
+	// if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady()) 
 	//	PostMessageA(TrayWindow::s_pTrayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::s_pTrayWindow->btnSettings.hMenu(), NULL);
 	m_isLoading = false;
 	Player::updateTimer(true);

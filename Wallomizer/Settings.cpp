@@ -10,10 +10,7 @@ wchar_t Settings::username[64];
 wchar_t Settings::apiKey[128];
 bool Settings::loadOnStartup = false;
 
-namespace Settings
-{
-	constexpr unsigned short settingsVersion = 1U;
-}
+constexpr unsigned short SETTINGS_FILE_VERSION = 2U;
 
 void Settings::saveSettings()
 {
@@ -24,7 +21,7 @@ void Settings::saveSettings()
 	_wfopen_s(&pFile, path, L"wb");
 	if (pFile != NULL)
 	{
-		fwrite(&settingsVersion, sizeof(settingsVersion), 1, pFile);
+		fwrite(&SETTINGS_FILE_VERSION, sizeof(SETTINGS_FILE_VERSION), 1, pFile);
 		fwrite(&loadOnStartup, sizeof(loadOnStartup), 1, pFile);
 		fwrite(&delay, sizeof(delay), 1, pFile);
 		fwrite(&username, sizeof(username), 1, pFile);
@@ -46,10 +43,11 @@ void Settings::loadSettings()
 	{
 		unsigned short fileVersion = 0;
 		fread(&fileVersion, sizeof(fileVersion), 1, pFile);
-		if (fileVersion != settingsVersion)
+		if (fileVersion != SETTINGS_FILE_VERSION)
 		{
 			fclose(pFile);
 			saveSettings();
+			MessageBox(NULL, "Incompatible settings file. Settings were reset.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 			return;
 		}
 		fread(&loadOnStartup, sizeof(loadOnStartup), 1, pFile);
