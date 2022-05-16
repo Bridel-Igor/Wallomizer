@@ -1,17 +1,27 @@
 #pragma once
 
 #include <Windows.h>
-#include <mutex>
+#include <WinInet.h>
 
-namespace Internet
+class Internet
 {
-	extern constexpr DWORD bufferSize = 32768;
-	extern char buffer[bufferSize];	// HACK: move to heap and allocate on demand
-	extern std::mutex bufferAccess;
+public:
+	Internet();
+	Internet(const Internet&) = delete;
+	Internet(Internet&&) = delete;
+	Internet& operator=(const Internet&) = delete;
+	Internet& operator=(Internet&&) = delete;
+	~Internet();
 
-	bool URLDownloadToBuffer(const wchar_t* URL, char* pBuffer = buffer, DWORD _bufferSize = bufferSize);
-	bool URLDownloadToFile(const wchar_t* URL, const wchar_t* path);
-	char* parse(char* pBuffer, const char* key, nullptr_t value);
-	char* parse(char* pBuffer, const char* key, wchar_t* value);
-	char* parse(char* pBuffer, const char* key, unsigned int* value);
-}
+	bool DownloadToBuffer(const wchar_t* wsURL, size_t bufferSize = BUFFER_SIZE_DEFAULT);
+	bool DownloadToFile(const wchar_t* wsURL, const wchar_t* wsPath);
+	bool parse(const char* sKey, bool bFromLastPos = false);
+	bool parse(const char* sKey, wchar_t* wsValue, bool bFromLastPos = false);
+	bool parse(const char* sKey, unsigned int& uValue, bool bFromLastPos = false);
+
+private:
+	static constexpr size_t BUFFER_SIZE_DEFAULT = 32768;
+
+	HINTERNET m_hInternetSession = nullptr;
+	char *m_pBuffer = nullptr, *m_pCurrent = nullptr;
+};

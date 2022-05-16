@@ -44,13 +44,11 @@ bool UserCollection::loadSettings(FILE* pFile)
 		return true;
 
 	// Getting the META
-	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
-	char* pBuffer = Internet::buffer;
-	if (!Internet::URLDownloadToBuffer(m_wsCollectionUrl))
+	Internet internet;
+	internet.DownloadToBuffer(m_wsCollectionUrl);
+	if (!internet.parse("\"meta\""))
 		return false;
-	if ((pBuffer = Internet::parse(pBuffer, "\"meta\"", nullptr)) == nullptr)
-		return false;
-	if (Internet::parse(pBuffer, "\"total\":", &m_uiNumber) == nullptr)
+	if (!internet.parse("\"total\":", m_uiNumber, true))
 		return false;
 	return true;
 }
@@ -81,15 +79,13 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 	_itow_s(page, wsCurrentPage, 10);
 	wcscat_s(wsPageUrl, wsCurrentPage);
 
-	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
-	if (!Internet::URLDownloadToBuffer(wsPageUrl))
-		return pWallpaper;
-	char *pBuffer = Internet::buffer;
+	Internet internet;
+	internet.DownloadToBuffer(wsPageUrl);
 	for (unsigned int i = 1; i < index; i++)
-		if ((pBuffer = Internet::parse(pBuffer, "\"path\":", nullptr)) == nullptr)
+		if (!internet.parse("\"path\":", true))
 			return pWallpaper;
 	pWallpaper = new Wallpaper(CollectionType::user);
-	if (Internet::parse(pBuffer, "\"path\":", pWallpaper->getPathW()) == nullptr)
+	if (!internet.parse("\"path\":", pWallpaper->getPathW(), true))
 	{
 		delete pWallpaper;
 		pWallpaper = nullptr;
@@ -108,7 +104,8 @@ bool UserCollection::loadWallpaper(const Wallpaper* pWallpaper)
 	wchar_t wsImgPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsImgPath);
 	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
-	return Internet::URLDownloadToFile(pWallpaper->getPathW(), wsImgPath);
+	Internet internet;
+	return internet.DownloadToFile(pWallpaper->getPathW(), wsImgPath);
 }
 
 void UserCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
@@ -144,16 +141,14 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 		wcscat_s(wsCollectionInfoURL, Settings::getApiKey());
 	}
 
-	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
-	char* pBuffer = Internet::buffer;
-	if (!Internet::URLDownloadToBuffer(wsCollectionInfoURL))
-		return;
+	Internet internet;
+	internet.DownloadToBuffer(wsCollectionInfoURL);
 	UserCollectionInfo uci;
 	while (true)
 	{
-		if ((pBuffer = Internet::parse(pBuffer, "\"id\":", &uci.id)) == nullptr)
+		if (!internet.parse("\"id\":", uci.id, true))
 			break;
-		if ((pBuffer = Internet::parse(pBuffer, "\"label\":", uci.wsLabel)) == nullptr)
+		if (!internet.parse("\"label\":", uci.wsLabel, true))
 			break;
 		list.push_back(uci);
 	}

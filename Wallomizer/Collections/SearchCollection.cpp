@@ -55,13 +55,11 @@ bool SearchCollection::loadSettings(FILE* pFile)
 	if (!m_isEnabled)
 		return true;
 
-	char* pBuffer = Internet::buffer;
-	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
-	if (!Internet::URLDownloadToBuffer(m_wsSearchUrl))
+	Internet internet;
+	internet.DownloadToBuffer(m_wsSearchUrl);
+	if (!internet.parse("\"meta\""))
 		return false;
-	if ((pBuffer = Internet::parse(pBuffer, "\"meta\"", nullptr)) == nullptr)
-		return false;
-	if (Internet::parse(pBuffer, "\"total\":", &m_uiNumber) == nullptr)
+	if (!internet.parse("\"total\":", m_uiNumber, true))
 		return false;
 	return true;
 }
@@ -102,17 +100,13 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 	_itow_s(page, wsCurrentPage, 10);
 	wcscat_s(wsPageUrl, wsCurrentPage);
 
-	char* pBuffer = Internet::buffer;
-	std::lock_guard<std::mutex> lock(Internet::bufferAccess);
-
-	if (!Internet::URLDownloadToBuffer(wsPageUrl))
-		return pWallpaper;
-
+	Internet internet;
+	internet.DownloadToBuffer(wsPageUrl);
 	for (unsigned int i = 0; i < index; i++)
-		if ((pBuffer = Internet::parse(pBuffer, "\"path\":", nullptr)) == nullptr)
+		if (!internet.parse("\"path\":", true))
 			return pWallpaper;
 	pWallpaper = new Wallpaper(CollectionType::search);
-	if (Internet::parse(pBuffer, "\"path\":", pWallpaper->getPathW()) == nullptr)
+	if (!internet.parse("\"path\":", pWallpaper->getPathW(), true))
 	{
 		delete pWallpaper;
 		pWallpaper = nullptr;
@@ -131,7 +125,8 @@ bool SearchCollection::loadWallpaper(const Wallpaper* pWallpaper)
 	wchar_t wsImgPath[MAX_PATH];
 	Filesystem::getRoamingDir(wsImgPath);
 	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
-	return Internet::URLDownloadToFile(pWallpaper->getPathW(), wsImgPath);
+	Internet internet;
+	return internet.DownloadToFile(pWallpaper->getPathW(), wsImgPath);
 }
 
 void SearchCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
