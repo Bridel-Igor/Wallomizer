@@ -46,9 +46,9 @@ bool UserCollection::loadSettings(FILE* pFile)
 	// Getting the META
 	Internet internet;
 	internet.DownloadToBuffer(m_wsCollectionUrl);
-	if (!internet.parse("\"meta\""))
+	if (!internet.parse("meta"))
 		return false;
-	if (!internet.parse("\"total\":", m_uiNumber, true))
+	if (!internet.parse("total", m_uiNumber, true))
 		return false;
 	return true;
 }
@@ -82,10 +82,10 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 	Internet internet;
 	internet.DownloadToBuffer(wsPageUrl);
 	for (unsigned int i = 1; i < index; i++)
-		if (!internet.parse("\"path\":", true))
+		if (!internet.parse("path", true))
 			return pWallpaper;
 	pWallpaper = new Wallpaper(CollectionType::user);
-	if (!internet.parse("\"path\":", pWallpaper->getPathW(), true))
+	if (!internet.parse("path", pWallpaper->getPathW(), true))
 	{
 		delete pWallpaper;
 		pWallpaper = nullptr;
@@ -146,9 +146,9 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 	UserCollectionInfo uci;
 	while (true)
 	{
-		if (!internet.parse("\"id\":", uci.id, true))
+		if (!internet.parse("id", uci.id, true))
 			break;
-		if (!internet.parse("\"label\":", uci.wsLabel, true))
+		if (!internet.parse("label", uci.wsLabel, true))
 			break;
 		list.push_back(uci);
 	}

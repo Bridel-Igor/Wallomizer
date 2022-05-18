@@ -71,19 +71,28 @@ bool Internet::parse(const char* sKey, bool bFromLastPos)
 {
 	if (m_pBuffer == nullptr)
 		return false;
+
+	const size_t len = strlen(sKey) + 4;
+	char *sFullKey = new char[len];
+	strcpy_s(sFullKey, len, "\"");
+	strcat_s(sFullKey, len, sKey);
+	strcat_s(sFullKey, len, "\":");
+
 	m_pCurrent = bFromLastPos ? m_pCurrent : m_pBuffer;
-	m_pCurrent = strstr(m_pCurrent, sKey);
+	m_pCurrent = strstr(m_pCurrent, sFullKey);
+	delete [] sFullKey;
+
 	if (m_pCurrent == nullptr)
 		return false;
-	m_pCurrent += strlen(sKey);
+	m_pCurrent += len - 1;
 	return true;
 }
 
 bool Internet::parse(const char* sKey, wchar_t* wsValue, bool bFromLastPos)
 {
 	parse(sKey, bFromLastPos);
-	m_pCurrent++;
 	int slide = 0, i = 0;
+	m_pCurrent++;
 	while (m_pCurrent != nullptr && m_pCurrent[i] != '"')
 	{
 		if (m_pCurrent[i] == '\\') // special symbols
@@ -118,6 +127,7 @@ bool Internet::parse(const char* sKey, unsigned int& uValue, bool bFromLastPos)
 		i++;
 	}
 	search[i] = '\0';
+	m_pCurrent += i;
 	uValue = atoi(search);
 	return true;
 }

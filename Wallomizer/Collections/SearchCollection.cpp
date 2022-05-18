@@ -57,9 +57,9 @@ bool SearchCollection::loadSettings(FILE* pFile)
 
 	Internet internet;
 	internet.DownloadToBuffer(m_wsSearchUrl);
-	if (!internet.parse("\"meta\""))
+	if (!internet.parse("meta"))
 		return false;
-	if (!internet.parse("\"total\":", m_uiNumber, true))
+	if (!internet.parse("total", m_uiNumber, true))
 		return false;
 	return true;
 }
@@ -103,10 +103,10 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 	Internet internet;
 	internet.DownloadToBuffer(wsPageUrl);
 	for (unsigned int i = 0; i < index; i++)
-		if (!internet.parse("\"path\":", true))
+		if (!internet.parse("path", true))
 			return pWallpaper;
 	pWallpaper = new Wallpaper(CollectionType::search);
-	if (!internet.parse("\"path\":", pWallpaper->getPathW(), true))
+	if (!internet.parse("path", pWallpaper->getPathW(), true))
 	{
 		delete pWallpaper;
 		pWallpaper = nullptr;
