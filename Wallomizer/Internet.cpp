@@ -69,7 +69,8 @@ bool Internet::DownloadToFile(const wchar_t* wsURL, const wchar_t* wsPath)
 
 bool Internet::parse(const char* sKey, bool bFromLastPos)
 {
-	if (m_pBuffer == nullptr)
+	m_pCurrent = bFromLastPos ? m_pCurrent : m_pBuffer;
+	if (m_pCurrent == nullptr)
 		return false;
 
 	const size_t len = strlen(sKey) + 4;
@@ -78,7 +79,6 @@ bool Internet::parse(const char* sKey, bool bFromLastPos)
 	strcat_s(sFullKey, len, sKey);
 	strcat_s(sFullKey, len, "\":");
 
-	m_pCurrent = bFromLastPos ? m_pCurrent : m_pBuffer;
 	m_pCurrent = strstr(m_pCurrent, sFullKey);
 	delete [] sFullKey;
 
@@ -90,7 +90,8 @@ bool Internet::parse(const char* sKey, bool bFromLastPos)
 
 bool Internet::parse(const char* sKey, wchar_t* wsValue, bool bFromLastPos)
 {
-	parse(sKey, bFromLastPos);
+	if (!parse(sKey, bFromLastPos))
+		return false;
 	int slide = 0, i = 0;
 	m_pCurrent++;
 	while (m_pCurrent != nullptr && m_pCurrent[i] != '"')
@@ -113,12 +114,14 @@ bool Internet::parse(const char* sKey, wchar_t* wsValue, bool bFromLastPos)
 		i++;
 	}
 	wsValue[i - slide] = '\0';
+	m_pCurrent += i;
 	return true;
 }
 
 bool Internet::parse(const char* sKey, unsigned int& uValue, bool bFromLastPos)
 {
-	parse(sKey, bFromLastPos);
+	if (!parse(sKey, bFromLastPos))
+		return false;
 	char search[64] = "";
 	int i = 0;
 	while (m_pCurrent != nullptr && m_pCurrent[i] != '}' && m_pCurrent[i] != ',')
