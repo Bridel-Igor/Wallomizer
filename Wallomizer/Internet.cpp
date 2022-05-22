@@ -13,25 +13,34 @@ Internet::~Internet()
 	if (m_pBuffer)
 		delete[] m_pBuffer;
 	m_pBuffer = nullptr;
+	m_currentBufferSize = 0;
 }
 
-bool Internet::DownloadToBuffer(const wchar_t* wsURL, size_t bufferSize)
+bool Internet::DownloadToBuffer(const wchar_t* wsURL, DWORD bufferSize)
 {
 	HINTERNET hURL = InternetOpenUrlW(m_hInternetSession, wsURL, NULL, 0, INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 
-	if (m_pBuffer == nullptr)
-		m_pBuffer = new char[bufferSize];
-	memset(m_pBuffer, 0, bufferSize);
+	if (bufferSize != m_currentBufferSize) // don't reallocate buffer if it's the same size as previous
+	{
+		m_currentBufferSize = bufferSize;
+		if (m_pBuffer)
+		{
+			delete[] m_pBuffer;
+			m_pBuffer = nullptr;
+		}
+		m_pBuffer = new char[m_currentBufferSize];
+	}
+	memset(m_pBuffer, 0, m_currentBufferSize);
 	m_pCurrent = m_pBuffer;
 
 	DWORD dwBytesRead = 0, tmpBufferSize = 1024;
-	while (InternetReadFile(hURL, m_pCurrent, tmpBufferSize, &dwBytesRead))
+	while (InternetReadFile(hURL, m_pCurrent, min(m_currentBufferSize, tmpBufferSize), &dwBytesRead))
 	{
 		if (dwBytesRead == 0)
 			break;
 		m_pCurrent += dwBytesRead;
-		bufferSize -= dwBytesRead;
-		if (bufferSize < 0)
+		m_currentBufferSize -= dwBytesRead;
+		if (m_currentBufferSize < 0)
 			break;
 	}
 
