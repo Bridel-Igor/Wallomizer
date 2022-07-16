@@ -40,26 +40,29 @@ SettingsWindow::SettingsWindow(HWND hCaller) :
 	stVersion		(this, "Version:",			10,		40,		130,	20, SS_RIGHT),
 	stActVersion	(this, "1.1.0",				150,	40,		100,	20),
 	btnUpdate		(this, "Check for updates",	270,	40,		120,	20),
-	stStartup		(this, "Load on startup:",	10,		70,		130,	20, SS_RIGHT),
-	cbStartup		(this,						150,	70,		20,		20),
+	stDeveloper		(this, "Developer:",		10,		70,		130,	20, SS_RIGHT),
+	stActDeveloper	(this, "Igor Bridel",		150,	70,		100,	20),
+	btnDonate		(this, "Donate",			270,	70,		120,	20),
+	stStartup		(this, "Load on startup:",	10,		100,	130,	20, SS_RIGHT),
+	cbStartup		(this,						150,	100,	20,		20),
 
-	stSlideshow		(this, "Slideshow",			10,		100,	380,	20, SS_CENTER),
-	stDelay			(this, "Delay:",			10,		150,	130,	20, SS_RIGHT),
-	stHours			(this, "Hours",				150,	130,	74,		20, SS_CENTER),
-	stMinutes		(this, "Minutes",			233,	130,	74,		20, SS_CENTER),
-	stSeconds		(this, "Seconds",			316,	130,	74,		20, SS_CENTER),
-	udeHours		(this,						150,	150,	74,		20, 0, 999, int((Settings::delay / 1000) / 3600)),
-	udeMinutes		(this,						233,	150,	74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60),
-	udeSeconds		(this,						316,	150,	74,		20, 0, 59, int(Settings::delay / 1000) % 60),
+	stSlideshow		(this, "Slideshow",			10,		130,	380,	20, SS_CENTER),
+	stDelay			(this, "Delay:",			10,		180,	130,	20, SS_RIGHT),
+	stHours			(this, "Hours",				150,	160,	74,		20, SS_CENTER),
+	stMinutes		(this, "Minutes",			233,	160,	74,		20, SS_CENTER),
+	stSeconds		(this, "Seconds",			316,	160,	74,		20, SS_CENTER),
+	udeHours		(this,						150,	180,	74,		20, 0, 999, int((Settings::delay / 1000) / 3600)),
+	udeMinutes		(this,						233,	180,	74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60),
+	udeSeconds		(this,						316,	180,	74,		20, 0, 59, int(Settings::delay / 1000) % 60),
 
-	stWallhaven		(this, "Wallhaven",			10,		180,	380,	20, SS_CENTER),
-	stApiKey		(this, "Api key:",			10,		210,	130,	20, SS_RIGHT),
-	edApiKey		(this, "",					150,	210,	240,	20, ES_PASSWORD),
-	stUsername		(this, "Default username:",	10,		240,	130,	20, SS_RIGHT),
-	edUsername		(this, "",					150,	240,	240,	20),
+	stWallhaven		(this, "Wallhaven",			10,		210,	380,	20, SS_CENTER),
+	stApiKey		(this, "Api key:",			10,		240,	130,	20, SS_RIGHT),
+	edApiKey		(this, "",					150,	240,	240,	20, ES_PASSWORD),
+	stUsername		(this, "Default username:",	10,		270,	130,	20, SS_RIGHT),
+	edUsername		(this, "",					150,	270,	240,	20),
 
-	btnCancel		(this, "Cancel",			10,		280,	130,	20),
-	btnOk			(this, "Ok",				150,	280,	240,	20)
+	btnCancel		(this, "Cancel",			10,		310,	130,	20),
+	btnOk			(this, "Ok",				150,	310,	240,	20)
 {
 	EnableWindow(m_hCaller, FALSE);
 
@@ -214,6 +217,11 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 		if (btnUpdate.isClicked(wParam))
 		{
 			ShellExecute(0, 0, "https://github.com/Bridel-Igor/Wallomizer/releases", 0, 0, SW_SHOW);
+			return 0;
+		}
+		if (btnDonate.isClicked(wParam))
+		{
+			ShellExecute(0, 0, "https://donatello.to/IgorBridel", 0, 0, SW_SHOW);
 			return 0;
 		}
 		if (cbStartup.isClicked(wParam))

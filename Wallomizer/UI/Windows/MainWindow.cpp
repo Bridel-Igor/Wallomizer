@@ -20,8 +20,7 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 														5,		0,		480,	20),
 	btnSettings			(this, "Settings",				10,		450,	95,		20),
 	player				(this,							250,	450,
-														400,	450,	100,	20, m_pCollectionManager),
-	btnDonate			(this, "Donate",				535,	450,	95,		20)
+														400,	450,	100,	20, m_pCollectionManager)
 {
 	s_pMainWindow = this;
 	while (!m_pCollectionManager->isReady())
@@ -81,11 +80,6 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SettingsWindow settingsWindow(hWnd());
 			settingsWindow.windowLoop();
 			Settings::saveSettings();
-			return 0;
-		}
-		if (btnDonate.isClicked(wParam))
-		{
-			ShellExecute(0, 0, "https://donatello.to/IgorBridel", 0, 0, SW_SHOW);
 			return 0;
 		}
 		int i = 0;
