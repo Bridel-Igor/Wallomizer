@@ -13,7 +13,7 @@
 #include "Filesystem.h"
 #include "Delay.h"
 
-constexpr unsigned short COLLECTION_MANAGER_FILE_VERSION = 1U;
+constexpr unsigned short COLLECTION_MANAGER_FILE_VERSION = 2U;
 
 CollectionManager::CollectionManager()
 {
@@ -36,8 +36,8 @@ bool CollectionManager::saveSettings(FILE* pFile) const
 	if (pFile != NULL)
 	{
 		fwrite(&COLLECTION_MANAGER_FILE_VERSION, sizeof(COLLECTION_MANAGER_FILE_VERSION), 1, pFile);
-		const size_t size = m_pCollections.size();
-		fwrite(&size, sizeof(size_t), 1, pFile);
+		const unsigned int size = (unsigned int)m_pCollections.size();
+		fwrite(&size, sizeof(size), 1, pFile);
 		for (auto pCollection : m_pCollections)
 			pCollection->saveSettings(pFile);
 		fclose(pFile);
@@ -68,7 +68,7 @@ bool CollectionManager::loadSettings(FILE* pFile)
 		else
 		{
 			clear();
-			size_t nCollections;
+			unsigned int nCollections;
 			fread(&nCollections, sizeof(nCollections), 1, pFile);
 			BaseCollection* pTmpCollection;
 			for (unsigned int i = 0; i < nCollections; i++)
