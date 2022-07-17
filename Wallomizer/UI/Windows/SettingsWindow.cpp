@@ -3,6 +3,7 @@
 #include "SettingsWindow.h"
 #include "Settings.h"
 #include "Player.h"
+#include "Internet.h"
 
 HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, LPCSTR lpszDesc)
 {
@@ -38,7 +39,7 @@ SettingsWindow::SettingsWindow(HWND hCaller) :
 	m_hCaller(hCaller),
 	stApplication	(this, "Application",		10,		10,		380,	20, SS_CENTER),
 	stVersion		(this, "Version:",			10,		40,		130,	20, SS_RIGHT),
-	stActVersion	(this, "1.1.0",				150,	40,		100,	20),
+	stActVersion	(this, "1.1.0.1",			150,	40,		100,	20),
 	btnUpdate		(this, "Check for updates",	270,	40,		120,	20),
 	stDeveloper		(this, "Developer:",		10,		70,		130,	20, SS_RIGHT),
 	stActDeveloper	(this, "Igor Bridel",		150,	70,		100,	20),
@@ -173,18 +174,40 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 		if (btnOk.isClicked(wParam))
 		{
 			unsigned long delay = (udeSeconds.getPos() + (udeMinutes.getPos() * 60) + (udeHours.getPos() * 3600)) * 1000;
-
 			if (delay < 10000)
 			{
 				MessageBoxA(nullptr, "Too small delay. Delay must be at least 10 seconds.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
-
+			
+			wchar_t apiKey[33];
+			edApiKey.getTextW(apiKey, 33);
+			unsigned char apiKeyLenght = wcslen(apiKey);
+			if (apiKeyLenght != 0)
+			{
+				if (apiKeyLenght != 32)
+				{
+					MessageBoxA(nullptr, "Invalid API key. It must be 32 characters long.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+					return 0;
+				}
+				Internet internet;
+				wchar_t ws_apiKeyTestUrl[78] = L"https://wallhaven.cc/api/v1/settings?apikey=";
+				wcscat_s(ws_apiKeyTestUrl, apiKey);
+				internet.DownloadToBuffer(ws_apiKeyTestUrl);
+				if (internet.parse("error"))
+				{
+					MessageBoxA(nullptr, "Unknown API key!", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+					return 0;
+				}
+				if (!internet.parse("data"))
+					MessageBoxA(nullptr, "Can't check API key! Wallhaven API is down, or no internet connection.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+			}
+			
 			Settings::delay = delay;
 			edUsername.getTextW(Settings::username, 64);
-			edApiKey.getTextW(Settings::apiKey, 128);
-
-			char startupPath[260];
+			Settings::setApiKey(apiKey);
+			
+			char startupPath[MAX_PATH];
 			HRESULT hr = SHGetFolderPathA(NULL, CSIDL_STARTUP, 0, NULL, startupPath); // if target win Vista and later use SHGetKnownFolderPath()
 			strcat_s(startupPath, "\\Wallomizer.lnk");
 			if (SUCCEEDED(hr))

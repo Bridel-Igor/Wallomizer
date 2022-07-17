@@ -5,7 +5,7 @@ namespace Settings
 	extern unsigned int prevCount;
 	extern unsigned long delay;
 	extern wchar_t username[64];
-	extern wchar_t apiKey[128];
+	extern wchar_t apiKey[33];
 	extern bool loadOnStartup;
 
 	void saveSettings();
