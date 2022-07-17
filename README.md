@@ -1,4 +1,4 @@
-# Wallomizer
+# Wallomizer <img align="right" src="https://user-images.githubusercontent.com/45804723/179357639-fbbcda85-0fb2-4f62-a3a2-e488880728c7.png">
 
 This program will be useful for wallhaven.cc users but you can become one of them anyway.
 
@@ -20,6 +20,7 @@ Just a folder on your HDD or SSD.
 Wallpaper collections of wallhaven.cc users. Can be filtered by purity.
 3. Wallhaven search result collection.
 Result of a search queue in wallhaven.cc. Can be filtered by category, purity, resolution, aspect ratio, dominant color, tags.
+
 You can add as many collections of these types as You want.
 
 If You want to support the project here is the link for donations:
