@@ -33,14 +33,14 @@ bool Internet::DownloadToBuffer(const wchar_t* wsURL, DWORD bufferSize)
 	memset(m_pBuffer, 0, m_currentBufferSize);
 	m_pCurrent = m_pBuffer;
 
-	DWORD dwBytesRead = 0, tmpBufferSize = 1024;
-	while (InternetReadFile(hURL, m_pCurrent, min(m_currentBufferSize, tmpBufferSize), &dwBytesRead))
+	DWORD dwBytesRead = 0, tmpBufferSize = 1024, dwBytesAwailable = m_currentBufferSize;
+	while (InternetReadFile(hURL, m_pCurrent, min(dwBytesAwailable, tmpBufferSize), &dwBytesRead))
 	{
 		if (dwBytesRead == 0)
 			break;
 		m_pCurrent += dwBytesRead;
-		m_currentBufferSize -= dwBytesRead;
-		if (m_currentBufferSize < 0)
+		dwBytesAwailable -= dwBytesRead;
+		if (dwBytesAwailable < 0)
 			break;
 	}
 
