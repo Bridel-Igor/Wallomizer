@@ -25,7 +25,7 @@ bool SearchCollection::loadSettings(FILE* pFile)
 
 	wcscpy_s(m_wsSearchUrl, L"https://wallhaven.cc/api/v1/search?");
 
-	if (wcslen(settings.wsTag))
+	if (settings.wsTag[0])
 	{
 		wcscat_s(m_wsSearchUrl, L"q=");
 		wcscat_s(m_wsSearchUrl, settings.wsTag);
@@ -68,7 +68,7 @@ void SearchCollection::getCollectionName(wchar_t* wsName, size_t size) const
 {
 	wcscpy_s(wsName, 255, L" Search: ");
 
-	if (wcslen(settings.wsTag))
+	if (settings.wsTag[0])
 	{
 		wchar_t wsTag[255]{ 0 };
 		for (int i = 0; i < wcslen(settings.wsTag); i++)

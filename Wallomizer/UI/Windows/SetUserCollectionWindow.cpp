@@ -30,7 +30,7 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, CollectionManager
 		validCollection = false;
 	}
 
-	if (m_pCurrentUserCollection->settings.wsCollectionID!=0 && wcslen(m_pCurrentUserCollection->settings.wsCollectionName)!=0)
+	if (m_pCurrentUserCollection->settings.wsCollectionID[0] && m_pCurrentUserCollection->settings.wsCollectionName[0])
 	{
 		uciList.clear();
 		UserCollection::UserCollectionInfo info;
@@ -112,7 +112,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 				SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)item.wsLabel);
 
 			int index = 0;
-			if (wcslen(prevName))
+			if (prevName[0])
 			{
 				index = (int)SendMessageW(cbCollections.hWnd(), CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)prevName);
 				if (index == CB_ERR)

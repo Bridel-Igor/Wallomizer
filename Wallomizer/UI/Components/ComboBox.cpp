@@ -36,7 +36,7 @@ void ComboBox::setTextA(LPCSTR text)
 
 bool ComboBox::isEmpty()
 {
-	char buf[10] = { 0 };
-	GetWindowTextA(m_hWnd, buf, 10);
-	return strlen(buf) ? false : true;
+	char buf[2] = { 0 };
+	GetWindowTextA(m_hWnd, buf, 2);
+	return !buf[0];
 }

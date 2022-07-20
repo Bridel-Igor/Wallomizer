@@ -135,7 +135,7 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 	wchar_t wsCollectionInfoURL[255];
 	wcscpy_s(wsCollectionInfoURL, L"https://wallhaven.cc/api/v1/collections/");
 	wcscat_s(wsCollectionInfoURL, wsUsername);
-	if (wcslen(wsApiKey))
+	if (wsApiKey[0])
 	{
 		wcscat_s(wsCollectionInfoURL, L"?apikey=");
 		wcscat_s(wsCollectionInfoURL, Settings::getApiKey());
