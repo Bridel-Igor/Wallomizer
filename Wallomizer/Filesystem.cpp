@@ -25,7 +25,7 @@ void Filesystem::initialize()
 	CreateDirectoryW(roamingNative, NULL);
 
 	wcscpy_s(roaming, MAX_PATH, roamingNative);
-	for (int j = 0; j < wcslen(roaming); j++)
+	for (int j = 0; j < roaming[j]; j++)
 		if (roaming[j] == '\\')
 			roaming[j] = '/';
 }
