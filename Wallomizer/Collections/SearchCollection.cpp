@@ -71,7 +71,7 @@ void SearchCollection::getCollectionName(wchar_t* wsName, size_t size) const
 	if (settings.wsTag[0])
 	{
 		wchar_t wsTag[255]{ 0 };
-		for (int i = 0; i < wcslen(settings.wsTag); i++)
+		for (int i = 0; settings.wsTag[i]; i++)
 			wsTag[i] = settings.wsTag[i];
 		wcscat_s(wsName, 255, wsTag);
 		wcscat_s(wsName, 255, L" | ");
@@ -134,7 +134,7 @@ void SearchCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
 	wchar_t wsImgUrl[255] = L"https://wallhaven.cc/w/";
 	bool isDashFound = false;
 	int j = (int)wcslen(wsImgUrl);
-	for (int i = 0; i < wcslen(pWallpaper->getPathW()); i++)
+	for (int i = 0; pWallpaper->getPathW()[i]; i++)
 	{
 		if (isDashFound)
 		{

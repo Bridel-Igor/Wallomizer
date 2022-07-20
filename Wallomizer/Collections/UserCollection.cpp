@@ -113,7 +113,7 @@ void UserCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
 	wchar_t wsImgUrl[255] = L"https://wallhaven.cc/w/";
 	bool isDashFound = false;
 	int j = (int)wcslen(wsImgUrl);
-	for (int i = 0; i < wcslen(pWallpaper->getPathW()); i++)
+	for (int i = 0; pWallpaper->getPathW()[i]; i++)
 	{
 		if (isDashFound)
 		{

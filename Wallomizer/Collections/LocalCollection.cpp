@@ -136,7 +136,7 @@ void LocalCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
 	wchar_t imgPath[MAX_PATH];
 	wcscpy_s(imgPath, MAX_PATH, pWallpaper->getPathW());
 
-	for (int j = 0; j < wcslen(imgPath); j++)
+	for (int j = 0; imgPath[j]; j++)
 		if (imgPath[j] == '/')
 			imgPath[j] = '\\';
 
