@@ -7,6 +7,7 @@ namespace Settings
 	extern wchar_t username[64];
 	extern wchar_t apiKey[33];
 	extern bool loadOnStartup;
+	extern unsigned int uPerPage;
 
 	void saveSettings();
 	void loadSettings();

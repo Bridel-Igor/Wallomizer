@@ -3,12 +3,14 @@
 
 #include "Settings.h"
 #include "Filesystem.h"
+#include "Internet.h"
 
 unsigned int Settings::prevCount = 5;
 unsigned long Settings::delay = 300000;
 wchar_t Settings::username[64];
 wchar_t Settings::apiKey[33];
 bool Settings::loadOnStartup = false;
+unsigned int Settings::uPerPage = 24;
 
 constexpr unsigned short SETTINGS_FILE_VERSION = 3U;
 
@@ -56,7 +58,20 @@ void Settings::loadSettings()
 		fread(&apiKey, sizeof(apiKey), 1, pFile);
 		if (delay < 10000)
 			delay = 10000;
-		fclose(pFile);
+		fclose(pFile);	
+		
+		if (isApiKeyUsed())
+		{
+			// get user's per page
+			Internet internet; // TODO: think about no internet exceptions!
+			wchar_t wsURL[128] = L"https://wallhaven.cc/api/v1/settings?apikey=";
+			wcscat_s(wsURL, apiKey);
+			internet.DownloadToBuffer(wsURL, 64);
+			wchar_t wsPerPage[4];
+			internet.parse("per_page", wsPerPage);
+			uPerPage = wcstoul(wsPerPage, nullptr, 10);
+		}
+
 		return;
 	}
 	saveSettings();

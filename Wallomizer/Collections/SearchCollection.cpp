@@ -56,7 +56,7 @@ bool SearchCollection::loadSettings(FILE* pFile)
 		return true;
 
 	Internet internet;
-	internet.DownloadToBuffer(m_wsSearchUrl);
+	internet.DownloadToBuffer(m_wsSearchUrl, Settings::uPerPage * 750);
 	if (!internet.parse("meta"))
 		return false;
 	if (!internet.parse("total", m_uiNumber, true))
@@ -90,8 +90,8 @@ CategoriesAndPurity SearchCollection::getCAP() const
 Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 {
 	Wallpaper* pWallpaper = nullptr;
-	int page = int(index / s_nPerPage);
-	index -= page * s_nPerPage;
+	int page = int(index / Settings::uPerPage);
+	index -= page * Settings::uPerPage;
 	page++;
 	wchar_t wsPageUrl[1024];
 	wcscpy_s(wsPageUrl, m_wsSearchUrl);
@@ -101,7 +101,7 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 	wcscat_s(wsPageUrl, wsCurrentPage);
 
 	Internet internet;
-	internet.DownloadToBuffer(wsPageUrl);
+	internet.DownloadToBuffer(wsPageUrl, Settings::uPerPage * 750);
 	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
 			return pWallpaper;

@@ -36,7 +36,6 @@ public:
 	SearchCollectionSettings settings;
 
 private:
-	static constexpr int s_nPerPage = 24;
 	CollectionManager* m_pCollectionManager = nullptr;
 	wchar_t m_wsSearchUrl[1024] = L"";	
 };
