@@ -81,7 +81,7 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 
 	Internet internet;
 	internet.DownloadToBuffer(wsPageUrl);
-	for (unsigned int i = 1; i < index; i++)
+	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
 			return pWallpaper;
 	pWallpaper = new Wallpaper(CollectionType::user);
