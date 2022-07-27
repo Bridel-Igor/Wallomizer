@@ -182,7 +182,7 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 			
 			wchar_t apiKey[33];
 			edApiKey.getTextW(apiKey, 33);
-			unsigned char apiKeyLenght = wcslen(apiKey);
+			size_t apiKeyLenght = wcslen(apiKey);
 			if (apiKeyLenght != 0)
 			{
 				if (apiKeyLenght != 32)
