@@ -1,3 +1,5 @@
+#include <Shobjidl.h>
+
 #include "Player.h"
 #include "Delay.h"
 #include "resource.h"
@@ -10,7 +12,9 @@ HICON	Player::Resources::hIPlay,			Player::Resources::hIPlayHover,			Player::Res
 		Player::Resources::hIPause,			Player::Resources::hIPauseHover,		Player::Resources::hIPauseActive,
 		Player::Resources::hIPrev,			Player::Resources::hIPrevHover,			Player::Resources::hIPrevDisabled,
 		Player::Resources::hINext,			Player::Resources::hINextHover,
-		Player::Resources::hIOpenExternal,	Player::Resources::hIOpenExternalHover;
+		Player::Resources::hIOpenExternal,	Player::Resources::hIOpenExternalHover,
+		Player::Resources::hIStop,			Player::Resources::hIStopHover,			Player::Resources::hIStopActive,
+		Player::Resources::hIFit,			Player::Resources::hIFitHover;
 unsigned char Player::Resources::refCount = 0;
 
 Player::Resources::Resources()
@@ -30,7 +34,11 @@ Player::Resources::Resources()
 	hINextHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_NEXT_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 	hIOpenExternal =		(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPEN_EXTERNAL),		IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 	hIOpenExternalHover =	(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPEN_EXTERNAL_HOVER),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
-	
+	hIStop =				(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_STOP),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIStopHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_STOP_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIStopActive =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_STOP_ACTIVE),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIFit =					(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_FIT),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+	hIFitHover =			(HICON)LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_FIT_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 }
 
 Player::Resources::~Resources()
@@ -50,14 +58,21 @@ Player::Resources::~Resources()
 	DestroyIcon(hINextHover);
 	DestroyIcon(hIOpenExternal);
 	DestroyIcon(hIOpenExternalHover);
+	DestroyIcon(hIStop);
+	DestroyIcon(hIStopHover);
+	DestroyIcon(hIStopActive);
+	DestroyIcon(hIFit);
+	DestroyIcon(hIFitHover);
 }
 
 Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, CollectionManager* pCollectionManager, DWORD additionalStyles) :
 	btnPrev(pParent,				xPlayer,		yPlayer,	20,		20, resources.hIPrev, resources.hIPrevHover),
 	btnOpenExternal(pParent,		xPlayer + 30,	yPlayer,	20,		20, resources.hIOpenExternal, resources.hIOpenExternalHover),
-	btnPlay(pParent,				xPlayer + 60,	yPlayer,	20,		20, resources.hIPlay, resources.hIPlayHover),
-	btnPause(pParent,				xPlayer + 90,	yPlayer,	20,		20, resources.hIPause, resources.hIPauseHover),
-	btnNext(pParent,				xPlayer + 120,	yPlayer,	20,		20, resources.hINext, resources.hINextHover),
+	btnStop(pParent,				xPlayer + 60,	yPlayer,	20,		20, resources.hIStop, resources.hIStopHover),
+	btnPlay(pParent,				xPlayer + 90,	yPlayer,	20,		20, resources.hIPlay, resources.hIPlayHover),
+	btnPause(pParent,				xPlayer + 120,	yPlayer,	20,		20, resources.hIPause, resources.hIPauseHover),
+	btnFit(pParent,					xPlayer + 150,	yPlayer,	20,		20, resources.hIFit, resources.hIFitHover),
+	btnNext(pParent,				xPlayer + 180,	yPlayer,	20,		20, resources.hINext, resources.hINextHover),
 	stDelayRemained(pParent, "",	xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles)
 {	
 	s_pCollectionManager = pCollectionManager;
@@ -85,17 +100,34 @@ bool Player::click(WPARAM& wParam)
 		s_pCollectionManager->setPreviousWallpaper();
 		return true;
 	}
+	if (btnStop.isClicked(wParam))
+	{ 
+		Delay::setSlideshowStatus(Delay::SlideshowStatus::stopped);
+		redrawPlayers();
+		return 0;
+	}
 	if (btnPlay.isClicked(wParam))
 	{
-		Delay::startSlideshow();
+		Delay::setSlideshowStatus(Delay::SlideshowStatus::playing);
 		redrawPlayers();
 		return true;
 	}
 	if (btnPause.isClicked(wParam)) // TODO: save session file on pause. And don't rewrite it on exit
 	{
-		Delay::pauseSlideshow();
+		Delay::setSlideshowStatus(Delay::SlideshowStatus::paused);
 		redrawPlayers();
 		return true;
+	}
+	if (btnFit.isClicked(wParam)) // HACK: incompatible with win7 and lower
+	{ 
+		IDesktopWallpaper* pDesktopWallpaper = NULL;
+		if (SUCCEEDED(CoCreateInstance(__uuidof(DesktopWallpaper), NULL, CLSCTX_ALL, IID_PPV_ARGS(&pDesktopWallpaper))))
+		{
+			DESKTOP_WALLPAPER_POSITION pDWPosition;
+			pDesktopWallpaper->GetPosition(&pDWPosition);
+			pDesktopWallpaper->SetPosition(pDWPosition == DWPOS_FIT ? DWPOS_FILL : DWPOS_FIT);
+		}
+		return 0;
 	}
 	if (btnNext.isClicked(wParam))
 	{
@@ -121,9 +153,20 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	}
 	if (btnOpenExternal.draw(pDIS, IWindow::Resources::mainBkBrush))
 		return true;
+	if (pDIS->hwndItem == btnStop.hWnd())
+	{
+		if (Delay::slideshowStatus == Delay::SlideshowStatus::stopped)
+		{
+			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
+			DrawIconEx(pDIS->hDC, 0, 0, resources.hIStopActive, 0, 0, 0, NULL, DI_NORMAL);
+			return true;
+		}
+		if (btnStop.draw(pDIS, IWindow::Resources::mainBkBrush))
+			return true;
+	}
 	if (pDIS->hwndItem == btnPlay.hWnd())
 	{
-		if (Delay::isSlideshowRunning)
+		if (Delay::slideshowStatus == Delay::SlideshowStatus::playing)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPlayActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -134,7 +177,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	}
 	if (pDIS->hwndItem == btnPause.hWnd())
 	{
-		if (!Delay::isSlideshowRunning)
+		if (Delay::slideshowStatus == Delay::SlideshowStatus::paused)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -143,6 +186,8 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 		if (btnPause.draw(pDIS, IWindow::Resources::mainBkBrush))
 			return true;
 	}
+	if (btnFit.draw(pDIS, IWindow::Resources::mainBkBrush))
+		return true;
 	if (btnNext.draw(pDIS, IWindow::Resources::mainBkBrush))
 		return true;
 	return false;
@@ -201,8 +246,10 @@ void Player::redrawPlayers()
 			continue;
 		InvalidateRect(pPlayer->btnPrev.hWnd(), NULL, FALSE);
 		InvalidateRect(pPlayer->btnOpenExternal.hWnd(), NULL, FALSE);
+		InvalidateRect(pPlayer->btnStop.hWnd(), NULL, FALSE);
 		InvalidateRect(pPlayer->btnPlay.hWnd(), NULL, FALSE);
 		InvalidateRect(pPlayer->btnPause.hWnd(), NULL, FALSE);
+		InvalidateRect(pPlayer->btnFit.hWnd(), NULL, FALSE);
 		InvalidateRect(pPlayer->btnNext.hWnd(), NULL, FALSE);
 		InvalidateRect(pPlayer->stDelayRemained.hWnd(), NULL, FALSE);
 	}

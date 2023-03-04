@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <Shobjidl.h>
 
 #include "Delay.h"
 #include "Settings.h"
@@ -6,7 +7,7 @@
 #include "Player.h"
 
 bool Delay::exiting = false;
-bool Delay::isSlideshowRunning = true;
+Delay::SlideshowStatus Delay::slideshowStatus = Delay::SlideshowStatus::playing;
 
 namespace Delay
 {
@@ -24,7 +25,7 @@ void Delay::saveSession(Wallpaper *pCurrent)
 	_wfopen_s(&pFile, wsPath, L"wb");
 	if (pFile == NULL)
 		return;
-	fwrite(&isSlideshowRunning, sizeof(isSlideshowRunning), 1, pFile);
+	fwrite(&slideshowStatus, sizeof(slideshowStatus), 1, pFile);
 	fwrite(&uDelayed, sizeof(uDelayed), 1, pFile);
 	CollectionType type = CollectionType::none;
 	if (pCurrent)
@@ -48,7 +49,7 @@ void Delay::loadSession(Wallpaper*& pCurrent)
 	_wfopen_s(&pFile, wsPath, L"rb");
 	if (pFile == NULL)
 		return;
-	fread(&isSlideshowRunning, sizeof(isSlideshowRunning), 1, pFile);
+	fread(&slideshowStatus, sizeof(slideshowStatus), 1, pFile);
 	fread(&uDelayed, sizeof(uDelayed), 1, pFile);
 	if (pCurrent == nullptr)
 	{
@@ -84,7 +85,7 @@ void Delay::delay()
 			continue;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		if (isSlideshowRunning)
+		if (slideshowStatus == SlideshowStatus::playing)
 			uDelayed += 100;
 		if (uDelayed % 1000 == 0)
 			Player::updateTimer();
@@ -107,12 +108,12 @@ void Delay::replayDelay()
 	bReplayDelay = true;
 }
 
-void Delay::startSlideshow()
+void Delay::setSlideshowStatus(const SlideshowStatus status)
 {
-	isSlideshowRunning = true;
-}
+	slideshowStatus = status;
 
-void Delay::pauseSlideshow()
-{
-	isSlideshowRunning = false;
+	// HACK: incompatible with win7 and lower
+	IDesktopWallpaper* pDesktopWallpaper = NULL;
+	if (SUCCEEDED(CoCreateInstance(__uuidof(DesktopWallpaper), NULL, CLSCTX_ALL, IID_PPV_ARGS(&pDesktopWallpaper)))) 
+		pDesktopWallpaper->Enable(slideshowStatus == SlideshowStatus::stopped ? FALSE : TRUE);
 }

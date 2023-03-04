@@ -34,10 +34,10 @@ TrayWindow::TrayWindow(CollectionManager* pCollectionManager) :
 	IWindow("Wallomizer", "Tray Window Class", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 
 												500,	500,	width,	height),
 	m_pCollectionManager(pCollectionManager),
-	btnSettings			(this, "Settings",	10,		60,		65,		20),
-	btnExit				(this, "Exit",		85,		60,		65,		20),
+	btnSettings			(this, "Settings",	40,		60,		65,		20),
+	btnExit				(this, "Exit",		115,	60,		65,		20),
 	player				(this,				10,		10,
-											10,		35,		140,	20, m_pCollectionManager, SS_CENTER)
+											10,		35,		200,	20, m_pCollectionManager, SS_CENTER)
 {
 	s_pTrayWindow = this;
 

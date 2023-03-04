@@ -19,8 +19,8 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 	stEmpty				(&collectionsPanel, "Collection list is empty. Click \"Add collection..\" button to add one.", 
 														5,		0,		480,	20),
 	btnSettings			(this, "Settings",				10,		450,	95,		20),
-	player				(this,							250,	450,
-														400,	450,	100,	20, m_pCollectionManager)
+	player				(this,							220,	450,
+														430,	450,	100,	20, m_pCollectionManager)
 {
 	s_pMainWindow = this;
 	while (!m_pCollectionManager->isReady())
@@ -99,7 +99,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			if (collectionItem.chboEnabled.isClicked(wParam))
 			{
-				if (HIWORD(wParam) == BN_CLICKED)
+				if (HIWORD(wParam) == BN_CLICKED) // TODO: probably doesn't need to check
 				{
 					collectionItem.chboEnabled.click();
 					m_pCollectionManager->m_pCollections[i]->setEnabled(collectionItem.chboEnabled.isChecked());

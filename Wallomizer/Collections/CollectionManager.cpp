@@ -94,7 +94,7 @@ bool CollectionManager::loadSettings(FILE* pFile)
 	if (MainWindow::s_pMainWindow && MainWindow::s_pMainWindow->isReady())
 		MainWindow::s_pMainWindow->updateCollectionItems();
 	m_isReady = true;
-	if (Delay::isSlideshowRunning)
+	if (Delay::slideshowStatus == Delay::SlideshowStatus::playing)
 		Delay::abortDelay();
 	// BUG: this thread runs faster than tray's thread
 	// if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady()) 

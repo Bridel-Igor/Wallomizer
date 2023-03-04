@@ -4,8 +4,15 @@
 
 namespace Delay
 {
+	enum class SlideshowStatus : unsigned char
+	{
+		paused,
+		playing,
+		stopped
+	};
+
 	extern bool exiting;
-	extern bool isSlideshowRunning;
+	extern SlideshowStatus slideshowStatus;
 
 	void saveSession(Wallpaper *pCurrent = nullptr);
 	void loadSession(Wallpaper *&pCurrent);
@@ -13,6 +20,5 @@ namespace Delay
 	unsigned long getRemainingDelay();
 	void abortDelay();
 	void replayDelay();
-	void startSlideshow();
-	void pauseSlideshow();
+	void setSlideshowStatus(const SlideshowStatus status);
 }

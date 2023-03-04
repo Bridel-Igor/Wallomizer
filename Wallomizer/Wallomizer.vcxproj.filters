@@ -320,6 +320,21 @@
     <Image Include="UI\Icons\ColorEmpty.ico">
       <Filter>UI\Resources</Filter>
     </Image>
+    <Image Include="UI\Icons\Stop_hover.ico">
+      <Filter>UI\Resources</Filter>
+    </Image>
+    <Image Include="UI\Icons\Stop_activated.ico">
+      <Filter>UI\Resources</Filter>
+    </Image>
+    <Image Include="UI\Icons\Stop.ico">
+      <Filter>UI\Resources</Filter>
+    </Image>
+    <Image Include="UI\Icons\Fit.ico">
+      <Filter>UI\Resources</Filter>
+    </Image>
+    <Image Include="UI\Icons\Fit_hover.ico">
+      <Filter>UI\Resources</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Collections">

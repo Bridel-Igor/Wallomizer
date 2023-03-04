@@ -249,6 +249,8 @@
     <Image Include="UI\Icons\ColorEmpty.ico" />
     <Image Include="UI\Icons\Delete.ico" />
     <Image Include="UI\Icons\Delete_hover.ico" />
+    <Image Include="UI\Icons\Fit.ico" />
+    <Image Include="UI\Icons\Fit_hover.ico" />
     <Image Include="UI\Icons\Next.ico" />
     <Image Include="UI\Icons\Next_hover.ico" />
     <Image Include="UI\Icons\Open_external.ico" />
@@ -264,6 +266,9 @@
     <Image Include="UI\Icons\Prev_disabled.ico" />
     <Image Include="UI\Icons\Prev.ico" />
     <Image Include="UI\Icons\Prev_hover.ico" />
+    <Image Include="UI\Icons\Stop.ico" />
+    <Image Include="UI\Icons\Stop_activated.ico" />
+    <Image Include="UI\Icons\Stop_hover.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

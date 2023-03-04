@@ -20,7 +20,9 @@ private:
 						hIPause,		hIPauseHover,		hIPauseActive,
 						hIPrev,			hIPrevHover,		hIPrevDisabled,
 						hINext,			hINextHover,
-						hIOpenExternal, hIOpenExternalHover;
+						hIOpenExternal, hIOpenExternalHover,
+						hIStop,			hIStopHover,		hIStopActive,
+						hIFit,			hIFitHover;
 	private:
 		static unsigned char refCount;
 	}resources;
@@ -36,7 +38,7 @@ public:
 private:
 	void updateText();
 
-	IconButton btnPrev, btnOpenExternal, btnPlay, btnPause, btnNext;
+	IconButton btnPrev, btnOpenExternal, btnStop, btnPlay, btnPause, btnFit, btnNext;
 	Static stDelayRemained;
 
 	static char sTimer[16];
