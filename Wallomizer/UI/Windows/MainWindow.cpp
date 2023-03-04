@@ -99,13 +99,10 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			if (collectionItem.chboEnabled.isClicked(wParam))
 			{
-				if (HIWORD(wParam) == BN_CLICKED) // TODO: probably doesn't need to check
-				{
-					collectionItem.chboEnabled.click();
-					m_pCollectionManager->m_pCollections[i]->setEnabled(collectionItem.chboEnabled.isChecked());
-					m_pCollectionManager->reloadSettings();
-					return 0;
-				}
+				collectionItem.chboEnabled.click();
+				m_pCollectionManager->m_pCollections[i]->setEnabled(collectionItem.chboEnabled.isChecked());
+				m_pCollectionManager->reloadSettings();
+				return 0;
 			}
 			i++;
 		}
