@@ -1,6 +1,8 @@
 #include <shlobj.h>
 #include <Windows.h>
 #include <exception>
+#include <winver.h>
+#pragma comment(lib, "Version.lib")
 
 #include "Filesystem.h"
 
@@ -38,4 +40,38 @@ void Filesystem::getRoamingDir(wchar_t* path)
 void Filesystem::getRoamingDirNative(wchar_t* path)
 {
 	wcscpy_s(path, MAX_PATH, roamingNative);
+}
+
+bool Filesystem::getAppVersion(char* version)
+{
+	char* szFilename;
+	if (_get_pgmptr(&szFilename) != 0)
+		return false;
+
+    // allocate a block of memory for the version info
+    DWORD dummy;
+    DWORD dwSize = GetFileVersionInfoSize(szFilename, &dummy);
+    if (dwSize == 0)
+        return false;
+	char *data = new char[dwSize];
+
+    // load the version info
+	if (!GetFileVersionInfo(szFilename, NULL, dwSize, &data[0]))
+	{
+		delete[] data;
+		return false;
+	}
+
+    // get version string
+    LPVOID pvProductVersion = NULL;
+    unsigned int iProductVersionLen = 0;
+    if (!VerQueryValue(&data[0], "\\StringFileInfo\\000904b0\\ProductVersion", &pvProductVersion, &iProductVersionLen))
+	{
+		delete[] data;
+		return false;
+	}
+
+    strcpy_s(version, iProductVersionLen, (char*)pvProductVersion);
+	delete[] data;
+	return true;
 }

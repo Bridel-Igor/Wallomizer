@@ -22,4 +22,11 @@ namespace Filesystem
 	/// 
 	/// @param path - pointer to wide char array of at least MAX_PATH (Windows constant) size that will be filled.
 	void getRoamingDirNative(wchar_t* path);
+
+	/// Get string that contains application version. You should provie char array to write to it.
+	/// 
+	/// @param version - pointer to char array of at least 16 size that will be filled.
+	/// 
+	/// @return true if success, false otherwise.
+	bool getAppVersion(char* version);
 }

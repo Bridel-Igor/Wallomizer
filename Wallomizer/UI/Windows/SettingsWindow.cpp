@@ -4,6 +4,7 @@
 #include "Settings.h"
 #include "Player.h"
 #include "Internet.h"
+#include "Filesystem.h"
 
 HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, LPCSTR lpszDesc)
 {
@@ -39,7 +40,7 @@ SettingsWindow::SettingsWindow(HWND hCaller) :
 	m_hCaller(hCaller),
 	stApplication	(this, "Application",		10,		10,		380,	20, SS_CENTER),
 	stVersion		(this, "Version:",			10,		40,		130,	20, SS_RIGHT),
-	stActVersion	(this, "1.1.1.4",			150,	40,		100,	20), // TODO: don't forget to change
+	stActVersion	(this, "",					150,	40,		100,	20),
 	btnUpdate		(this, "Check for updates",	270,	40,		120,	20),
 	stDeveloper		(this, "Developer:",		10,		70,		130,	20, SS_RIGHT),
 	stActDeveloper	(this, "Igor Bridel",		150,	70,		100,	20),
@@ -66,6 +67,10 @@ SettingsWindow::SettingsWindow(HWND hCaller) :
 	btnOk			(this, "Ok",				150,	310,	240,	20)
 {
 	EnableWindow(m_hCaller, FALSE);
+
+	char version[16] = {0};
+	if (Filesystem::getAppVersion(version))
+		SetWindowText(stActVersion.hWnd(), version);
 
 	edUsername.setTextW(Settings::username);
 	edApiKey.setTextW(Settings::apiKey);
