@@ -126,8 +126,14 @@ void CollectionManager::openCollectionSettingsWindow(HWND)
 { 
 	std::thread mainWindowThread([&]()
 		{
-			MainWindow mainWindow(this);
-			mainWindow.windowLoop();
+			try 
+			{
+				MainWindow mainWindow(this);
+				mainWindow.windowLoop();
+			}
+			catch (...)
+			{
+			}
 		});
 	mainWindowThread.detach(); // TODO: exception handling. Move thread var to members
 }

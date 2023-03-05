@@ -1,4 +1,6 @@
 #include <thread>
+#include <Windows.h>
+#include <VersionHelpers.h>
 
 #include "TrayWindow.h"
 #include "resource.h"
@@ -65,26 +67,42 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_NOTIFYICONMSG:
-	{	
+	{
 		if (lParam == WM_RBUTTONDOWN || lParam == WM_LBUTTONDOWN || lParam == WM_LBUTTONDBLCLK || lParam == WM_RBUTTONDBLCLK)
 		{
 			POINT pt;
-			RECT wrkArea;
+			RECT rect;
 
-			GetCursorPos(&pt);
+			if (IsWindows7OrGreater())
+			{
+				NOTIFYICONIDENTIFIER nii;
+				nii.cbSize = sizeof(NOTIFYICONIDENTIFIER);
+				nii.hWnd = hWnd();
+				nii.uID = 1;
+				nii.guidItem = GUID_NULL;
+				Shell_NotifyIconGetRect(&nii, &rect);
+
+				pt.x = (int)((rect.left + rect.right) / 2);
+				pt.y = (int)((rect.top + rect.bottom) / 2);
+			}
+			else
+			{
+				GetCursorPos(&pt);
+			}
+
 			pt.x -= int(width / 2);
 			pt.y -= int(height / 2);
 
-			SystemParametersInfoA(SPI_GETWORKAREA, 0, &wrkArea, 0);
-			pt.x = pt.x - int(width / 2) < wrkArea.left		? wrkArea.left				: pt.x;
-			pt.x = pt.x + int(width / 2) > wrkArea.right	? wrkArea.right - width		: pt.x;
-			pt.y = pt.y - int(height / 2) < wrkArea.top		? wrkArea.top				: pt.y;
-			pt.y = pt.y + int(height / 2) > wrkArea.bottom	? wrkArea.bottom - height	: pt.y;
+			SystemParametersInfoA(SPI_GETWORKAREA, 0, &rect, 0);
+			pt.x = pt.x				< rect.left		? rect.left				: pt.x;
+			pt.x = pt.x + width		> rect.right	? rect.right - width		: pt.x;
+			pt.y = pt.y				< rect.top		? rect.top				: pt.y;
+			pt.y = pt.y + height	> rect.bottom	? rect.bottom - height	: pt.y;
 
 			player.updateTimer(true);
 			SetWindowPos(hWnd(), HWND_TOPMOST, pt.x, pt.y, width, height, SWP_SHOWWINDOW);
-			ShowWindow(hWnd(), SW_SHOW);
 			SetForegroundWindow(hWnd());
+			SendMessage(hWnd(), WM_SETCURSOR, 0, 0);
 		}
 	}
 	return 0;
@@ -92,7 +110,10 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_NCACTIVATE:
 	{
 		if (wParam == FALSE)
+		{
 			ShowWindow(hWnd(), SW_HIDE);
+			Shell_NotifyIconA(NIM_SETFOCUS, nullptr);
+		}
 	}
 	return 0;
 
