@@ -137,12 +137,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Igor Bridel"
             VALUE "FileDescription", "Wallomizer"
-            VALUE "FileVersion", "1.2.0 beta 5"
+            VALUE "FileVersion", "1.2.0 beta 6"
             VALUE "InternalName", "Wallomizer.exe"
             VALUE "LegalCopyright", "Copyright (c) 2021 Igor Bridel"
             VALUE "OriginalFilename", "Wallomizer.exe"
             VALUE "ProductName", "Wallomizer"
-            VALUE "ProductVersion", "1.2.0 beta 5"
+            VALUE "ProductVersion", "1.2.0 beta 6"
         END
     END
     BLOCK "VarFileInfo"

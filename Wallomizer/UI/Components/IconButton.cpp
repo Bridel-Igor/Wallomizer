@@ -1,15 +1,50 @@
 #include "IconButton.h"
 
-IconButton::IconButton(IComponent* pParent, int x, int y, int width, int height, HICON& hIcon, HICON& hIconHovered, DWORD additionalStyles, DWORD additionalExStyles) :
+#include <CommCtrl.h>
+
+IconButton::IconButton(IComponent* pParent, int x, int y, int width, int height, HICON& hIcon, HICON& hIconHovered, const char* toolTip, DWORD additionalStyles, DWORD additionalExStyles) :
 	IHoverable(pParent)
 {
 	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), TEXT(""), WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, m_pParent->hWnd(), m_hMenu, NULL, NULL);
 	m_hIcon = hIcon;
 	m_hIconHovered = hIconHovered;
+
+    m_hToolTip = nullptr;
+    if (toolTip[0] != 0)
+    {
+        // Create a tooltip.
+        m_hToolTip = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL,
+            WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
+            CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+            m_hWnd, NULL, NULL, NULL);
+
+        if (!m_hToolTip)
+            return;
+
+        SetWindowPos(m_hToolTip, HWND_TOPMOST, 0, 0, 0, 0,
+            SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+        // Set up "tool" information. In this case, the "tool" is the entire parent window.
+        TOOLINFO ti = { 0 };
+        ti.cbSize = sizeof(TOOLINFO);
+        ti.uFlags = TTF_SUBCLASS;
+        ti.hwnd = m_hWnd;
+        ti.hinst = NULL;
+        char tooltip[32];
+        strcpy_s(tooltip, toolTip);
+        ti.lpszText = tooltip;
+
+        GetClientRect(m_hWnd, &ti.rect);
+
+        // Associate the tooltip with the "tool" window.
+        SendMessage(m_hToolTip, TTM_ADDTOOL, 0, (LPARAM)(LPTOOLINFO)&ti);
+    }
 }
 
 IconButton::~IconButton()
 {
+    if (m_hToolTip)
+        DestroyWindow(m_hToolTip);
 	DestroyWindow(m_hWnd);
 }
 

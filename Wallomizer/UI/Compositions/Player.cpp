@@ -66,13 +66,13 @@ Player::Resources::~Resources()
 }
 
 Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, CollectionManager* pCollectionManager, DWORD additionalStyles) :
-	btnPrev(pParent,				xPlayer,		yPlayer,	20,		20, resources.hIPrev, resources.hIPrevHover),
-	btnOpenExternal(pParent,		xPlayer + 30,	yPlayer,	20,		20, resources.hIOpenExternal, resources.hIOpenExternalHover),
-	btnStop(pParent,				xPlayer + 60,	yPlayer,	20,		20, resources.hIStop, resources.hIStopHover),
-	btnPlay(pParent,				xPlayer + 90,	yPlayer,	20,		20, resources.hIPlay, resources.hIPlayHover),
-	btnPause(pParent,				xPlayer + 120,	yPlayer,	20,		20, resources.hIPause, resources.hIPauseHover),
-	btnFit(pParent,					xPlayer + 150,	yPlayer,	20,		20, resources.hIFit, resources.hIFitHover),
-	btnNext(pParent,				xPlayer + 180,	yPlayer,	20,		20, resources.hINext, resources.hINextHover),
+	btnPrev(pParent,				xPlayer,		yPlayer,	20,		20, resources.hIPrev,			resources.hIPrevHover,			"Previous"),
+	btnOpenExternal(pParent,		xPlayer + 30,	yPlayer,	20,		20, resources.hIOpenExternal,	resources.hIOpenExternalHover,	"Source image"),
+	btnStop(pParent,				xPlayer + 60,	yPlayer,	20,		20, resources.hIStop,			resources.hIStopHover,			"Stop"),
+	btnPlay(pParent,				xPlayer + 90,	yPlayer,	20,		20, resources.hIPlay,			resources.hIPlayHover,			"Play"),
+	btnPause(pParent,				xPlayer + 120,	yPlayer,	20,		20, resources.hIPause,			resources.hIPauseHover,			"Pause"),
+	btnFit(pParent,					xPlayer + 150,	yPlayer,	20,		20, resources.hIFit,			resources.hIFitHover,			"Fit/fill"),
+	btnNext(pParent,				xPlayer + 180,	yPlayer,	20,		20, resources.hINext,			resources.hINextHover,			"Next"),
 	stDelayRemained(pParent, "",	xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles)
 {	
 	s_pCollectionManager = pCollectionManager;

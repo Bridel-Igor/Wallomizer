@@ -23,7 +23,7 @@ public:
 	/// @param hIconHover - handle to icon that represents button in it's hovered state.
 	/// @param additionalStyles - WinAPI style flags that will be added to WS_CHILD, WS_VISIBLE and BS_OWNERDRAW flags. Can be ignored.
 	/// @param additionalExStyles - WinAPI extended style flags. Can be ignored.
-	IconButton(IComponent* pParent, int x, int y, int width, int height, HICON& hIcon, HICON& hIconHovered, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
+	IconButton(IComponent* pParent, int x, int y, int width, int height, HICON& hIcon, HICON& hIconHovered, const char *toolTip = "", DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
 	~IconButton();
 
 	/// Call this method from reaction to WM_DRAWITEM message.
@@ -38,4 +38,7 @@ public:
 private:
 	/// Handles to icons which represents button in basic and hovered state.
 	HICON m_hIcon, m_hIconHovered;
+
+	/// Handle to looltip window.
+	HWND m_hToolTip;
 };
