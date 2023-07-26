@@ -29,4 +29,7 @@ namespace Filesystem
 	/// 
 	/// @return true if success, false otherwise.
 	bool getAppVersion(char* version);
+
+	/// Current file version of CollectionManager.dat file.
+	constexpr unsigned short COLLECTION_MANAGER_FILE_VERSION = 3U;
 }

@@ -15,14 +15,16 @@ bool UserCollection::saveSettings(FILE* pFile) const
 	return true;
 }
 
-bool UserCollection::loadSettings(FILE* pFile)
+bool UserCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 {
 	if (pFile == NULL)
 		return false;
 
 	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
-	fread(&settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
 
+	if (fileVersion >= 2U && fileVersion <= Filesystem::COLLECTION_MANAGER_FILE_VERSION)
+		fread(&settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
+	
 	// Forming collection URL
 	wcscpy_s(m_wsCollectionUrl, L"https://wallhaven.cc/api/v1/collections/");
 	wcscat_s(m_wsCollectionUrl, settings.wsUsername);

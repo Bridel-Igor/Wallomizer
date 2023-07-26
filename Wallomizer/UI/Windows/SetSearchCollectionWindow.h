@@ -18,11 +18,12 @@ private:
 	HWND m_hCaller;
 	CollectionManager* m_pCollectionManager;
 	SearchCollection* m_pCurrentSearchCollection;
-	Static stCategory, stPurity, stTag, stFilt, stTagInstruct[8];
+	Static stCategory, stPurity, stAIFilter, stTag, stFilt, stTagInstruct[8];
 	Edit edTag;
 	Button btnOk, btnCancel, btnRes, btnAR, btnColor;
 	CategoryComponent catCom;
 	PurityComponent purCom;
+	PushButton pbAIFilter;
 
 	wchar_t tmpRes[255] = L"", tmpAR[128] = L"", tmpColor[16] = L"";
 };

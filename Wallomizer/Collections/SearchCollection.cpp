@@ -15,13 +15,32 @@ bool SearchCollection::saveSettings(FILE* pFile) const
 	return true;
 }
 
-bool SearchCollection::loadSettings(FILE* pFile)
+bool SearchCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 {
 	if (pFile == NULL)
 		return false;
 
 	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
-	fread(&settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
+
+	if (fileVersion == 2U)
+	{
+		struct SearchCollectionSettings_2U
+		{
+			CategoriesAndPurity categoriesAndPurity = CAP::categoryGeneral | CAP::categoryAnime | CAP::categoryPeople | CAP::puritySFW;
+			wchar_t wsTag[255] = L"";
+			wchar_t wsResolution[255] = L"";
+			wchar_t wsRatio[128] = L"";
+			wchar_t wsColor[16] = L"";
+		}settings_2U;
+		fread(&settings_2U, sizeof(SearchCollectionSettings_2U), 1, pFile);
+		settings.categoriesAndPurity = settings_2U.categoriesAndPurity;
+		wcscpy_s(settings.wsColor, settings_2U.wsColor);
+		wcscpy_s(settings.wsRatio, settings_2U.wsRatio);
+		wcscpy_s(settings.wsResolution, settings_2U.wsResolution);
+		wcscpy_s(settings.wsTag, settings_2U.wsTag);
+	}
+	if (fileVersion >= 3U && fileVersion <= Filesystem::COLLECTION_MANAGER_FILE_VERSION)
+		fread(&settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
 
 	wcscpy_s(m_wsSearchUrl, L"https://wallhaven.cc/api/v1/search?");
 
@@ -41,6 +60,9 @@ bool SearchCollection::loadSettings(FILE* pFile)
 	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::puritySFW ? L"1" : L"0");
 	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::puritySketchy ? L"1" : L"0");
 	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::purityNSFW ? L"1" : L"0");
+
+	wcscat_s(m_wsSearchUrl, L"&ai_art_filter=");
+	wcscat_s(m_wsSearchUrl, settings.AIFiltering? L"1" : L"0");
 
 	wcscat_s(m_wsSearchUrl, settings.wsResolution);
 	wcscat_s(m_wsSearchUrl, settings.wsRatio);

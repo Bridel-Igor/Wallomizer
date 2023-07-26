@@ -13,8 +13,6 @@
 #include "Filesystem.h"
 #include "Delay.h"
 
-constexpr unsigned short COLLECTION_MANAGER_FILE_VERSION = 2U;
-
 CollectionManager::CollectionManager()
 {
 	m_randomGenerator = std::mt19937(static_cast<unsigned int>(time(0)));
@@ -35,7 +33,7 @@ bool CollectionManager::saveSettings(FILE* pFile) const
 	_wfopen_s(&pFile, wsPath, L"wb");
 	if (pFile != NULL)
 	{
-		fwrite(&COLLECTION_MANAGER_FILE_VERSION, sizeof(COLLECTION_MANAGER_FILE_VERSION), 1, pFile);
+		fwrite(&Filesystem::COLLECTION_MANAGER_FILE_VERSION, sizeof(Filesystem::COLLECTION_MANAGER_FILE_VERSION), 1, pFile);
 		const unsigned int size = (unsigned int)m_pCollections.size();
 		fwrite(&size, sizeof(size), 1, pFile);
 		for (auto pCollection : m_pCollections)
@@ -46,7 +44,7 @@ bool CollectionManager::saveSettings(FILE* pFile) const
 	return false;
 }
 
-bool CollectionManager::loadSettings(FILE* pFile)
+bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 {
 	m_isLoading = true;
 	Player::updateTimer(true);
@@ -57,15 +55,8 @@ bool CollectionManager::loadSettings(FILE* pFile)
 	_wfopen_s(&pFile, wsPath, L"rb");
 	if (pFile != NULL)
 	{
-		unsigned short fileVersion = 0;
 		fread(&fileVersion, sizeof(fileVersion), 1, pFile);
-		if (fileVersion != COLLECTION_MANAGER_FILE_VERSION)
-		{
-			fclose(pFile);
-			saveSettings();
-			MessageBox(NULL, "Incompatible collection list file. Collection list was reset.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
-		}
-		else
+		if (fileVersion >= 2U && fileVersion <= Filesystem::COLLECTION_MANAGER_FILE_VERSION)
 		{
 			clear();
 			unsigned int nCollections;
@@ -83,11 +74,17 @@ bool CollectionManager::loadSettings(FILE* pFile)
 					pTmpCollection = new SearchCollection(this);
 				else
 					break;
-				pTmpCollection->loadSettings(pFile);
+				pTmpCollection->loadSettings(pFile, fileVersion);
 				pTmpCollection->setValid(true);
 				m_pCollections.push_back(pTmpCollection);
 			}
 			fclose(pFile);
+		}
+		else
+		{
+			fclose(pFile);
+			saveSettings();
+			MessageBox(NULL, "Incompatible collection list file. Collection list was reset.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 		}
 	}
 	updateNumber();

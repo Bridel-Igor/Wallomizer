@@ -20,7 +20,7 @@ public:
 
 	~LocalCollection() {}
 	bool saveSettings(FILE* pFile) const;
-	bool loadSettings(FILE* pFile);
+	bool loadSettings(FILE* pFile, unsigned short fileVersion);
 	void getCollectionName(wchar_t* pwsName, size_t size) const;
 	CollectionType getCollectionType() const { return CollectionType::local; }
 	CategoriesAndPurity getCAP() const { return 0; }

@@ -4,39 +4,43 @@
 #include "ColorPickerWindow.h"
 
 SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, SearchCollection* pCollection) :
-	IWindow("Search collection", "Set Search Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 260),
+	IWindow("Search collection", "Set Search Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 290),
 	m_hCaller(hCaller),
 	m_pCollectionManager(pCollectionManager),
 	m_pCurrentSearchCollection(pCollection),
-	stCategory		(this, "Category:",												10,		10,		60,		20),
+	stCategory		(this, "Category:",													10,		10,		60,		20),
 	catCom			(this,																80,		10,		159,	20),
 
 	stPurity		(this, "Purity:",													254,	10,		40,		20),
 	purCom			(this,																301,	10,		159,	20),
 
-	stFilt			(this, "Filters:",												10,		40,		60,		20),
-	btnRes			(this, "Pick resolution",											80,		40,		120,	20),
-	btnAR			(this, "Pick ratio",												210,	40,		120,	20),
-	btnColor		(this, "Pick color",												340,	40,		120,	20),
+	stAIFilter		(this, "AI Filtering:",												10,		40,		60,		20),
+	pbAIFilter		(this, "Show AI Art",												80,		40,		106,	20),
 
-	stTag			(this, "Tags:",													10,		70,		60,		20),
-	edTag			(this, L"",														80,		70,		380,	20),
-	stTagInstruct { {this, "tagname - search fuzzily for a tag/keyword",				80,		100,	380,	15},
-					{this, "- tagname - exclude a tag / keyword",						80,		115,	380,	15},
-					{this, "+ tag1 + tag2 - must have tag1 and tag2",					80,		130,	380,	15},
-					{this, "+ tag1 - tag2 - must have tag1 and NOT tag2",				80,		145,	380,	15},
-					{this, "@username - user uploads",								80,		160,	380,	15},
-					{this, "id : 123 - Exact tag search(can not be combined)",		80,		175,	380,	15},
-					{this, "type : {png / jpg} - Search for file type(jpg = jpeg)",	80,		190,	380,	15},
-					{this, "like : wallpaper ID - Find wallpapers with similar tags",	80,		205,	380,	15} },
+	stFilt			(this, "Filters:",													10,		70,		60,		20),
+	btnRes			(this, "Pick resolution",											80,		70,		120,	20),
+	btnAR			(this, "Pick ratio",												210,	70,		120,	20),
+	btnColor		(this, "Pick color",												340,	70,		120,	20),
 
-	btnCancel		(this, "Cancel",													80,		230,	185,	20),
-	btnOk			(this, "Ok",														275,	230,	185,	20)
+	stTag			(this, "Tags:",														10,		100,	60,		20),
+	edTag			(this, L"",															80,		100,	380,	20),
+	stTagInstruct { {this, "tagname - search fuzzily for a tag/keyword",				80,		130,	380,	15},
+					{this, "- tagname - exclude a tag / keyword",						80,		145,	380,	15},
+					{this, "+ tag1 + tag2 - must have tag1 and tag2",					80,		160,	380,	15},
+					{this, "+ tag1 - tag2 - must have tag1 and NOT tag2",				80,		175,	380,	15},
+					{this, "@username - user uploads",									80,		190,	380,	15},
+					{this, "id : 123 - Exact tag search(can not be combined)",			80,		205,	380,	15},
+					{this, "type : {png / jpg} - Search for file type(jpg = jpeg)",		80,		220,	380,	15},
+					{this, "like : wallpaper ID - Find wallpapers with similar tags",	80,		235,	380,	15} },
+
+	btnCancel		(this, "Cancel",													80,		260,	185,	20),
+	btnOk			(this, "Ok",														275,	260,	185,	20)
 {
 	if (m_pCurrentSearchCollection)
 	{
 		catCom.setCategory(m_pCurrentSearchCollection->settings.categoriesAndPurity);
 		purCom.setPurity(m_pCurrentSearchCollection->settings.categoriesAndPurity);
+		pbAIFilter.check(!m_pCurrentSearchCollection->settings.AIFiltering);
 		edTag.setTextW(m_pCurrentSearchCollection->settings.wsTag);
 		wcscpy_s(tmpRes, m_pCurrentSearchCollection->settings.wsResolution);
 		wcscpy_s(tmpAR, m_pCurrentSearchCollection->settings.wsRatio);
@@ -69,6 +73,11 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 			return TRUE;
 		if (catCom.draw(pDIS))
 			return TRUE;
+		if (pDIS->hwndItem == pbAIFilter.hWnd())
+		{
+			pbAIFilter.draw(pDIS);
+			return TRUE;
+		}
 	}
 	return 0;
 
@@ -78,6 +87,11 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 			return 0;
 		if (catCom.click(wParam))
 			return 0;
+		if (pbAIFilter.isClicked(wParam))
+		{
+			pbAIFilter.check(!pbAIFilter.isChecked());
+			return 0;
+		}
 		if (btnRes.isClicked(wParam))
 		{
 			ResPickerWindow resPickerWindow(hWnd(), tmpRes);
@@ -106,6 +120,7 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 		{
 			m_pCurrentSearchCollection->settings.categoriesAndPurity = 0;
 			m_pCurrentSearchCollection->settings.categoriesAndPurity = catCom.getCategory() | purCom.getPurity();
+			m_pCurrentSearchCollection->settings.AIFiltering = !pbAIFilter.isChecked();
 			edTag.getTextW(m_pCurrentSearchCollection->settings.wsTag, 255);
 			wcscpy_s(m_pCurrentSearchCollection->settings.wsResolution, tmpRes);
 			wcscpy_s(m_pCurrentSearchCollection->settings.wsRatio, tmpAR);

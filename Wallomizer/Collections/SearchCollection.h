@@ -10,6 +10,7 @@ private:
 	struct SearchCollectionSettings
 	{
 		CategoriesAndPurity categoriesAndPurity = CAP::categoryGeneral | CAP::categoryAnime | CAP::categoryPeople | CAP::puritySFW;
+		bool AIFiltering = false;
 		wchar_t wsTag[255] = L"";
 		wchar_t wsResolution[255] = L"";
 		wchar_t wsRatio[128] = L"";
@@ -23,7 +24,7 @@ public:
 
 	~SearchCollection() {};
 	bool saveSettings(FILE* pFile) const;
-	bool loadSettings(FILE* pFile);
+	bool loadSettings(FILE* pFile, unsigned short fileVersion);
 	void getCollectionName(wchar_t* pwsName, size_t size) const;
 	CollectionType getCollectionType() const { return CollectionType::search; }
 	CategoriesAndPurity getCAP() const;

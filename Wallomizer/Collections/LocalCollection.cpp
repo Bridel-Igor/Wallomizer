@@ -30,14 +30,16 @@ bool LocalCollection::saveSettings(FILE* pFile) const
 	return true;
 }
 
-bool LocalCollection::loadSettings(FILE* pFile)
+bool LocalCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 {
 	if (pFile == NULL)
 		return false;
 	
 	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
-	fread(&settings, sizeof(LocalCollection::LocalCollectionSettings), 1, pFile);
 
+	if (fileVersion >= 2U && fileVersion <= Filesystem::COLLECTION_MANAGER_FILE_VERSION)
+		fread(&settings, sizeof(LocalCollection::LocalCollectionSettings), 1, pFile);
+	
 	std::experimental::filesystem::path dirPath{ settings.wsDirectoryPath };
 	m_uiNumber = 0;
 	if (m_isEnabled)
