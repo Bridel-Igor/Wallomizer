@@ -8,7 +8,7 @@ namespace HMenuGenerator
 {
 	std::set<HMENU> usedValues;
 	std::mt19937 rndGen(static_cast<unsigned int>(time(0)));
-	const std::uniform_int_distribution<unsigned long long> uid(1000, 1999);
+	std::uniform_int_distribution<unsigned long long> uid(1000, 1999);
 }
 
 HMENU HMenuGenerator::getNewHMenu()
