@@ -73,22 +73,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\igor\source\repos\Wallomizer\Wallomizer\Collections;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Windows;C:\Users\igor\source\repos\Wallomizer\Wallomizer;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Interfaces;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Compositions;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Components;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Collections;$(ProjectDir)UI;$(ProjectDir)UI\Components;$(ProjectDir)UI\Compositions;$(ProjectDir)UI\Interfaces;$(ProjectDir)UI\Windows;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\igor\source\repos\Wallomizer\Wallomizer\Collections;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Windows;C:\Users\igor\source\repos\Wallomizer\Wallomizer;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Interfaces;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Compositions;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Components;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Collections;$(ProjectDir)UI;$(ProjectDir)UI\Components;$(ProjectDir)UI\Compositions;$(ProjectDir)UI\Interfaces;$(ProjectDir)UI\Windows;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\igor\source\repos\Wallomizer\Wallomizer\Collections;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Windows;C:\Users\igor\source\repos\Wallomizer\Wallomizer;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Interfaces;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Compositions;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Components;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Collections;$(ProjectDir)UI;$(ProjectDir)UI\Components;$(ProjectDir)UI\Compositions;$(ProjectDir)UI\Interfaces;$(ProjectDir)UI\Windows;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\igor\source\repos\Wallomizer\Wallomizer\Collections;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Windows;C:\Users\igor\source\repos\Wallomizer\Wallomizer;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Interfaces;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Compositions;C:\Users\igor\source\repos\Wallomizer\Wallomizer\UI\Components;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Collections;$(ProjectDir)UI;$(ProjectDir)UI\Components;$(ProjectDir)UI\Compositions;$(ProjectDir)UI\Interfaces;$(ProjectDir)UI\Windows;$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
