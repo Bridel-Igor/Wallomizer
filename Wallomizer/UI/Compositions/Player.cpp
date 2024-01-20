@@ -1,9 +1,8 @@
-#include <Shobjidl.h> // HACK: delete this
-
 #include "Player.h"
 #include "Delay.h"
 #include "resource.h"
 #include "IWindow.h"
+#include "Filesystem.h"
 
 char Player::sTimer[16];
 CollectionManager* Player::s_pCollectionManager = nullptr;
@@ -118,14 +117,35 @@ bool Player::click(WPARAM& wParam)
 		redrawPlayers();
 		return true;
 	}
-	if (btnFit.isClicked(wParam)) // HACK: incompatible with win7 and lower
-	{ 
-		IDesktopWallpaper* pDesktopWallpaper = NULL;
-		if (SUCCEEDED(CoCreateInstance(__uuidof(DesktopWallpaper), NULL, CLSCTX_ALL, IID_PPV_ARGS(&pDesktopWallpaper))))
+	if (btnFit.isClicked(wParam)) 
+	{
+		HKEY hUserKey, hKey;
+		LRESULT lResult = RegOpenCurrentUser(KEY_ALL_ACCESS, &hUserKey);
+		if (lResult != ERROR_SUCCESS)
+			hUserKey = HKEY_CURRENT_USER;
+		LSTATUS result = RegOpenKeyExA(hUserKey, "Control Panel\\Desktop", 0, KEY_ALL_ACCESS, &hKey);
+		if (result == ERROR_SUCCESS)
 		{
-			DESKTOP_WALLPAPER_POSITION pDWPosition;
-			pDesktopWallpaper->GetPosition(&pDWPosition);
-			pDesktopWallpaper->SetPosition(pDWPosition == DWPOS_FIT ? DWPOS_FILL : DWPOS_FIT);
+			const BYTE fit[3] = "6";
+			const BYTE fill[3] = "10";
+			TCHAR style[32];
+			DWORD size = sizeof(style);
+			LSTATUS resultQuery = RegQueryValueExA(hKey, "WallpaperStyle", 0, NULL, (LPBYTE)style, &size);
+			RegSetValueExA(hKey, "WallpaperStyle", 0, REG_SZ, (LPBYTE)((resultQuery != ERROR_SUCCESS) || (style[0] != fit[0])) ? fit : fill, 3);
+			RegCloseKey(hKey);
+		}
+
+		if (Delay::slideshowStatus == Delay::SlideshowStatus::stopped)
+		{
+			SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, (PVOID)&L"", SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
+		}
+		else
+		{
+			wchar_t wsCurrentPathNative[MAX_PATH];
+			Filesystem::getRoamingDirNative(wsCurrentPathNative);
+			wcscat_s(wsCurrentPathNative, MAX_PATH, L"Current wallpaper.jpg");
+			SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, wsCurrentPathNative, SPIF_UPDATEINIFILE);
+			Player::redrawPlayers();
 		}
 		return true;
 	}
