@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <Shobjidl.h>
 
 #include "Delay.h"
 #include "Settings.h"
@@ -112,8 +111,16 @@ void Delay::setSlideshowStatus(const SlideshowStatus status)
 {
 	slideshowStatus = status;
 
-	// HACK: incompatible with win7 and lower
-	IDesktopWallpaper* pDesktopWallpaper = NULL;
-	if (SUCCEEDED(CoCreateInstance(__uuidof(DesktopWallpaper), NULL, CLSCTX_ALL, IID_PPV_ARGS(&pDesktopWallpaper)))) 
-		pDesktopWallpaper->Enable(slideshowStatus == SlideshowStatus::stopped ? FALSE : TRUE);
+	if (status == SlideshowStatus::stopped)
+	{
+		SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, (PVOID)&L"", SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
+	}
+	else
+	{
+		wchar_t wsCurrentPathNative[MAX_PATH];
+		Filesystem::getRoamingDirNative(wsCurrentPathNative);
+		wcscat_s(wsCurrentPathNative, MAX_PATH, L"Current wallpaper.jpg");
+		SystemParametersInfoW(SPI_SETDESKWALLPAPER, 3, wsCurrentPathNative, SPIF_UPDATEINIFILE);
+		Player::redrawPlayers();
+	}
 }

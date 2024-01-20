@@ -1,4 +1,4 @@
-#include <Shobjidl.h>
+#include <Shobjidl.h> // HACK: delete this
 
 #include "Player.h"
 #include "Delay.h"
@@ -127,7 +127,7 @@ bool Player::click(WPARAM& wParam)
 			pDesktopWallpaper->GetPosition(&pDWPosition);
 			pDesktopWallpaper->SetPosition(pDWPosition == DWPOS_FIT ? DWPOS_FILL : DWPOS_FIT);
 		}
-		return 0;
+		return true;
 	}
 	if (btnNext.isClicked(wParam))
 	{
