@@ -4,6 +4,7 @@
 #include "Settings.h"
 #include "Filesystem.h"
 #include "Player.h"
+#include "WinUtils.h"
 
 bool Delay::exiting = false;
 Delay::SlideshowStatus Delay::slideshowStatus = Delay::SlideshowStatus::playing;
@@ -110,17 +111,6 @@ void Delay::replayDelay()
 void Delay::setSlideshowStatus(const SlideshowStatus status)
 {
 	slideshowStatus = status;
-
-	if (status == SlideshowStatus::stopped)
-	{
-		SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, (PVOID)&L"", SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
-	}
-	else
-	{
-		wchar_t wsCurrentPathNative[MAX_PATH];
-		Filesystem::getRoamingDirNative(wsCurrentPathNative);
-		wcscat_s(wsCurrentPathNative, MAX_PATH, L"Current wallpaper.jpg");
-		SystemParametersInfoW(SPI_SETDESKWALLPAPER, 3, wsCurrentPathNative, SPIF_UPDATEINIFILE);
-		Player::redrawPlayers();
-	}
+	WinUtils::updateDesktopBackground();
+	Player::redrawPlayers();
 }

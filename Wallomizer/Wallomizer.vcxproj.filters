@@ -118,6 +118,9 @@
     <ClCompile Include="UI\Interfaces\IComponent.cpp">
       <Filter>UI\Interfaces</Filter>
     </ClCompile>
+    <ClCompile Include="WinUtils.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI\Windows\AddCollectionWindow.h">
@@ -242,6 +245,9 @@
     </ClInclude>
     <ClInclude Include="UI\Components\Panel.h">
       <Filter>UI\Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="WinUtils.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -12,6 +12,7 @@
 #include "SearchCollection.h"
 #include "Filesystem.h"
 #include "Delay.h"
+#include "WinUtils.h"
 
 CollectionManager::CollectionManager()
 {
@@ -246,10 +247,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	{
 		return;
 	}
-	wchar_t wsCurrentPathNative[MAX_PATH];
-	Filesystem::getRoamingDirNative(wsCurrentPathNative);
-	wcscat_s(wsCurrentPathNative, MAX_PATH, L"Current wallpaper.jpg");
-	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, wsCurrentPathNative, SPIF_UPDATEINIFILE);
+	WinUtils::updateDesktopBackground();
 	Player::redrawPlayers();
 }
 
