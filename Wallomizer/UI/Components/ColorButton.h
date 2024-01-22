@@ -52,11 +52,10 @@ public:
 	/// Call this method from reaction to WM_DRAWITEM message.
 	/// 
 	/// @param pDIS - LPDRAWITEMSTRUCT casted from lParam.
-	/// @param bkgrnd - brush for background to draw on.
 	/// 
 	/// @return True if component is drawn, false otherwise. 
 	///			If it's true return TRUE from function that handles WinAPI messages. 
-	void draw(LPDRAWITEMSTRUCT& pDIS);
+	bool draw(LPDRAWITEMSTRUCT& pDIS);
 
 	/// Get an ASCII representation of color in hex. You should provide char array to write it to.
 	/// 

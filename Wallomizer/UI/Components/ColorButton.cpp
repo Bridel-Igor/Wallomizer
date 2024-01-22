@@ -63,8 +63,11 @@ bool ColorButton::isChecked() const
 	return m_checked;
 }
 
-void ColorButton::draw(LPDRAWITEMSTRUCT& pDIS)
+bool ColorButton::draw(LPDRAWITEMSTRUCT& pDIS)
 {
+	if (pDIS->hwndItem != m_hWnd)
+		return false;
+
 	FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 	SelectObject(pDIS->hDC, resources.s_nullPen);
 	SelectObject(pDIS->hDC, m_brush);
@@ -81,7 +84,7 @@ void ColorButton::draw(LPDRAWITEMSTRUCT& pDIS)
 		LineTo(pDIS->hDC, pDIS->rcItem.right - 1, pDIS->rcItem.top + 1);
 		LineTo(pDIS->hDC, pDIS->rcItem.left + 1, pDIS->rcItem.top + 1);
 
-		RECT tmp;
+		RECT tmp = { 0 };
 		tmp.left = pDIS->rcItem.left, tmp.right = tmp.left + 1;
 		tmp.top = pDIS->rcItem.bottom, tmp.bottom = tmp.top - 1;
 		FillRect(pDIS->hDC, &tmp, IWindow::Resources::mainBkBrush);
@@ -93,6 +96,8 @@ void ColorButton::draw(LPDRAWITEMSTRUCT& pDIS)
 		DrawIconEx(pDIS->hDC, (pDIS->rcItem.right - 20) / 2, (pDIS->rcItem.bottom - 20) / 2,
 					m_checkedPenIsWhite ? resources.s_hICheckWhite : resources.s_hICheckBlack,
 					0, 0, 0, NULL, DI_NORMAL);
+
+	return true;
 }
 
 void ColorButton::getColor(wchar_t* buffer, int size)

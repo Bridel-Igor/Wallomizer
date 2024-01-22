@@ -157,6 +157,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppMutex.cpp" />
+    <ClCompile Include="ColorPickerButton.cpp" />
     <ClCompile Include="UI\Components\Panel.cpp" />
     <ClCompile Include="UI\Interfaces\IClickable.cpp" />
     <ClCompile Include="UI\Interfaces\IComponent.cpp" />
@@ -200,6 +201,7 @@
   <ItemGroup>
     <ClInclude Include="AppMutex.h" />
     <ClInclude Include="CategoriesAndPurity.h" />
+    <ClInclude Include="ColorPickerButton.h" />
     <ClInclude Include="UI\Components\Panel.h" />
     <ClInclude Include="UI\Interfaces\IWindow.h" />
     <ClInclude Include="UI\Windows\AddCollectionWindow.h" />

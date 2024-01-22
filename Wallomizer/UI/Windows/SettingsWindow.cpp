@@ -5,18 +5,19 @@
 #include "Player.h"
 #include "Internet.h"
 #include "Filesystem.h"
+#include "WinUtils.h"
 
 HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, LPCSTR lpszDesc)
 {
 	HRESULT hRes;
-	IShellLink* psl;
+	IShellLink* psl = nullptr;
 
 	if (!SUCCEEDED(CoInitialize(NULL)))
 		return -1;
 	hRes = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
 	if (SUCCEEDED(hRes))
 	{
-		IPersistFile* ppf;
+		IPersistFile* ppf = nullptr;
 		psl->SetPath(lpszPathObj);
 		psl->SetDescription(lpszDesc);
 		psl->SetWorkingDirectory(lpszDirPath);
@@ -38,33 +39,36 @@ HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, 
 SettingsWindow::SettingsWindow(HWND hCaller) :
 	IWindow("Settings", "Setting Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	m_hCaller(hCaller),
-	stApplication	(this, "Application",		10,		10,		380,	20, SS_CENTER),
-	stVersion		(this, "Version:",			10,		40,		130,	20, SS_RIGHT),
-	stActVersion	(this, "",					150,	40,		100,	20),
-	btnUpdate		(this, "Check for updates",	270,	40,		120,	20),
-	stDeveloper		(this, "Developer:",		10,		70,		130,	20, SS_RIGHT),
-	stActDeveloper	(this, "Igor Bridel",		150,	70,		100,	20),
-	btnDonate		(this, "Donate",			270,	70,		120,	20),
-	stStartup		(this, "Load on startup:",	10,		100,	130,	20, SS_RIGHT),
-	cbStartup		(this,						150,	100,	20,		20),
+	stApplication	(this, "Application",					10,		10,		380,	20, SS_CENTER),
+	stVersion		(this, "Version:",						10,		40,		130,	20, SS_RIGHT),
+	stActVersion	(this, "",								150,	40,		100,	20),
+	btnUpdate		(this, "Check for updates",				270,	40,		120,	20),
+	stDeveloper		(this, "Developer:",					10,		70,		130,	20, SS_RIGHT),
+	stActDeveloper	(this, "Igor Bridel",					150,	70,		100,	20),
+	btnDonate		(this, "Donate",						270,	70,		120,	20),
+	stStartup		(this, "Load on startup:",				10,		100,	130,	20, SS_RIGHT),
+	cbStartup		(this,									150,	100,	20,		20),
 
-	stSlideshow		(this, "Slideshow",			10,		130,	380,	20, SS_CENTER),
-	stDelay			(this, "Delay:",			10,		180,	130,	20, SS_RIGHT),
-	stHours			(this, "Hours",				150,	160,	74,		20, SS_CENTER),
-	stMinutes		(this, "Minutes",			233,	160,	74,		20, SS_CENTER),
-	stSeconds		(this, "Seconds",			316,	160,	74,		20, SS_CENTER),
-	udeHours		(this,						150,	180,	74,		20, 0, 999, int((Settings::delay / 1000) / 3600)),
-	udeMinutes		(this,						233,	180,	74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60),
-	udeSeconds		(this,						316,	180,	74,		20, 0, 59, int(Settings::delay / 1000) % 60),
+	stSlideshow		(this, "Slideshow",						10,		130,	380,	20, SS_CENTER),
+	stDelay			(this, "Delay:",						10,		180,	130,	20, SS_RIGHT),
+	stHours			(this, "Hours",							150,	160,	74,		20, SS_CENTER),
+	stMinutes		(this, "Minutes",						233,	160,	74,		20, SS_CENTER),
+	stSeconds		(this, "Seconds",						316,	160,	74,		20, SS_CENTER),
+	udeHours		(this,									150,	180,	74,		20, 0, 999, int((Settings::delay / 1000) / 3600)),
+	udeMinutes		(this,									233,	180,	74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60),
+	udeSeconds		(this,									316,	180,	74,		20, 0, 59, int(Settings::delay / 1000) % 60),
 
-	stWallhaven		(this, "Wallhaven",			10,		210,	380,	20, SS_CENTER),
-	stApiKey		(this, "Api key:",			10,		240,	130,	20, SS_RIGHT),
-	edApiKey		(this, "",					150,	240,	240,	20, ES_PASSWORD),
-	stUsername		(this, "Default username:",	10,		270,	130,	20, SS_RIGHT),
-	edUsername		(this, "",					150,	270,	240,	20),
+	stBckColor		(this, "Background color:",				10,		210,	130,	20,	SS_RIGHT),
+	cpbBckColor		(this, WinUtils::getBackgroundColor(),	150,	210,	120,	20),
 
-	btnCancel		(this, "Cancel",			10,		310,	130,	20),
-	btnOk			(this, "Ok",				150,	310,	240,	20)
+	stWallhaven		(this, "Wallhaven",						10,		240,	380,	20, SS_CENTER),
+	stApiKey		(this, "Api key:",						10,		270,	130,	20, SS_RIGHT),
+	edApiKey		(this, "",								150,	270,	240,	20, ES_PASSWORD),
+	stUsername		(this, "Default username:",				10,		300,	130,	20, SS_RIGHT),
+	edUsername		(this, "",								150,	300,	240,	20),
+
+	btnCancel		(this, "Cancel",						10,		340,	130,	20),
+	btnOk			(this, "Ok",							150,	340,	240,	20)
 {
 	EnableWindow(m_hCaller, FALSE);
 
@@ -232,6 +236,8 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 				}
 			}
 
+			WinUtils::setBackgroundColor(cpbBckColor.getColor());
+
 			Settings::saveSettings();
 			Player::updateTimer(true);
 			DestroyWindow(hWnd());
@@ -257,6 +263,11 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 			cbStartup.click();
 			return 0;
 		}
+		if (cpbBckColor.isClicked(wParam))
+		{
+			cpbBckColor.click();
+			return 0;
+		}
 	}
 	return 0;
 
@@ -264,6 +275,8 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 	{
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
 		if (cbStartup.draw(pDIS, resources.mainBkBrush))
+			return TRUE;
+		if (cpbBckColor.draw(pDIS))
 			return TRUE;
 	}
 	return 0;

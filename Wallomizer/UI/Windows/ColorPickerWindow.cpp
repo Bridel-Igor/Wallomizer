@@ -80,11 +80,8 @@ LRESULT ColorPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM 
 	{
 		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
 		for (int i = 0; i < 30; i++)
-			if (pDIS->hwndItem == btnClr[i].hWnd())
-			{
-				btnClr[i].draw(pDIS);
+			if (btnClr[i].draw(pDIS))
 				return TRUE;
-			}
 	}
 	return 0;
 
