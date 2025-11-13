@@ -11,7 +11,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 {
     try
 	{
-		AppMutex appMutex("Wallomizer"); // making shure application is opened in only one instance
+		AppMutex appMutex("Wallomizer"); // making sure application is opened in only one instance
 		SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 
 		Filesystem::initialize(); // checking for all necessary directories
