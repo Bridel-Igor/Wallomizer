@@ -61,9 +61,6 @@ bool SearchCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::puritySketchy ? L"1" : L"0");
 	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::purityNSFW ? L"1" : L"0");
 
-	wcscat_s(m_wsSearchUrl, L"&ai_art_filter=");
-	wcscat_s(m_wsSearchUrl, settings.AIFiltering? L"1" : L"0");
-
 	wcscat_s(m_wsSearchUrl, settings.wsResolution);
 	wcscat_s(m_wsSearchUrl, settings.wsRatio);
 	wcscat_s(m_wsSearchUrl, settings.wsColor);

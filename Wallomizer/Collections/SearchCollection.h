@@ -10,7 +10,6 @@ private:
 	struct SearchCollectionSettings
 	{
 		CategoriesAndPurity categoriesAndPurity = CAP::categoryGeneral | CAP::categoryAnime | CAP::categoryPeople | CAP::puritySFW;
-		bool AIFiltering = false;
 		wchar_t wsTag[255] = L"";
 		wchar_t wsResolution[255] = L"";
 		wchar_t wsRatio[128] = L"";
