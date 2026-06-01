@@ -22,6 +22,3 @@ Wallpaper collections of wallhaven.cc users. Can be filtered by purity.
 Result of a search queue in wallhaven.cc. Can be filtered by category, purity, resolution, aspect ratio, dominant color, tags.
 
 You can add as many collections of these types as You want.
-
-If You want to support the project here is the link for donations:
-https://donatello.to/IgorBridel
