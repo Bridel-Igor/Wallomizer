@@ -45,7 +45,6 @@ SettingsWindow::SettingsWindow(HWND hCaller) :
 	btnUpdate		(this, "Check for updates",				270,	40,		120,	20),
 	stDeveloper		(this, "Developer:",					10,		70,		130,	20, SS_RIGHT),
 	stActDeveloper	(this, "Igor Bridel",					150,	70,		100,	20),
-	btnDonate		(this, "Donate",						270,	70,		120,	20),
 	stStartup		(this, "Load on startup:",				10,		100,	130,	20, SS_RIGHT),
 	cbStartup		(this,									150,	100,	20,		20),
 
@@ -251,11 +250,6 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 		if (btnUpdate.isClicked(wParam))
 		{
 			ShellExecute(0, 0, "https://github.com/Bridel-Igor/Wallomizer/releases", 0, 0, SW_SHOW);
-			return 0;
-		}
-		if (btnDonate.isClicked(wParam))
-		{
-			ShellExecute(0, 0, "https://donatello.to/IgorBridel", 0, 0, SW_SHOW);
 			return 0;
 		}
 		if (cbStartup.isClicked(wParam))

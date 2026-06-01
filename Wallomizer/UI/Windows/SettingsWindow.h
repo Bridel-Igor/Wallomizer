@@ -24,7 +24,7 @@ private:
 	Static stVersion, stActVersion, stDeveloper, stActDeveloper, stHours, stMinutes, stSeconds, stDelay, stBckColor, stApiKey, stUsername, stStartup;
 	Edit edApiKey, edUsername;
 	UpDownEdit udeHours, udeMinutes, udeSeconds;
-	Button btnOk, btnCancel, btnUpdate, btnDonate;
+	Button btnOk, btnCancel, btnUpdate;
 	CheckBox cbStartup;
 	ColorPickerButton cpbBckColor;
 };
