@@ -72,6 +72,11 @@ bool Filesystem::getAppVersion(char* version)
 	}
 
     strcpy_s(version, iProductVersionLen, (char*)pvProductVersion);
+
+#ifdef _DEBUG
+	strcat_s(version, 16, " debug");
+#endif
+
 	delete[] data;
 	return true;
 }
