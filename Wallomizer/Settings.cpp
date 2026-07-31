@@ -11,10 +11,7 @@ constexpr unsigned short SETTINGS_FILE_VERSION = 3U;
 Settings::Settings(WinUtils& winUtils) :
 	m_winUtils(winUtils)
 {
-	prevCount = 5;
-	delay = 300000;
-	loadOnStartup = false;
-	uPerPage = 24;
+	loadSettings();
 }
 
 void Settings::saveSettings()
@@ -83,14 +80,4 @@ void Settings::loadSettings()
 void Settings::setApiKey(const wchar_t* _apiKey)
 {
 	wcscpy_s(apiKey, 33, _apiKey);
-}
-
-wchar_t* Settings::getApiKey()
-{
-	return apiKey;
-}
-
-bool Settings::isApiKeyUsed()
-{
-	return apiKey[0];
 }

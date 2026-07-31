@@ -9,12 +9,7 @@
 Delay::Delay(App& app) :
 	m_app(app)
 {
-	exiting = false;
-	slideshowStatus = Delay::SlideshowStatus::playing;
-}
-
-Delay::~Delay()
-{
+	loadSession(m_app.getCollectionManager().pCurrent);
 }
 
 void Delay::saveSession(Wallpaper *pCurrent)
@@ -94,7 +89,7 @@ void Delay::delay()
 	uDelayed = 0;
 }
 
-unsigned long Delay::getRemainingDelay()
+unsigned long Delay::getRemainingDelay() const
 {
 	return m_app.getSettings().delay > uDelayed ? m_app.getSettings().delay - uDelayed : 0;
 }

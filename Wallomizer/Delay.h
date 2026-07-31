@@ -15,18 +15,17 @@ public:
 
 public:
 	Delay(App& app);
-	~Delay();
 
 	void saveSession(Wallpaper* pCurrent = nullptr);
 	void loadSession(Wallpaper*& pCurrent);
 	void delay();
-	unsigned long getRemainingDelay();
+	unsigned long getRemainingDelay() const;
 	void abortDelay();
 	void replayDelay();
 	void setSlideshowStatus(const SlideshowStatus status);
 
-	bool exiting;
-	SlideshowStatus slideshowStatus;
+	bool exiting = false;
+	SlideshowStatus slideshowStatus = Delay::SlideshowStatus::playing;
 
 private:
 	App& m_app;

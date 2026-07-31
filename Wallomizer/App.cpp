@@ -14,9 +14,6 @@ App::App() :
 
 int App::run()
 {
-	m_settings.loadSettings();
-	m_delay.loadSession(m_collectionManager.pCurrent);
-
 	// opening and processing UI in different thread
 	std::exception_ptr trayWindowException = nullptr;
 	std::thread trayWindowThread([this, &trayWindowException]()
