@@ -18,7 +18,7 @@ Delay::~Delay()
 void Delay::saveSession(Wallpaper *pCurrent)
 {
 	wchar_t wsPath[MAX_PATH];
-	m_app.getWinUtils().getRoamingDir(wsPath);
+	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"Session.dat\0");
 	FILE* pFile;
 	_wfopen_s(&pFile, wsPath, L"wb");
@@ -42,7 +42,7 @@ void Delay::saveSession(Wallpaper *pCurrent)
 void Delay::loadSession(Wallpaper*& pCurrent)
 {
 	wchar_t wsPath[MAX_PATH];
-	m_app.getWinUtils().getRoamingDir(wsPath);
+	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"Session.dat\0");
 	FILE* pFile;
 	_wfopen_s(&pFile, wsPath, L"rb");

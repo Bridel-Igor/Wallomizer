@@ -147,7 +147,7 @@ void SearchCollection::openCollectionSettingsWindow(HWND hCaller)
 bool SearchCollection::loadWallpaper(const Wallpaper* pWallpaper, App& app)
 {
 	wchar_t wsImgPath[MAX_PATH];
-	app.getWinUtils().getRoamingDir(wsImgPath);
+	wcscpy_s(wsImgPath, MAX_PATH, app.getWinUtils().getRoamingDir());
 	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
 	Internet internet;
 	return internet.DownloadToFile(pWallpaper->getPathW(), wsImgPath);

@@ -33,7 +33,7 @@ void WinUtils::updateDesktopBackground(bool isImageVisible) const
 	wchar_t wsCurrentPathNative[MAX_PATH] = { 0 };
 	if (isImageVisible)
 	{
-		getRoamingDirNative(wsCurrentPathNative);
+		wcscpy_s(wsCurrentPathNative, MAX_PATH, getRoamingDirNative());
 		wcscat_s(wsCurrentPathNative, MAX_PATH, L"Current wallpaper.jpg");
 	}
 	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, wsCurrentPathNative, SPIF_UPDATEINIFILE);
@@ -94,16 +94,6 @@ void WinUtils::setBackgroundColor(COLORREF color) const
 COLORREF WinUtils::getBackgroundColor() const
 {
 	return GetSysColor(COLOR_BACKGROUND);
-}
-
-void WinUtils::getRoamingDir(wchar_t* path) const
-{
-	wcscpy_s(path, MAX_PATH, roaming);
-}
-
-void WinUtils::getRoamingDirNative(wchar_t* path) const
-{
-	wcscpy_s(path, MAX_PATH, roamingNative);
 }
 
 bool WinUtils::getAppVersion(char* version) const

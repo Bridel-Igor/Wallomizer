@@ -32,19 +32,23 @@ public:
 	/// @return Curent color of COLORREF type. Use GetRValue, GetGValue, GetBValue macro if needed.
 	COLORREF getBackgroundColor() const;
 
-	/// Get string that contains path to <"user name"/AppData/Roaming/Wallomizer/> directory. You should provide wide char array to write it to.
-	/// Path contains '/' separators and ends with one. If you need path with '\\' separators use getRoamingDirNative function.
-	/// 
-	/// @param path - pointer to wide char array of at least MAX_PATH (Windows constant) size that will be filled.
-	void getRoamingDir(wchar_t* path) const;
+	/// Get const pointer to string that contains path to <"user name"/AppData/Roaming/Wallomizer/> directory.
+	/// Length is MAX_PATH (Windows constant).
+	/// Path contains '/' separators and ends with one.
+	/// If you need path with '\\' separators use getRoamingDirNative function.
+	const wchar_t* getRoamingDir() const
+	{
+		return roaming;
+	}
 
-	// Following example contains "\\\\" separators insted of "\\" only for purpose of correct VS function description display.
-
-	/// Get string that contains path to <"user name"\\\\AppData\\\\Roaming\\\\Wallomizer\\\\> directory. You should provide wide char array to write it to.
-	/// Path contains '\\\\' separators and ends with one. If you need path with '/' separators use getRoamingDir function.
-	/// 
-	/// @param path - pointer to wide char array of at least MAX_PATH (Windows constant) size that will be filled.
-	void getRoamingDirNative(wchar_t* path) const;
+	/// Get const pointer to string that contains path to <"user name"\\AppData\\Roaming\\Wallomizer\\> directory.
+	/// Length is MAX_PATH (Windows constant).
+	/// Path contains '\\' separators and ends with one.
+	/// If you need path with '/' separators use getRoamingDir function.
+	const wchar_t* getRoamingDirNative() const
+	{
+		return roamingNative;
+	}
 
 	/// Get string that contains application version. You should provie char array to write to it.
 	/// 

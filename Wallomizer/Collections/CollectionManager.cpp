@@ -30,7 +30,7 @@ CollectionManager::~CollectionManager()
 bool CollectionManager::saveSettings(FILE* pFile) const
 {
 	wchar_t wsPath[MAX_PATH];
-	m_app.getWinUtils().getRoamingDir(wsPath);
+	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"CollectionManager.dat");
 	_wfopen_s(&pFile, wsPath, L"wb");
 	if (pFile != NULL)
@@ -51,7 +51,7 @@ bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 	m_isLoading = true;
 	Player::updateTimer(m_app, true);
 	wchar_t wsPath[MAX_PATH];
-	m_app.getWinUtils().getRoamingDir(wsPath);
+	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"CollectionManager.dat");
 	m_isReady = false;
 	_wfopen_s(&pFile, wsPath, L"rb");
@@ -143,7 +143,7 @@ void CollectionManager::reloadSettings()
 	saveSettings();
 	loadSettings();
 	wchar_t wsPath[MAX_PATH];
-	m_app.getWinUtils().getRoamingDir(wsPath);
+	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
 	m_app.getDelay().replayDelay();
@@ -196,7 +196,7 @@ void CollectionManager::eraseCollection(int index)
 	updateNumber();
 	std::lock_guard<std::mutex> lock(imageModification);
 	wchar_t wsPath[MAX_PATH];
-	m_app.getWinUtils().getRoamingDir(wsPath);
+	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
 	m_app.getDelay().abortDelay();
@@ -221,9 +221,9 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 {
 	std::lock_guard<std::mutex> lock(imageModification);
 	wchar_t wsLoadedPath[MAX_PATH], wsCurrentPath[MAX_PATH];
-	m_app.getWinUtils().getRoamingDir(wsLoadedPath);
-	m_app.getWinUtils().getRoamingDir(wsCurrentPath);
+	wcscpy_s(wsLoadedPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsLoadedPath, MAX_PATH, L"Loaded wallpaper.dat");
+	wcscpy_s(wsCurrentPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsCurrentPath, MAX_PATH, L"Current wallpaper.jpg");
 	if (!std::experimental::filesystem::exists(wsLoadedPath))
 	{

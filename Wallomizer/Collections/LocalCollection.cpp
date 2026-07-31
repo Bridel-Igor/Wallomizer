@@ -125,10 +125,10 @@ bool LocalCollection::loadWallpaper(const Wallpaper* pWallpaper, App& app)
 	size_t size;
 	FILE* pSource = nullptr, * pDestination = nullptr;
 	_wfopen_s(&pSource, pWallpaper->getPathW(), L"rb");
-	wchar_t path[MAX_PATH];
-	app.getWinUtils().getRoamingDir(path);
-	wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
-	_wfopen_s(&pDestination, path, L"wb");
+	wchar_t wsPath[MAX_PATH];
+	wcscpy_s(wsPath, MAX_PATH, app.getWinUtils().getRoamingDir());
+	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
+	_wfopen_s(&pDestination, wsPath, L"wb");
 	if (pSource == nullptr || pDestination == nullptr)
 		return false;
 	while ((size = fread(buf, 1, BUFSIZ, pSource)) != 0)
