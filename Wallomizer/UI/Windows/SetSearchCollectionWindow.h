@@ -1,22 +1,23 @@
 #pragma once
 
 #include "SearchCollection.h"
-#include "CollectionManager.h"
 #include "IWindow.h"
 #include "Button.h"
 #include "Static.h"
 #include "Edit.h"
 
+class CollectionManager;
+
 class SetSearchCollectionWindow : public IWindow
 {
 public:
-	SetSearchCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, SearchCollection* pCollection);
+	SetSearchCollectionWindow(HWND hCaller, CollectionManager& collectionManager, SearchCollection* pCollection);
 	~SetSearchCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
 	HWND m_hCaller;
-	CollectionManager* m_pCollectionManager; //TODO: change to reference
+	CollectionManager& m_collectionManager;
 	SearchCollection* m_pCurrentSearchCollection;
 	Static stCategory, stPurity, stTag, stFilt, stTagInstruct[8];
 	Edit edTag;

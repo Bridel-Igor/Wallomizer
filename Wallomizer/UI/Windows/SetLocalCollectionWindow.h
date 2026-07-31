@@ -6,18 +6,19 @@
 #include "Button.h"
 #include "Edit.h"
 #include "CheckBox.h"
-#include "CollectionManager.h"
+
+class CollectionManager;
 
 class SetLocalCollectionWindow : public IWindow
 {
 public:
-	SetLocalCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, LocalCollection *pCollection);
+	SetLocalCollectionWindow(HWND hCaller, CollectionManager& collectionManager, LocalCollection *pCollection);
 	~SetLocalCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
 	HWND m_hCaller;
-	CollectionManager* m_pCollectionManager; //TODO: change to reference
+	CollectionManager& m_collectionManager;
 	LocalCollection* m_pCurrentLocalCollection;
 	Static stPath, stRecursive;
 	Edit edPath;

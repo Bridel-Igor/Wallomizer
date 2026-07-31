@@ -69,7 +69,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (btnAdd.isClicked(wParam))
 		{
-			AddCollectionWindow addCollectionWindow(hWnd(), &m_app.getCollectionManager());
+			AddCollectionWindow addCollectionWindow(hWnd(), m_app.getCollectionManager());
 			addCollectionWindow.windowLoop();
 			return 0;
 		}

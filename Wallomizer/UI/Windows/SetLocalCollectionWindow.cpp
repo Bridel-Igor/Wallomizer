@@ -2,10 +2,12 @@
 
 #include <ShObjIdl.h>
 
-SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, LocalCollection* pCollection) :
+#include "CollectionManager.h"
+
+SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, CollectionManager& collectionManager, LocalCollection* pCollection) :
 	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 120),
 	m_hCaller(hCaller),
-	m_pCollectionManager(pCollectionManager),
+	m_collectionManager(collectionManager),
 	m_pCurrentLocalCollection(pCollection),
 	stPath		(this, "Enter path to directory:",	10,		10,		390,	20),
 	edPath		(this, m_pCurrentLocalCollection? m_pCurrentLocalCollection->settings.wsDirectoryPath :L"",
@@ -50,7 +52,7 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 			if (m_pCurrentLocalCollection->isValid() == false)
 				m_pCurrentLocalCollection->setValid(true);
 			else
-				m_pCollectionManager->reloadSettings();
+				m_collectionManager.reloadSettings();
 			DestroyWindow(hWnd);
 			return 0;
 		}

@@ -2,7 +2,6 @@
 
 #include "BaseCollection.h"
 #include "CategoriesAndPurityComponents.h"
-#include "CollectionManager.h"
 
 class App;
 
@@ -45,6 +44,5 @@ public:
 private:
 	App& m_app;
 	static constexpr int s_nPerPage = 24;
-	CollectionManager* m_pCollectionManager = nullptr;
 	wchar_t m_wsCollectionUrl[255] = L"";
 };

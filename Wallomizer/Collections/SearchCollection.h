@@ -2,7 +2,6 @@
 
 #include "BaseCollection.h"
 #include "CategoriesAndPurityComponents.h"
-#include "CollectionManager.h"
 
 class App;
 
@@ -37,6 +36,5 @@ public:
 
 private:
 	App& m_app;
-	CollectionManager* m_pCollectionManager = nullptr;
 	wchar_t m_wsSearchUrl[1024] = L"";	
 };

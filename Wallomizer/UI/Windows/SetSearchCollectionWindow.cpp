@@ -3,11 +3,12 @@
 #include "ResPickerWindow.h"
 #include "AspRatPickerWindow.h"
 #include "ColorPickerWindow.h"
+#include "CollectionManager.h"
 
-SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, SearchCollection* pCollection) :
+SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionManager& collectionManager, SearchCollection* pCollection) :
 	IWindow("Search collection", "Set Search Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 260),
 	m_hCaller(hCaller),
-	m_pCollectionManager(pCollectionManager),
+	m_collectionManager(collectionManager),
 	m_pCurrentSearchCollection(pCollection),
 	stCategory		(this, "Category:",													10,		10,		60,		20),
 	catCom			(this,																80,		10,		159,	20),
@@ -114,7 +115,7 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 			if (m_pCurrentSearchCollection->isValid() == false)
 				m_pCurrentSearchCollection->setValid(true);
 			else
-				m_pCollectionManager->reloadSettings();
+				m_collectionManager.reloadSettings();
 			DestroyWindow(hWnd());
 			return 0;
 		}

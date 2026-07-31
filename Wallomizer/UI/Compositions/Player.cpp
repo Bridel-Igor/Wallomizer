@@ -74,7 +74,6 @@ Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yT
 	stDelayRemained(pParent, "",	xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles),
 	m_app(app)
 {	
-	//s_pCollectionManager = pCollectionManager;
 	updateTimer(m_app, true);
 	pPlayers.push_back(this);
 }

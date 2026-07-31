@@ -114,7 +114,7 @@ Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
 
 void LocalCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetLocalCollectionWindow setLocalCollectionWindow(hCaller, m_pCollectionManager, this);
+	SetLocalCollectionWindow setLocalCollectionWindow(hCaller, m_app.getCollectionManager(), this);
 	setLocalCollectionWindow.windowLoop();
 }
 

@@ -2,7 +2,6 @@
 
 #include "BaseCollection.h"
 #include "CategoriesAndPurity.h"
-#include "CollectionManager.h"
 
 class App;
 
@@ -34,5 +33,4 @@ public:
 
 private:
 	App& m_app;
-	CollectionManager* m_pCollectionManager = nullptr;
 };

@@ -2,17 +2,18 @@
 
 #include "IWindow.h"
 #include "Button.h"
-#include "CollectionManager.h"
+
+class CollectionManager;
 
 class AddCollectionWindow : public IWindow
 {
 public:
-	AddCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager);
+	AddCollectionWindow(HWND hCaller, CollectionManager& collectionManager);
 	~AddCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
 	HWND m_hCaller;
-	CollectionManager* m_pCollectionManager; //TODO: change to reference
+	CollectionManager& m_collectionManager;
 	Button btnAddLocalCollection, btnAddUserCollection, btnAddSearchCollection, btnCancel;
 };

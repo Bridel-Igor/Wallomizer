@@ -140,7 +140,7 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 
 void SearchCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetSearchCollectionWindow setSearchCollectionWindow(hCaller, m_pCollectionManager, this);
+	SetSearchCollectionWindow setSearchCollectionWindow(hCaller, m_app.getCollectionManager(), this);
 	setSearchCollectionWindow.windowLoop();
 }
 

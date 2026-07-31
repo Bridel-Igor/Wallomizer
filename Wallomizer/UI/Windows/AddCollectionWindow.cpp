@@ -3,11 +3,12 @@
 #include "UserCollection.h"
 #include "LocalCollection.h"
 #include "SearchCollection.h"
+#include "CollectionManager.h"
 
-AddCollectionWindow::AddCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager) :
+AddCollectionWindow::AddCollectionWindow(HWND hCaller, CollectionManager& collectionManager) :
 	IWindow("Add collection", "Add Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100,	100,	240,	140),
 	m_hCaller(hCaller),
-	m_pCollectionManager(pCollectionManager),
+	m_collectionManager(collectionManager),
 	btnAddLocalCollection(this, "Add local collection",					10,		10,		220,	20),
 	btnAddUserCollection(this, "Add wallhaven user collection",		10,		40,		220,	20),
 	btnAddSearchCollection(this, "Add wallhaven search collection",	10,		70,		220,	20),
@@ -35,21 +36,21 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 		if (btnAddUserCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			m_pCollectionManager->addCollection(CollectionType::user);
+			m_collectionManager.addCollection(CollectionType::user);
 			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnAddLocalCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			m_pCollectionManager->addCollection(CollectionType::local);
+			m_collectionManager.addCollection(CollectionType::local);
 			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnAddSearchCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			m_pCollectionManager->addCollection(CollectionType::search);
+			m_collectionManager.addCollection(CollectionType::search);
 			DestroyWindow(hWnd());
 			return 0;
 		}
