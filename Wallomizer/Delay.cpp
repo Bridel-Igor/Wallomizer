@@ -1,25 +1,24 @@
 #include <windows.h>
 
 #include "Delay.h"
-#include "Settings.h"
-#include "Filesystem.h"
+#include "App.h"
 #include "Player.h"
-#include "WinUtils.h"
 
-bool Delay::exiting = false;
-Delay::SlideshowStatus Delay::slideshowStatus = Delay::SlideshowStatus::playing;
-
-namespace Delay
+Delay::Delay(App& app) :
+	m_app(app)
 {
-	bool bAbortDelay = false;
-	bool bReplayDelay = false;
-	unsigned long uDelayed = 0;
+	exiting = false;
+	slideshowStatus = Delay::SlideshowStatus::playing;
+}
+
+Delay::~Delay()
+{
 }
 
 void Delay::saveSession(Wallpaper *pCurrent)
 {
 	wchar_t wsPath[MAX_PATH];
-	Filesystem::getRoamingDir(wsPath);
+	m_app.getWinUtils().getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"Session.dat\0");
 	FILE* pFile;
 	_wfopen_s(&pFile, wsPath, L"wb");
@@ -43,7 +42,7 @@ void Delay::saveSession(Wallpaper *pCurrent)
 void Delay::loadSession(Wallpaper*& pCurrent)
 {
 	wchar_t wsPath[MAX_PATH];
-	Filesystem::getRoamingDir(wsPath);
+	m_app.getWinUtils().getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"Session.dat\0");
 	FILE* pFile;
 	_wfopen_s(&pFile, wsPath, L"rb");
@@ -70,7 +69,7 @@ void Delay::loadSession(Wallpaper*& pCurrent)
 
 void Delay::delay()
 {
-	while (uDelayed < Settings::delay)
+	while (uDelayed < m_app.getSettings().delay)
 	{
 		if (bAbortDelay)
 		{
@@ -88,14 +87,14 @@ void Delay::delay()
 		if (slideshowStatus == SlideshowStatus::playing)
 			uDelayed += 100;
 		if (uDelayed % 1000 == 0)
-			Player::updateTimer();
+			Player::updateTimer(m_app);
 	}
 	uDelayed = 0;
 }
 
 unsigned long Delay::getRemainingDelay()
 {
-	return Settings::delay > uDelayed ? Settings::delay - uDelayed : 0;
+	return m_app.getSettings().delay > uDelayed ? m_app.getSettings().delay - uDelayed : 0;
 }
 
 void Delay::abortDelay()
@@ -111,6 +110,6 @@ void Delay::replayDelay()
 void Delay::setSlideshowStatus(const SlideshowStatus status)
 {
 	slideshowStatus = status;
-	WinUtils::updateDesktopBackground();
+	m_app.getWinUtils().updateDesktopBackground(slideshowStatus != Delay::SlideshowStatus::stopped);
 	Player::redrawPlayers();
 }

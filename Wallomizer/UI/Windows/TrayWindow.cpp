@@ -6,6 +6,7 @@
 #include "resource.h"
 #include "Settings.h"
 #include "Delay.h"
+#include "App.h"
 
 #define WM_NOTIFYICONMSG (WM_USER + 2)
 
@@ -32,14 +33,14 @@ static BOOL TrayMessage(HWND hDlg, DWORD dwMessage, UINT uID, HICON hIcon, LPCST
 	return Shell_NotifyIconA(dwMessage, &tnd);
 }
 
-TrayWindow::TrayWindow(CollectionManager* pCollectionManager) :
+TrayWindow::TrayWindow(App& app) :
 	IWindow("Wallomizer", "Tray Window Class", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 
 												500,	500,	width,	height),
-	m_pCollectionManager(pCollectionManager),
+	m_app(app),
 	btnSettings			(this, "Settings",	40,		60,		65,		20),
 	btnExit				(this, "Exit",		115,	60,		65,		20),
 	player				(this,				10,		10,
-											10,		35,		200,	20, m_pCollectionManager, SS_CENTER)
+											10,		35,		200,	20, m_app, SS_CENTER)
 {
 	s_pTrayWindow = this;
 
@@ -57,9 +58,9 @@ TrayWindow::~TrayWindow()
 	ShowWindow(hWnd(), SW_HIDE);
 	DestroyIcon(hStatusIcon);
 
-	Delay::exiting = true;
-	Delay::saveSession(m_pCollectionManager->pCurrent);
-	Delay::abortDelay();
+	m_app.getDelay().exiting = true;
+	m_app.getDelay().saveSession(m_app.getCollectionManager().pCurrent);
+	m_app.getDelay().abortDelay();
 }
 
 LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -99,7 +100,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			pt.y = pt.y				< rect.top		? rect.top				: pt.y;
 			pt.y = pt.y + height	> rect.bottom	? rect.bottom - height	: pt.y;
 
-			player.updateTimer(true);
+			player.updateTimer(m_app, true);
 			SetWindowPos(hWnd(), HWND_TOPMOST, pt.x, pt.y, width, height, SWP_SHOWWINDOW);
 			SetForegroundWindow(hWnd());
 			SendMessage(hWnd(), WM_SETCURSOR, 0, 0);
@@ -127,7 +128,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_QUERYENDSESSION:
 	{
-		Delay::saveSession(m_pCollectionManager->pCurrent);
+		m_app.getDelay().saveSession(m_app.getCollectionManager().pCurrent);
 		return TRUE;
 	}
 
@@ -137,7 +138,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		if (btnSettings.isClicked(wParam))
 		{
-			m_pCollectionManager->openCollectionSettingsWindow();
+			m_app.getCollectionManager().openCollectionSettingsWindow();
 			return 0;
 		}
 		if (btnExit.isClicked(wParam))

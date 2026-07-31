@@ -2,22 +2,24 @@
 #include <stdio.h>
 
 #include "Settings.h"
-#include "Filesystem.h"
 #include "Internet.h"
-
-unsigned int Settings::prevCount = 5;
-unsigned long Settings::delay = 300000;
-wchar_t Settings::username[64];
-wchar_t Settings::apiKey[33];
-bool Settings::loadOnStartup = false;
-unsigned int Settings::uPerPage = 24;
+#include "WinUtils.h"
 
 constexpr unsigned short SETTINGS_FILE_VERSION = 3U;
+
+Settings::Settings(WinUtils& winUtils) :
+	m_winUtils(winUtils)
+{
+	prevCount = 5;
+	delay = 300000;
+	loadOnStartup = false;
+	uPerPage = 24;
+}
 
 void Settings::saveSettings()
 {
 	wchar_t path[MAX_PATH];
-	Filesystem::getRoamingDir(path);
+	m_winUtils.getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"Settings.dat\0");
 	FILE* pFile;
 	_wfopen_s(&pFile, path, L"wb");
@@ -37,7 +39,7 @@ void Settings::saveSettings()
 void Settings::loadSettings()
 {
 	wchar_t path[MAX_PATH];
-	Filesystem::getRoamingDir(path);
+	m_winUtils.getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"Settings.dat\0");
 	FILE* pFile;
 	_wfopen_s(&pFile, path, L"rb");

@@ -4,6 +4,8 @@
 #include "CategoriesAndPurityComponents.h"
 #include "CollectionManager.h"
 
+class App;
+
 class UserCollection : public BaseCollection
 {
 public:
@@ -23,9 +25,7 @@ private:
 	};
 
 public:
-	UserCollection(CollectionManager* collectionManager) :
-		m_pCollectionManager(collectionManager)
-	{}
+	UserCollection(App& app);
 
 	~UserCollection() {};
 	bool saveSettings(FILE* pFile) const;
@@ -36,13 +36,14 @@ public:
 	Wallpaper* getWallpaperInfo(unsigned int index) const;
 	void openCollectionSettingsWindow(HWND hCaller);
 
-	static bool loadWallpaper(const Wallpaper* pWallpaper);
+	static bool loadWallpaper(const Wallpaper* pWallpaper, App& app);
 	static void openWallpaperExternal(const Wallpaper* pWallpaper);
-	static void loadCollectionList(std::list<UserCollectionInfo>& list, const wchar_t* sUsername, const wchar_t* sApiKey);
+	static void loadCollectionList(App& app, std::list<UserCollectionInfo>& list, const wchar_t* sUsername, const wchar_t* sApiKey);
 
 	UserCollectionSettings settings;
 	
 private:
+	App& m_app;
 	static constexpr int s_nPerPage = 24;
 	CollectionManager* m_pCollectionManager = nullptr;
 	wchar_t m_wsCollectionUrl[255] = L"";

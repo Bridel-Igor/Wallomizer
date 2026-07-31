@@ -4,6 +4,8 @@
 #include "CategoriesAndPurityComponents.h"
 #include "CollectionManager.h"
 
+class App;
+
 class SearchCollection : public BaseCollection
 {
 private:
@@ -17,9 +19,7 @@ private:
 	};
 
 public:
-	SearchCollection(CollectionManager* collectionManager) :
-		m_pCollectionManager(collectionManager)
-	{}
+	SearchCollection(App& app);
 
 	~SearchCollection() {};
 	bool saveSettings(FILE* pFile) const;
@@ -30,12 +30,13 @@ public:
 	Wallpaper* getWallpaperInfo(unsigned int index) const;
 	void openCollectionSettingsWindow(HWND hCaller);
 
-	static bool loadWallpaper(const Wallpaper* pWallpaper);
+	static bool loadWallpaper(const Wallpaper* pWallpaper, App& app);
 	static void openWallpaperExternal(const Wallpaper* pWallpaper);
 
 	SearchCollectionSettings settings;
 
 private:
+	App& m_app;
 	CollectionManager* m_pCollectionManager = nullptr;
 	wchar_t m_wsSearchUrl[1024] = L"";	
 };

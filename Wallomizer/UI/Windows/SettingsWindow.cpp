@@ -4,8 +4,8 @@
 #include "Settings.h"
 #include "Player.h"
 #include "Internet.h"
-#include "Filesystem.h"
 #include "WinUtils.h"
+#include "App.h"
 
 HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, LPCSTR lpszDesc)
 {
@@ -36,9 +36,10 @@ HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, 
 	return hRes;
 }
 
-SettingsWindow::SettingsWindow(HWND hCaller) :
+SettingsWindow::SettingsWindow(HWND hCaller, App& app) :
 	IWindow("Settings", "Setting Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	m_hCaller(hCaller),
+	m_app(app),
 	stApplication	(this, "Application",					10,		10,		380,	20, SS_CENTER),
 	stVersion		(this, "Version:",						10,		40,		130,	20, SS_RIGHT),
 	stActVersion	(this, "",								150,	40,		100,	20),
@@ -53,12 +54,12 @@ SettingsWindow::SettingsWindow(HWND hCaller) :
 	stHours			(this, "Hours",							150,	160,	74,		20, SS_CENTER),
 	stMinutes		(this, "Minutes",						233,	160,	74,		20, SS_CENTER),
 	stSeconds		(this, "Seconds",						316,	160,	74,		20, SS_CENTER),
-	udeHours		(this,									150,	180,	74,		20, 0, 999, int((Settings::delay / 1000) / 3600)),
-	udeMinutes		(this,									233,	180,	74,		20, 0, 59, int((Settings::delay / 1000) / 60) % 60),
-	udeSeconds		(this,									316,	180,	74,		20, 0, 59, int(Settings::delay / 1000) % 60),
+	udeHours		(this,									150,	180,	74,		20, 0, 999, int((app.getSettings().delay / 1000) / 3600)),
+	udeMinutes		(this,									233,	180,	74,		20, 0, 59, int((app.getSettings().delay / 1000) / 60) % 60),
+	udeSeconds		(this,									316,	180,	74,		20, 0, 59, int(app.getSettings().delay / 1000) % 60),
 
 	stBckColor		(this, "Background color:",				10,		210,	130,	20,	SS_RIGHT),
-	cpbBckColor		(this, WinUtils::getBackgroundColor(),	150,	210,	120,	20),
+	cpbBckColor		(this, app.getWinUtils().getBackgroundColor(),	150,	210,	120,	20),
 
 	stWallhaven		(this, "Wallhaven",						10,		240,	380,	20, SS_CENTER),
 	stApiKey		(this, "Api key:",						10,		270,	130,	20, SS_RIGHT),
@@ -72,12 +73,12 @@ SettingsWindow::SettingsWindow(HWND hCaller) :
 	EnableWindow(m_hCaller, FALSE);
 
 	char version[16] = {0};
-	if (Filesystem::getAppVersion(version))
+	if (m_app.getWinUtils().getAppVersion(version))
 		SetWindowText(stActVersion.hWnd(), version);
 
-	edUsername.setTextW(Settings::username);
-	edApiKey.setTextW(Settings::apiKey);
-	cbStartup.setChecked(Settings::loadOnStartup);
+	edUsername.setTextW(app.getSettings().username);
+	edApiKey.setTextW(app.getSettings().apiKey);
+	cbStartup.setChecked(app.getSettings().loadOnStartup);
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	SendMessage(stApplication.hWnd(), WM_SETFONT, (WPARAM)resources.titleFont, TRUE);
@@ -211,9 +212,9 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 					MessageBoxA(nullptr, "Can't check API key! Wallhaven API is down, or no internet connection.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 			}
 			
-			Settings::delay = delay;
-			edUsername.getTextW(Settings::username, 64);
-			Settings::setApiKey(apiKey);
+			m_app.getSettings().delay = delay;
+			edUsername.getTextW(m_app.getSettings().username, 64);
+			m_app.getSettings().setApiKey(apiKey);
 			
 			char startupPath[MAX_PATH];
 			HRESULT hr = SHGetFolderPathA(NULL, CSIDL_STARTUP, 0, NULL, startupPath); // if target win Vista and later use SHGetKnownFolderPath()
@@ -226,19 +227,19 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 					GetModuleFileNameA(NULL, currentPath, 260);
 					GetCurrentDirectoryA(260, currentDirectory);
 					CreateLink(currentPath, currentDirectory, startupPath, "");
-					Settings::loadOnStartup = true;
+					m_app.getSettings().loadOnStartup = true;
 				}
 				else
 				{
 					remove(startupPath);
-					Settings::loadOnStartup = false;
+					m_app.getSettings().loadOnStartup = false;
 				}
 			}
 
-			WinUtils::setBackgroundColor(cpbBckColor.getColor());
+			m_app.getWinUtils().setBackgroundColor(cpbBckColor.getColor());
 
-			Settings::saveSettings();
-			Player::updateTimer(true);
+			m_app.getSettings().saveSettings();
+			Player::updateTimer(m_app, true);
 			DestroyWindow(hWnd());
 			return 0;
 		}

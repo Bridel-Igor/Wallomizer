@@ -1,19 +1,45 @@
 #include "WinUtils.h"
-#include "Filesystem.h"
-#include "Delay.h"
 
-void WinUtils::updateDesktopBackground()
+#include <shlobj.h>
+#include <Windows.h>
+#include <exception>
+#include <winver.h>
+#pragma comment(lib, "Version.lib")
+
+WinUtils::WinUtils()
+{
+	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
+
+	PWSTR tmp_path;
+	HRESULT res = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &tmp_path);
+	if (res != S_OK)
+	{
+		CoTaskMemFree(tmp_path);
+		throw std::exception("Can't get .../AppData/Roaming/ path.");
+	}
+	wcscpy_s(roamingNative, MAX_PATH, tmp_path);
+	CoTaskMemFree(tmp_path);
+	wcscat_s(roamingNative, MAX_PATH, L"\\Wallomizer\\\0");
+	CreateDirectoryW(roamingNative, NULL);
+
+	wcscpy_s(roaming, MAX_PATH, roamingNative);
+	for (int j = 0; roaming[j]; j++)
+		if (roaming[j] == '\\')
+			roaming[j] = '/';
+}
+
+void WinUtils::updateDesktopBackground(bool isImageVisible) const
 {
 	wchar_t wsCurrentPathNative[MAX_PATH] = { 0 };
-	if (Delay::slideshowStatus != Delay::SlideshowStatus::stopped)
+	if (isImageVisible)
 	{
-		Filesystem::getRoamingDirNative(wsCurrentPathNative);
+		getRoamingDirNative(wsCurrentPathNative);
 		wcscat_s(wsCurrentPathNative, MAX_PATH, L"Current wallpaper.jpg");
 	}
 	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, wsCurrentPathNative, SPIF_UPDATEINIFILE);
 }
 
-void WinUtils::flipWallpaperStyle()
+void WinUtils::flipWallpaperStyle() const
 {
 	HKEY hUserKey, hKey;
 	LRESULT lResult = RegOpenCurrentUser(KEY_ALL_ACCESS, &hUserKey);
@@ -32,7 +58,7 @@ void WinUtils::flipWallpaperStyle()
 	}
 }
 
-void WinUtils::setBackgroundColor(COLORREF color)
+void WinUtils::setBackgroundColor(COLORREF color) const
 {
 	int colors[1] = { COLOR_BACKGROUND };
 	SetSysColors(1, colors, &color);
@@ -65,7 +91,56 @@ void WinUtils::setBackgroundColor(COLORREF color)
 	}
 }
 
-COLORREF WinUtils::getBackgroundColor()
+COLORREF WinUtils::getBackgroundColor() const
 {
 	return GetSysColor(COLOR_BACKGROUND);
+}
+
+void WinUtils::getRoamingDir(wchar_t* path) const
+{
+	wcscpy_s(path, MAX_PATH, roaming);
+}
+
+void WinUtils::getRoamingDirNative(wchar_t* path) const
+{
+	wcscpy_s(path, MAX_PATH, roamingNative);
+}
+
+bool WinUtils::getAppVersion(char* version) const
+{
+	char* szFilename;
+	if (_get_pgmptr(&szFilename) != 0)
+		return false;
+
+	// allocate a block of memory for the version info
+	DWORD dummy;
+	DWORD dwSize = GetFileVersionInfoSize(szFilename, &dummy);
+	if (dwSize == 0)
+		return false;
+	char* data = new char[dwSize];
+
+	// load the version info
+	if (!GetFileVersionInfo(szFilename, NULL, dwSize, &data[0]))
+	{
+		delete[] data;
+		return false;
+	}
+
+	// get version string
+	LPVOID pvProductVersion = NULL;
+	unsigned int iProductVersionLen = 0;
+	if (!VerQueryValue(&data[0], "\\StringFileInfo\\000904b0\\ProductVersion", &pvProductVersion, &iProductVersionLen))
+	{
+		delete[] data;
+		return false;
+	}
+
+	strcpy_s(version, iProductVersionLen, (char*)pvProductVersion);
+
+#ifdef _DEBUG
+	strcat_s(version, 16, " debug");
+#endif
+
+	delete[] data;
+	return true;
 }

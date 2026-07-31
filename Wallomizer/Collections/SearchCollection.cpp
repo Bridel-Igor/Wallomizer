@@ -2,7 +2,12 @@
 #include "Internet.h"
 #include "SetSearchCollectionWindow.h"
 #include "Settings.h"
-#include "Filesystem.h"
+#include "App.h"
+
+SearchCollection::SearchCollection(App& app) :
+	m_app(app)
+{
+}
 
 bool SearchCollection::saveSettings(FILE* pFile) const
 {
@@ -39,7 +44,7 @@ bool SearchCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 		wcscpy_s(settings.wsResolution, settings_2U.wsResolution);
 		wcscpy_s(settings.wsTag, settings_2U.wsTag);
 	}
-	if (fileVersion >= 3U && fileVersion <= Filesystem::COLLECTION_MANAGER_FILE_VERSION)
+	if (fileVersion >= 3U && fileVersion <= CollectionManager::COLLECTION_MANAGER_FILE_VERSION)
 		fread(&settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
 
 	wcscpy_s(m_wsSearchUrl, L"https://wallhaven.cc/api/v1/search?");
@@ -65,17 +70,17 @@ bool SearchCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 	wcscat_s(m_wsSearchUrl, settings.wsRatio);
 	wcscat_s(m_wsSearchUrl, settings.wsColor);
 
-	if (Settings::isApiKeyUsed())
+	if (m_app.getSettings().isApiKeyUsed())
 	{
 		wcscat_s(m_wsSearchUrl, L"&apikey=");
-		wcscat_s(m_wsSearchUrl, Settings::getApiKey());
+		wcscat_s(m_wsSearchUrl, m_app.getSettings().getApiKey());
 	}
 
 	if (!m_isEnabled)
 		return true;
 
 	Internet internet;
-	internet.DownloadToBuffer(m_wsSearchUrl, Settings::uPerPage * 750);
+	internet.DownloadToBuffer(m_wsSearchUrl, m_app.getSettings().uPerPage * 750);
 	if (!internet.parse("meta"))
 		return false;
 	if (!internet.parse("total", m_uiNumber, true))
@@ -109,8 +114,8 @@ CategoriesAndPurity SearchCollection::getCAP() const
 Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 {
 	Wallpaper* pWallpaper = nullptr;
-	int page = int(index / Settings::uPerPage);
-	index -= page * Settings::uPerPage;
+	int page = int(index / m_app.getSettings().uPerPage);
+	index -= page * m_app.getSettings().uPerPage;
 	page++;
 	wchar_t wsPageUrl[1024];
 	wcscpy_s(wsPageUrl, m_wsSearchUrl);
@@ -120,7 +125,7 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 	wcscat_s(wsPageUrl, wsCurrentPage);
 
 	Internet internet;
-	internet.DownloadToBuffer(wsPageUrl, Settings::uPerPage * 750);
+	internet.DownloadToBuffer(wsPageUrl, m_app.getSettings().uPerPage * 750);
 	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
 			return pWallpaper;
@@ -139,10 +144,10 @@ void SearchCollection::openCollectionSettingsWindow(HWND hCaller)
 	setSearchCollectionWindow.windowLoop();
 }
 
-bool SearchCollection::loadWallpaper(const Wallpaper* pWallpaper)
+bool SearchCollection::loadWallpaper(const Wallpaper* pWallpaper, App& app)
 {
 	wchar_t wsImgPath[MAX_PATH];
-	Filesystem::getRoamingDir(wsImgPath);
+	app.getWinUtils().getRoamingDir(wsImgPath);
 	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
 	Internet internet;
 	return internet.DownloadToFile(pWallpaper->getPathW(), wsImgPath);

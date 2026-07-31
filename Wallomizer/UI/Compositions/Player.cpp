@@ -2,11 +2,10 @@
 #include "Delay.h"
 #include "resource.h"
 #include "IWindow.h"
-#include "Filesystem.h"
 #include "WinUtils.h"
+#include "App.h"
 
 char Player::sTimer[16];
-CollectionManager* Player::s_pCollectionManager = nullptr;
 std::list<Player*> Player::pPlayers;
 HICON	Player::Resources::hIPlay,			Player::Resources::hIPlayHover,			Player::Resources::hIPlayActive,
 		Player::Resources::hIPause,			Player::Resources::hIPauseHover,		Player::Resources::hIPauseActive,
@@ -65,7 +64,7 @@ Player::Resources::~Resources()
 	DestroyIcon(hIFitHover);
 }
 
-Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, CollectionManager* pCollectionManager, DWORD additionalStyles) :
+Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, App& app, DWORD additionalStyles) :
 	btnPrev(pParent,				xPlayer,		yPlayer,	20,		20, resources.hIPrev,			resources.hIPrevHover,			"Previous"),
 	btnOpenExternal(pParent,		xPlayer + 30,	yPlayer,	20,		20, resources.hIOpenExternal,	resources.hIOpenExternalHover,	"Source image"),
 	btnStop(pParent,				xPlayer + 60,	yPlayer,	20,		20, resources.hIStop,			resources.hIStopHover,			"Stop"),
@@ -73,10 +72,11 @@ Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yT
 	btnPause(pParent,				xPlayer + 120,	yPlayer,	20,		20, resources.hIPause,			resources.hIPauseHover,			"Pause"),
 	btnFit(pParent,					xPlayer + 150,	yPlayer,	20,		20, resources.hIFit,			resources.hIFitHover,			"Fit/fill"),
 	btnNext(pParent,				xPlayer + 180,	yPlayer,	20,		20, resources.hINext,			resources.hINextHover,			"Next"),
-	stDelayRemained(pParent, "",	xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles)
+	stDelayRemained(pParent, "",	xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles),
+	m_app(app)
 {	
-	s_pCollectionManager = pCollectionManager;
-	updateTimer(true);
+	//s_pCollectionManager = pCollectionManager;
+	updateTimer(m_app, true);
 	pPlayers.push_back(this);
 }
 
@@ -87,48 +87,46 @@ Player::~Player()
 
 bool Player::click(WPARAM& wParam)
 {
-	if (s_pCollectionManager == nullptr)
-		return false;
 	if (btnOpenExternal.isClicked(wParam))
 	{
-		s_pCollectionManager->openWallpaperExternal();
+		m_app.getCollectionManager().openWallpaperExternal();
 		return true;
 	}
 	if (btnPrev.isClicked(wParam))
 	{
-		Delay::replayDelay();
-		s_pCollectionManager->setPreviousWallpaper();
+		m_app.getDelay().replayDelay();
+		m_app.getCollectionManager().setPreviousWallpaper();
 		return true;
 	}
 	if (btnStop.isClicked(wParam))
 	{ 
-		Delay::setSlideshowStatus(Delay::SlideshowStatus::stopped);
+		m_app.getDelay().setSlideshowStatus(Delay::SlideshowStatus::stopped);
 		redrawPlayers();
 		return 0;
 	}
 	if (btnPlay.isClicked(wParam))
 	{
-		Delay::setSlideshowStatus(Delay::SlideshowStatus::playing);
+		m_app.getDelay().setSlideshowStatus(Delay::SlideshowStatus::playing);
 		redrawPlayers();
 		return true;
 	}
 	if (btnPause.isClicked(wParam)) // TODO: save session file on pause. And don't rewrite it on exit
 	{
-		Delay::setSlideshowStatus(Delay::SlideshowStatus::paused);
+		m_app.getDelay().setSlideshowStatus(Delay::SlideshowStatus::paused);
 		redrawPlayers();
 		return true;
 	}
 	if (btnFit.isClicked(wParam)) 
 	{
-		WinUtils::flipWallpaperStyle();
-		WinUtils::updateDesktopBackground();
+		m_app.getWinUtils().flipWallpaperStyle();
+		m_app.getWinUtils().updateDesktopBackground(m_app.getDelay().slideshowStatus != Delay::SlideshowStatus::stopped);
 		Player::redrawPlayers();
 		return true;
 	}
 	if (btnNext.isClicked(wParam))
 	{
-		Delay::replayDelay();
-		s_pCollectionManager->setNextWallpaper();
+		m_app.getDelay().replayDelay();
+		m_app.getCollectionManager().setNextWallpaper();
 		return true;
 	}
 	return false;
@@ -138,7 +136,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 {	
 	if (pDIS->hwndItem == btnPrev.hWnd())
 	{
-		if (s_pCollectionManager && !s_pCollectionManager->hasPrevious())
+		if (!m_app.getCollectionManager().hasPrevious())
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
@@ -151,7 +149,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 		return true;
 	if (pDIS->hwndItem == btnStop.hWnd())
 	{
-		if (Delay::slideshowStatus == Delay::SlideshowStatus::stopped)
+		if (m_app.getDelay().slideshowStatus == Delay::SlideshowStatus::stopped)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIStopActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -162,7 +160,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	}
 	if (pDIS->hwndItem == btnPlay.hWnd())
 	{
-		if (Delay::slideshowStatus == Delay::SlideshowStatus::playing)
+		if (m_app.getDelay().slideshowStatus == Delay::SlideshowStatus::playing)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPlayActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -173,7 +171,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	}
 	if (pDIS->hwndItem == btnPause.hWnd())
 	{
-		if (Delay::slideshowStatus == Delay::SlideshowStatus::paused)
+		if (m_app.getDelay().slideshowStatus == Delay::SlideshowStatus::paused)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -189,7 +187,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	return false;
 }
 
-void Player::updateTimer(bool isForced)
+void Player::updateTimer(App& app, bool isForced)
 {
 	for (auto pPlayer : pPlayers)
 	{
@@ -201,11 +199,11 @@ void Player::updateTimer(bool isForced)
 	if (!isForced)
 		return;
 
-	if (s_pCollectionManager && s_pCollectionManager->m_isLoading)
+	if (app.getCollectionManager().m_isLoading)
 		strcpy_s(sTimer, "loading...");
 	else
 	{
-		unsigned long remaining = Delay::getRemainingDelay();
+		unsigned long remaining = app.getDelay().getRemainingDelay();
 		if (remaining % 1000 != 0)
 			remaining += 1000;
 		char sSec[3], sMin[3], sHour[4];

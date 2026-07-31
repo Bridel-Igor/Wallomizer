@@ -10,10 +10,12 @@
 #include "CollectionItem.h"
 #include "Panel.h"
 
+class App;
+
 class MainWindow : public IWindow
 {
 public:
-	MainWindow(CollectionManager* pCollectionManager);
+	MainWindow(App& app);
 	~MainWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void updateCollectionItems();
@@ -26,11 +28,12 @@ private:
 	void destroyCollectionItems();
 	void updateScroll();
 
+	App& m_app;
+
 	COLORREF bkColor;
 	HBRUSH bkBrush;
 	int fWidth, fHeight, fX, fY;
 
-	CollectionManager* m_pCollectionManager;
 	Static stCollections;
 	Panel collectionsPanel;
 	Static stEmpty;

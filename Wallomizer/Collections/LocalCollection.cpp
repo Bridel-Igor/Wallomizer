@@ -7,7 +7,7 @@
 #include "LocalCollection.h"
 #include "SetLocalCollectionWindow.h"
 #include "Settings.h"
-#include "Filesystem.h"
+#include "App.h"
 
 bool isImage(std::experimental::filesystem::path path)
 {
@@ -17,6 +17,11 @@ bool isImage(std::experimental::filesystem::path path)
 		if (path.extension().compare((std::experimental::filesystem::path)extension) == 0)
 			return true;
 	return false;
+}
+
+LocalCollection::LocalCollection(App& app) :
+	m_app(app)
+{
 }
 
 bool LocalCollection::saveSettings(FILE* pFile) const
@@ -37,7 +42,7 @@ bool LocalCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 	
 	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
 
-	if (fileVersion >= 2U && fileVersion <= Filesystem::COLLECTION_MANAGER_FILE_VERSION)
+	if (fileVersion >= 2U && fileVersion <= CollectionManager::COLLECTION_MANAGER_FILE_VERSION)
 		fread(&settings, sizeof(LocalCollection::LocalCollectionSettings), 1, pFile);
 	
 	std::experimental::filesystem::path dirPath{ settings.wsDirectoryPath };
@@ -114,14 +119,14 @@ void LocalCollection::openCollectionSettingsWindow(HWND hCaller)
 	setLocalCollectionWindow.windowLoop();
 }
 
-bool LocalCollection::loadWallpaper(const Wallpaper* pWallpaper)
+bool LocalCollection::loadWallpaper(const Wallpaper* pWallpaper, App& app)
 {
 	char buf[BUFSIZ];
 	size_t size;
 	FILE* pSource = nullptr, * pDestination = nullptr;
 	_wfopen_s(&pSource, pWallpaper->getPathW(), L"rb");
 	wchar_t path[MAX_PATH];
-	Filesystem::getRoamingDir(path);
+	app.getWinUtils().getRoamingDir(path);
 	wcscat_s(path, MAX_PATH, L"Loaded wallpaper.dat");
 	_wfopen_s(&pDestination, path, L"wb");
 	if (pSource == nullptr || pDestination == nullptr)

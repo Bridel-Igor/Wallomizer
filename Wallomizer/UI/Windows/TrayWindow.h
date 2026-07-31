@@ -7,18 +7,20 @@
 #include "Player.h"
 #include "CollectionManager.h"
 
+class App;
+
 class TrayWindow : public IWindow
 {
 public:
-	TrayWindow(CollectionManager* pCollectionManager);
+	TrayWindow(App& app);
 	~TrayWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	
 	static constexpr int width = 220, height = 90;
 	static TrayWindow *s_pTrayWindow;
 
-private: 
-	CollectionManager* m_pCollectionManager;
+private:
+	App& m_app;
 
 public:
 	Button btnSettings, btnExit;

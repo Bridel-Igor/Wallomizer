@@ -6,12 +6,13 @@
 #include "SettingsWindow.h"
 #include "TrayWindow.h"
 #include "Delay.h"
+#include "App.h"
 
 MainWindow* MainWindow::s_pMainWindow = nullptr;
 
-MainWindow::MainWindow(CollectionManager* pCollectionManager) :
+MainWindow::MainWindow(App& app) :
 	IWindow("Wallomizer", "Main Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
-	m_pCollectionManager(pCollectionManager),
+	m_app(app),
 	stCollections		(this, "Collections:",			20,		10,		100,	20),
 	btnAdd				(this, "Add collection..",		530,	10,		100,	20),
 	fX(10), fY(40), fWidth(width - 20), fHeight(400), bkColor(RGB(15, 15, 15)), bkBrush(CreateSolidBrush(bkColor)),
@@ -20,14 +21,14 @@ MainWindow::MainWindow(CollectionManager* pCollectionManager) :
 														5,		0,		480,	20),
 	btnSettings			(this, "Settings",				10,		450,	95,		20),
 	player				(this,							220,	450,
-														430,	450,	100,	20, m_pCollectionManager)
+														430,	450,	100,	20, app)
 {
 	s_pMainWindow = this;
-	while (!m_pCollectionManager->isReady())
+	while (!m_app.getCollectionManager().isReady())
 		Sleep(50);
 	centerWindow(GetDesktopWindow());
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)IWindow::Resources::mainFont);
-	player.updateTimer(true);
+	player.updateTimer(m_app, true);
 	updateCollectionItems();
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
@@ -48,7 +49,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (wParam == TRUE)
 		{
-			player.updateTimer(true);
+			player.updateTimer(m_app, true);
 			player.redrawPlayers();
 		}
 	}
@@ -69,7 +70,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (btnAdd.isClicked(wParam))
 		{
-			AddCollectionWindow addCollectionWindow(hWnd(), m_pCollectionManager);
+			AddCollectionWindow addCollectionWindow(hWnd(), &m_app.getCollectionManager());
 			addCollectionWindow.windowLoop();
 			return 0;
 		}
@@ -77,9 +78,9 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		if (btnSettings.isClicked(wParam))
 		{
-			SettingsWindow settingsWindow(hWnd());
+			SettingsWindow settingsWindow(hWnd(), m_app);
 			settingsWindow.windowLoop();
-			Settings::saveSettings();
+			m_app.getSettings().saveSettings();
 			return 0;
 		}
 		int i = 0;
@@ -87,12 +88,12 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (collectionItem.btnSettings.isClicked(wParam))
 			{
-				m_pCollectionManager->m_pCollections[i]->openCollectionSettingsWindow(hWnd());
+				m_app.getCollectionManager().m_pCollections[i]->openCollectionSettingsWindow(hWnd());
 				return 0;
 			}
 			if (collectionItem.btnDelete.isClicked(wParam))
 			{
-				m_pCollectionManager->eraseCollection(i);
+				m_app.getCollectionManager().eraseCollection(i);
 				updateCollectionItems();
 				InvalidateRect(collectionsPanel.hWnd(), nullptr, TRUE);
 				return 0;
@@ -100,8 +101,8 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (collectionItem.chboEnabled.isClicked(wParam))
 			{
 				collectionItem.chboEnabled.click();
-				m_pCollectionManager->m_pCollections[i]->setEnabled(collectionItem.chboEnabled.isChecked());
-				m_pCollectionManager->reloadSettings();
+				m_app.getCollectionManager().m_pCollections[i]->setEnabled(collectionItem.chboEnabled.isChecked());
+				m_app.getCollectionManager().reloadSettings();
 				return 0;
 			}
 			i++;
@@ -209,16 +210,16 @@ void MainWindow::updateCollectionItems()
 	ShowWindow(stEmpty.hWnd(), SW_HIDE);
 
 	size_t i;
-	for (i = m_pCollectionManager->m_pCollections.size(); i < collectionItems.size(); i++) //deleting excess items
+	for (i = m_app.getCollectionManager().m_pCollections.size(); i < collectionItems.size(); i++) //deleting excess items
 		collectionItems.pop_back();
 
 	i = 0;
 	for (auto& collectionItem : collectionItems) // updating those which won't be created
-		collectionItem.updateInfo(m_pCollectionManager->m_pCollections[i++]);
+		collectionItem.updateInfo(m_app.getCollectionManager().m_pCollections[i++]);
 
-	for (i = collectionItems.size(); i < m_pCollectionManager->m_pCollections.size(); i++) // creation
-		if (m_pCollectionManager->m_pCollections[i] != nullptr)
-			collectionItems.emplace_back(&collectionsPanel, 0, (int)(i * (CollectionItem::height + 1)), fWidth, m_pCollectionManager->m_pCollections[i], IWindow::Resources::mainFont);
+	for (i = collectionItems.size(); i < m_app.getCollectionManager().m_pCollections.size(); i++) // creation
+		if (m_app.getCollectionManager().m_pCollections[i] != nullptr)
+			collectionItems.emplace_back(&collectionsPanel, 0, (int)(i * (CollectionItem::height + 1)), fWidth, m_app.getCollectionManager().m_pCollections[i], IWindow::Resources::mainFont);
 
 	updateScroll();
 	for (auto& collectionItem : collectionItems) // placing according to the scrollbar

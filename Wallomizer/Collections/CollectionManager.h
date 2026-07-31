@@ -7,10 +7,12 @@
 
 #include "BaseCollection.h"
 
+class App;
+
 class CollectionManager : public BaseCollection
 {
 public:
-	CollectionManager();
+	CollectionManager(App& app);
 
 	~CollectionManager();
 	bool saveSettings(FILE* pFile = nullptr) const;
@@ -35,13 +37,17 @@ public:
 	bool hasPrevious() const;
 	bool isReady() const { return m_isReady; }
 
-	static bool loadWallpaper(const Wallpaper *pWallpaper);
+	static bool loadWallpaper(const Wallpaper *pWallpaper, App& app);
 	
 	std::vector<BaseCollection*> m_pCollections;
 	bool m_isLoading = false;
 	Wallpaper *pCurrent = nullptr, *pNext = nullptr;
+
+	/// Current file version of CollectionManager.dat file.
+	static constexpr unsigned short COLLECTION_MANAGER_FILE_VERSION = 3U;
 	
 private:
+	App& m_app;
 	std::list<Wallpaper*> pPreviousList;
 	bool m_isReady = false;
 	std::mt19937 m_randomGenerator;

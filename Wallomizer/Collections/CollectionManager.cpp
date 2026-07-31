@@ -4,17 +4,18 @@
 #include <ctime>
 
 #include "CollectionManager.h"
+#include "App.h"
 #include "Settings.h"
 #include "MainWindow.h"
 #include "TrayWindow.h"
 #include "UserCollection.h"
 #include "LocalCollection.h"
 #include "SearchCollection.h"
-#include "Filesystem.h"
 #include "Delay.h"
 #include "WinUtils.h"
 
-CollectionManager::CollectionManager()
+CollectionManager::CollectionManager(App& app) :
+	m_app(app)
 {
 	m_randomGenerator = std::mt19937(static_cast<unsigned int>(time(0)));
 	m_uniformIntDistribution = std::uniform_int_distribution<int>(0, 0);
@@ -29,12 +30,12 @@ CollectionManager::~CollectionManager()
 bool CollectionManager::saveSettings(FILE* pFile) const
 {
 	wchar_t wsPath[MAX_PATH];
-	Filesystem::getRoamingDir(wsPath);
+	m_app.getWinUtils().getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"CollectionManager.dat");
 	_wfopen_s(&pFile, wsPath, L"wb");
 	if (pFile != NULL)
 	{
-		fwrite(&Filesystem::COLLECTION_MANAGER_FILE_VERSION, sizeof(Filesystem::COLLECTION_MANAGER_FILE_VERSION), 1, pFile);
+		fwrite(&CollectionManager::COLLECTION_MANAGER_FILE_VERSION, sizeof(CollectionManager::COLLECTION_MANAGER_FILE_VERSION), 1, pFile);
 		const unsigned int size = (unsigned int)m_pCollections.size();
 		fwrite(&size, sizeof(size), 1, pFile);
 		for (auto pCollection : m_pCollections)
@@ -48,16 +49,16 @@ bool CollectionManager::saveSettings(FILE* pFile) const
 bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 {
 	m_isLoading = true;
-	Player::updateTimer(true);
+	Player::updateTimer(m_app, true);
 	wchar_t wsPath[MAX_PATH];
-	Filesystem::getRoamingDir(wsPath);
+	m_app.getWinUtils().getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"CollectionManager.dat");
 	m_isReady = false;
 	_wfopen_s(&pFile, wsPath, L"rb");
 	if (pFile != NULL)
 	{
 		fread(&fileVersion, sizeof(fileVersion), 1, pFile);
-		if (fileVersion >= 2U && fileVersion <= Filesystem::COLLECTION_MANAGER_FILE_VERSION)
+		if (fileVersion >= 2U && fileVersion <= CollectionManager::COLLECTION_MANAGER_FILE_VERSION)
 		{
 			clear();
 			unsigned int nCollections;
@@ -68,11 +69,11 @@ bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 				CollectionType collectionType;
 				fread(&collectionType, sizeof(collectionType), 1, pFile);
 				if (collectionType == CollectionType::local)
-					pTmpCollection = new LocalCollection(this);
+					pTmpCollection = new LocalCollection(m_app);
 				else if (collectionType == CollectionType::user)
-					pTmpCollection = new UserCollection(this);
+					pTmpCollection = new UserCollection(m_app);
 				else if (collectionType == CollectionType::search)
-					pTmpCollection = new SearchCollection(this);
+					pTmpCollection = new SearchCollection(m_app);
 				else
 					break;
 				pTmpCollection->loadSettings(pFile, fileVersion);
@@ -92,13 +93,13 @@ bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 	if (MainWindow::s_pMainWindow && MainWindow::s_pMainWindow->isReady())
 		MainWindow::s_pMainWindow->updateCollectionItems();
 	m_isReady = true;
-	if (Delay::slideshowStatus == Delay::SlideshowStatus::playing)
-		Delay::abortDelay();
+	if (m_app.getDelay().slideshowStatus == Delay::SlideshowStatus::playing)
+		m_app.getDelay().abortDelay();
 	// BUG: this thread runs faster than tray's thread
 	// if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady()) 
 	//	PostMessageA(TrayWindow::s_pTrayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::s_pTrayWindow->btnSettings.hMenu(), NULL);
 	m_isLoading = false;
-	Player::updateTimer(true);
+	Player::updateTimer(m_app, true);
 	return true;
 }
 
@@ -126,7 +127,7 @@ void CollectionManager::openCollectionSettingsWindow(HWND)
 		{
 			try 
 			{
-				MainWindow mainWindow(this);
+				MainWindow mainWindow(m_app);
 				mainWindow.windowLoop();
 			}
 			catch (...)
@@ -142,10 +143,10 @@ void CollectionManager::reloadSettings()
 	saveSettings();
 	loadSettings();
 	wchar_t wsPath[MAX_PATH];
-	Filesystem::getRoamingDir(wsPath);
+	m_app.getWinUtils().getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
-	Delay::replayDelay();
+	m_app.getDelay().replayDelay();
 }
 
 void CollectionManager::clear()
@@ -169,9 +170,9 @@ void CollectionManager::addCollection(CollectionType collectionType)
 	BaseCollection* pCollection = nullptr;
 	switch (collectionType)
 	{
-	case CollectionType::local:		pCollection = new LocalCollection(this);	break;
-	case CollectionType::user:		pCollection = new UserCollection(this);		break;
-	case CollectionType::search:	pCollection = new SearchCollection(this);	break;
+	case CollectionType::local:		pCollection = new LocalCollection(m_app);	break;
+	case CollectionType::user:		pCollection = new UserCollection(m_app);	break;
+	case CollectionType::search:	pCollection = new SearchCollection(m_app);	break;
 	}
 	if (pCollection == nullptr)
 		return;
@@ -195,10 +196,10 @@ void CollectionManager::eraseCollection(int index)
 	updateNumber();
 	std::lock_guard<std::mutex> lock(imageModification);
 	wchar_t wsPath[MAX_PATH];
-	Filesystem::getRoamingDir(wsPath);
+	m_app.getWinUtils().getRoamingDir(wsPath);
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
-	Delay::abortDelay();
+	m_app.getDelay().abortDelay();
 }
 
 void CollectionManager::loadNextWallpaper()
@@ -213,20 +214,20 @@ void CollectionManager::loadRandomWallpaper()
 		return;
 	const int randomFromAll = m_uniformIntDistribution(m_randomGenerator);
 	pNext = getWallpaperInfo(randomFromAll);
-	loadWallpaper(pNext);
+	loadWallpaper(pNext, m_app);
 }
 
 void CollectionManager::setLoadedWallpaper(bool setPrevious)
 {
 	std::lock_guard<std::mutex> lock(imageModification);
 	wchar_t wsLoadedPath[MAX_PATH], wsCurrentPath[MAX_PATH];
-	Filesystem::getRoamingDir(wsLoadedPath);
-	Filesystem::getRoamingDir(wsCurrentPath);
+	m_app.getWinUtils().getRoamingDir(wsLoadedPath);
+	m_app.getWinUtils().getRoamingDir(wsCurrentPath);
 	wcscat_s(wsLoadedPath, MAX_PATH, L"Loaded wallpaper.dat");
 	wcscat_s(wsCurrentPath, MAX_PATH, L"Current wallpaper.jpg");
 	if (!std::experimental::filesystem::exists(wsLoadedPath))
 	{
-		Delay::abortDelay();
+		m_app.getDelay().abortDelay();
 		return;
 	}
 	if (!setPrevious)
@@ -234,7 +235,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 		if (pCurrent != nullptr)
 		{
 			pPreviousList.push_back(pCurrent);
-			if (pPreviousList.size() > Settings::prevCount)
+			if (pPreviousList.size() > m_app.getSettings().prevCount)
 			{
 				delete pPreviousList.front();
 				pPreviousList.pop_front();
@@ -247,7 +248,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	{
 		return;
 	}
-	WinUtils::updateDesktopBackground();
+	m_app.getWinUtils().updateDesktopBackground(m_app.getDelay().slideshowStatus != Delay::SlideshowStatus::stopped);
 	Player::redrawPlayers();
 }
 
@@ -262,7 +263,7 @@ void CollectionManager::setPreviousWallpaper()
 	if (pPreviousList.empty())
 		return;
 
-	loadWallpaper(pPreviousList.back());
+	loadWallpaper(pPreviousList.back(), m_app);
 	setLoadedWallpaper(true);
 	loadNextWallpaper();
 
@@ -296,16 +297,16 @@ bool CollectionManager::hasPrevious() const
 	return !pPreviousList.empty();
 }
 
-bool CollectionManager::loadWallpaper(const Wallpaper* pWallpaper)
+bool CollectionManager::loadWallpaper(const Wallpaper* pWallpaper, App& app)
 {
 	switch (pWallpaper->getType())
 	{
 	case CollectionType::local:
-		return LocalCollection::loadWallpaper(pWallpaper);
+		return LocalCollection::loadWallpaper(pWallpaper, app);
 	case CollectionType::user:
-		return UserCollection::loadWallpaper(pWallpaper);
+		return UserCollection::loadWallpaper(pWallpaper, app);
 	case CollectionType::search:
-		return SearchCollection::loadWallpaper(pWallpaper);
+		return SearchCollection::loadWallpaper(pWallpaper, app);
 	default:
 		return false;
 	}

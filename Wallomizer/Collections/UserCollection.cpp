@@ -2,7 +2,12 @@
 #include "Internet.h"
 #include "SetUserCollectionWindow.h"
 #include "Settings.h"
-#include "Filesystem.h"
+#include "App.h"
+
+UserCollection::UserCollection(App& app) :
+	m_app(app)
+{
+}
 
 bool UserCollection::saveSettings(FILE* pFile) const
 {
@@ -22,7 +27,7 @@ bool UserCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 
 	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
 
-	if (fileVersion >= 2U && fileVersion <= Filesystem::COLLECTION_MANAGER_FILE_VERSION)
+	if (fileVersion >= 2U && fileVersion <= CollectionManager::COLLECTION_MANAGER_FILE_VERSION)
 		fread(&settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
 	
 	// Forming collection URL
@@ -36,10 +41,10 @@ bool UserCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 	wcscat_s(m_wsCollectionUrl, settings.categoriesAndPurity & CAP::puritySketchy ? L"1" : L"0");
 	wcscat_s(m_wsCollectionUrl, settings.categoriesAndPurity & CAP::purityNSFW ? L"1" : L"0");
 
-	if (Settings::isApiKeyUsed())
+	if (m_app.getSettings().isApiKeyUsed())
 	{
 		wcscat_s(m_wsCollectionUrl, L"&apikey=");
-		wcscat_s(m_wsCollectionUrl, Settings::getApiKey());
+		wcscat_s(m_wsCollectionUrl, m_app.getSettings().getApiKey());
 	}
 
 	if (!m_isEnabled)
@@ -97,14 +102,14 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 
 void UserCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetUserCollectionWindow setUserCollectionWindow(hCaller, m_pCollectionManager, this);
+	SetUserCollectionWindow setUserCollectionWindow(hCaller, m_app, this);
 	setUserCollectionWindow.windowLoop();
 }
 
-bool UserCollection::loadWallpaper(const Wallpaper* pWallpaper)
+bool UserCollection::loadWallpaper(const Wallpaper* pWallpaper, App& app)
 {
 	wchar_t wsImgPath[MAX_PATH];
-	Filesystem::getRoamingDir(wsImgPath);
+	app.getWinUtils().getRoamingDir(wsImgPath);
 	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
 	Internet internet;
 	return internet.DownloadToFile(pWallpaper->getPathW(), wsImgPath);
@@ -132,7 +137,7 @@ void UserCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
 	ShellExecuteW(0, 0, wsImgUrl, 0, 0, SW_SHOW);
 }
 
-void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, const wchar_t* wsUsername, const wchar_t* wsApiKey)
+void UserCollection::loadCollectionList(App& app, std::list<UserCollectionInfo>& list, const wchar_t* wsUsername, const wchar_t* wsApiKey)
 {
 	wchar_t wsCollectionInfoURL[255];
 	wcscpy_s(wsCollectionInfoURL, L"https://wallhaven.cc/api/v1/collections/");
@@ -140,7 +145,7 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 	if (wsApiKey[0])
 	{
 		wcscat_s(wsCollectionInfoURL, L"?apikey=");
-		wcscat_s(wsCollectionInfoURL, Settings::getApiKey());
+		wcscat_s(wsCollectionInfoURL, app.getSettings().getApiKey());
 	}
 
 	Internet internet;

@@ -8,10 +8,12 @@
 #include "CheckBox.h"
 #include "ColorPickerButton.h"
 
+class App;
+
 class SettingsWindow : public IWindow
 {
 public:
-	SettingsWindow(HWND hCaller);
+	SettingsWindow(HWND hCaller, App& app);
 	~SettingsWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -20,6 +22,7 @@ public:
 
 private:
 	HWND m_hCaller;
+	App& m_app;
 	Static stApplication, stSlideshow, stWallhaven;
 	Static stVersion, stActVersion, stDeveloper, stActDeveloper, stHours, stMinutes, stSeconds, stDelay, stBckColor, stApiKey, stUsername, stStartup;
 	Edit edApiKey, edUsername;

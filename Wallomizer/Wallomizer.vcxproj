@@ -156,6 +156,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="App.cpp" />
     <ClCompile Include="AppMutex.cpp" />
     <ClCompile Include="ColorPickerButton.cpp" />
     <ClCompile Include="UI\Components\Panel.cpp" />
@@ -175,7 +176,6 @@
     <ClCompile Include="UI\Components\ComboBox.cpp" />
     <ClCompile Include="Delay.cpp" />
     <ClCompile Include="UI\Components\Edit.cpp" />
-    <ClCompile Include="Filesystem.cpp" />
     <ClCompile Include="UI\Components\IconButton.cpp" />
     <ClCompile Include="Collections\LocalCollection.cpp" />
     <ClCompile Include="UI\Interfaces\HMenuGenerator.cpp" />
@@ -199,6 +199,7 @@
     <ClCompile Include="WinUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App.h" />
     <ClInclude Include="AppMutex.h" />
     <ClInclude Include="CategoriesAndPurity.h" />
     <ClInclude Include="ColorPickerButton.h" />
@@ -217,7 +218,6 @@
     <ClInclude Include="UI\Interfaces\IClickable.h" />
     <ClInclude Include="UI\Components\IconButton.h" />
     <ClInclude Include="Delay.h" />
-    <ClInclude Include="Filesystem.h" />
     <ClInclude Include="UI\Interfaces\IComponent.h" />
     <ClInclude Include="UI\Interfaces\IHoverable.h" />
     <ClInclude Include="Collections\LocalCollection.h" />

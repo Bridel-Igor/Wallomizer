@@ -1,10 +1,11 @@
 #include "SetUserCollectionWindow.h"
 #include "Settings.h"
+#include "App.h"
 
-SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, UserCollection* pCollection) :
+SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, App& app, UserCollection* pCollection) :
 	IWindow("User collection", "Set User Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	m_hCaller(hCaller),
-	m_pCollectionManager	(pCollectionManager),
+	m_app(app),
 	m_pCurrentUserCollection(pCollection),
 	stUsername				(this, "Username:",			10,		10,		80,		20, SS_RIGHT),
 	edUsername				(this, "",					100,	10,		240,	20),
@@ -22,8 +23,8 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, CollectionManager
 
 	if (edUsername.isEmpty())
 	{
-		edUsername.setTextW(Settings::username);
-		wcscpy_s(m_pCurrentUserCollection->settings.wsUsername, Settings::username);
+		edUsername.setTextW(m_app.getSettings().username);
+		wcscpy_s(m_pCurrentUserCollection->settings.wsUsername, m_app.getSettings().username);
 		SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
 		SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)L"Click to update");
 		SendMessageW(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
@@ -99,7 +100,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 			wchar_t tmpUsername[64];
 			edUsername.getTextW(tmpUsername, 64);
 			uciList.clear();
-			UserCollection::loadCollectionList(uciList, tmpUsername, Settings::apiKey);
+			UserCollection::loadCollectionList(m_app, uciList, tmpUsername, m_app.getSettings().apiKey);
 			SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
 			if (uciList.empty())
 			{
@@ -143,7 +144,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 			if (m_pCurrentUserCollection->isValid() == false)
 				m_pCurrentUserCollection->setValid(true);
 			else
-				m_pCollectionManager->reloadSettings();
+				m_app.getCollectionManager().reloadSettings();
 			DestroyWindow(hWnd());
 			return 0;
 		}

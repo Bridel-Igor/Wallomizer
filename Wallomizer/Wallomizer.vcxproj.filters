@@ -58,9 +58,6 @@
     <ClCompile Include="Internet.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Filesystem.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Delay.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -123,6 +120,9 @@
     </ClCompile>
     <ClCompile Include="ColorPickerButton.cpp">
       <Filter>UI\Components\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -204,9 +204,6 @@
     <ClInclude Include="resource.h">
       <Filter>UI\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="Filesystem.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Delay.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -254,6 +251,9 @@
     </ClInclude>
     <ClInclude Include="ColorPickerButton.h">
       <Filter>UI\Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

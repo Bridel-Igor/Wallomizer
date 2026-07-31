@@ -2,8 +2,11 @@
 
 #include "Wallpaper.h"
 
-namespace Delay
+class App;
+
+class Delay
 {
+public:
 	enum class SlideshowStatus : unsigned char
 	{
 		paused,
@@ -11,14 +14,25 @@ namespace Delay
 		stopped
 	};
 
-	extern bool exiting;
-	extern SlideshowStatus slideshowStatus;
+public:
+	Delay(App& app);
+	~Delay();
 
-	void saveSession(Wallpaper *pCurrent = nullptr);
-	void loadSession(Wallpaper *&pCurrent);
+	void saveSession(Wallpaper* pCurrent = nullptr);
+	void loadSession(Wallpaper*& pCurrent);
 	void delay();
 	unsigned long getRemainingDelay();
 	void abortDelay();
 	void replayDelay();
 	void setSlideshowStatus(const SlideshowStatus status);
-}
+
+	bool exiting;
+	SlideshowStatus slideshowStatus;
+
+private:
+	App& m_app;
+
+	bool bAbortDelay = false;
+	bool bReplayDelay = false;
+	unsigned long uDelayed = 0;
+};
