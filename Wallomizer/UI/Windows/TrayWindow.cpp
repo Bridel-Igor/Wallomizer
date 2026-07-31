@@ -1,11 +1,10 @@
+#include "TrayWindow.h"
+
 #include <thread>
 #include <Windows.h>
 #include <VersionHelpers.h>
 
-#include "TrayWindow.h"
 #include "resource.h"
-#include "Settings.h"
-#include "Delay.h"
 #include "App.h"
 
 #define WM_NOTIFYICONMSG (WM_USER + 2)

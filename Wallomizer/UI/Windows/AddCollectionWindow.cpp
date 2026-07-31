@@ -1,4 +1,5 @@
 #include "AddCollectionWindow.h"
+
 #include "UserCollection.h"
 #include "LocalCollection.h"
 #include "SearchCollection.h"

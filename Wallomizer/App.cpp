@@ -1,7 +1,8 @@
 #include "App.h"
-#include "TrayWindow.h"
 
 #include <thread>
+
+#include "TrayWindow.h"
 
 App::App() :
 	m_appMutex("Wallomizer"),

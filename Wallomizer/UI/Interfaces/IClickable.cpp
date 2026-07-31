@@ -1,4 +1,5 @@
 #include "IClickable.h"
+
 #include "HMenuGenerator.h"
 
 IClickable::IClickable(IComponent* pParent) :

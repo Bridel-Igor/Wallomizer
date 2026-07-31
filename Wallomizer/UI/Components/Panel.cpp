@@ -1,6 +1,7 @@
+#include "Panel.h"
+
 #include <exception>
 
-#include "Panel.h"
 #include "IWindow.h"
 #include "IHoverable.h"
 

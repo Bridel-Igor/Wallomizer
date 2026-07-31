@@ -1,10 +1,9 @@
+#include "SettingsWindow.h"
+
 #include <shlobj_core.h>
 
-#include "SettingsWindow.h"
-#include "Settings.h"
 #include "Player.h"
 #include "Internet.h"
-#include "WinUtils.h"
 #include "App.h"
 
 HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, LPCSTR lpszDesc)

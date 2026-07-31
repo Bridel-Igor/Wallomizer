@@ -1,5 +1,5 @@
 #include "SetUserCollectionWindow.h"
-#include "Settings.h"
+
 #include "App.h"
 
 SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, App& app, UserCollection* pCollection) :

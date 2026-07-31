@@ -1,6 +1,6 @@
-#include <exception>
-
 #include "AppMutex.h"
+
+#include <exception>
 
 AppMutex::AppMutex(const char* appName)
 {

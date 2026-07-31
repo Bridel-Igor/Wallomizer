@@ -1,8 +1,8 @@
+#include "HMenuGenerator.h"
+
 #include <random>
 #include <ctime>
 #include <set>
-
-#include "HMenuGenerator.h"
 
 namespace HMenuGenerator
 {

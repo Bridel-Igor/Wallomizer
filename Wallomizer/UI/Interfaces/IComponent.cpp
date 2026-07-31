@@ -1,6 +1,6 @@
-#include <stack>
-
 #include "IComponent.h"
+
+#include <stack>
 
 IComponent::IComponent(IComponent* pParent) :
 	m_pParent(pParent)

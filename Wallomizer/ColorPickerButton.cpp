@@ -1,4 +1,5 @@
 #include "ColorPickerButton.h"
+
 #include "IWindow.h"
 
 ColorPickerButton::ColorPickerButton(IComponent* pParent, COLORREF color, int x, int y, int width, int height) :

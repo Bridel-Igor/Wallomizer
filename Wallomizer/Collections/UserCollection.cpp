@@ -1,7 +1,7 @@
 #include "UserCollection.h"
+
 #include "Internet.h"
 #include "SetUserCollectionWindow.h"
-#include "Settings.h"
 #include "App.h"
 
 UserCollection::UserCollection(App& app) :

@@ -1,6 +1,7 @@
+#include "CheckBox.h"
+
 #include <Windows.h>
 
-#include "CheckBox.h"
 #include "resource.h"
 
 HICON CheckBox::Resources::hICheckBox, CheckBox::Resources::hICheckBoxChecked, 

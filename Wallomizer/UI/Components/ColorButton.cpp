@@ -1,4 +1,5 @@
 #include "ColorButton.h"
+
 #include "resource.h"
 #include "IWindow.h"
 

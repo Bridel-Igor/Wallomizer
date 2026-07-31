@@ -1,11 +1,10 @@
+#include "MainWindow.h"
+
 #include <thread>
 
-#include "MainWindow.h"
-#include "Settings.h"
 #include "AddCollectionWindow.h"
 #include "SettingsWindow.h"
 #include "TrayWindow.h"
-#include "Delay.h"
 #include "App.h"
 
 MainWindow* MainWindow::s_pMainWindow = nullptr;

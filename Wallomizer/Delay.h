@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Wallpaper.h"
-
 class App;
+class Wallpaper;
 
 class Delay
 {

@@ -6,7 +6,6 @@
 #include "UpDownEdit.h"
 #include "Edit.h"
 #include "Player.h"
-#include "CollectionManager.h"
 #include "CollectionItem.h"
 #include "Panel.h"
 

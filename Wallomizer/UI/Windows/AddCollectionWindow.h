@@ -13,6 +13,6 @@ public:
 
 private:
 	HWND m_hCaller;
-	CollectionManager* m_pCollectionManager;
+	CollectionManager* m_pCollectionManager; //TODO: change to reference
 	Button btnAddLocalCollection, btnAddUserCollection, btnAddSearchCollection, btnCancel;
 };

@@ -1,7 +1,8 @@
+#include "Settings.h"
+
 #include <Windows.h>
 #include <stdio.h>
 
-#include "Settings.h"
 #include "Internet.h"
 #include "WinUtils.h"
 

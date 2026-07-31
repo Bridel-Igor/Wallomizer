@@ -1,9 +1,8 @@
-#pragma once
+#include "IWindow.h"
 
 #include <stack>
 #include <exception>
 
-#include "IWindow.h"
 #include "IHoverable.h"
 #include "Edit.h"
 

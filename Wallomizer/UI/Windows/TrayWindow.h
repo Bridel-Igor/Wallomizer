@@ -5,7 +5,6 @@
 #include "IWindow.h"
 #include "Button.h"
 #include "Player.h"
-#include "CollectionManager.h"
 
 class App;
 

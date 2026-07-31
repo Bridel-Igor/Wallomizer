@@ -1,6 +1,6 @@
-#include <string>
-
 #include "ResPickerWindow.h"
+
+#include <string>
 
 ResPickerWindow::ResPickerWindow(HWND hCaller, wchar_t* wsResolution) :
 	IWindow("Resolution", "Res Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 390, 250),

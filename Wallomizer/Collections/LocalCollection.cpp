@@ -1,12 +1,11 @@
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include "LocalCollection.h"
 
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
 #include <string>
 #include <shlobj_core.h>
 
-#include "LocalCollection.h"
 #include "SetLocalCollectionWindow.h"
-#include "Settings.h"
 #include "App.h"
 
 bool isImage(std::experimental::filesystem::path path)

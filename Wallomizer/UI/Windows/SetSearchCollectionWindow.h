@@ -16,7 +16,7 @@ public:
 
 private:
 	HWND m_hCaller;
-	CollectionManager* m_pCollectionManager;
+	CollectionManager* m_pCollectionManager; //TODO: change to reference
 	SearchCollection* m_pCurrentSearchCollection;
 	Static stCategory, stPurity, stTag, stFilt, stTagInstruct[8];
 	Edit edTag;

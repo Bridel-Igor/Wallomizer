@@ -1,18 +1,15 @@
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include "CollectionManager.h"
 
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
 #include <ctime>
 
-#include "CollectionManager.h"
 #include "App.h"
-#include "Settings.h"
 #include "MainWindow.h"
 #include "TrayWindow.h"
 #include "UserCollection.h"
 #include "LocalCollection.h"
 #include "SearchCollection.h"
-#include "Delay.h"
-#include "WinUtils.h"
 
 CollectionManager::CollectionManager(App& app) :
 	m_app(app)

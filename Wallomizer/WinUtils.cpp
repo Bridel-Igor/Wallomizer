@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <exception>
 #include <winver.h>
+
 #pragma comment(lib, "Version.lib")
 
 WinUtils::WinUtils()

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "UserCollection.h"
-#include "CollectionManager.h"
 #include "IWindow.h"
 #include "Edit.h"
 #include "Static.h"

@@ -1,6 +1,6 @@
-#include <windows.h>
-
 #include "Wallpaper.h"
+
+#include <windows.h>
 
 Wallpaper::Wallpaper(CollectionType _type)
 {

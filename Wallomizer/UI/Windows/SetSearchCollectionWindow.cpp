@@ -1,4 +1,5 @@
 #include "SetSearchCollectionWindow.h"
+
 #include "ResPickerWindow.h"
 #include "AspRatPickerWindow.h"
 #include "ColorPickerWindow.h"

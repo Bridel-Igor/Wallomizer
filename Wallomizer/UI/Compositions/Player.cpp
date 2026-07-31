@@ -1,8 +1,7 @@
 #include "Player.h"
-#include "Delay.h"
+
 #include "resource.h"
 #include "IWindow.h"
-#include "WinUtils.h"
 #include "App.h"
 
 char Player::sTimer[16];

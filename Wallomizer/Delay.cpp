@@ -1,8 +1,10 @@
+#include "Delay.h"
+
 #include <windows.h>
 
-#include "Delay.h"
 #include "App.h"
 #include "Player.h"
+#include "Wallpaper.h"
 
 Delay::Delay(App& app) :
 	m_app(app)

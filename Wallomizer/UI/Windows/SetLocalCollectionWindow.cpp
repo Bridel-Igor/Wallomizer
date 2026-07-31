@@ -1,6 +1,6 @@
-#include <ShObjIdl.h>
-
 #include "SetLocalCollectionWindow.h"
+
+#include <ShObjIdl.h>
 
 SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, CollectionManager* pCollectionManager, LocalCollection* pCollection) :
 	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 120),

@@ -1,7 +1,8 @@
+#include "CollectionItem.h"
+
 #include <Windows.h>
 #include <CommCtrl.h>
 
-#include "CollectionItem.h"
 #include "resource.h"
 
 HICON CollectionItem::Resources::hIOptions, CollectionItem::Resources::hIOptionsHover, 

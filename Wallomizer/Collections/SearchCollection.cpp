@@ -1,7 +1,7 @@
 #include "SearchCollection.h"
+
 #include "Internet.h"
 #include "SetSearchCollectionWindow.h"
-#include "Settings.h"
 #include "App.h"
 
 SearchCollection::SearchCollection(App& app) :
