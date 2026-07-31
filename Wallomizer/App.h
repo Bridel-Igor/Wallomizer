@@ -2,7 +2,7 @@
 
 #include "AppMutex.h"
 #include "WinUtils.h"
-#include "Delay.h"
+#include "Timer.h"
 #include "CollectionManager.h"
 #include "Settings.h"
 
@@ -23,16 +23,16 @@ public:
 	void exit();
 
 	const WinUtils& getWinUtils() const { return m_winUtils; }
-	Delay& getDelay() { return m_delay; }
-	CollectionManager& getCollectionManager() { return m_collectionManager; }
 	Settings& getSettings() { return m_settings; }
+	CollectionManager& getCollectionManager() { return m_collectionManager; }
+	Timer& getTimer() { return m_timer; }
 
 private:
 	AppMutex m_appMutex;
 	WinUtils m_winUtils;
-	Delay m_delay;
-	CollectionManager m_collectionManager;
 	Settings m_settings;
+	CollectionManager m_collectionManager;
+	Timer m_timer;
 
 	bool m_running = true;
 };

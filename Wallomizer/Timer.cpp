@@ -1,4 +1,4 @@
-#include "Delay.h"
+#include "Timer.h"
 
 #include <windows.h>
 
@@ -6,14 +6,15 @@
 #include "Player.h"
 #include "Wallpaper.h"
 
-Delay::Delay(App& app) :
+Timer::Timer(App& app) :
 	m_app(app)
 {
 	loadSession(m_app.getCollectionManager().pCurrent);
 }
 
-void Delay::saveSession(Wallpaper *pCurrent)
+void Timer::saveSession(Wallpaper *pCurrent)
 {
+	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
 	wchar_t wsPath[MAX_PATH];
 	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"Session.dat\0");
@@ -21,8 +22,8 @@ void Delay::saveSession(Wallpaper *pCurrent)
 	_wfopen_s(&pFile, wsPath, L"wb");
 	if (pFile == NULL)
 		return;
-	fwrite(&slideshowStatus, sizeof(slideshowStatus), 1, pFile);
-	fwrite(&uDelayed, sizeof(uDelayed), 1, pFile);
+	fwrite(&m_status, sizeof(m_status), 1, pFile);
+	fwrite(&m_timePassed, sizeof(m_timePassed), 1, pFile);
 	CollectionType type = CollectionType::none;
 	if (pCurrent)
 		type = pCurrent->getType();
@@ -36,8 +37,9 @@ void Delay::saveSession(Wallpaper *pCurrent)
 	fclose(pFile);
 }
 
-void Delay::loadSession(Wallpaper*& pCurrent)
+void Timer::loadSession(Wallpaper*& pCurrent)
 {
+	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
 	wchar_t wsPath[MAX_PATH];
 	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"Session.dat\0");
@@ -45,8 +47,8 @@ void Delay::loadSession(Wallpaper*& pCurrent)
 	_wfopen_s(&pFile, wsPath, L"rb");
 	if (pFile == NULL)
 		return;
-	fread(&slideshowStatus, sizeof(slideshowStatus), 1, pFile);
-	fread(&uDelayed, sizeof(uDelayed), 1, pFile);
+	fread(&m_status, sizeof(m_status), 1, pFile);
+	fread(&m_timePassed, sizeof(m_timePassed), 1, pFile);
 	if (pCurrent == nullptr)
 	{
 		CollectionType type;
@@ -60,53 +62,56 @@ void Delay::loadSession(Wallpaper*& pCurrent)
 		}
 	}
 	fclose(pFile);
-	bAbortDelay = false;
 	DeleteFileW(wsPath);
 }
 
-void Delay::delay()
+void Timer::run()
 {
-	while (uDelayed < m_app.getSettings().delay)
+	while (m_timePassed < m_app.getSettings().delay)
 	{
-		if (bAbortDelay)
+		if (m_abort)
 		{
-			bAbortDelay = false;
-			uDelayed = 0;
+			m_abort = false;
+			m_timePassed = 0;
 			return;
 		}
-		if (bReplayDelay)
+		if (m_repeat)
 		{
-			bReplayDelay = false;
-			uDelayed = 0;
+			m_repeat = false;
+			m_timePassed = 0;
 			continue;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		if (slideshowStatus == SlideshowStatus::playing)
-			uDelayed += 100;
-		if (uDelayed % 1000 == 0)
+		if (m_status == Status::playing)
+		{
 			Player::updateTimer(m_app);
+			m_timePassed += 100;
+		}
 	}
-	uDelayed = 0;
+	m_timePassed = 0;
 }
 
-unsigned long Delay::getRemainingDelay() const
+void Timer::play() noexcept
 {
-	return m_app.getSettings().delay > uDelayed ? m_app.getSettings().delay - uDelayed : 0;
+	m_status = Status::playing;
+	m_app.getWinUtils().updateDesktopBackground(true);
 }
 
-void Delay::abortDelay()
+void Timer::pause() noexcept
 {
-	bAbortDelay = true;
+	m_status = Status::paused;
+	m_app.getWinUtils().updateDesktopBackground(true);
+	saveSession(m_app.getCollectionManager().pCurrent);
 }
 
-void Delay::replayDelay()
+void Timer::stop() noexcept
 {
-	bReplayDelay = true;
+	m_status = Status::stopped;
+	m_app.getWinUtils().updateDesktopBackground(false);
+	saveSession(m_app.getCollectionManager().pCurrent);
 }
 
-void Delay::setSlideshowStatus(const SlideshowStatus status)
+unsigned long Timer::getRemainingTime() const
 {
-	slideshowStatus = status;
-	m_app.getWinUtils().updateDesktopBackground(slideshowStatus != Delay::SlideshowStatus::stopped);
-	Player::redrawPlayers();
+	return m_app.getSettings().delay > m_timePassed ? m_app.getSettings().delay - m_timePassed : 0;
 }

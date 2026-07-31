@@ -92,38 +92,38 @@ bool Player::click(WPARAM& wParam)
 	}
 	if (btnPrev.isClicked(wParam))
 	{
-		m_app.getDelay().replayDelay();
+		m_app.getTimer().repeat();
 		m_app.getCollectionManager().setPreviousWallpaper();
 		return true;
 	}
 	if (btnStop.isClicked(wParam))
 	{ 
-		m_app.getDelay().setSlideshowStatus(Delay::SlideshowStatus::stopped);
+		m_app.getTimer().stop();
 		redrawPlayers();
 		return 0;
 	}
 	if (btnPlay.isClicked(wParam))
 	{
-		m_app.getDelay().setSlideshowStatus(Delay::SlideshowStatus::playing);
+		m_app.getTimer().play();
 		redrawPlayers();
 		return true;
 	}
-	if (btnPause.isClicked(wParam)) // TODO: save session file on pause. And don't rewrite it on exit
+	if (btnPause.isClicked(wParam))
 	{
-		m_app.getDelay().setSlideshowStatus(Delay::SlideshowStatus::paused);
+		m_app.getTimer().pause();
 		redrawPlayers();
 		return true;
 	}
 	if (btnFit.isClicked(wParam)) 
 	{
 		m_app.getWinUtils().flipWallpaperStyle();
-		m_app.getWinUtils().updateDesktopBackground(m_app.getDelay().slideshowStatus != Delay::SlideshowStatus::stopped);
+		m_app.getWinUtils().updateDesktopBackground(m_app.getTimer().getStatus() != Timer::Status::stopped);
 		Player::redrawPlayers();
 		return true;
 	}
 	if (btnNext.isClicked(wParam))
 	{
-		m_app.getDelay().replayDelay();
+		m_app.getTimer().repeat();
 		m_app.getCollectionManager().setNextWallpaper();
 		return true;
 	}
@@ -147,7 +147,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 		return true;
 	if (pDIS->hwndItem == btnStop.hWnd())
 	{
-		if (m_app.getDelay().slideshowStatus == Delay::SlideshowStatus::stopped)
+		if (m_app.getTimer().getStatus() == Timer::Status::stopped)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIStopActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -158,7 +158,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	}
 	if (pDIS->hwndItem == btnPlay.hWnd())
 	{
-		if (m_app.getDelay().slideshowStatus == Delay::SlideshowStatus::playing)
+		if (m_app.getTimer().getStatus() == Timer::Status::playing)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPlayActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -169,7 +169,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	}
 	if (pDIS->hwndItem == btnPause.hWnd())
 	{
-		if (m_app.getDelay().slideshowStatus == Delay::SlideshowStatus::paused)
+		if (m_app.getTimer().getStatus() == Timer::Status::paused)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -201,7 +201,7 @@ void Player::updateTimer(App& app, bool isForced)
 		strcpy_s(sTimer, "loading...");
 	else
 	{
-		unsigned long remaining = app.getDelay().getRemainingDelay();
+		unsigned long remaining = app.getTimer().getRemainingTime();
 		if (remaining % 1000 != 0)
 			remaining += 1000;
 		char sSec[3], sMin[3], sHour[4];

@@ -58,7 +58,7 @@
     <ClCompile Include="Internet.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Delay.cpp">
+    <ClCompile Include="Timer.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Wallpaper.cpp">
@@ -204,7 +204,7 @@
     <ClInclude Include="resource.h">
       <Filter>UI\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="Delay.h">
+    <ClInclude Include="Timer.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Wallpaper.h">

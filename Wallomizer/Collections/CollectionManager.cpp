@@ -90,13 +90,13 @@ bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 	if (MainWindow::s_pMainWindow && MainWindow::s_pMainWindow->isReady())
 		MainWindow::s_pMainWindow->updateCollectionItems();
 	m_isReady = true;
-	if (m_app.getDelay().slideshowStatus == Delay::SlideshowStatus::playing)
-		m_app.getDelay().abortDelay();
+	// TODO: is any of these needed?
+	//if (m_app.getTimer().getStatus() == Timer::Status::playing)
+	//	m_app.getTimer().abortDelay();
 	// BUG: this thread runs faster than tray's thread
 	// if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady()) 
 	//	PostMessageA(TrayWindow::s_pTrayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::s_pTrayWindow->btnSettings.hMenu(), NULL);
 	m_isLoading = false;
-	Player::updateTimer(m_app, true);
 	return true;
 }
 
@@ -143,7 +143,8 @@ void CollectionManager::reloadSettings()
 	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
-	m_app.getDelay().replayDelay();
+	m_app.getTimer().repeat();
+	Player::updateTimer(m_app, true);
 }
 
 void CollectionManager::clear()
@@ -196,7 +197,7 @@ void CollectionManager::eraseCollection(int index)
 	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	DeleteFileW(wsPath);
-	m_app.getDelay().abortDelay();
+	m_app.getTimer().abort();
 }
 
 void CollectionManager::loadNextWallpaper()
@@ -224,7 +225,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	wcscat_s(wsCurrentPath, MAX_PATH, L"Current wallpaper.jpg");
 	if (!std::experimental::filesystem::exists(wsLoadedPath))
 	{
-		m_app.getDelay().abortDelay();
+		m_app.getTimer().abort();
 		return;
 	}
 	if (!setPrevious)
@@ -245,7 +246,7 @@ void CollectionManager::setLoadedWallpaper(bool setPrevious)
 	{
 		return;
 	}
-	m_app.getWinUtils().updateDesktopBackground(m_app.getDelay().slideshowStatus != Delay::SlideshowStatus::stopped);
+	m_app.getWinUtils().updateDesktopBackground(m_app.getTimer().getStatus() != Timer::Status::stopped);
 	Player::redrawPlayers();
 }
 
