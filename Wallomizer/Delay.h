@@ -24,7 +24,6 @@ public:
 	void replayDelay();
 	void setSlideshowStatus(const SlideshowStatus status);
 
-	bool exiting = false;
 	SlideshowStatus slideshowStatus = Delay::SlideshowStatus::playing;
 
 private:

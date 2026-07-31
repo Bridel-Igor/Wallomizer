@@ -20,6 +20,7 @@ public:
 
 	/// Runs the complete application lifecycle.
 	int run();
+	void exit();
 
 	const WinUtils& getWinUtils() const { return m_winUtils; }
 	Delay& getDelay() { return m_delay; }
@@ -32,4 +33,6 @@ private:
 	Delay m_delay;
 	CollectionManager m_collectionManager;
 	Settings m_settings;
+
+	bool m_running = true;
 };

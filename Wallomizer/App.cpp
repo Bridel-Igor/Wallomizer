@@ -29,11 +29,11 @@ int App::run()
 			}
 		});
 
-	while (true)
+	while (m_running)
 	{
 		if (m_collectionManager.getNumber() == 0)
 		{
-			if (m_delay.exiting)
+			if (!m_running)
 				break;
 			Sleep(100);
 			continue;
@@ -41,7 +41,7 @@ int App::run()
 		std::thread delayThread(&Delay::delay, &m_delay);
 		m_collectionManager.loadNextWallpaper();
 		delayThread.join();
-		if (m_delay.exiting)
+		if (!m_running)
 			break;
 		m_collectionManager.setLoadedWallpaper();
 	}
@@ -50,4 +50,11 @@ int App::run()
 	if (trayWindowException)
 		std::rethrow_exception(trayWindowException);
 	return 0;
+}
+
+void App::exit()
+{
+	m_delay.saveSession(m_collectionManager.pCurrent);
+	m_delay.abortDelay();
+	m_running = false;
 }

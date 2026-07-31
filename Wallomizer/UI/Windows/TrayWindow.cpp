@@ -56,10 +56,7 @@ TrayWindow::~TrayWindow()
 	s_pTrayWindow = nullptr;
 	ShowWindow(hWnd(), SW_HIDE);
 	DestroyIcon(hStatusIcon);
-
-	m_app.getDelay().exiting = true;
-	m_app.getDelay().saveSession(m_app.getCollectionManager().pCurrent);
-	m_app.getDelay().abortDelay();
+	m_app.exit();
 }
 
 LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
