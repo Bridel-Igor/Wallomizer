@@ -44,7 +44,7 @@ bool UserCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 	if (m_app.getSettings().isApiKeyUsed())
 	{
 		wcscat_s(m_wsCollectionUrl, L"&apikey=");
-		wcscat_s(m_wsCollectionUrl, m_app.getSettings().getApiKey());
+		wcscat_s(m_wsCollectionUrl, m_app.getSettings().apiKey);
 	}
 
 	if (!m_isEnabled)
@@ -145,7 +145,7 @@ void UserCollection::loadCollectionList(App& app, std::list<UserCollectionInfo>&
 	if (wsApiKey[0])
 	{
 		wcscat_s(wsCollectionInfoURL, L"?apikey=");
-		wcscat_s(wsCollectionInfoURL, app.getSettings().getApiKey());
+		wcscat_s(wsCollectionInfoURL, app.getSettings().apiKey);
 	}
 
 	Internet internet;

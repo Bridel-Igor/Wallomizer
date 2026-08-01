@@ -11,7 +11,7 @@ class AppMutex
 public:
 	/// Constructor of application mutex.
 	/// @param appName - Name of the application. Used as mutex value. 
-	AppMutex(const char* appName);
+	explicit AppMutex(const char* appName);
 	~AppMutex();
 
 	/// Deleted as using of copy or move constructors will throw exception. 

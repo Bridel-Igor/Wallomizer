@@ -2,32 +2,29 @@
 
 #include <windows.h>
 
-Wallpaper::Wallpaper(CollectionType _type)
+Wallpaper::Wallpaper(CollectionType type)
 {
-	type = CollectionType::none;
-	m_wsParameter = nullptr;
-
-	switch (_type)
+	switch (type)
 	{
 		case CollectionType::local:
 		{
-			m_wsParameter = new wchar_t[MAX_PATH];
-			if (m_wsParameter != nullptr)
-				type = _type;
+			m_path = new wchar_t[MAX_PATH];
+			if (m_path != nullptr)
+				m_type = type;
 		}
 		break;
 		case CollectionType::user:
 		{
-			m_wsParameter = new wchar_t[255];
-			if (m_wsParameter != nullptr)
-				type = _type;
+			m_path = new wchar_t[255];
+			if (m_path != nullptr)
+				m_type = type;
 		}
 		break;
 		case CollectionType::search:
 		{
-			m_wsParameter = new wchar_t[1024];
-			if (m_wsParameter != nullptr)
-				type = _type;
+			m_path = new wchar_t[1024];
+			if (m_path != nullptr)
+				m_type = type;
 		}
 		break;
 	}
@@ -35,11 +32,11 @@ Wallpaper::Wallpaper(CollectionType _type)
 
 Wallpaper::~Wallpaper()
 {
-	type = CollectionType::none;
-	if (m_wsParameter != nullptr)
+	m_type = CollectionType::none;
+	if (m_path != nullptr)
 	{
-		delete[] m_wsParameter;
-		m_wsParameter = nullptr;
+		delete[] m_path;
+		m_path = nullptr;
 	}
 }
 
@@ -47,12 +44,12 @@ CollectionType Wallpaper::getType() const
 {
 	if (this == nullptr)
 		return CollectionType::none;
-	return type;
+	return m_type;
 }
 
 wchar_t* Wallpaper::getPathW() const
 {
 	if (this == nullptr)
 		return nullptr;
-	return m_wsParameter;
+	return m_path;
 }

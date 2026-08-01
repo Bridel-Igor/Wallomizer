@@ -5,11 +5,15 @@ class WinUtils;
 class Settings
 {
 public:
-	Settings(WinUtils& winUtils);
-	void saveSettings();
+	explicit Settings(const WinUtils& winUtils);
+	Settings(const Settings&) = delete;
+	Settings& operator=(const Settings&) = delete;
+	Settings(Settings&&) = delete;
+	Settings& operator=(Settings&&) = delete;
+
+	void saveSettings() const;
 	void loadSettings();
 	void setApiKey(const wchar_t* apiKey);
-	const wchar_t* getApiKey() const noexcept { return apiKey; }
 	const bool isApiKeyUsed() const noexcept { return apiKey[0]; }
 
 	unsigned int prevCount = 5;
@@ -20,5 +24,5 @@ public:
 	unsigned int uPerPage = 24;
 
 private:
-	WinUtils& m_winUtils;
+	const WinUtils& m_winUtils;
 };

@@ -8,13 +8,13 @@
 
 constexpr unsigned short SETTINGS_FILE_VERSION = 3U;
 
-Settings::Settings(WinUtils& winUtils) :
+Settings::Settings(const WinUtils& winUtils) :
 	m_winUtils(winUtils)
 {
 	loadSettings();
 }
 
-void Settings::saveSettings()
+void Settings::saveSettings() const
 {
 	wchar_t wcPath[MAX_PATH];
 	wcscpy_s(wcPath, MAX_PATH, m_winUtils.getRoamingDir());

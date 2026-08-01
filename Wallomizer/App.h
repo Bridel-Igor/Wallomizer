@@ -20,16 +20,16 @@ public:
 
 	/// Runs the complete application lifecycle.
 	int run();
-	void exit();
+	void requestExit();
 
-	const WinUtils& getWinUtils() const { return m_winUtils; }
-	Settings& getSettings() { return m_settings; }
-	CollectionManager& getCollectionManager() { return m_collectionManager; }
-	Timer& getTimer() { return m_timer; }
+	const WinUtils& getWinUtils() const			noexcept { return m_winUtils; }
+	Settings& getSettings()						noexcept { return m_settings; }
+	CollectionManager& getCollectionManager()	noexcept { return m_collectionManager; }
+	Timer& getTimer()							noexcept { return m_timer; }
 
 private:
-	AppMutex m_appMutex;
-	WinUtils m_winUtils;
+	const AppMutex m_appMutex;
+	const WinUtils m_winUtils;
 	Settings m_settings;
 	CollectionManager m_collectionManager;
 	Timer m_timer;

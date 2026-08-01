@@ -52,7 +52,7 @@ int App::run()
 	return 0;
 }
 
-void App::exit()
+void App::requestExit()
 {
 	m_timer.saveSession(m_collectionManager.pCurrent);
 	m_timer.abort();

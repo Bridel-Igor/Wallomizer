@@ -18,15 +18,15 @@ WinUtils::WinUtils()
 		CoTaskMemFree(tmp_path);
 		throw std::exception("Can't get .../AppData/Roaming/ path.");
 	}
-	wcscpy_s(roamingNative, MAX_PATH, tmp_path);
+	wcscpy_s(m_roamingNative, MAX_PATH, tmp_path);
 	CoTaskMemFree(tmp_path);
-	wcscat_s(roamingNative, MAX_PATH, L"\\Wallomizer\\\0");
-	CreateDirectoryW(roamingNative, NULL);
+	wcscat_s(m_roamingNative, MAX_PATH, L"\\Wallomizer\\\0");
+	CreateDirectoryW(m_roamingNative, NULL);
 
-	wcscpy_s(roaming, MAX_PATH, roamingNative);
-	for (int j = 0; roaming[j]; j++)
-		if (roaming[j] == '\\')
-			roaming[j] = '/';
+	wcscpy_s(m_roaming, MAX_PATH, m_roamingNative);
+	for (int j = 0; m_roaming[j]; j++)
+		if (m_roaming[j] == '\\')
+			m_roaming[j] = '/';
 }
 
 void WinUtils::updateDesktopBackground(bool isImageVisible) const

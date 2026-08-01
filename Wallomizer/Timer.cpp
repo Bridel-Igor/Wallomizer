@@ -12,7 +12,7 @@ Timer::Timer(App& app) :
 	loadSession(m_app.getCollectionManager().pCurrent);
 }
 
-void Timer::saveSession(Wallpaper *pCurrent)
+void Timer::saveSession(const Wallpaper *pCurrent)
 {
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
 	wchar_t wsPath[MAX_PATH];
@@ -111,7 +111,10 @@ void Timer::stop() noexcept
 	saveSession(m_app.getCollectionManager().pCurrent);
 }
 
-unsigned long Timer::getRemainingTime() const
+unsigned long Timer::getRemainingTime() const noexcept
 {
-	return m_app.getSettings().delay > m_timePassed ? m_app.getSettings().delay - m_timePassed : 0;
+	const unsigned long delay = m_app.getSettings().delay;
+	return delay > m_timePassed ? 
+			delay - m_timePassed : 
+			0;
 }

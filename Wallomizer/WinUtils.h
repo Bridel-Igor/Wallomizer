@@ -36,19 +36,13 @@ public:
 	/// Length is MAX_PATH (Windows constant).
 	/// Path contains '/' separators and ends with one.
 	/// If you need path with '\\' separators use getRoamingDirNative function.
-	const wchar_t* getRoamingDir() const
-	{
-		return roaming;
-	}
+	const wchar_t* getRoamingDir() const noexcept { return m_roaming; }
 
 	/// Get const pointer to string that contains path to <"user name"\\AppData\\Roaming\\Wallomizer\\> directory.
 	/// Length is MAX_PATH (Windows constant).
 	/// Path contains '\\' separators and ends with one.
 	/// If you need path with '/' separators use getRoamingDir function.
-	const wchar_t* getRoamingDirNative() const
-	{
-		return roamingNative;
-	}
+	const wchar_t* getRoamingDirNative() const noexcept { return m_roamingNative; }
 
 	/// Get string that contains application version. You should provie char array to write to it.
 	/// 
@@ -58,6 +52,6 @@ public:
 	bool getAppVersion(char* version) const;
 
 private:
-	wchar_t roaming[MAX_PATH];
-	wchar_t roamingNative[MAX_PATH];
+	wchar_t m_roaming[MAX_PATH];
+	wchar_t m_roamingNative[MAX_PATH];
 };

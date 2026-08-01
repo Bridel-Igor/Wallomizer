@@ -56,7 +56,7 @@ TrayWindow::~TrayWindow()
 	s_pTrayWindow = nullptr;
 	ShowWindow(hWnd(), SW_HIDE);
 	DestroyIcon(hStatusIcon);
-	m_app.exit();
+	m_app.requestExit();
 }
 
 LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
