@@ -13,7 +13,7 @@ bool SearchCollection::saveSettings(FILE* pFile) const
 {
 	if (pFile == NULL)
 		return false;
-	const CollectionType collType = getCollectionType();
+	const Collection::Type collType = getCollectionType();
 	fwrite(&collType, sizeof(collType), 1, pFile);
 	fwrite(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
 	fwrite(&settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
@@ -113,7 +113,6 @@ CategoriesAndPurity SearchCollection::getCAP() const
 
 Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 {
-	Wallpaper* pWallpaper = nullptr;
 	int page = int(index / m_app.getSettings().uPerPage);
 	index -= page * m_app.getSettings().uPerPage;
 	page++;
@@ -128,14 +127,13 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 	internet.DownloadToBuffer(wsPageUrl, m_app.getSettings().uPerPage * 750);
 	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
-			return pWallpaper;
-	pWallpaper = new Wallpaper(CollectionType::search);
-	if (!internet.parse("path", pWallpaper->getPathW(), true))
-	{
-		delete pWallpaper;
-		pWallpaper = nullptr;
-	}
-	return pWallpaper;
+			return nullptr;
+
+	wchar_t wsPath[Collection::getMaxPathSize(Collection::Type::search) + 1] = {};
+	if (!internet.parse("path", wsPath, true))
+		return nullptr;
+
+	return new Wallpaper(Collection::Type::search, wsPath);
 }
 
 void SearchCollection::openCollectionSettingsWindow(HWND hCaller)
@@ -144,30 +142,30 @@ void SearchCollection::openCollectionSettingsWindow(HWND hCaller)
 	setSearchCollectionWindow.windowLoop();
 }
 
-bool SearchCollection::loadWallpaper(const Wallpaper* pWallpaper, App& app)
+bool SearchCollection::loadWallpaper(std::wstring_view path, const WinUtils& winUtils)
 {
 	wchar_t wsImgPath[MAX_PATH];
-	wcscpy_s(wsImgPath, MAX_PATH, app.getWinUtils().getRoamingDir());
+	wcscpy_s(wsImgPath, MAX_PATH, winUtils.getRoamingDir());
 	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
 	Internet internet;
-	return internet.DownloadToFile(pWallpaper->getPathW(), wsImgPath);
+	return internet.DownloadToFile(path.data(), wsImgPath);
 }
 
-void SearchCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
+void SearchCollection::openWallpaperExternal(std::wstring_view path)
 {
 	wchar_t wsImgUrl[255] = L"https://wallhaven.cc/w/";
 	bool isDashFound = false;
 	int j = (int)wcslen(wsImgUrl);
-	for (int i = 0; pWallpaper->getPathW()[i]; i++)
+	for (int i = 0; path.data()[i]; i++)
 	{
 		if (isDashFound)
 		{
-			if (pWallpaper->getPathW()[i] == '.')
+			if (path.data()[i] == '.')
 				break;
-			wsImgUrl[j] = pWallpaper->getPathW()[i];
+			wsImgUrl[j] = path.data()[i];
 			j++;
 		}
-		if (pWallpaper->getPathW()[i] == '-')
+		if (path.data()[i] == '-')
 			isDashFound = true;
 	}
 	wsImgUrl[j] = '\0';

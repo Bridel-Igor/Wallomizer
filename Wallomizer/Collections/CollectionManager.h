@@ -18,7 +18,7 @@ public:
 	bool saveSettings(FILE* pFile = nullptr) const;
 	bool loadSettings(FILE* pFile = nullptr, unsigned short fileVersion = 0);
 	void getCollectionName(wchar_t*, size_t) const {}
-	CollectionType getCollectionType() const { return CollectionType::none; }
+	Collection::Type getCollectionType() const { return Collection::Type::none; }
 	CategoriesAndPurity getCAP() const { return 0; }
 	Wallpaper* getWallpaperInfo(unsigned int index) const;
 	void openCollectionSettingsWindow(HWND = nullptr);
@@ -26,18 +26,15 @@ public:
 	void reloadSettings();
 	void clear();
 	void updateNumber();
-	void addCollection(CollectionType collectionType);
+	void addCollection(Collection::Type collectionType);
 	void eraseCollection(int index);
 	void loadNextWallpaper();
 	void loadRandomWallpaper();
 	void setLoadedWallpaper(bool setPrevious = false);
 	void setNextWallpaper();
 	void setPreviousWallpaper();
-	void openWallpaperExternal() const;
 	bool hasPrevious() const;
 	bool isReady() const { return m_isReady; }
-
-	static bool loadWallpaper(const Wallpaper *pWallpaper, App& app);
 	
 	std::vector<BaseCollection*> m_pCollections;
 	bool m_isLoading = false;

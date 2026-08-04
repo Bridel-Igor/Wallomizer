@@ -87,7 +87,7 @@ bool Player::click(WPARAM& wParam)
 {
 	if (btnOpenExternal.isClicked(wParam))
 	{
-		m_app.getCollectionManager().openWallpaperExternal();
+		m_app.getCollectionManager().pCurrent->openExternally();
 		return true;
 	}
 	if (btnPrev.isClicked(wParam))

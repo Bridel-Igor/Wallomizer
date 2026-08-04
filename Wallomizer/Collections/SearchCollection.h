@@ -1,9 +1,12 @@
 #pragma once
 
+#include <string_view>
+
 #include "BaseCollection.h"
 #include "CategoriesAndPurityComponents.h"
 
 class App;
+class WinUtils;
 
 class SearchCollection : public BaseCollection
 {
@@ -24,13 +27,13 @@ public:
 	bool saveSettings(FILE* pFile) const;
 	bool loadSettings(FILE* pFile, unsigned short fileVersion);
 	void getCollectionName(wchar_t* pwsName, size_t size) const;
-	CollectionType getCollectionType() const { return CollectionType::search; }
+	Collection::Type getCollectionType() const { return Collection::Type::search; }
 	CategoriesAndPurity getCAP() const;
 	Wallpaper* getWallpaperInfo(unsigned int index) const;
 	void openCollectionSettingsWindow(HWND hCaller);
 
-	static bool loadWallpaper(const Wallpaper* pWallpaper, App& app);
-	static void openWallpaperExternal(const Wallpaper* pWallpaper);
+	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);
+	static void openWallpaperExternal(std::wstring_view path);
 
 	SearchCollectionSettings settings;
 

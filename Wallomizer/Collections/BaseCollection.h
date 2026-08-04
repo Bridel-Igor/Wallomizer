@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "Wallpaper.h"
+#include "CollectionTypes.h"
 #include "CategoriesAndPurity.h"
 
 class BaseCollection
@@ -19,7 +20,7 @@ public:
 	virtual bool saveSettings(FILE* pFile) const = 0;
 	virtual bool loadSettings(FILE* pFile, unsigned short fileVersion) = 0;
 	virtual void getCollectionName(wchar_t* pwsName, size_t size) const = 0;
-	virtual CollectionType getCollectionType() const = 0;
+	virtual Collection::Type getCollectionType() const = 0;
 	virtual CategoriesAndPurity getCAP() const = 0;
 	virtual Wallpaper* getWallpaperInfo(unsigned int index) const = 0;
 	virtual void openCollectionSettingsWindow(HWND hWnd) = 0;

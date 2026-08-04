@@ -63,13 +63,13 @@ bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 			BaseCollection* pTmpCollection;
 			for (unsigned int i = 0; i < nCollections; i++)
 			{
-				CollectionType collectionType;
+				Collection::Type collectionType;
 				fread(&collectionType, sizeof(collectionType), 1, pFile);
-				if (collectionType == CollectionType::local)
-					pTmpCollection = new LocalCollection(m_app);
-				else if (collectionType == CollectionType::user)
+				if (collectionType == Collection::Type::local)
+					pTmpCollection = new LocalCollection(*this);
+				else if (collectionType == Collection::Type::user)
 					pTmpCollection = new UserCollection(m_app);
-				else if (collectionType == CollectionType::search)
+				else if (collectionType == Collection::Type::search)
 					pTmpCollection = new SearchCollection(m_app);
 				else
 					break;
@@ -163,14 +163,14 @@ void CollectionManager::updateNumber()
 		m_uniformIntDistribution = std::uniform_int_distribution<int>(0, m_uiNumber-1);
 }
 
-void CollectionManager::addCollection(CollectionType collectionType)
+void CollectionManager::addCollection(Collection::Type collectionType)
 {
 	BaseCollection* pCollection = nullptr;
 	switch (collectionType)
 	{
-	case CollectionType::local:		pCollection = new LocalCollection(m_app);	break;
-	case CollectionType::user:		pCollection = new UserCollection(m_app);	break;
-	case CollectionType::search:	pCollection = new SearchCollection(m_app);	break;
+	case Collection::Type::local:	pCollection = new LocalCollection(*this);	break;
+	case Collection::Type::user:	pCollection = new UserCollection(m_app);	break;
+	case Collection::Type::search:	pCollection = new SearchCollection(m_app);	break;
 	}
 	if (pCollection == nullptr)
 		return;
@@ -212,7 +212,7 @@ void CollectionManager::loadRandomWallpaper()
 		return;
 	const int randomFromAll = m_uniformIntDistribution(m_randomGenerator);
 	pNext = getWallpaperInfo(randomFromAll);
-	loadWallpaper(pNext, m_app);
+	pNext->loadWallpaper(m_app.getWinUtils());
 }
 
 void CollectionManager::setLoadedWallpaper(bool setPrevious)
@@ -261,7 +261,7 @@ void CollectionManager::setPreviousWallpaper()
 	if (pPreviousList.empty())
 		return;
 
-	loadWallpaper(pPreviousList.back(), m_app);
+	pPreviousList.back()->loadWallpaper(m_app.getWinUtils());
 	setLoadedWallpaper(true);
 	loadNextWallpaper();
 
@@ -272,40 +272,7 @@ void CollectionManager::setPreviousWallpaper()
 	Player::redrawPlayers();
 }
 
-void CollectionManager::openWallpaperExternal() const
-{
-	switch (pCurrent->getType())
-	{
-	case CollectionType::local:
-		LocalCollection::openWallpaperExternal(pCurrent);
-		break;
-	case CollectionType::user:
-		UserCollection::openWallpaperExternal(pCurrent);
-		break;
-	case CollectionType::search:
-		SearchCollection::openWallpaperExternal(pCurrent);
-		break;
-	default:
-		return;
-	}
-}
-
 bool CollectionManager::hasPrevious() const
 {
 	return !pPreviousList.empty();
-}
-
-bool CollectionManager::loadWallpaper(const Wallpaper* pWallpaper, App& app)
-{
-	switch (pWallpaper->getType())
-	{
-	case CollectionType::local:
-		return LocalCollection::loadWallpaper(pWallpaper, app);
-	case CollectionType::user:
-		return UserCollection::loadWallpaper(pWallpaper, app);
-	case CollectionType::search:
-		return SearchCollection::loadWallpaper(pWallpaper, app);
-	default:
-		return false;
-	}
 }

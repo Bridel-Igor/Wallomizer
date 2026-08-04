@@ -1,38 +1,34 @@
 #pragma once
 
-/// Enumeration of possible types of wallpaper collections.
-enum class CollectionType : unsigned char
-{
-	none,
-	local,
-	user,
-	search
-};
+#include <string>
 
-/// Class that contains wallpaper info.
-/// Used for containing information about current and previous wallpapers.
-/// Wallpaper object used for retrieving wallpaper from specified path or URL 
-/// by passing it to static loadWallpaper method of corresponding to CollectionType collection class.
+#include "CollectionTypes.h"
+
+class WinUtils;
+
+/// Stores wallpaper information: source collection type and path/URL.
+/// Provides methods to load and open the wallpaper externally.
 class Wallpaper
 {
 public:
-	/// Wallpaper construction.
-	/// 
-	/// @param type - one of values of CollectionType enum that corresponds to collection class for constructing wallpaper.
-	explicit Wallpaper(CollectionType type);
-	~Wallpaper();
+	explicit Wallpaper(Collection::Type type, const wchar_t* path) :
+		m_type(type),
+		m_path(path)
+	{}
 
-	/// Get the collection type this wallpaper correspondes to.
-	/// 
-	/// @return One of the values of CollectionType enum that corresponds to collection class.
-	CollectionType getType() const;
+	Wallpaper(const Wallpaper&) = delete;
+	Wallpaper& operator=(const Wallpaper&) = delete;
 
-	/// Get path or URL for current wallpaper.
-	/// 
-	/// @return Pointer to wide char array, that contains path or URL.
-	wchar_t* getPathW() const;
+	Wallpaper(Wallpaper&&) noexcept = default;
+	Wallpaper& operator=(Wallpaper&&) = delete;
+
+	Collection::Type getType() const noexcept { return m_type; }
+	const std::wstring& getPath() const noexcept { return m_path; }
+
+	bool loadWallpaper(const WinUtils& winUtils) const;
+	void openExternally() const;
 
 private:
-	wchar_t* m_path = nullptr;
-	CollectionType m_type = CollectionType::none;
+	Collection::Type m_type = Collection::Type::none;
+	std::wstring m_path;
 };

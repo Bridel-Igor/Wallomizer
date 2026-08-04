@@ -13,7 +13,7 @@ bool UserCollection::saveSettings(FILE* pFile) const
 {
 	if (pFile == NULL)
 		return false;
-	const CollectionType collType = getCollectionType();
+	const Collection::Type collType = getCollectionType();
 	fwrite(&collType, sizeof(collType), 1, pFile);
 	fwrite(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
 	fwrite(&settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
@@ -75,7 +75,6 @@ CategoriesAndPurity UserCollection::getCAP() const
 
 Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 {
-	Wallpaper* pWallpaper = nullptr;
 	int page = int(index / s_nPerPage);
 	index -= page * s_nPerPage;
 	page++;
@@ -90,14 +89,13 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 	internet.DownloadToBuffer(wsPageUrl);
 	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
-			return pWallpaper;
-	pWallpaper = new Wallpaper(CollectionType::user);
-	if (!internet.parse("path", pWallpaper->getPathW(), true))
-	{
-		delete pWallpaper;
-		pWallpaper = nullptr;
-	}
-	return pWallpaper;
+			return nullptr;
+
+	wchar_t wsPath[Collection::getMaxPathSize(Collection::Type::user) + 1] = {};
+	if (!internet.parse("path", wsPath, true))
+		return nullptr;
+
+	return new Wallpaper(Collection::Type::user, wsPath);
 }
 
 void UserCollection::openCollectionSettingsWindow(HWND hCaller)
@@ -106,30 +104,30 @@ void UserCollection::openCollectionSettingsWindow(HWND hCaller)
 	setUserCollectionWindow.windowLoop();
 }
 
-bool UserCollection::loadWallpaper(const Wallpaper* pWallpaper, App& app)
+bool UserCollection::loadWallpaper(std::wstring_view path, const WinUtils& winUtils)
 {
 	wchar_t wsImgPath[MAX_PATH];
-	wcscpy_s(wsImgPath, MAX_PATH, app.getWinUtils().getRoamingDir());
+	wcscpy_s(wsImgPath, MAX_PATH, winUtils.getRoamingDir());
 	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
 	Internet internet;
-	return internet.DownloadToFile(pWallpaper->getPathW(), wsImgPath);
+	return internet.DownloadToFile(path.data(), wsImgPath);
 }
 
-void UserCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
+void UserCollection::openWallpaperExternal(std::wstring_view path)
 {
 	wchar_t wsImgUrl[255] = L"https://wallhaven.cc/w/";
 	bool isDashFound = false;
 	int j = (int)wcslen(wsImgUrl);
-	for (int i = 0; pWallpaper->getPathW()[i]; i++)
+	for (int i = 0; path.data()[i]; i++)
 	{
 		if (isDashFound)
 		{
-			if (pWallpaper->getPathW()[i] == '.')
+			if (path.data()[i] == '.')
 				break;
-			wsImgUrl[j] = pWallpaper->getPathW()[i];
+			wsImgUrl[j] = path.data()[i];
 			j++;
 		}
-		if (pWallpaper->getPathW()[i] == '-')
+		if (path.data()[i] == '-')
 			isDashFound = true;
 	}
 	wsImgUrl[j] = '\0';

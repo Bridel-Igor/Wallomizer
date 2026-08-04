@@ -24,16 +24,15 @@ void Timer::saveSession(const Wallpaper *pCurrent)
 		return;
 	fwrite(&m_status, sizeof(m_status), 1, pFile);
 	fwrite(&m_timePassed, sizeof(m_timePassed), 1, pFile);
-	CollectionType type = CollectionType::none;
+	Collection::Type type = Collection::Type::none;
+	const wchar_t* path = nullptr;
 	if (pCurrent)
-		type = pCurrent->getType();
-	fwrite(&type, sizeof(CollectionType), 1, pFile);
-	switch (type)
 	{
-	case CollectionType::local:		fwrite(pCurrent->getPathW(), sizeof(wchar_t), MAX_PATH, pFile);	break;
-	case CollectionType::user:		fwrite(pCurrent->getPathW(), sizeof(wchar_t), 255, pFile);		break;
-	case CollectionType::search:	fwrite(pCurrent->getPathW(), sizeof(wchar_t), 1024, pFile);		break;
+		type = pCurrent->getType();
+		path = pCurrent->getPath().c_str();
 	}
+	fwrite(&type, sizeof(Collection::Type), 1, pFile);
+	fwrite(path, sizeof(wchar_t), Collection::getMaxPathSize(type), pFile);
 	fclose(pFile);
 }
 
@@ -51,15 +50,12 @@ void Timer::loadSession(Wallpaper*& pCurrent)
 	fread(&m_timePassed, sizeof(m_timePassed), 1, pFile);
 	if (pCurrent == nullptr)
 	{
-		CollectionType type;
-		fread(&type, sizeof(CollectionType), 1, pFile);
-		pCurrent = new Wallpaper(type);
-		switch (type)
-		{
-		case CollectionType::local:		fread(pCurrent->getPathW(), sizeof(wchar_t), MAX_PATH, pFile);	break;
-		case CollectionType::user:		fread(pCurrent->getPathW(), sizeof(wchar_t), 255, pFile);		break;
-		case CollectionType::search:	fread(pCurrent->getPathW(), sizeof(wchar_t), 1024, pFile);		break;
-		}
+		Collection::Type type;
+		fread(&type, sizeof(Collection::Type), 1, pFile);
+		wchar_t* wsWallpaperPath = new wchar_t[getMaxPathSize(type) + 1] {};
+		fread(wsWallpaperPath, sizeof(wchar_t), getMaxPathSize(type), pFile);
+		pCurrent = new Wallpaper(type, wsWallpaperPath);
+		delete[] wsWallpaperPath;
 	}
 	fclose(pFile);
 	DeleteFileW(wsPath);

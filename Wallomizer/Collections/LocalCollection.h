@@ -1,9 +1,12 @@
 #pragma once
 
+#include <string_view>
+
 #include "BaseCollection.h"
 #include "CategoriesAndPurity.h"
 
-class App;
+class CollectionManager;
+class WinUtils;
 
 class LocalCollection : public BaseCollection
 {
@@ -15,22 +18,23 @@ private:
 	};
 
 public:
-	LocalCollection(App& app);
+	LocalCollection(CollectionManager& collectionManager) :
+		m_collectionManager(collectionManager)
+	{}
 
-	~LocalCollection() {}
 	bool saveSettings(FILE* pFile) const;
 	bool loadSettings(FILE* pFile, unsigned short fileVersion);
 	void getCollectionName(wchar_t* pwsName, size_t size) const;
-	CollectionType getCollectionType() const { return CollectionType::local; }
+	Collection::Type getCollectionType() const { return Collection::Type::local; }
 	CategoriesAndPurity getCAP() const { return 0; }
 	Wallpaper* getWallpaperInfo(unsigned int index) const;
 	void openCollectionSettingsWindow(HWND hCaller);
 
-	static bool loadWallpaper(const Wallpaper* pWallpaper, App& app);
-	static void openWallpaperExternal(const Wallpaper* pWallpaper);
+	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);
+	static void openWallpaperExternal(std::wstring_view path);
 
 	LocalCollectionSettings settings;
 
 private:
-	App& m_app;
+	CollectionManager& m_collectionManager;
 };

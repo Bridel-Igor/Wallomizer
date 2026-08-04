@@ -6,7 +6,8 @@
 #include <shlobj_core.h>
 
 #include "SetLocalCollectionWindow.h"
-#include "App.h"
+#include "CollectionManager.h"
+#include "WinUtils.h"
 
 bool isImage(std::experimental::filesystem::path path)
 {
@@ -18,16 +19,11 @@ bool isImage(std::experimental::filesystem::path path)
 	return false;
 }
 
-LocalCollection::LocalCollection(App& app) :
-	m_app(app)
-{
-}
-
 bool LocalCollection::saveSettings(FILE* pFile) const
 {
 	if (pFile == NULL)
 		return false;
-	const CollectionType collType = getCollectionType();
+	const Collection::Type collType = getCollectionType();
 	fwrite(&collType, sizeof(collType), 1, pFile);
 	fwrite(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
 	fwrite(&settings, sizeof(LocalCollection::LocalCollectionSettings), 1, pFile);
@@ -72,9 +68,8 @@ void LocalCollection::getCollectionName(wchar_t* pwsName, size_t size) const
 
 Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
 {
-	Wallpaper* pWallpaper = nullptr;
 	if (settings.wsDirectoryPath[0] == L'\0' || m_uiNumber <= 0)
-		return pWallpaper;
+		return nullptr;
 	unsigned int i = 0;
 	std::experimental::filesystem::path dirPath{ settings.wsDirectoryPath };
 
@@ -85,10 +80,7 @@ Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
 			{
 				if (i == index)
 				{
-					pWallpaper = new Wallpaper(CollectionType::local);
-					wcscpy_s(pWallpaper->getPathW(), MAX_PATH, path.path().generic_wstring().c_str());
-					pWallpaper->getPathW()[wcslen(pWallpaper->getPathW())] = '\0';
-					return pWallpaper;
+					return new Wallpaper(Collection::Type::local, path.path().generic_wstring().c_str());
 				}
 				i++;
 			}
@@ -100,32 +92,29 @@ Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
 			{
 				if (i == index)
 				{
-					pWallpaper = new Wallpaper(CollectionType::local);
-					wcscpy_s(pWallpaper->getPathW(), MAX_PATH, path.path().generic_wstring().c_str());
-					pWallpaper->getPathW()[wcslen(pWallpaper->getPathW())] = '\0';
-					return pWallpaper;
+					return new Wallpaper(Collection::Type::local, path.path().generic_wstring().c_str());
 				}
 				i++;
 			}
 	}
 
-	return pWallpaper;
+	return nullptr;
 }
 
 void LocalCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetLocalCollectionWindow setLocalCollectionWindow(hCaller, m_app.getCollectionManager(), this);
+	SetLocalCollectionWindow setLocalCollectionWindow(hCaller, m_collectionManager, this);
 	setLocalCollectionWindow.windowLoop();
 }
 
-bool LocalCollection::loadWallpaper(const Wallpaper* pWallpaper, App& app)
+bool LocalCollection::loadWallpaper(std::wstring_view path, const WinUtils& winUtils)
 {
 	char buf[BUFSIZ];
 	size_t size;
 	FILE* pSource = nullptr, * pDestination = nullptr;
-	_wfopen_s(&pSource, pWallpaper->getPathW(), L"rb");
+	_wfopen_s(&pSource, path.data(), L"rb");
 	wchar_t wsPath[MAX_PATH];
-	wcscpy_s(wsPath, MAX_PATH, app.getWinUtils().getRoamingDir());
+	wcscpy_s(wsPath, MAX_PATH, winUtils.getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
 	_wfopen_s(&pDestination, wsPath, L"wb");
 	if (pSource == nullptr || pDestination == nullptr)
@@ -137,10 +126,10 @@ bool LocalCollection::loadWallpaper(const Wallpaper* pWallpaper, App& app)
 	return true;
 }
 
-void LocalCollection::openWallpaperExternal(const Wallpaper* pWallpaper)
+void LocalCollection::openWallpaperExternal(std::wstring_view path)
 {
 	wchar_t imgPath[MAX_PATH];
-	wcscpy_s(imgPath, MAX_PATH, pWallpaper->getPathW());
+	wcscpy_s(imgPath, MAX_PATH, path.data());
 
 	for (int j = 0; imgPath[j]; j++)
 		if (imgPath[j] == '/')

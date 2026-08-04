@@ -36,21 +36,21 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 		if (btnAddUserCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			m_collectionManager.addCollection(CollectionType::user);
+			m_collectionManager.addCollection(Collection::Type::user);
 			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnAddLocalCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			m_collectionManager.addCollection(CollectionType::local);
+			m_collectionManager.addCollection(Collection::Type::local);
 			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnAddSearchCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			m_collectionManager.addCollection(CollectionType::search);
+			m_collectionManager.addCollection(Collection::Type::search);
 			DestroyWindow(hWnd());
 			return 0;
 		}
