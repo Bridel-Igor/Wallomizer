@@ -1,10 +1,12 @@
 #include "Player.h"
 
+#include <cstdint>
+#include <cstdio>
+
 #include "resource.h"
 #include "IWindow.h"
 #include "App.h"
 
-char Player::sTimer[16];
 std::list<Player*> Player::pPlayers;
 HICON	Player::Resources::hIPlay,			Player::Resources::hIPlayHover,			Player::Resources::hIPlayActive,
 		Player::Resources::hIPause,			Player::Resources::hIPauseHover,		Player::Resources::hIPauseActive,
@@ -197,35 +199,23 @@ void Player::updateTimer(App& app, bool isForced)
 	if (!isForced)
 		return;
 
-	if (app.getCollectionManager().m_isLoading)
-		strcpy_s(sTimer, "loading...");
-	else
+	char text[16] = "loading...";
+	if (!timer.isLoading())
 	{
-		unsigned long remaining = app.getTimer().getRemainingTime();
-		if (remaining % 1000 != 0)
-			remaining += 1000;
-		char sSec[3], sMin[3], sHour[4];
-		_itoa_s((remaining / 1000) % 60, sSec, 10);
-		_itoa_s(((remaining / 1000) / 60) % 60, sMin, 10);
-		_itoa_s((remaining / 1000) / 3600, sHour, 10);
-		sHour[3] = '\0';
-		sMin[2] = '\0';
-		sSec[2] = '\0';
-		strcpy_s(sTimer, sHour);
-		strcat_s(sTimer, " : ");
-		if (strlen(sMin) == 1)
-			strcat_s(sTimer, "0");
-		strcat_s(sTimer, sMin);
-		strcat_s(sTimer, " : ");
-		if (strlen(sSec) == 1)
-			strcat_s(sTimer, "0");
-		strcat_s(sTimer, sSec);
+		const uint32_t remainingSeconds = (app.getTimer().getRemainingTime() + 999) / 1000;
+
+		const uint16_t hours = static_cast<uint16_t>(remainingSeconds / 3600);
+		const uint8_t minutes = static_cast<uint8_t>((remainingSeconds / 60) % 60);
+		const uint8_t seconds = static_cast<uint8_t>(remainingSeconds % 60);
+
+		sprintf_s(text, 16, "%u:%02u:%02u", hours, minutes, seconds);
 	}
+
 	for (auto pPlayer : pPlayers)
 	{
 		if (!isForced && !IsWindowVisible(GetParent(pPlayer->btnPrev.hWnd())))
 			continue;
-		pPlayer->updateText();
+		pPlayer->updateText(text);
 		InvalidateRect(pPlayer->stDelayRemained.hWnd(), NULL, FALSE);
 	}
 }
@@ -247,7 +237,7 @@ void Player::redrawPlayers()
 	}
 }
 
-void Player::updateText()
+void Player::updateText(const char* text)
 {
-	SetWindowTextA(stDelayRemained.hWnd(), sTimer);
+	SetWindowTextA(stDelayRemained.hWnd(), text);
 }

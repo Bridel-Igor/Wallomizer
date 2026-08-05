@@ -38,12 +38,11 @@ public:
 	static void redrawPlayers();
 	
 private:
-	void updateText();
+	void updateText(const char* text);
 
 	IconButton btnPrev, btnOpenExternal, btnStop, btnPlay, btnPause, btnFit, btnNext;
 	Static stDelayRemained;
 	App& m_app;
 
-	static char sTimer[16];
 	static std::list<Player*> pPlayers;
 };
