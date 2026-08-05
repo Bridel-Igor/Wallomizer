@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string_view>
+#include <filesystem>
 
 #include "BaseCollection.h"
 #include "CategoriesAndPurity.h"
@@ -30,8 +30,8 @@ public:
 	Wallpaper getWallpaper(unsigned int index) const;
 	void openCollectionSettingsWindow(HWND hCaller);
 
-	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);
-	static void openWallpaperExternal(std::wstring_view path);
+	static bool loadWallpaper(std::filesystem::path sourcePath, const WinUtils& winUtils);
+	static void openWallpaperExternal(std::filesystem::path sourcePath);
 
 	LocalCollectionSettings settings;
 

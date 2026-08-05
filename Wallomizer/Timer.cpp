@@ -20,8 +20,7 @@ Timer::Timer(const WinUtils& winUtils, Settings& settings, WallpaperManager& wal
 void Timer::saveSession()
 {
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
-	std::wstring filePath = m_winUtils.getRoamingDir();
-	filePath += L"Session.dat";
+	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
 	FILE* pFile;
 	_wfopen_s(&pFile, filePath.c_str(), L"wb");
 	if (pFile == nullptr)
@@ -42,8 +41,7 @@ void Timer::saveSession()
 void Timer::loadSession()
 {
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
-	std::wstring filePath = m_winUtils.getRoamingDir();
-	filePath += L"Session.dat";
+	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
 	FILE* pFile;
 	_wfopen_s(&pFile, filePath.c_str(), L"rb");
 	if (pFile == nullptr)

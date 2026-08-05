@@ -106,11 +106,9 @@ void UserCollection::openCollectionSettingsWindow(HWND hCaller)
 
 bool UserCollection::loadWallpaper(std::wstring_view path, const WinUtils& winUtils)
 {
-	wchar_t wsImgPath[MAX_PATH];
-	wcscpy_s(wsImgPath, MAX_PATH, winUtils.getRoamingDir());
-	wcscat_s(wsImgPath, MAX_PATH, L"Loaded wallpaper.dat");
+	std::filesystem::path loadedPath = winUtils.getRoamingDir() / L"Loaded wallpaper.dat";
 	Internet internet;
-	return internet.DownloadToFile(path.data(), wsImgPath);
+	return internet.DownloadToFile(path.data(), loadedPath.c_str());
 }
 
 void UserCollection::openWallpaperExternal(std::wstring_view path)

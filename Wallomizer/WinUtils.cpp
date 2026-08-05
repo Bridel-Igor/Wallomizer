@@ -3,41 +3,59 @@
 #include <shlobj.h>
 #include <Windows.h>
 #include <exception>
-#include <winver.h>
+#include <vector>
+#include <wrl/client.h>
 
 #pragma comment(lib, "Version.lib")
+
+namespace
+{
+	class ComInitializer
+	{
+	public:
+		ComInitializer()
+			: m_hr(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED))
+		{
+		}
+
+		~ComInitializer()
+		{
+			if (SUCCEEDED(m_hr))
+				CoUninitialize();
+		}
+
+		bool isInitialized() const noexcept
+		{
+			return SUCCEEDED(m_hr);
+		}
+
+	private:
+		HRESULT m_hr;
+	};
+}
 
 WinUtils::WinUtils()
 {
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
 
-	PWSTR tmp_path;
-	HRESULT res = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &tmp_path);
-	if (res != S_OK)
-	{
-		CoTaskMemFree(tmp_path);
-		throw std::exception("Can't get .../AppData/Roaming/ path.");
-	}
-	wcscpy_s(m_roamingNative, MAX_PATH, tmp_path);
-	CoTaskMemFree(tmp_path);
-	wcscat_s(m_roamingNative, MAX_PATH, L"\\Wallomizer\\\0");
-	CreateDirectoryW(m_roamingNative, NULL);
+	PWSTR tmp_path = nullptr;
+	const HRESULT result = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &tmp_path);
+	if (FAILED(result))
+		throw std::exception("Can't get AppData/Roaming path.");
 
-	wcscpy_s(m_roaming, MAX_PATH, m_roamingNative);
-	for (int j = 0; m_roaming[j]; j++)
-		if (m_roaming[j] == '\\')
-			m_roaming[j] = '/';
+	m_roamingPath = std::filesystem::path(tmp_path) / L"Wallomizer";
+
+	CoTaskMemFree(tmp_path);
+
+	std::filesystem::create_directories(m_roamingPath);
 }
 
 void WinUtils::updateDesktopBackground(bool isImageVisible) const
 {
-	wchar_t wsCurrentPathNative[MAX_PATH] = { 0 };
+	std::filesystem::path path;
 	if (isImageVisible)
-	{
-		wcscpy_s(wsCurrentPathNative, MAX_PATH, getRoamingDirNative());
-		wcscat_s(wsCurrentPathNative, MAX_PATH, L"Current wallpaper.jpg");
-	}
-	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, wsCurrentPathNative, SPIF_UPDATEINIFILE);
+		path = getRoamingDir() / L"Current wallpaper.jpg";
+	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, const_cast<wchar_t*>(path.c_str()), SPIF_UPDATEINIFILE);
 }
 
 void WinUtils::flipWallpaperStyle() const
@@ -59,7 +77,7 @@ void WinUtils::flipWallpaperStyle() const
 	}
 }
 
-void WinUtils::setBackgroundColor(COLORREF color) const
+void WinUtils::setBackgroundColor(Color color) const
 {
 	int colors[1] = { COLOR_BACKGROUND };
 	SetSysColors(1, colors, &color);
@@ -92,46 +110,94 @@ void WinUtils::setBackgroundColor(COLORREF color) const
 	}
 }
 
-COLORREF WinUtils::getBackgroundColor() const
+WinUtils::Color WinUtils::getBackgroundColor() const
 {
 	return GetSysColor(COLOR_BACKGROUND);
 }
 
-bool WinUtils::getAppVersion(char* version) const
+std::string WinUtils::getAppVersion() const
 {
-	char* szFilename;
-	if (_get_pgmptr(&szFilename) != 0)
-		return false;
+	char* filename;
+	if (_get_pgmptr(&filename) != 0)
+		return "";
 
 	// allocate a block of memory for the version info
-	DWORD dummy;
-	DWORD dwSize = GetFileVersionInfoSize(szFilename, &dummy);
-	if (dwSize == 0)
-		return false;
-	char* data = new char[dwSize];
+	DWORD dummy = 0;
+	DWORD size = GetFileVersionInfoSize(filename, &dummy);
+	if (size == 0)
+		return "";
+	std::vector<char> data(size);
 
 	// load the version info
-	if (!GetFileVersionInfo(szFilename, NULL, dwSize, &data[0]))
-	{
-		delete[] data;
-		return false;
-	}
+	if (!GetFileVersionInfoA(filename, 0, size, data.data()))
+		return "";
 
 	// get version string
-	LPVOID pvProductVersion = NULL;
-	unsigned int iProductVersionLen = 0;
-	if (!VerQueryValue(&data[0], "\\StringFileInfo\\000904b0\\ProductVersion", &pvProductVersion, &iProductVersionLen))
-	{
-		delete[] data;
-		return false;
-	}
+	LPVOID value = nullptr;
+	UINT length = 0;
+	if (!VerQueryValue(data.data(), "\\StringFileInfo\\000904b0\\ProductVersion", &value, &length))
+		return "";
 
-	strcpy_s(version, iProductVersionLen, (char*)pvProductVersion);
+	std::string version = static_cast<char*>(value);
 
 #ifdef _DEBUG
-	strcat_s(version, 16, " debug");
+	version += " debug";
 #endif
 
-	delete[] data;
-	return true;
+	return version;
+}
+
+void WinUtils::setStartup(bool enabled) const
+{
+	PWSTR rawPath = nullptr;
+
+	HRESULT hr = SHGetKnownFolderPath(FOLDERID_Startup, 0, nullptr, &rawPath);
+	if (FAILED(hr))
+		return;
+
+	const std::filesystem::path startupPath = std::filesystem::path(rawPath) / L"Wallomizer.lnk";
+
+	CoTaskMemFree(rawPath);
+
+	if (!enabled)
+	{
+		std::error_code ec;
+		std::filesystem::remove(startupPath, ec);
+		return;
+	}
+
+	wchar_t currentBuffer[MAX_PATH];
+	wchar_t directoryBuffer[MAX_PATH];
+
+	GetModuleFileNameW(nullptr, currentBuffer, MAX_PATH);
+	GetCurrentDirectoryW(MAX_PATH, directoryBuffer);
+
+	createShortcut(currentBuffer, startupPath, directoryBuffer);
+}
+
+bool WinUtils::createShortcut(const std::filesystem::path& target, const std::filesystem::path& link, const std::filesystem::path& workingDirectory) const
+{
+	ComInitializer com;
+
+	if (!com.isInitialized())
+		return false;
+
+	Microsoft::WRL::ComPtr<IShellLinkW> shellLink;
+
+	if (FAILED(CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellLink))))
+		return false;
+
+	if (FAILED(shellLink->SetPath(target.c_str())))
+		return false;
+
+	shellLink->SetDescription(L"");
+
+	if (!workingDirectory.empty())
+		shellLink->SetWorkingDirectory(workingDirectory.c_str());
+
+	Microsoft::WRL::ComPtr<IPersistFile> persistFile;
+	if (FAILED(shellLink.As(&persistFile)))
+		return false;
+
+	return SUCCEEDED(persistFile->Save(link.c_str(), TRUE));
 }

@@ -1,39 +1,8 @@
 #include "SettingsWindow.h"
 
-#include <shlobj_core.h>
-
 #include "Player.h"
 #include "Internet.h"
 #include "App.h"
-
-HRESULT CreateLink(LPCSTR lpszPathObj, LPCSTR lpszDirPath, LPCSTR lpszPathLink, LPCSTR lpszDesc)
-{
-	HRESULT hRes;
-	IShellLink* psl = nullptr;
-
-	if (!SUCCEEDED(CoInitialize(NULL)))
-		return -1;
-	hRes = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
-	if (SUCCEEDED(hRes))
-	{
-		IPersistFile* ppf = nullptr;
-		psl->SetPath(lpszPathObj);
-		psl->SetDescription(lpszDesc);
-		psl->SetWorkingDirectory(lpszDirPath);
-		hRes = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
-		if (SUCCEEDED(hRes))
-		{
-			WCHAR wsz[MAX_PATH];
-			int ret = MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH);
-			if (ret != 0)
-				hRes = ppf->Save(wsz, TRUE);
-			ppf->Release();
-		}
-		psl->Release();
-	}
-	CoUninitialize();
-	return hRes;
-}
 
 SettingsWindow::SettingsWindow(HWND hCaller, App& app) :
 	IWindow("Settings", "Setting Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
@@ -71,9 +40,7 @@ SettingsWindow::SettingsWindow(HWND hCaller, App& app) :
 {
 	EnableWindow(m_hCaller, FALSE);
 
-	char version[16] = {0};
-	if (m_app.getWinUtils().getAppVersion(version))
-		SetWindowText(stActVersion.hWnd(), version);
+	SetWindowText(stActVersion.hWnd(), m_app.getWinUtils().getAppVersion().c_str());
 
 	edUsername.setTextW(app.getSettings().username);
 	edApiKey.setTextW(app.getSettings().apiKey);
@@ -215,25 +182,8 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 			edUsername.getTextW(m_app.getSettings().username, 64);
 			m_app.getSettings().setApiKey(apiKey);
 			
-			char startupPath[MAX_PATH];
-			HRESULT hr = SHGetFolderPathA(NULL, CSIDL_STARTUP, 0, NULL, startupPath); // if target win Vista and later use SHGetKnownFolderPath()
-			strcat_s(startupPath, "\\Wallomizer.lnk");
-			if (SUCCEEDED(hr))
-			{
-				if (cbStartup.isChecked())
-				{
-					char currentPath[260], currentDirectory[260];
-					GetModuleFileNameA(NULL, currentPath, 260);
-					GetCurrentDirectoryA(260, currentDirectory);
-					CreateLink(currentPath, currentDirectory, startupPath, "");
-					m_app.getSettings().loadOnStartup = true;
-				}
-				else
-				{
-					remove(startupPath);
-					m_app.getSettings().loadOnStartup = false;
-				}
-			}
+			m_app.getWinUtils().setStartup(cbStartup.isChecked());
+			m_app.getSettings().loadOnStartup = cbStartup.isChecked();
 
 			m_app.getWinUtils().setBackgroundColor(cpbBckColor.getColor());
 

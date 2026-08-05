@@ -16,11 +16,9 @@ Settings::Settings(const WinUtils& winUtils) :
 
 void Settings::saveSettings() const
 {
-	wchar_t wcPath[MAX_PATH];
-	wcscpy_s(wcPath, MAX_PATH, m_winUtils.getRoamingDir());
-	wcscat_s(wcPath, MAX_PATH, L"Settings.dat\0");
+	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Settings.dat";
 	FILE* pFile;
-	_wfopen_s(&pFile, wcPath, L"wb");
+	_wfopen_s(&pFile, filePath.c_str(), L"wb");
 	if (pFile != NULL)
 	{
 		fwrite(&SETTINGS_FILE_VERSION, sizeof(SETTINGS_FILE_VERSION), 1, pFile);
@@ -36,11 +34,9 @@ void Settings::saveSettings() const
 
 void Settings::loadSettings()
 {
-	wchar_t wcPath[MAX_PATH];
-	wcscpy_s(wcPath, MAX_PATH, m_winUtils.getRoamingDir());
-	wcscat_s(wcPath, MAX_PATH, L"Settings.dat\0");
+	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Settings.dat";
 	FILE* pFile;
-	_wfopen_s(&pFile, wcPath, L"rb");
+	_wfopen_s(&pFile, filePath.c_str(), L"rb");
 	if (pFile != NULL)
 	{
 		unsigned short fileVersion = 0;

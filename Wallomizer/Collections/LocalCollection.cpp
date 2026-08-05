@@ -107,39 +107,28 @@ void LocalCollection::openCollectionSettingsWindow(HWND hCaller)
 	setLocalCollectionWindow.windowLoop();
 }
 
-bool LocalCollection::loadWallpaper(std::wstring_view path, const WinUtils& winUtils)
+bool LocalCollection::loadWallpaper(std::filesystem::path sourcePath, const WinUtils& winUtils)
 {
-	char buf[BUFSIZ];
-	size_t size;
-	FILE* pSource = nullptr, * pDestination = nullptr;
-	_wfopen_s(&pSource, path.data(), L"rb");
-	wchar_t wsPath[MAX_PATH];
-	wcscpy_s(wsPath, MAX_PATH, winUtils.getRoamingDir());
-	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
-	_wfopen_s(&pDestination, wsPath, L"wb");
-	if (pSource == nullptr || pDestination == nullptr)
+	std::error_code ec;
+	std::filesystem::path loadedPath = winUtils.getRoamingDir() / L"Loaded wallpaper.dat";
+	std::filesystem::copy_file(sourcePath, loadedPath, std::filesystem::copy_options::overwrite_existing, ec);
+	
+	if (ec)
+	{
+		std::error_code ignore;
+		std::filesystem::remove(loadedPath);
 		return false;
-	while ((size = fread(buf, 1, BUFSIZ, pSource)) != 0)
-		fwrite(buf, 1, size, pDestination);
-	fclose(pSource);
-	fclose(pDestination);
+	}
+
 	return true;
 }
 
-void LocalCollection::openWallpaperExternal(std::wstring_view path)
+void LocalCollection::openWallpaperExternal(std::filesystem::path sourcePath)
 {
-	wchar_t imgPath[MAX_PATH];
-	wcscpy_s(imgPath, MAX_PATH, path.data());
-
-	for (int j = 0; imgPath[j]; j++)
-		if (imgPath[j] == '/')
-			imgPath[j] = '\\';
-
-	__unaligned ITEMIDLIST* pidl = ILCreateFromPathW(imgPath);
+	PIDLIST_ABSOLUTE pidl = ILCreateFromPathW(sourcePath.make_preferred().c_str());
 	if (pidl) 
 	{
-		SHOpenFolderAndSelectItems(pidl, 0, 0, 0);
+		SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0);
 		ILFree(pidl);
-		return;
 	}
 }

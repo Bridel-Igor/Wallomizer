@@ -1,8 +1,5 @@
 #include "WallpaperManager.h"
 
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
-
 #include "App.h"
 #include "Player.h"
 
@@ -41,27 +38,32 @@ void WallpaperManager::setLoadedWallpaper(bool setPrevious)
 {
 	std::lock_guard<std::mutex> lock(m_imageModification);
 
-	std::wstring pathOfLoaded = m_app.getWinUtils().getRoamingDir();
-	pathOfLoaded += L"Loaded wallpaper.dat";
-	std::wstring pathOfCurrent = m_app.getWinUtils().getRoamingDir();
-	pathOfCurrent += L"Current wallpaper.jpg";
+	std::filesystem::path pathOfLoaded = m_app.getWinUtils().getRoamingDir() / L"Loaded wallpaper.dat";
+	std::filesystem::path pathOfCurrent = m_app.getWinUtils().getRoamingDir() / L"Current wallpaper.jpg";
 
-	if (!std::experimental::filesystem::exists(pathOfLoaded))
+	if (!std::filesystem::exists(pathOfLoaded))
 	{
 		m_app.getTimer().abort();
 		return;
 	}
+
 	if (!setPrevious)
 	{
 		m_wallpaperList.push_back(m_NextWallpaper);
 		if (m_wallpaperList.size() > m_app.getSettings().prevCount + 1)
 			m_wallpaperList.pop_front();
 	}
-	DeleteFileW(pathOfCurrent.c_str());
-	if (MoveFileW(pathOfLoaded.c_str(), pathOfCurrent.c_str()) == 0)
-	{
+
+	std::error_code ec;
+
+	std::filesystem::remove(pathOfCurrent, ec);
+	if (ec)
 		return;
-	}
+
+	std::filesystem::rename(pathOfLoaded, pathOfCurrent, ec);
+	if (ec)
+		return;
+
 	m_app.getWinUtils().updateDesktopBackground(m_app.getTimer().getStatus() != Timer::Status::stopped);
 	Player::redrawPlayers();
 }
@@ -89,10 +91,8 @@ void WallpaperManager::deleteLoaded()
 {
 	std::lock_guard<std::mutex> lock(m_imageModification);
 
-	std::wstring pathOfLoaded = m_app.getWinUtils().getRoamingDir();
-	pathOfLoaded += L"Loaded wallpaper.dat";
-
-	DeleteFileW(pathOfLoaded.c_str());
+	std::filesystem::path pathOfLoaded = m_app.getWinUtils().getRoamingDir() / L"Loaded wallpaper.dat";
+	std::filesystem::remove(pathOfLoaded);
 }
 
 void WallpaperManager::openCurrentWallpaperExternally()

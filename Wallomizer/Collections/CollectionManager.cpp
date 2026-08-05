@@ -24,10 +24,8 @@ CollectionManager::~CollectionManager()
 
 bool CollectionManager::saveSettings(FILE* pFile) const
 {
-	wchar_t wsPath[MAX_PATH];
-	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
-	wcscat_s(wsPath, MAX_PATH, L"CollectionManager.dat");
-	_wfopen_s(&pFile, wsPath, L"wb");
+	std::filesystem::path path = m_app.getWinUtils().getRoamingDir() / L"CollectionManager.dat";
+	_wfopen_s(&pFile, path.c_str(), L"wb");
 	if (pFile != NULL)
 	{
 		fwrite(&CollectionManager::COLLECTION_MANAGER_FILE_VERSION, sizeof(CollectionManager::COLLECTION_MANAGER_FILE_VERSION), 1, pFile);
@@ -46,10 +44,8 @@ bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 	Timer::LoadingGuard loading = m_app.getTimer().loadingGuard();
 	Player::updateTimer(m_app.getTimer(), true);
 
-	wchar_t wsPath[MAX_PATH];
-	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
-	wcscat_s(wsPath, MAX_PATH, L"CollectionManager.dat");
-	_wfopen_s(&pFile, wsPath, L"rb");
+	std::filesystem::path path = m_app.getWinUtils().getRoamingDir() / L"CollectionManager.dat";
+	_wfopen_s(&pFile, path.c_str(), L"rb");
 	if (pFile != NULL)
 	{
 		fread(&fileVersion, sizeof(fileVersion), 1, pFile);
