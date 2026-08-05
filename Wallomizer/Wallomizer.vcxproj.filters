@@ -100,7 +100,7 @@
     <ClCompile Include="UI\Interfaces\IHoverable.cpp">
       <Filter>UI\Interfaces</Filter>
     </ClCompile>
-    <ClCompile Include="AppMutex.cpp">
+    <ClCompile Include="InstanceGuard.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="UI\Interfaces\IWindow.cpp">
@@ -234,7 +234,7 @@
     <ClInclude Include="UI\Interfaces\HMenuGenerator.h">
       <Filter>UI\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="AppMutex.h">
+    <ClInclude Include="InstanceGuard.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="UI\Interfaces\IWindow.h">

@@ -5,7 +5,7 @@
 #include "TrayWindow.h"
 
 App::App() :
-	m_appMutex("Wallomizer"),
+	m_instanceGuard("Wallomizer"),
 	m_settings(m_winUtils),
 	m_collectionManager(*this),
 	m_wallpaperManager(*this),

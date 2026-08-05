@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AppMutex.h"
+#include "InstanceGuard.h"
 #include "WinUtils.h"
 #include "Timer.h"
 #include "CollectionManager.h"
@@ -30,7 +30,7 @@ public:
 	Timer& getTimer()							noexcept { return m_timer; }
 
 private:
-	const AppMutex m_appMutex;
+	const InstanceGuard m_instanceGuard;
 	const WinUtils m_winUtils;
 	Settings m_settings;
 	CollectionManager m_collectionManager;
