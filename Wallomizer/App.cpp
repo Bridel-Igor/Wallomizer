@@ -9,7 +9,7 @@ App::App() :
 	m_settings(m_winUtils),
 	m_collectionManager(*this),
 	m_wallpaperManager(*this),
-	m_timer(*this)
+	m_timer(m_winUtils, m_settings, m_wallpaperManager)
 {
 }
 

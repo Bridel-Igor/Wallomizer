@@ -238,7 +238,7 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 			m_app.getWinUtils().setBackgroundColor(cpbBckColor.getColor());
 
 			m_app.getSettings().saveSettings();
-			Player::updateTimer(m_app, true);
+			Player::updateTimer(m_app.getTimer(), true);
 			DestroyWindow(hWnd());
 			return 0;
 		}

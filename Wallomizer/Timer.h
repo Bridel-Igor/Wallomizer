@@ -2,7 +2,9 @@
 
 #include <mutex>
 
-class App;
+class WinUtils;
+class Settings;
+class WallpaperManager;
 class Wallpaper;
 
 class Timer
@@ -35,7 +37,7 @@ public:
 	};
 
 public:
-	explicit Timer(App& app);
+	explicit Timer(const WinUtils& winUtils, Settings& settings, WallpaperManager& wallpaperManager);
 	Timer(const Timer&) = delete;
 	Timer& operator=(const Timer&) = delete;
 	Timer(Timer&&) = delete;
@@ -56,7 +58,10 @@ public:
 	bool isLoading() const noexcept { return m_loading; }
 
 private:
-	App& m_app;
+	const WinUtils& m_winUtils;
+	Settings& m_settings;
+	WallpaperManager& m_wallpaperManager;
+
 	Status m_status = Status::playing;
 	std::mutex m_sessionFileAccess;
 

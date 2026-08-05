@@ -44,7 +44,8 @@ bool CollectionManager::saveSettings(FILE* pFile) const
 bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 {
 	Timer::LoadingGuard loading = m_app.getTimer().loadingGuard();
-	Player::updateTimer(m_app, true);
+	Player::updateTimer(m_app.getTimer(), true);
+
 	wchar_t wsPath[MAX_PATH];
 	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"CollectionManager.dat");
@@ -136,7 +137,7 @@ void CollectionManager::reloadSettings()
 	loadSettings();
 	m_app.getWallpaperManager().deleteLoaded();
 	m_app.getTimer().repeat();
-	Player::updateTimer(m_app, true);
+	Player::updateTimer(m_app.getTimer(), true);
 }
 
 void CollectionManager::clear()

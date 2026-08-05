@@ -5,7 +5,9 @@
 
 #include "resource.h"
 #include "IWindow.h"
-#include "App.h"
+#include "WinUtils.h"
+#include "Timer.h"
+#include "WallpaperManager.h"
 
 std::list<Player*> Player::pPlayers;
 HICON	Player::Resources::hIPlay,			Player::Resources::hIPlayHover,			Player::Resources::hIPlayActive,
@@ -65,7 +67,7 @@ Player::Resources::~Resources()
 	DestroyIcon(hIFitHover);
 }
 
-Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, App& app, DWORD additionalStyles) :
+Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, const WinUtils& winUtils, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles) :
 	btnPrev(pParent,				xPlayer,		yPlayer,	20,		20, resources.hIPrev,			resources.hIPrevHover,			"Previous"),
 	btnOpenExternal(pParent,		xPlayer + 30,	yPlayer,	20,		20, resources.hIOpenExternal,	resources.hIOpenExternalHover,	"Source image"),
 	btnStop(pParent,				xPlayer + 60,	yPlayer,	20,		20, resources.hIStop,			resources.hIStopHover,			"Stop"),
@@ -74,9 +76,11 @@ Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yT
 	btnFit(pParent,					xPlayer + 150,	yPlayer,	20,		20, resources.hIFit,			resources.hIFitHover,			"Fit/fill"),
 	btnNext(pParent,				xPlayer + 180,	yPlayer,	20,		20, resources.hINext,			resources.hINextHover,			"Next"),
 	stDelayRemained(pParent, "",	xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles),
-	m_app(app)
+	m_winUtils(winUtils),
+	m_timer(timer),
+	m_wallpaperManager(wallpaperManager)
 {	
-	updateTimer(m_app, true);
+	updateTimer(m_timer, true);
 	pPlayers.push_back(this);
 }
 
@@ -89,44 +93,44 @@ bool Player::click(WPARAM& wParam)
 {
 	if (btnOpenExternal.isClicked(wParam))
 	{
-		m_app.getWallpaperManager().openCurrentWallpaperExternally();
+		m_wallpaperManager.openCurrentWallpaperExternally();
 		return true;
 	}
 	if (btnPrev.isClicked(wParam))
 	{
-		m_app.getTimer().repeat();
-		m_app.getWallpaperManager().setPreviousWallpaper();
+		m_timer.repeat();
+		m_wallpaperManager.setPreviousWallpaper();
 		return true;
 	}
 	if (btnStop.isClicked(wParam))
 	{ 
-		m_app.getTimer().stop();
+		m_timer.stop();
 		redrawPlayers();
 		return 0;
 	}
 	if (btnPlay.isClicked(wParam))
 	{
-		m_app.getTimer().play();
+		m_timer.play();
 		redrawPlayers();
 		return true;
 	}
 	if (btnPause.isClicked(wParam))
 	{
-		m_app.getTimer().pause();
+		m_timer.pause();
 		redrawPlayers();
 		return true;
 	}
 	if (btnFit.isClicked(wParam)) 
 	{
-		m_app.getWinUtils().flipWallpaperStyle();
-		m_app.getWinUtils().updateDesktopBackground(m_app.getTimer().getStatus() != Timer::Status::stopped);
+		m_winUtils.flipWallpaperStyle();
+		m_winUtils.updateDesktopBackground(m_timer.getStatus() != Timer::Status::stopped);
 		Player::redrawPlayers();
 		return true;
 	}
 	if (btnNext.isClicked(wParam))
 	{
-		m_app.getTimer().repeat();
-		m_app.getWallpaperManager().setNextWallpaper();
+		m_timer.repeat();
+		m_wallpaperManager.setNextWallpaper();
 		return true;
 	}
 	return false;
@@ -136,7 +140,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 {	
 	if (pDIS->hwndItem == btnPrev.hWnd())
 	{
-		if (!m_app.getWallpaperManager().hasPrevious())
+		if (!m_wallpaperManager.hasPrevious())
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);
@@ -149,7 +153,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 		return true;
 	if (pDIS->hwndItem == btnStop.hWnd())
 	{
-		if (m_app.getTimer().getStatus() == Timer::Status::stopped)
+		if (m_timer.getStatus() == Timer::Status::stopped)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIStopActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -160,7 +164,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	}
 	if (pDIS->hwndItem == btnPlay.hWnd())
 	{
-		if (m_app.getTimer().getStatus() == Timer::Status::playing)
+		if (m_timer.getStatus() == Timer::Status::playing)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPlayActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -171,7 +175,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	}
 	if (pDIS->hwndItem == btnPause.hWnd())
 	{
-		if (m_app.getTimer().getStatus() == Timer::Status::paused)
+		if (m_timer.getStatus() == Timer::Status::paused)
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPauseActive, 0, 0, 0, NULL, DI_NORMAL);
@@ -187,7 +191,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 	return false;
 }
 
-void Player::updateTimer(App& app, bool isForced)
+void Player::updateTimer(Timer& timer, bool isForced)
 {
 	for (auto pPlayer : pPlayers)
 	{
@@ -202,7 +206,7 @@ void Player::updateTimer(App& app, bool isForced)
 	char text[16] = "loading...";
 	if (!timer.isLoading())
 	{
-		const uint32_t remainingSeconds = (app.getTimer().getRemainingTime() + 999) / 1000;
+		const uint32_t remainingSeconds = (timer.getRemainingTime() + 999) / 1000;
 
 		const uint16_t hours = static_cast<uint16_t>(remainingSeconds / 3600);
 		const uint8_t minutes = static_cast<uint8_t>((remainingSeconds / 60) % 60);

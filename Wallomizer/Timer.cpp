@@ -3,12 +3,16 @@
 #include <windows.h>
 #include <string>
 
-#include "App.h"
+#include "WinUtils.h"
+#include "Settings.h"
+#include "WallpaperManager.h"
 #include "Player.h"
 #include "Wallpaper.h"
 
-Timer::Timer(App& app) :
-	m_app(app)
+Timer::Timer(const WinUtils& winUtils, Settings& settings, WallpaperManager& wallpaperManager) :
+	m_winUtils(winUtils),
+	m_settings(settings),
+	m_wallpaperManager(wallpaperManager)
 {
 	loadSession();
 }
@@ -16,7 +20,7 @@ Timer::Timer(App& app) :
 void Timer::saveSession()
 {
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
-	std::wstring filePath = m_app.getWinUtils().getRoamingDir();
+	std::wstring filePath = m_winUtils.getRoamingDir();
 	filePath += L"Session.dat";
 	FILE* pFile;
 	_wfopen_s(&pFile, filePath.c_str(), L"wb");
@@ -25,7 +29,7 @@ void Timer::saveSession()
 	fwrite(&m_status, sizeof(m_status), 1, pFile);
 	fwrite(&m_timePassed, sizeof(m_timePassed), 1, pFile);
 
-	const Wallpaper& wallpaper = m_app.getWallpaperManager().getCurrentWallpaper();
+	const Wallpaper& wallpaper = m_wallpaperManager.getCurrentWallpaper();
 	const uint16_t pathLength = static_cast<uint16_t>(wallpaper.getPath().size());
 	const Collection::Type type = wallpaper.getType();
 	fwrite(&type, sizeof(type), 1, pFile);
@@ -38,7 +42,7 @@ void Timer::saveSession()
 void Timer::loadSession()
 {
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
-	std::wstring filePath = m_app.getWinUtils().getRoamingDir();
+	std::wstring filePath = m_winUtils.getRoamingDir();
 	filePath += L"Session.dat";
 	FILE* pFile;
 	_wfopen_s(&pFile, filePath.c_str(), L"rb");
@@ -60,14 +64,14 @@ void Timer::loadSession()
 	fclose(pFile);
 
 	Wallpaper loadedWallpaper(type, path.c_str());
-	m_app.getWallpaperManager().setCurrentWallpaper(std::move(loadedWallpaper));
+	m_wallpaperManager.setCurrentWallpaper(std::move(loadedWallpaper));
 
 	DeleteFileW(filePath.c_str()); // TODO: do i need to delete it?
 }
 
 void Timer::run()
 {
-	while (m_timePassed < m_app.getSettings().delay)
+	while (m_timePassed < m_settings.delay)
 	{
 		if (m_abort)
 		{
@@ -84,7 +88,7 @@ void Timer::run()
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		if (m_status == Status::playing)
 		{
-			Player::updateTimer(m_app);
+			Player::updateTimer(*this);
 			m_timePassed += 100;
 		}
 	}
@@ -94,26 +98,26 @@ void Timer::run()
 void Timer::play() noexcept
 {
 	m_status = Status::playing;
-	m_app.getWinUtils().updateDesktopBackground(true);
+	m_winUtils.updateDesktopBackground(true);
 }
 
 void Timer::pause() noexcept
 {
 	m_status = Status::paused;
-	m_app.getWinUtils().updateDesktopBackground(true);
+	m_winUtils.updateDesktopBackground(true);
 	saveSession();
 }
 
 void Timer::stop() noexcept
 {
 	m_status = Status::stopped;
-	m_app.getWinUtils().updateDesktopBackground(false);
+	m_winUtils.updateDesktopBackground(false);
 	saveSession();
 }
 
 unsigned long Timer::getRemainingTime() const noexcept
 {
-	const unsigned long delay = m_app.getSettings().delay;
+	const unsigned long delay = m_settings.delay;
 	return delay > m_timePassed ? 
 			delay - m_timePassed : 
 			0;

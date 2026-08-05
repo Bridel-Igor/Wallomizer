@@ -4,9 +4,10 @@
 
 #include "Static.h"
 #include "IconButton.h"
-#include "CollectionManager.h"
 
-class App;
+class WinUtils;
+class Timer;
+class WallpaperManager;
 
 class Player
 {
@@ -30,11 +31,11 @@ private:
 	}resources;
 
 public:
-	Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, App& app, DWORD additionalStyles = 0UL);
+	Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, const WinUtils& winUtils, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles = 0UL);
 	~Player();
 	bool click(WPARAM& wParam);
 	bool draw(LPDRAWITEMSTRUCT& pDIS);
-	static void updateTimer(App& app, bool isForced = false);
+	static void updateTimer(Timer& timer, bool isForced = false);
 	static void redrawPlayers();
 	
 private:
@@ -42,7 +43,10 @@ private:
 
 	IconButton btnPrev, btnOpenExternal, btnStop, btnPlay, btnPause, btnFit, btnNext;
 	Static stDelayRemained;
-	App& m_app;
+
+	const WinUtils& m_winUtils;
+	Timer& m_timer;
+	WallpaperManager& m_wallpaperManager;
 
 	static std::list<Player*> pPlayers;
 };

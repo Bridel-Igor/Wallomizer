@@ -20,12 +20,12 @@ MainWindow::MainWindow(App& app) :
 														5,		0,		480,	20),
 	btnSettings			(this, "Settings",				10,		450,	95,		20),
 	player				(this,							220,	450,
-														430,	450,	100,	20, app)
+														430,	450,	100,	20, m_app.getWinUtils(), m_app.getTimer(), m_app.getWallpaperManager())
 {
 	s_pMainWindow = this;
 	centerWindow(GetDesktopWindow());
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)IWindow::Resources::mainFont);
-	player.updateTimer(m_app, true);
+	player.updateTimer(m_app.getTimer(), true);
 	updateCollectionItems();
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
@@ -46,7 +46,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (wParam == TRUE)
 		{
-			player.updateTimer(m_app, true);
+			player.updateTimer(m_app.getTimer(), true);
 			player.redrawPlayers();
 		}
 	}

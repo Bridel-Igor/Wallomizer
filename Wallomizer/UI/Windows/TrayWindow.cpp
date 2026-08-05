@@ -39,7 +39,7 @@ TrayWindow::TrayWindow(App& app) :
 	btnSettings			(this, "Settings",	40,		60,		65,		20),
 	btnExit				(this, "Exit",		115,	60,		65,		20),
 	player				(this,				10,		10,
-											10,		35,		200,	20, m_app, SS_CENTER)
+											10,		35,		200,	20, m_app.getWinUtils(), m_app.getTimer(), m_app.getWallpaperManager(), SS_CENTER)
 {
 	s_pTrayWindow = this;
 
@@ -96,7 +96,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			pt.y = pt.y				< rect.top		? rect.top				: pt.y;
 			pt.y = pt.y + height	> rect.bottom	? rect.bottom - height	: pt.y;
 
-			player.updateTimer(m_app, true);
+			player.updateTimer(m_app.getTimer(), true);
 			SetWindowPos(hWnd(), HWND_TOPMOST, pt.x, pt.y, width, height, SWP_SHOWWINDOW);
 			SetForegroundWindow(hWnd());
 			SendMessage(hWnd(), WM_SETCURSOR, 0, 0);
