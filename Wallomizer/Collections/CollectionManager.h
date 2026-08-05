@@ -31,7 +31,6 @@ public:
 	Wallpaper getRandomWallpaper();
 	
 	std::vector<BaseCollection*> m_pCollections;
-	bool m_isLoading = false;
 
 	/// Current file version of CollectionManager.dat file.
 	static constexpr unsigned short COLLECTION_MANAGER_FILE_VERSION = 3U;

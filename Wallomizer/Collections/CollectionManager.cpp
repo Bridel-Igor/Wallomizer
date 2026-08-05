@@ -43,7 +43,7 @@ bool CollectionManager::saveSettings(FILE* pFile) const
 
 bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 {
-	m_isLoading = true;
+	Timer::LoadingGuard loading = m_app.getTimer().loadingGuard();
 	Player::updateTimer(m_app, true);
 	wchar_t wsPath[MAX_PATH];
 	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
@@ -92,7 +92,6 @@ bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 	// BUG: this thread runs faster than tray's thread
 	// if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady()) 
 	//	PostMessageA(TrayWindow::s_pTrayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::s_pTrayWindow->btnSettings.hMenu(), NULL);
-	m_isLoading = false;
 	return true;
 }
 
