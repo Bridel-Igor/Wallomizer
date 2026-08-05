@@ -66,10 +66,10 @@ void LocalCollection::getCollectionName(wchar_t* pwsName, size_t size) const
 	wcscat_s(pwsName, 255, settings.wsDirectoryPath);
 }
 
-Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
+Wallpaper LocalCollection::getWallpaper(unsigned int index) const
 {
 	if (settings.wsDirectoryPath[0] == L'\0' || m_uiNumber <= 0)
-		return nullptr;
+		return Wallpaper::getEmptyWallpaper();
 	unsigned int i = 0;
 	std::experimental::filesystem::path dirPath{ settings.wsDirectoryPath };
 
@@ -80,7 +80,7 @@ Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
 			{
 				if (i == index)
 				{
-					return new Wallpaper(Collection::Type::local, path.path().generic_wstring().c_str());
+					return Wallpaper(Collection::Type::local, path.path().generic_wstring());
 				}
 				i++;
 			}
@@ -92,13 +92,13 @@ Wallpaper* LocalCollection::getWallpaperInfo(unsigned int index) const
 			{
 				if (i == index)
 				{
-					return new Wallpaper(Collection::Type::local, path.path().generic_wstring().c_str());
+					return Wallpaper(Collection::Type::local, path.path().generic_wstring());
 				}
 				i++;
 			}
 	}
 
-	return nullptr;
+	return Wallpaper::getEmptyWallpaper();
 }
 
 void LocalCollection::openCollectionSettingsWindow(HWND hCaller)

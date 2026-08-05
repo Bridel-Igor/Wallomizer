@@ -61,9 +61,6 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Wallpaper.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="UI\Components\CheckBox.cpp">
       <Filter>UI\Components\Source</Filter>
     </ClCompile>
@@ -118,10 +115,16 @@
     <ClCompile Include="WinUtils.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="ColorPickerButton.cpp">
+    <ClCompile Include="App.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="WallpaperManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Components\ColorPickerButton.cpp">
       <Filter>UI\Components\Source</Filter>
     </ClCompile>
-    <ClCompile Include="App.cpp">
+    <ClCompile Include="Wallpaper.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -207,9 +210,6 @@
     <ClInclude Include="Timer.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Wallpaper.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="UI\Components\IconButton.h">
       <Filter>UI\Components\Headers</Filter>
     </ClInclude>
@@ -237,9 +237,6 @@
     <ClInclude Include="AppMutex.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="CategoriesAndPurity.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="UI\Interfaces\IWindow.h">
       <Filter>UI\Interfaces</Filter>
     </ClInclude>
@@ -249,11 +246,23 @@
     <ClInclude Include="WinUtils.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="ColorPickerButton.h">
-      <Filter>UI\Components\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="App.h">
       <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="WallpaperManager.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Components\ColorPickerButton.h">
+      <Filter>UI\Components\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Wallpaper.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Collections\CategoriesAndPurity.h">
+      <Filter>Collections\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CollectionTypes.h">
+      <Filter>Collections\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

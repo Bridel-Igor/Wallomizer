@@ -87,13 +87,13 @@ bool Player::click(WPARAM& wParam)
 {
 	if (btnOpenExternal.isClicked(wParam))
 	{
-		m_app.getCollectionManager().pCurrent->openExternally();
+		m_app.getWallpaperManager().openCurrentWallpaperExternally();
 		return true;
 	}
 	if (btnPrev.isClicked(wParam))
 	{
 		m_app.getTimer().repeat();
-		m_app.getCollectionManager().setPreviousWallpaper();
+		m_app.getWallpaperManager().setPreviousWallpaper();
 		return true;
 	}
 	if (btnStop.isClicked(wParam))
@@ -124,7 +124,7 @@ bool Player::click(WPARAM& wParam)
 	if (btnNext.isClicked(wParam))
 	{
 		m_app.getTimer().repeat();
-		m_app.getCollectionManager().setNextWallpaper();
+		m_app.getWallpaperManager().setNextWallpaper();
 		return true;
 	}
 	return false;
@@ -134,7 +134,7 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 {	
 	if (pDIS->hwndItem == btnPrev.hWnd())
 	{
-		if (!m_app.getCollectionManager().hasPrevious())
+		if (!m_app.getWallpaperManager().hasPrevious())
 		{
 			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
 			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPrevDisabled, 0, 0, 0, NULL, DI_NORMAL);

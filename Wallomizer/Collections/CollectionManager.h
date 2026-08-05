@@ -19,8 +19,8 @@ public:
 	bool loadSettings(FILE* pFile = nullptr, unsigned short fileVersion = 0);
 	void getCollectionName(wchar_t*, size_t) const {}
 	Collection::Type getCollectionType() const { return Collection::Type::none; }
-	CategoriesAndPurity getCAP() const { return 0; }
-	Wallpaper* getWallpaperInfo(unsigned int index) const;
+	CategoriesAndPurity getCAP() const { return CAP::none; }
+	Wallpaper getWallpaper(unsigned int index) const;
 	void openCollectionSettingsWindow(HWND = nullptr);
 
 	void reloadSettings();
@@ -28,26 +28,17 @@ public:
 	void updateNumber();
 	void addCollection(Collection::Type collectionType);
 	void eraseCollection(int index);
-	void loadNextWallpaper();
-	void loadRandomWallpaper();
-	void setLoadedWallpaper(bool setPrevious = false);
-	void setNextWallpaper();
-	void setPreviousWallpaper();
-	bool hasPrevious() const;
-	bool isReady() const { return m_isReady; }
+	Wallpaper getRandomWallpaper();
 	
 	std::vector<BaseCollection*> m_pCollections;
 	bool m_isLoading = false;
-	Wallpaper *pCurrent = nullptr, *pNext = nullptr;
 
 	/// Current file version of CollectionManager.dat file.
 	static constexpr unsigned short COLLECTION_MANAGER_FILE_VERSION = 3U;
 	
 private:
 	App& m_app;
-	std::list<Wallpaper*> pPreviousList;
-	bool m_isReady = false;
+
 	std::mt19937 m_randomGenerator;
 	std::uniform_int_distribution<int> m_uniformIntDistribution;
-	std::mutex imageModification;
 };

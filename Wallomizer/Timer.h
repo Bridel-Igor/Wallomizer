@@ -22,8 +22,8 @@ public:
 	Timer(Timer&&) = delete;
 	Timer& operator=(Timer&&) = delete;
 
-	void saveSession(const Wallpaper* pCurrent = nullptr);
-	void loadSession(Wallpaper*& pCurrent);
+	void saveSession();
+	void loadSession();
 	void run();
 
 	void play() noexcept;

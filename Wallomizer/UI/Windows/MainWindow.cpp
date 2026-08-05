@@ -23,8 +23,6 @@ MainWindow::MainWindow(App& app) :
 														430,	450,	100,	20, app)
 {
 	s_pMainWindow = this;
-	while (!m_app.getCollectionManager().isReady())
-		Sleep(50);
 	centerWindow(GetDesktopWindow());
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)IWindow::Resources::mainFont);
 	player.updateTimer(m_app, true);

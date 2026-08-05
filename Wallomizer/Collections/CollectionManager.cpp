@@ -1,7 +1,5 @@
 #include "CollectionManager.h"
 
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
 #include <ctime>
 
 #include "App.h"
@@ -50,7 +48,6 @@ bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 	wchar_t wsPath[MAX_PATH];
 	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
 	wcscat_s(wsPath, MAX_PATH, L"CollectionManager.dat");
-	m_isReady = false;
 	_wfopen_s(&pFile, wsPath, L"rb");
 	if (pFile != NULL)
 	{
@@ -89,7 +86,6 @@ bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 	updateNumber();
 	if (MainWindow::s_pMainWindow && MainWindow::s_pMainWindow->isReady())
 		MainWindow::s_pMainWindow->updateCollectionItems();
-	m_isReady = true;
 	// TODO: is any of these needed?
 	//if (m_app.getTimer().getStatus() == Timer::Status::playing)
 	//	m_app.getTimer().abortDelay();
@@ -100,7 +96,7 @@ bool CollectionManager::loadSettings(FILE* pFile, unsigned short fileVersion)
 	return true;
 }
 
-Wallpaper* CollectionManager::getWallpaperInfo(unsigned int _index) const
+Wallpaper CollectionManager::getWallpaper(unsigned int _index) const
 {
 	int index = _index;
 	for (unsigned int i = 0; i < m_pCollections.size(); i++)
@@ -111,11 +107,11 @@ Wallpaper* CollectionManager::getWallpaperInfo(unsigned int _index) const
 		if (index < 0)
 		{
 			if (m_pCollections[i] == nullptr || i >= m_pCollections.size() || m_pCollections[i]->getNumber() <= (index + m_pCollections[i]->getNumber()))
-				return nullptr;
-			return m_pCollections[i]->getWallpaperInfo(index + m_pCollections[i]->getNumber());
+				return Wallpaper::getEmptyWallpaper();
+			return m_pCollections[i]->getWallpaper(index + m_pCollections[i]->getNumber());
 		}
 	}
-	return nullptr;
+	return Wallpaper::getEmptyWallpaper();
 }
 
 void CollectionManager::openCollectionSettingsWindow(HWND)
@@ -136,13 +132,10 @@ void CollectionManager::openCollectionSettingsWindow(HWND)
 
 void CollectionManager::reloadSettings()
 {
-	std::lock_guard<std::mutex> lock(imageModification);
+	
 	saveSettings();
 	loadSettings();
-	wchar_t wsPath[MAX_PATH];
-	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
-	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
-	DeleteFileW(wsPath);
+	m_app.getWallpaperManager().deleteLoaded();
 	m_app.getTimer().repeat();
 	Player::updateTimer(m_app, true);
 }
@@ -192,87 +185,14 @@ void CollectionManager::eraseCollection(int index)
 	m_pCollections.erase(CollectionManager::m_pCollections.begin() + index);
 	saveSettings();
 	updateNumber();
-	std::lock_guard<std::mutex> lock(imageModification);
-	wchar_t wsPath[MAX_PATH];
-	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
-	wcscat_s(wsPath, MAX_PATH, L"Loaded wallpaper.dat");
-	DeleteFileW(wsPath);
+	m_app.getWallpaperManager().deleteLoaded();
 	m_app.getTimer().abort();
 }
 
-void CollectionManager::loadNextWallpaper()
-{
-	std::lock_guard<std::mutex> lock(imageModification);
-	loadRandomWallpaper();
-}
-
-void CollectionManager::loadRandomWallpaper()
+Wallpaper CollectionManager::getRandomWallpaper()
 {
 	if (m_uiNumber <= 0)
-		return;
+		return Wallpaper(Collection::Type::none, L"");
 	const int randomFromAll = m_uniformIntDistribution(m_randomGenerator);
-	pNext = getWallpaperInfo(randomFromAll);
-	pNext->loadWallpaper(m_app.getWinUtils());
-}
-
-void CollectionManager::setLoadedWallpaper(bool setPrevious)
-{
-	std::lock_guard<std::mutex> lock(imageModification);
-	wchar_t wsLoadedPath[MAX_PATH], wsCurrentPath[MAX_PATH];
-	wcscpy_s(wsLoadedPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
-	wcscat_s(wsLoadedPath, MAX_PATH, L"Loaded wallpaper.dat");
-	wcscpy_s(wsCurrentPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
-	wcscat_s(wsCurrentPath, MAX_PATH, L"Current wallpaper.jpg");
-	if (!std::experimental::filesystem::exists(wsLoadedPath))
-	{
-		m_app.getTimer().abort();
-		return;
-	}
-	if (!setPrevious)
-	{
-		if (pCurrent != nullptr)
-		{
-			pPreviousList.push_back(pCurrent);
-			if (pPreviousList.size() > m_app.getSettings().prevCount)
-			{
-				delete pPreviousList.front();
-				pPreviousList.pop_front();
-			}
-		}
-		pCurrent = pNext;
-	}
-	DeleteFileW(wsCurrentPath);
-	if (MoveFileW(wsLoadedPath, wsCurrentPath) == 0)
-	{
-		return;
-	}
-	m_app.getWinUtils().updateDesktopBackground(m_app.getTimer().getStatus() != Timer::Status::stopped);
-	Player::redrawPlayers();
-}
-
-void CollectionManager::setNextWallpaper()
-{
-	setLoadedWallpaper();
-	loadNextWallpaper();
-}
-
-void CollectionManager::setPreviousWallpaper()
-{
-	if (pPreviousList.empty())
-		return;
-
-	pPreviousList.back()->loadWallpaper(m_app.getWinUtils());
-	setLoadedWallpaper(true);
-	loadNextWallpaper();
-
-	delete pCurrent;
-	pCurrent = pPreviousList.back();
-	pPreviousList.pop_back();
-
-	Player::redrawPlayers();
-}
-
-bool CollectionManager::hasPrevious() const
-{
-	return !pPreviousList.empty();
+	return getWallpaper(randomFromAll);
 }

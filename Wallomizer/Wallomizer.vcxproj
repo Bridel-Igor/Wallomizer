@@ -195,6 +195,7 @@
     <ClCompile Include="Collections\UserCollection.cpp" />
     <ClCompile Include="UI\Windows\SetUserCollectionWindow.cpp" />
     <ClCompile Include="Wallpaper.cpp" />
+    <ClCompile Include="WallpaperManager.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="WinUtils.cpp" />
   </ItemGroup>
@@ -242,6 +243,7 @@
     <ClInclude Include="UI\Components\UpDownEdit.h" />
     <ClInclude Include="Collections\UserCollection.h" />
     <ClInclude Include="Wallpaper.h" />
+    <ClInclude Include="WallpaperManager.h" />
     <ClInclude Include="WinUtils.h" />
   </ItemGroup>
   <ItemGroup>

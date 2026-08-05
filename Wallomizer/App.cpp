@@ -8,6 +8,7 @@ App::App() :
 	m_appMutex("Wallomizer"),
 	m_settings(m_winUtils),
 	m_collectionManager(*this),
+	m_wallpaperManager(*this),
 	m_timer(*this)
 {
 }
@@ -39,11 +40,11 @@ int App::run()
 			continue;
 		}
 		std::thread timerThread(&Timer::run, &m_timer);
-		m_collectionManager.loadNextWallpaper();
+		m_wallpaperManager.loadNextWallpaper();
 		timerThread.join();
 		if (!m_running)
 			break;
-		m_collectionManager.setLoadedWallpaper();
+		m_wallpaperManager.setLoadedWallpaper();
 	}
 
 	trayWindowThread.join();
@@ -54,7 +55,7 @@ int App::run()
 
 void App::requestExit()
 {
-	m_timer.saveSession(m_collectionManager.pCurrent);
+	m_timer.saveSession();
 	m_timer.abort();
 	m_running = false;
 }

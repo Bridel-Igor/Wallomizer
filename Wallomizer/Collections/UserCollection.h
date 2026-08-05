@@ -35,7 +35,7 @@ public:
 	void getCollectionName(wchar_t* pwsName, size_t size) const;
 	Collection::Type getCollectionType() const { return Collection::Type::user; }
 	CategoriesAndPurity getCAP() const;
-	Wallpaper* getWallpaperInfo(unsigned int index) const;
+	Wallpaper getWallpaper(unsigned int index) const;
 	void openCollectionSettingsWindow(HWND hCaller);
 
 	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);

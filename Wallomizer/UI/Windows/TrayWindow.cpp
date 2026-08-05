@@ -124,7 +124,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_QUERYENDSESSION:
 	{
-		m_app.getTimer().saveSession(m_app.getCollectionManager().pCurrent);
+		m_app.getTimer().saveSession();
 		return TRUE;
 	}
 

@@ -22,7 +22,7 @@ public:
 	virtual void getCollectionName(wchar_t* pwsName, size_t size) const = 0;
 	virtual Collection::Type getCollectionType() const = 0;
 	virtual CategoriesAndPurity getCAP() const = 0;
-	virtual Wallpaper* getWallpaperInfo(unsigned int index) const = 0;
+	virtual Wallpaper getWallpaper(unsigned int index) const = 0;
 	virtual void openCollectionSettingsWindow(HWND hWnd) = 0;
 
 	unsigned int getNumber() const	{ return m_uiNumber; }

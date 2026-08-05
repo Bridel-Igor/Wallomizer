@@ -4,6 +4,7 @@
 #include "WinUtils.h"
 #include "Timer.h"
 #include "CollectionManager.h"
+#include "WallpaperManager.h"
 #include "Settings.h"
 
 /// Root application class responsible for managing the application lifecycle
@@ -25,6 +26,7 @@ public:
 	const WinUtils& getWinUtils() const			noexcept { return m_winUtils; }
 	Settings& getSettings()						noexcept { return m_settings; }
 	CollectionManager& getCollectionManager()	noexcept { return m_collectionManager; }
+	WallpaperManager& getWallpaperManager()		noexcept { return m_wallpaperManager; }
 	Timer& getTimer()							noexcept { return m_timer; }
 
 private:
@@ -32,6 +34,7 @@ private:
 	const WinUtils m_winUtils;
 	Settings m_settings;
 	CollectionManager m_collectionManager;
+	WallpaperManager m_wallpaperManager;
 	Timer m_timer;
 
 	bool m_running = true;

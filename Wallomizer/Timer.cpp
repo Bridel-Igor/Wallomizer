@@ -1,6 +1,7 @@
 #include "Timer.h"
 
 #include <windows.h>
+#include <string>
 
 #include "App.h"
 #include "Player.h"
@@ -9,56 +10,59 @@
 Timer::Timer(App& app) :
 	m_app(app)
 {
-	loadSession(m_app.getCollectionManager().pCurrent);
+	loadSession();
 }
 
-void Timer::saveSession(const Wallpaper *pCurrent)
+void Timer::saveSession()
 {
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
-	wchar_t wsPath[MAX_PATH];
-	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
-	wcscat_s(wsPath, MAX_PATH, L"Session.dat\0");
+	std::wstring filePath = m_app.getWinUtils().getRoamingDir();
+	filePath += L"Session.dat";
 	FILE* pFile;
-	_wfopen_s(&pFile, wsPath, L"wb");
-	if (pFile == NULL)
+	_wfopen_s(&pFile, filePath.c_str(), L"wb");
+	if (pFile == nullptr)
 		return;
 	fwrite(&m_status, sizeof(m_status), 1, pFile);
 	fwrite(&m_timePassed, sizeof(m_timePassed), 1, pFile);
-	Collection::Type type = Collection::Type::none;
-	const wchar_t* path = nullptr;
-	if (pCurrent)
-	{
-		type = pCurrent->getType();
-		path = pCurrent->getPath().c_str();
-	}
-	fwrite(&type, sizeof(Collection::Type), 1, pFile);
-	fwrite(path, sizeof(wchar_t), Collection::getMaxPathSize(type), pFile);
+
+	const Wallpaper& wallpaper = m_app.getWallpaperManager().getCurrentWallpaper();
+	const uint16_t pathLength = static_cast<uint16_t>(wallpaper.getPath().size());
+	const Collection::Type type = wallpaper.getType();
+	fwrite(&type, sizeof(type), 1, pFile);
+	fwrite(&pathLength, sizeof(pathLength), 1, pFile);
+	fwrite(wallpaper.getPath().c_str(), sizeof(wchar_t), pathLength, pFile);
+
 	fclose(pFile);
 }
 
-void Timer::loadSession(Wallpaper*& pCurrent)
+void Timer::loadSession()
 {
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
-	wchar_t wsPath[MAX_PATH];
-	wcscpy_s(wsPath, MAX_PATH, m_app.getWinUtils().getRoamingDir());
-	wcscat_s(wsPath, MAX_PATH, L"Session.dat\0");
+	std::wstring filePath = m_app.getWinUtils().getRoamingDir();
+	filePath += L"Session.dat";
 	FILE* pFile;
-	_wfopen_s(&pFile, wsPath, L"rb");
-	if (pFile == NULL)
+	_wfopen_s(&pFile, filePath.c_str(), L"rb");
+	if (pFile == nullptr)
 		return;
+
 	fread(&m_status, sizeof(m_status), 1, pFile);
 	fread(&m_timePassed, sizeof(m_timePassed), 1, pFile);
-	if (pCurrent == nullptr)
-	{
-		Collection::Type type;
-		fread(&type, sizeof(Collection::Type), 1, pFile);
-		wchar_t* wsWallpaperPath = new wchar_t[getMaxPathSize(type) + 1] {};
-		fread(wsWallpaperPath, sizeof(wchar_t), getMaxPathSize(type), pFile);
-		pCurrent = new Wallpaper(type, wsWallpaperPath);
-		delete[] wsWallpaperPath;
-	}
+
+	Collection::Type type;
+	fread(&type, sizeof(type), 1, pFile);
+
+	uint16_t pathLength;
+	fread(&pathLength, sizeof(pathLength), 1, pFile);
+
+	std::wstring path(pathLength, L'\0');
+	fread(path.data(), sizeof(wchar_t), pathLength, pFile);
+
 	fclose(pFile);
-	DeleteFileW(wsPath);
+
+	Wallpaper loadedWallpaper(type, path.c_str());
+	m_app.getWallpaperManager().setCurrentWallpaper(std::move(loadedWallpaper));
+
+	DeleteFileW(filePath.c_str()); // TODO: do i need to delete it?
 }
 
 void Timer::run()
@@ -97,14 +101,14 @@ void Timer::pause() noexcept
 {
 	m_status = Status::paused;
 	m_app.getWinUtils().updateDesktopBackground(true);
-	saveSession(m_app.getCollectionManager().pCurrent);
+	saveSession();
 }
 
 void Timer::stop() noexcept
 {
 	m_status = Status::stopped;
 	m_app.getWinUtils().updateDesktopBackground(false);
-	saveSession(m_app.getCollectionManager().pCurrent);
+	saveSession();
 }
 
 unsigned long Timer::getRemainingTime() const noexcept

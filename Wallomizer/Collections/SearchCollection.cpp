@@ -111,7 +111,7 @@ CategoriesAndPurity SearchCollection::getCAP() const
 	return settings.categoriesAndPurity;
 }
 
-Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
+Wallpaper SearchCollection::getWallpaper(unsigned int index) const
 {
 	int page = int(index / m_app.getSettings().uPerPage);
 	index -= page * m_app.getSettings().uPerPage;
@@ -127,13 +127,13 @@ Wallpaper* SearchCollection::getWallpaperInfo(unsigned int index) const
 	internet.DownloadToBuffer(wsPageUrl, m_app.getSettings().uPerPage * 750);
 	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
-			return nullptr;
+			return Wallpaper::getEmptyWallpaper();
 
 	wchar_t wsPath[Collection::getMaxPathSize(Collection::Type::search) + 1] = {};
 	if (!internet.parse("path", wsPath, true))
-		return nullptr;
+		return Wallpaper::getEmptyWallpaper();
 
-	return new Wallpaper(Collection::Type::search, wsPath);
+	return Wallpaper(Collection::Type::search, wsPath);
 }
 
 void SearchCollection::openCollectionSettingsWindow(HWND hCaller)

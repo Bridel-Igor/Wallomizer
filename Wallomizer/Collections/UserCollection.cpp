@@ -73,7 +73,7 @@ CategoriesAndPurity UserCollection::getCAP() const
 	return settings.categoriesAndPurity;
 }
 
-Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
+Wallpaper UserCollection::getWallpaper(unsigned int index) const
 {
 	int page = int(index / s_nPerPage);
 	index -= page * s_nPerPage;
@@ -89,13 +89,13 @@ Wallpaper* UserCollection::getWallpaperInfo(unsigned int index) const
 	internet.DownloadToBuffer(wsPageUrl);
 	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
-			return nullptr;
+			return Wallpaper::getEmptyWallpaper();
 
 	wchar_t wsPath[Collection::getMaxPathSize(Collection::Type::user) + 1] = {};
 	if (!internet.parse("path", wsPath, true))
-		return nullptr;
+		return Wallpaper::getEmptyWallpaper();
 
-	return new Wallpaper(Collection::Type::user, wsPath);
+	return Wallpaper(Collection::Type::user, wsPath);
 }
 
 void UserCollection::openCollectionSettingsWindow(HWND hCaller)
