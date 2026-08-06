@@ -21,7 +21,6 @@ public:
 	wchar_t username[64] = {0};
 	wchar_t apiKey[33] = {0};
 	bool loadOnStartup = false;
-	unsigned int uPerPage = 24;
 
 private:
 	const WinUtils& m_winUtils;

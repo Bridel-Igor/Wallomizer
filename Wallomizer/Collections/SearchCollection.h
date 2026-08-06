@@ -40,4 +40,6 @@ public:
 private:
 	App& m_app;
 	wchar_t m_wsSearchUrl[1024] = L"";	
+
+	static uint32_t s_perPage;
 };

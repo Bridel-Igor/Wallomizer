@@ -4,6 +4,8 @@
 #include "SetSearchCollectionWindow.h"
 #include "App.h"
 
+uint32_t SearchCollection::s_perPage = 64;
+
 SearchCollection::SearchCollection(App& app) :
 	m_app(app)
 {
@@ -80,11 +82,19 @@ bool SearchCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 		return true;
 
 	Internet internet;
-	internet.DownloadToBuffer(m_wsSearchUrl, m_app.getSettings().uPerPage * 750);
+	internet.DownloadToBuffer(m_wsSearchUrl, s_perPage * 750);
+
 	if (!internet.parse("meta"))
 		return false;
+
+	wchar_t wsPerPage[4]{};
+	if (!internet.parse("per_page", wsPerPage, true))
+		return false;
+	s_perPage = wcstoul(wsPerPage, nullptr, 10);
+
 	if (!internet.parse("total", m_uiNumber, true))
 		return false;
+
 	return true;
 }
 
@@ -113,8 +123,8 @@ CategoriesAndPurity SearchCollection::getCAP() const
 
 Wallpaper SearchCollection::getWallpaper(unsigned int index) const
 {
-	int page = int(index / m_app.getSettings().uPerPage);
-	index -= page * m_app.getSettings().uPerPage;
+	int page = int(index / s_perPage);
+	index -= page * s_perPage;
 	page++;
 	wchar_t wsPageUrl[1024];
 	wcscpy_s(wsPageUrl, m_wsSearchUrl);
@@ -124,7 +134,7 @@ Wallpaper SearchCollection::getWallpaper(unsigned int index) const
 	wcscat_s(wsPageUrl, wsCurrentPage);
 
 	Internet internet;
-	internet.DownloadToBuffer(wsPageUrl, m_app.getSettings().uPerPage * 750);
+	internet.DownloadToBuffer(wsPageUrl, s_perPage * 750);
 	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
 			return Wallpaper::getEmptyWallpaper();
@@ -132,6 +142,11 @@ Wallpaper SearchCollection::getWallpaper(unsigned int index) const
 	wchar_t wsPath[Collection::getMaxPathSize(Collection::Type::search) + 1] = {};
 	if (!internet.parse("path", wsPath, true))
 		return Wallpaper::getEmptyWallpaper();
+
+	internet.parse("meta", true);
+	wchar_t wsPerPage[4]{};
+	if (internet.parse("per_page", wsPerPage, true))
+		s_perPage = wcstoul(wsPerPage, nullptr, 10);
 
 	return Wallpaper(Collection::Type::search, wsPath);
 }

@@ -56,18 +56,6 @@ void Settings::loadSettings()
 			delay = 10000;
 		fclose(pFile);	
 		
-		if (isApiKeyUsed())
-		{
-			// get user's per page
-			Internet internet; // TODO: think about no internet exceptions!
-			wchar_t wsURL[128] = L"https://wallhaven.cc/api/v1/settings?apikey=";
-			wcscat_s(wsURL, apiKey);
-			internet.DownloadToBuffer(wsURL, 64);
-			wchar_t wsPerPage[4];
-			internet.parse("per_page", wsPerPage);
-			uPerPage = wcstoul(wsPerPage, nullptr, 10);
-		}
-
 		return;
 	}
 	saveSettings();
