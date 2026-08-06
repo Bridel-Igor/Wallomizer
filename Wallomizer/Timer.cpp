@@ -69,7 +69,7 @@ void Timer::loadSession()
 
 void Timer::run()
 {
-	while (m_timePassed < m_settings.delay)
+	while (m_timePassed < m_settings.getData().delay)
 	{
 		if (m_abort)
 		{
@@ -115,7 +115,7 @@ void Timer::stop() noexcept
 
 unsigned long Timer::getRemainingTime() const noexcept
 {
-	const unsigned long delay = m_settings.delay;
+	const unsigned long delay = m_settings.getData().delay;
 	return delay > m_timePassed ? 
 			delay - m_timePassed : 
 			0;

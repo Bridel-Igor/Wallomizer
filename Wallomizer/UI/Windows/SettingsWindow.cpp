@@ -22,9 +22,9 @@ SettingsWindow::SettingsWindow(HWND hCaller, App& app) :
 	stHours			(this, "Hours",							150,	160,	74,		20, SS_CENTER),
 	stMinutes		(this, "Minutes",						233,	160,	74,		20, SS_CENTER),
 	stSeconds		(this, "Seconds",						316,	160,	74,		20, SS_CENTER),
-	udeHours		(this,									150,	180,	74,		20, 0, 999, int((app.getSettings().delay / 1000) / 3600)),
-	udeMinutes		(this,									233,	180,	74,		20, 0, 59, int((app.getSettings().delay / 1000) / 60) % 60),
-	udeSeconds		(this,									316,	180,	74,		20, 0, 59, int(app.getSettings().delay / 1000) % 60),
+	udeHours		(this,									150,	180,	74,		20, 0, 999, int((app.getSettings().getData().delay / 1000) / 3600)),
+	udeMinutes		(this,									233,	180,	74,		20, 0, 59, int((app.getSettings().getData().delay / 1000) / 60) % 60),
+	udeSeconds		(this,									316,	180,	74,		20, 0, 59, int(app.getSettings().getData().delay / 1000) % 60),
 
 	stBckColor		(this, "Background color:",				10,		210,	130,	20,	SS_RIGHT),
 	cpbBckColor		(this, app.getWinUtils().getBackgroundColor(),	150,	210,	120,	20),
@@ -42,9 +42,9 @@ SettingsWindow::SettingsWindow(HWND hCaller, App& app) :
 
 	SetWindowText(stActVersion.hWnd(), m_app.getWinUtils().getAppVersion().c_str());
 
-	edUsername.setTextW(app.getSettings().username);
-	edApiKey.setTextW(app.getSettings().apiKey);
-	cbStartup.setChecked(app.getSettings().loadOnStartup);
+	edUsername.setTextW(app.getSettings().getData().username);
+	edApiKey.setTextW(app.getSettings().getData().apiKey);
+	cbStartup.setChecked(app.getSettings().getData().loadOnStartup);
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	SendMessage(stApplication.hWnd(), WM_SETFONT, (WPARAM)resources.titleFont, TRUE);
@@ -148,46 +148,54 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 		}
 		if (btnOk.isClicked(wParam))
 		{
-			unsigned long delay = (udeSeconds.getPos() + (udeMinutes.getPos() * 60) + (udeHours.getPos() * 3600)) * 1000;
-			if (delay < 10000)
+			Settings::Data& data = m_app.getSettings().getData();
+			Settings::Data newData = data;
+			newData.loadOnStartup = cbStartup.isChecked();
+			newData.delay = (udeSeconds.getPos() + (udeMinutes.getPos() * 60) + (udeHours.getPos() * 3600)) * 1000;
+			edApiKey.getTextW(newData.apiKey, 33);
+			edUsername.getTextW(newData.username, 64);
+
+			if (!newData.validateDelay())
 			{
-				MessageBoxA(nullptr, "Too small delay. Delay must be at least 10 seconds.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+				MessageBoxA(nullptr, "Delay must be at least 10 seconds.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+				return 0;
+			}
+
+			if (!newData.validateApiKeyLength())
+			{
+				MessageBoxA(nullptr, "Invalid API key. It must be 32 characters long.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+				return 0;
+			}
+
+			if (!newData.validateUsername())
+			{
+				MessageBoxA(nullptr, "User name is too long.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
 			
-			wchar_t apiKey[33];
-			edApiKey.getTextW(apiKey, 33);
-			size_t apiKeyLenght = wcslen(apiKey);
-			if (apiKeyLenght != 0)
+			Internet internet;
+			wchar_t ws_apiKeyTestUrl[78] = L"https://wallhaven.cc/api/v1/settings?apikey=";
+			wcscat_s(ws_apiKeyTestUrl, newData.apiKey);
+			internet.DownloadToBuffer(ws_apiKeyTestUrl);
+			if (internet.parse("error"))
 			{
-				if (apiKeyLenght != 32)
-				{
-					MessageBoxA(nullptr, "Invalid API key. It must be 32 characters long.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
-					return 0;
-				}
-				Internet internet;
-				wchar_t ws_apiKeyTestUrl[78] = L"https://wallhaven.cc/api/v1/settings?apikey=";
-				wcscat_s(ws_apiKeyTestUrl, apiKey);
-				internet.DownloadToBuffer(ws_apiKeyTestUrl);
-				if (internet.parse("error"))
-				{
-					MessageBoxA(nullptr, "Unknown API key!", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
-					return 0;
-				}
-				if (!internet.parse("data"))
-					MessageBoxA(nullptr, "Can't check API key! Wallhaven API is down, or no internet connection.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+				MessageBoxA(nullptr, "Unknown API key!", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+				return 0;
 			}
-			
-			m_app.getSettings().delay = delay;
-			edUsername.getTextW(m_app.getSettings().username, 64);
-			m_app.getSettings().setApiKey(apiKey);
-			
+			if (!internet.parse("data"))
+				MessageBoxA(nullptr, "Can't check API key! Wallhaven API is down, or no internet connection.", "Wallomizer", MB_OK | MB_ICONINFORMATION);
+
+			Settings::Data backupData = data;
+			data = newData;
+			if (m_app.getSettings().saveSettings() == false)
+			{
+				data = backupData;
+				MessageBoxA(nullptr, "Unable to save settings.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+				return 0;
+			}
+
 			m_app.getWinUtils().setStartup(cbStartup.isChecked());
-			m_app.getSettings().loadOnStartup = cbStartup.isChecked();
-
 			m_app.getWinUtils().setBackgroundColor(cpbBckColor.getColor());
-
-			m_app.getSettings().saveSettings();
 			Player::updateTimer(m_app.getTimer(), true);
 			DestroyWindow(hWnd());
 			return 0;

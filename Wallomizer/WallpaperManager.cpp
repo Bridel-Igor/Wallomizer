@@ -50,7 +50,7 @@ void WallpaperManager::setLoadedWallpaper(bool setPrevious)
 	if (!setPrevious)
 	{
 		m_wallpaperList.push_back(m_NextWallpaper);
-		if (m_wallpaperList.size() > m_app.getSettings().prevCount + 1)
+		if (m_wallpaperList.size() > m_app.getSettings().getData().prevCount + 1)
 			m_wallpaperList.pop_front();
 	}
 

@@ -1,27 +1,48 @@
 #pragma once
 
-class WinUtils;
+#include <cstdint>
+#include <filesystem>
 
 class Settings
 {
 public:
-	explicit Settings(const WinUtils& winUtils);
+	struct Data
+	{
+		std::uint32_t prevCount = 5;
+		std::uint32_t delay = 300000;
+		wchar_t username[64]{};
+		wchar_t apiKey[33]{};
+		std::uint8_t loadOnStartup = 0;
+
+		bool validate() const;
+		bool validateDelay() const;
+		bool validateUsername() const;
+		bool validateApiKeyLength() const;
+		bool validateLoadOnStartup() const;
+		
+	private:
+		static constexpr std::uint32_t MIN_DELAY = 10000;
+		static constexpr std::uint32_t MAX_DELAY = 3599999000;
+	};
+
+public:
+	explicit Settings(std::filesystem::path roamingPath);
 	Settings(const Settings&) = delete;
 	Settings& operator=(const Settings&) = delete;
 	Settings(Settings&&) = delete;
 	Settings& operator=(Settings&&) = delete;
 
-	void saveSettings() const;
-	void loadSettings();
-	void setApiKey(const wchar_t* apiKey);
-	const bool isApiKeyUsed() const noexcept { return apiKey[0]; }
+	void resetSettings() noexcept { m_data = {}; };
+	bool saveSettings() const;
+	bool loadSettings();
+	bool isApiKeyUsed() const noexcept { return m_data.apiKey[0]; }
 
-	unsigned int prevCount = 5;
-	unsigned long delay = 300000;
-	wchar_t username[64] = {0};
-	wchar_t apiKey[33] = {0};
-	bool loadOnStartup = false;
-
+	Data& getData() noexcept { return m_data; }
+	const Data& getData() const noexcept { return m_data; }
+	
 private:
-	const WinUtils& m_winUtils;
+	static constexpr std::uint16_t FILE_VERSION = 3;
+	
+	Data m_data;
+	const std::filesystem::path m_filePath;
 };

@@ -77,7 +77,6 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			SettingsWindow settingsWindow(hWnd(), m_app);
 			settingsWindow.windowLoop();
-			m_app.getSettings().saveSettings();
 			return 0;
 		}
 		int i = 0;

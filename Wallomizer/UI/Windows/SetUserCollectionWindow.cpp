@@ -23,8 +23,8 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, App& app, UserCol
 
 	if (edUsername.isEmpty())
 	{
-		edUsername.setTextW(m_app.getSettings().username);
-		wcscpy_s(m_pCurrentUserCollection->settings.wsUsername, m_app.getSettings().username);
+		edUsername.setTextW(m_app.getSettings().getData().username);
+		wcscpy_s(m_pCurrentUserCollection->settings.wsUsername, m_app.getSettings().getData().username);
 		SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
 		SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)L"Click to update");
 		SendMessageW(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
@@ -100,7 +100,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 			wchar_t tmpUsername[64];
 			edUsername.getTextW(tmpUsername, 64);
 			uciList.clear();
-			UserCollection::loadCollectionList(m_app, uciList, tmpUsername, m_app.getSettings().apiKey);
+			UserCollection::loadCollectionList(m_app, uciList, tmpUsername, m_app.getSettings().getData().apiKey);
 			SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
 			if (uciList.empty())
 			{

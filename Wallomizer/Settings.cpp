@@ -1,67 +1,81 @@
 #include "Settings.h"
 
 #include <Windows.h>
-#include <stdio.h>
+#include <string>
 
-#include "Internet.h"
-#include "WinUtils.h"
+#include "BinaryIO.h"
 
-constexpr unsigned short SETTINGS_FILE_VERSION = 3U;
-
-Settings::Settings(const WinUtils& winUtils) :
-	m_winUtils(winUtils)
+Settings::Settings(std::filesystem::path roamingPath) :
+	m_filePath(roamingPath / L"Settings.dat")
 {
 	loadSettings();
 }
 
-void Settings::saveSettings() const
+bool Settings::saveSettings() const
 {
-	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Settings.dat";
-	FILE* pFile;
-	_wfopen_s(&pFile, filePath.c_str(), L"wb");
-	if (pFile != NULL)
-	{
-		fwrite(&SETTINGS_FILE_VERSION, sizeof(SETTINGS_FILE_VERSION), 1, pFile);
-		fwrite(&loadOnStartup, sizeof(loadOnStartup), 1, pFile);
-		fwrite(&delay, sizeof(delay), 1, pFile);
-		fwrite(&username, sizeof(username), 1, pFile);
-		fwrite(&apiKey, sizeof(apiKey), 1, pFile);
-		fclose(pFile);
-		return;
-	}
-	MessageBoxA(nullptr, "Can't save settings.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+	BinaryWriter file(m_filePath);
+	return file.isOpen()
+		&& file.write(FILE_VERSION)
+		&& file.write(m_data.loadOnStartup)
+		&& file.write(m_data.delay)
+		&& file.write(m_data.username)
+		&& file.write(m_data.apiKey);
 }
 
-void Settings::loadSettings()
+bool Settings::loadSettings()
 {
-	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Settings.dat";
-	FILE* pFile;
-	_wfopen_s(&pFile, filePath.c_str(), L"rb");
-	if (pFile != NULL)
+	if (!std::filesystem::exists(m_filePath))
 	{
-		unsigned short fileVersion = 0;
-		fread(&fileVersion, sizeof(fileVersion), 1, pFile);
-		if (fileVersion != SETTINGS_FILE_VERSION)
-		{
-			fclose(pFile);
-			saveSettings();
-			MessageBox(NULL, "Incompatible settings file. Settings were reset.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
-			return;
-		}
-		fread(&loadOnStartup, sizeof(loadOnStartup), 1, pFile);
-		fread(&delay, sizeof(delay), 1, pFile);
-		fread(&username, sizeof(username), 1, pFile);
-		fread(&apiKey, sizeof(apiKey), 1, pFile);
-		if (delay < 10000)
-			delay = 10000;
-		fclose(pFile);	
-		
-		return;
+		saveSettings();
+		return true;
 	}
-	saveSettings();
+
+	std::uint16_t fileVersion = 0;
+	BinaryReader file(m_filePath);
+	if (!file.isOpen()
+		|| !file.read(fileVersion)
+		|| fileVersion != FILE_VERSION
+		|| !file.read(m_data.loadOnStartup)
+		|| !file.read(m_data.delay)
+		|| !file.read(m_data.username)
+		|| !file.read(m_data.apiKey)
+		|| !m_data.validate())
+	{
+		resetSettings();
+		saveSettings();
+		MessageBoxA(nullptr, "Settings file is corrupted or incompatible. Default settings have been restored.", "Wallomizer", MB_OK | MB_ICONINFORMATION);
+		return false;
+	}
+	return true;
 }
 
-void Settings::setApiKey(const wchar_t* _apiKey)
+bool Settings::Data::validate() const
 {
-	wcscpy_s(apiKey, 33, _apiKey);
+	return validateDelay()
+		&& validateUsername()
+		&& validateApiKeyLength()
+		&& validateLoadOnStartup();
+}
+
+bool Settings::Data::validateDelay() const
+{
+	return delay >= MIN_DELAY && delay <= MAX_DELAY;
+}
+
+bool Settings::Data::validateUsername() const
+{
+	return username[63] == L'\0';
+}
+
+bool Settings::Data::validateApiKeyLength() const
+{
+	if (apiKey[32] != L'\0')
+		return false;
+	const std::size_t length = wcslen(apiKey);
+	return length==0 || length==32;
+}
+
+bool Settings::Data::validateLoadOnStartup() const
+{
+	return loadOnStartup == 0 || loadOnStartup == 1;
 }

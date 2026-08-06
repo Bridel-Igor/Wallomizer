@@ -75,7 +75,7 @@ bool SearchCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
 	if (m_app.getSettings().isApiKeyUsed())
 	{
 		wcscat_s(m_wsSearchUrl, L"&apikey=");
-		wcscat_s(m_wsSearchUrl, m_app.getSettings().apiKey);
+		wcscat_s(m_wsSearchUrl, m_app.getSettings().getData().apiKey);
 	}
 
 	if (!m_isEnabled)

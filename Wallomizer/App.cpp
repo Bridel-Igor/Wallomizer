@@ -6,7 +6,7 @@
 
 App::App() :
 	m_instanceGuard("Wallomizer"),
-	m_settings(m_winUtils),
+	m_settings(m_winUtils.getRoamingDir()),
 	m_collectionManager(*this),
 	m_wallpaperManager(*this),
 	m_timer(m_winUtils, m_settings, m_wallpaperManager)
