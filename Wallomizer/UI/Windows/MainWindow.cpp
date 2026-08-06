@@ -141,8 +141,8 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			yNewPos = yCurrentScroll;
 		}
 
-		yNewPos = max(0, yNewPos);
-		yNewPos = min(yMaxScroll, yNewPos);
+		yNewPos = std::max(0, yNewPos);
+		yNewPos = std::min(yMaxScroll, yNewPos);
 
 		if (yNewPos == yCurrentScroll)
 			break;
@@ -236,8 +236,8 @@ void MainWindow::destroyCollectionItems()
 void MainWindow::updateScroll()
 {
 	int itemListHeight = (int)collectionItems.size() * (CollectionItem::height + 1);
-	yMaxScroll = max(itemListHeight - fHeight, 0);
-	yCurrentScroll = min(yCurrentScroll, yMaxScroll);
+	yMaxScroll = std::max(itemListHeight - fHeight, 0);
+	yCurrentScroll = std::min(yCurrentScroll, yMaxScroll);
 	yCurrentScroll = yCurrentScroll < 0 ? 0 : yCurrentScroll;
 	si.cbSize = sizeof(si);
 	si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;

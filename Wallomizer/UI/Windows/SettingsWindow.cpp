@@ -1,5 +1,7 @@
 #include "SettingsWindow.h"
 
+#include <Shellapi.h>
+
 #include "Player.h"
 #include "Internet.h"
 #include "App.h"

@@ -2,9 +2,9 @@
 
 #include <thread>
 #include <Windows.h>
+#include <Shellapi.h>
 #include <VersionHelpers.h>
 
-#include "resource.h"
 #include "App.h"
 
 #define WM_NOTIFYICONMSG (WM_USER + 2)
@@ -76,7 +76,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				nii.cbSize = sizeof(NOTIFYICONIDENTIFIER);
 				nii.hWnd = hWnd();
 				nii.uID = 1;
-				nii.guidItem = GUID_NULL;
+				nii.guidItem = GUID{};
 				Shell_NotifyIconGetRect(&nii, &rect);
 
 				pt.x = (int)((rect.left + rect.right) / 2);

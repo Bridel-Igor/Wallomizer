@@ -1,5 +1,7 @@
 #include "SearchCollection.h"
 
+#include <Shellapi.h>
+
 #include "Internet.h"
 #include "SetSearchCollectionWindow.h"
 #include "App.h"

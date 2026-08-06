@@ -1,5 +1,7 @@
 #include "Internet.h"
 
+#include <algorithm>
+
 #pragma comment(lib, "Wininet.lib")
 
 Internet::Internet()
@@ -34,7 +36,7 @@ bool Internet::DownloadToBuffer(const wchar_t* wsURL, DWORD bufferSize)
 	m_pCurrent = m_pBuffer;
 
 	DWORD dwBytesRead = 0, tmpBufferSize = 1024, dwBytesAvailable = m_currentBufferSize;
-	while (InternetReadFile(hURL, m_pCurrent, min(dwBytesAvailable, tmpBufferSize), &dwBytesRead))
+	while (InternetReadFile(hURL, m_pCurrent, std::min(dwBytesAvailable, tmpBufferSize), &dwBytesRead))
 	{
 		if (dwBytesRead == 0)
 			break;

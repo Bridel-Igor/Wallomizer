@@ -1,5 +1,7 @@
 #include "UserCollection.h"
 
+#include <Shellapi.h>
+
 #include "Internet.h"
 #include "SetUserCollectionWindow.h"
 #include "App.h"
