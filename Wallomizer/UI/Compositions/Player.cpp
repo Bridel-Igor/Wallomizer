@@ -150,7 +150,10 @@ bool Player::draw(LPDRAWITEMSTRUCT& pDIS)
 			return true;
 	}
 	if (btnOpenExternal.draw(pDIS, IWindow::Resources::mainBkBrush))
+	{
+		// TODO: gray out if there is no wallpaper in manager
 		return true;
+	}
 	if (pDIS->hwndItem == btnStop.hWnd())
 	{
 		if (m_timer.getStatus() == Timer::Status::stopped)

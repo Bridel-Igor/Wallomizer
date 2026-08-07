@@ -1,6 +1,5 @@
 #include "Wallpaper.h"
 
-#include "WinUtils.h"
 #include "LocalCollection.h"
 #include "UserCollection.h"
 #include "SearchCollection.h"

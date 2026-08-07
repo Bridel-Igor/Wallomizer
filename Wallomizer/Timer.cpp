@@ -1,13 +1,10 @@
 #include "Timer.h"
 
-#include <windows.h>
-#include <string>
-
 #include "WinUtils.h"
 #include "Settings.h"
 #include "WallpaperManager.h"
 #include "Player.h"
-#include "Wallpaper.h"
+#include "BinaryIO.h"
 
 Timer::Timer(const WinUtils& winUtils, Settings& settings, WallpaperManager& wallpaperManager) :
 	m_winUtils(winUtils),
@@ -17,54 +14,40 @@ Timer::Timer(const WinUtils& winUtils, Settings& settings, WallpaperManager& wal
 	loadSession();
 }
 
-void Timer::saveSession()
+bool Timer::saveSession()
 {
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
 	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
-	FILE* pFile;
-	_wfopen_s(&pFile, filePath.c_str(), L"wb");
-	if (pFile == nullptr)
-		return;
-	fwrite(&m_status, sizeof(m_status), 1, pFile);
-	fwrite(&m_timePassed, sizeof(m_timePassed), 1, pFile);
 
 	const Wallpaper& wallpaper = m_wallpaperManager.getCurrentWallpaper();
-	const uint16_t pathLength = static_cast<uint16_t>(wallpaper.getPath().size());
-	const Collection::Type type = wallpaper.getType();
-	fwrite(&type, sizeof(type), 1, pFile);
-	fwrite(&pathLength, sizeof(pathLength), 1, pFile);
-	fwrite(wallpaper.getPath().c_str(), sizeof(wchar_t), pathLength, pFile);
 
-	fclose(pFile);
+	BinaryWriter file(filePath);
+	return file.isOpen()
+		&& file.write(m_status)
+		&& file.write(m_timePassed)
+		&& file.write(wallpaper.getType())
+		&& file.write(wallpaper.getPath());
 }
 
-void Timer::loadSession()
+bool Timer::loadSession()
 {
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
 	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
-	FILE* pFile;
-	_wfopen_s(&pFile, filePath.c_str(), L"rb");
-	if (pFile == nullptr)
-		return;
-
-	fread(&m_status, sizeof(m_status), 1, pFile);
-	fread(&m_timePassed, sizeof(m_timePassed), 1, pFile);
 
 	Collection::Type type;
-	fread(&type, sizeof(type), 1, pFile);
+	std::wstring path;
 
-	uint16_t pathLength;
-	fread(&pathLength, sizeof(pathLength), 1, pFile);
-
-	std::wstring path(pathLength, L'\0');
-	fread(path.data(), sizeof(wchar_t), pathLength, pFile);
-
-	fclose(pFile);
-
-	Wallpaper loadedWallpaper(type, path.c_str());
+	BinaryReader file(filePath);
+	if (!file.isOpen()
+		|| !file.read(m_status)
+		|| !file.read(m_timePassed)
+		|| !file.read(type)
+		|| !file.read(path))
+		return false;
+		
+	Wallpaper loadedWallpaper(type, path);
 	m_wallpaperManager.setCurrentWallpaper(std::move(loadedWallpaper));
-
-	DeleteFileW(filePath.c_str()); // TODO: do i need to delete it?
+	return true;
 }
 
 void Timer::run()

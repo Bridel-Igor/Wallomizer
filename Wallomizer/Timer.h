@@ -5,7 +5,6 @@
 class WinUtils;
 class Settings;
 class WallpaperManager;
-class Wallpaper;
 
 class Timer
 {
@@ -43,8 +42,8 @@ public:
 	Timer(Timer&&) = delete;
 	Timer& operator=(Timer&&) = delete;
 
-	void saveSession();
-	void loadSession();
+	bool saveSession();
+	bool loadSession();
 	void run();
 
 	void play() noexcept;

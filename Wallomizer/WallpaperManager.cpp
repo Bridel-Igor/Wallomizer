@@ -97,5 +97,6 @@ void WallpaperManager::deleteLoaded()
 
 void WallpaperManager::openCurrentWallpaperExternally()
 {
-	m_wallpaperList.back().openExternally();
+	if (!m_wallpaperList.empty())
+		m_wallpaperList.back().openExternally();
 }
