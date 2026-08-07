@@ -2,120 +2,144 @@
 
 #include <Shellapi.h>
 
-#include "Internet.h"
+#include "WinUtils.h"
+#include "Settings.h"
+#include "CollectionManager.h"
+#include "Wallpaper.h"
 #include "SetSearchCollectionWindow.h"
-#include "App.h"
+#include "Internet.h"
+#include "BinaryIO.h"
 
 uint32_t SearchCollection::s_perPage = 64;
 
-SearchCollection::SearchCollection(App& app) :
-	m_app(app)
+SearchCollection::SearchCollection(Settings& settings, CollectionManager& collectionManager) :
+	m_settings(settings),
+	m_collectionManager(collectionManager)
 {
+	m_type = Collection::Type::search;
 }
 
-bool SearchCollection::saveSettings(FILE* pFile) const
+bool SearchCollection::saveSettings(BinaryWriter& file) const
 {
-	if (pFile == NULL)
-		return false;
-	const Collection::Type collType = getCollectionType();
-	fwrite(&collType, sizeof(collType), 1, pFile);
-	fwrite(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
-	fwrite(&settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
-	return true;
+	return file.write(m_type)
+		&& file.write(m_isEnabled)
+		&& file.write(settings.categoriesAndPurity)
+		&& file.write(settings.tag)
+		&& file.write(settings.resolution)
+		&& file.write(settings.ratio)
+		&& file.write(settings.color);
 }
 
-bool SearchCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
+bool SearchCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersion)
 {
-	if (pFile == NULL)
-		return false;
-
-	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
-
-	if (fileVersion == 2U)
+	switch (fileVersion)
 	{
-		struct SearchCollectionSettings_2U
+	case 4U:
+		return file.read(m_isEnabled)
+			&& file.read(settings.categoriesAndPurity)
+			&& file.read(settings.tag)
+			&& file.read(settings.resolution)
+			&& file.read(settings.ratio)
+			&& file.read(settings.color);
+	case 3U:
+	case 2U:
+	{
+		struct LegacyData_V3_V2
 		{
 			CategoriesAndPurity categoriesAndPurity = CAP::categoryGeneral | CAP::categoryAnime | CAP::categoryPeople | CAP::puritySFW;
 			wchar_t wsTag[255] = L"";
 			wchar_t wsResolution[255] = L"";
 			wchar_t wsRatio[128] = L"";
 			wchar_t wsColor[16] = L"";
-		}settings_2U;
-		fread(&settings_2U, sizeof(SearchCollectionSettings_2U), 1, pFile);
-		settings.categoriesAndPurity = settings_2U.categoriesAndPurity;
-		wcscpy_s(settings.wsColor, settings_2U.wsColor);
-		wcscpy_s(settings.wsRatio, settings_2U.wsRatio);
-		wcscpy_s(settings.wsResolution, settings_2U.wsResolution);
-		wcscpy_s(settings.wsTag, settings_2U.wsTag);
-	}
-	if (fileVersion >= 3U && fileVersion <= CollectionManager::COLLECTION_MANAGER_FILE_VERSION)
-		fread(&settings, sizeof(SearchCollection::SearchCollectionSettings), 1, pFile);
-
-	wcscpy_s(m_wsSearchUrl, L"https://wallhaven.cc/api/v1/search?");
-
-	if (settings.wsTag[0])
-	{
-		wcscat_s(m_wsSearchUrl, L"q=");
-		wcscat_s(m_wsSearchUrl, settings.wsTag);
-		wcscat_s(m_wsSearchUrl, L"&");
-	}
-
-	wcscat_s(m_wsSearchUrl, L"categories=");
-	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::categoryGeneral ? L"1" : L"0");
-	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::categoryAnime ? L"1" : L"0");
-	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::categoryPeople ? L"1" : L"0");
-
-	wcscat_s(m_wsSearchUrl, L"&purity=");
-	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::puritySFW ? L"1" : L"0");
-	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::puritySketchy ? L"1" : L"0");
-	wcscat_s(m_wsSearchUrl, settings.categoriesAndPurity & CAP::purityNSFW ? L"1" : L"0");
-
-	wcscat_s(m_wsSearchUrl, settings.wsResolution);
-	wcscat_s(m_wsSearchUrl, settings.wsRatio);
-	wcscat_s(m_wsSearchUrl, settings.wsColor);
-
-	if (m_app.getSettings().isApiKeyUsed())
-	{
-		wcscat_s(m_wsSearchUrl, L"&apikey=");
-		wcscat_s(m_wsSearchUrl, m_app.getSettings().getData().apiKey);
-	}
-
-	if (!m_isEnabled)
+		};
+		LegacyData_V3_V2 oldData;
+		if (!file.read(m_isEnabled)
+			|| !file.read(oldData))
+			return false;
+		settings.categoriesAndPurity = oldData.categoriesAndPurity;
+		settings.tag = oldData.wsTag;
+		settings.resolution = oldData.wsResolution;
+		settings.ratio = oldData.wsRatio;
+		settings.color = oldData.wsColor;
 		return true;
+	}
+	default:
+		return false;
+	}
+}
+
+void SearchCollection::update()
+{
+	if (!m_isEnabled)
+		return;
+
+	std::wstring url = getURL();
 
 	Internet internet;
-	internet.DownloadToBuffer(m_wsSearchUrl, s_perPage * 750);
+	internet.DownloadToBuffer(url.c_str(), s_perPage * 750);
 
 	if (!internet.parse("meta"))
-		return false;
+		return;
 
 	wchar_t wsPerPage[4]{};
 	if (!internet.parse("per_page", wsPerPage, true))
-		return false;
+		return;
 	s_perPage = wcstoul(wsPerPage, nullptr, 10);
 
-	if (!internet.parse("total", m_uiNumber, true))
-		return false;
-
-	return true;
+	if (!internet.parse("total", m_number, true))
+		return;
 }
 
-void SearchCollection::getCollectionName(wchar_t* wsName, size_t size) const
+std::wstring SearchCollection::getURL() const
 {
-	wcscpy_s(wsName, 255, L" Search: ");
+	std::wstring url = L"https://wallhaven.cc/api/v1/search?";
+	url.reserve(1024);
 
-	if (settings.wsTag[0])
+	if (!settings.tag.empty())
 	{
-		wchar_t wsTag[255]{ 0 };
-		for (int i = 0; settings.wsTag[i]; i++)
-			wsTag[i] = settings.wsTag[i];
-		wcscat_s(wsName, 255, wsTag);
-		wcscat_s(wsName, 255, L" | ");
+		url += L"q=";
+		url += settings.tag;
+		url += L"&";
 	}
 
-	wcscat_s(wsName, size, settings.categoriesAndPurity & CAP::categoryGeneral ? L"General " : L"");
-	wcscat_s(wsName, size, settings.categoriesAndPurity & CAP::categoryAnime ? L"Anime " : L"");
-	wcscat_s(wsName, size, settings.categoriesAndPurity & CAP::categoryPeople ? L"People " : L"");
+	url += L"categories=";
+	url += (settings.categoriesAndPurity & CAP::categoryGeneral) ? L"1" : L"0";
+	url += (settings.categoriesAndPurity & CAP::categoryAnime) ? L"1" : L"0";
+	url += (settings.categoriesAndPurity & CAP::categoryPeople) ? L"1" : L"0";
+
+	url += L"&purity=";
+	url += (settings.categoriesAndPurity & CAP::puritySFW) ? L"1" : L"0";
+	url += (settings.categoriesAndPurity & CAP::puritySketchy) ? L"1" : L"0";
+	url += (settings.categoriesAndPurity & CAP::purityNSFW) ? L"1" : L"0";
+
+	url += settings.resolution;
+	url += settings.ratio;
+	url += settings.color;
+
+	if (m_settings.isApiKeyUsed())
+	{
+		url += L"&apikey=";
+		url += m_settings.getData().apiKey;
+	}
+
+	return url;
+}
+
+std::wstring SearchCollection::getCollectionName() const
+{
+	std::wstring name = L" Search: ";
+
+	if (!settings.tag.empty())
+	{
+		name += settings.tag;
+		name += L" | ";
+	}
+
+	name += (settings.categoriesAndPurity & CAP::categoryGeneral) ? L"General " : L"";
+	name += (settings.categoriesAndPurity & CAP::categoryAnime) ? L"Anime " : L"";
+	name += (settings.categoriesAndPurity & CAP::categoryPeople) ? L"People " : L"";
+
+	return name;
 }
 
 CategoriesAndPurity SearchCollection::getCAP() const
@@ -123,20 +147,18 @@ CategoriesAndPurity SearchCollection::getCAP() const
 	return settings.categoriesAndPurity;
 }
 
-Wallpaper SearchCollection::getWallpaper(unsigned int index) const
+Wallpaper SearchCollection::getWallpaper(std::size_t index) const
 {
-	int page = int(index / s_perPage);
+	std::size_t page = index / s_perPage;
 	index -= page * s_perPage;
 	page++;
-	wchar_t wsPageUrl[1024];
-	wcscpy_s(wsPageUrl, m_wsSearchUrl);
-	wcscat_s(wsPageUrl, L"&page=");
-	wchar_t wsCurrentPage[15] = L"";
-	_itow_s(page, wsCurrentPage, 10);
-	wcscat_s(wsPageUrl, wsCurrentPage);
+
+	std::wstring url = getURL();
+	url += L"&page=";
+	url += std::to_wstring(page);
 
 	Internet internet;
-	internet.DownloadToBuffer(wsPageUrl, s_perPage * 750);
+	internet.DownloadToBuffer(url.c_str(), s_perPage * 750);
 	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
 			return Wallpaper::getEmptyWallpaper();
@@ -155,7 +177,7 @@ Wallpaper SearchCollection::getWallpaper(unsigned int index) const
 
 void SearchCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetSearchCollectionWindow setSearchCollectionWindow(hCaller, m_app.getCollectionManager(), this);
+	SetSearchCollectionWindow setSearchCollectionWindow(hCaller, *this);
 	setSearchCollectionWindow.windowLoop();
 }
 

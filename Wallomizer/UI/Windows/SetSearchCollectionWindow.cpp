@@ -3,13 +3,11 @@
 #include "ResPickerWindow.h"
 #include "AspRatPickerWindow.h"
 #include "ColorPickerWindow.h"
-#include "CollectionManager.h"
 
-SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionManager& collectionManager, SearchCollection* pCollection) :
+SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, SearchCollection& searchCollection) :
 	IWindow("Search collection", "Set Search Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 260),
 	m_hCaller(hCaller),
-	m_collectionManager(collectionManager),
-	m_pCurrentSearchCollection(pCollection),
+	m_searchCollection(searchCollection),
 	stCategory		(this, "Category:",													10,		10,		60,		20),
 	catCom			(this,																80,		10,		159,	20),
 
@@ -35,15 +33,13 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, CollectionMan
 	btnCancel		(this, "Cancel",													80,		230,	185,	20),
 	btnOk			(this, "Ok",														275,	230,	185,	20)
 {
-	if (m_pCurrentSearchCollection)
-	{
-		catCom.setCategory(m_pCurrentSearchCollection->settings.categoriesAndPurity);
-		purCom.setPurity(m_pCurrentSearchCollection->settings.categoriesAndPurity);
-		edTag.setTextW(m_pCurrentSearchCollection->settings.wsTag);
-		wcscpy_s(tmpRes, m_pCurrentSearchCollection->settings.wsResolution);
-		wcscpy_s(tmpAR, m_pCurrentSearchCollection->settings.wsRatio);
-		wcscpy_s(tmpColor, m_pCurrentSearchCollection->settings.wsColor);
-	}
+	catCom.setCategory(m_searchCollection.settings.categoriesAndPurity);
+	purCom.setPurity(m_searchCollection.settings.categoriesAndPurity);
+	edTag.setTextW(m_searchCollection.settings.tag.c_str());
+	wcscpy_s(tmpRes, m_searchCollection.settings.resolution.c_str());
+	wcscpy_s(tmpAR, m_searchCollection.settings.ratio.c_str());
+	wcscpy_s(tmpColor, m_searchCollection.settings.color.c_str());
+
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	centerWindow(m_hCaller);
@@ -106,16 +102,15 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 		}
 		if (btnOk.isClicked(wParam))
 		{
-			m_pCurrentSearchCollection->settings.categoriesAndPurity = 0;
-			m_pCurrentSearchCollection->settings.categoriesAndPurity = catCom.getCategory() | purCom.getPurity();
-			edTag.getTextW(m_pCurrentSearchCollection->settings.wsTag, 255);
-			wcscpy_s(m_pCurrentSearchCollection->settings.wsResolution, tmpRes);
-			wcscpy_s(m_pCurrentSearchCollection->settings.wsRatio, tmpAR);
-			wcscpy_s(m_pCurrentSearchCollection->settings.wsColor, tmpColor);
-			if (m_pCurrentSearchCollection->isValid() == false)
-				m_pCurrentSearchCollection->setValid(true);
-			else
-				m_collectionManager.reloadSettings();
+			m_searchCollection.settings.categoriesAndPurity = 0;
+			m_searchCollection.settings.categoriesAndPurity = catCom.getCategory() | purCom.getPurity();
+			wchar_t tag[255]{};
+			edTag.getTextW(tag, 255);
+			m_searchCollection.settings.tag = tag;
+			m_searchCollection.settings.resolution = tmpRes;
+			m_searchCollection.settings.ratio = tmpAR;
+			m_searchCollection.settings.color = tmpColor;
+			m_searchCollection.update();
 			DestroyWindow(hWnd());
 			return 0;
 		}

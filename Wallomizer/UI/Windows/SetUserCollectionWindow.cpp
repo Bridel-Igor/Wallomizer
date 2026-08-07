@@ -2,11 +2,11 @@
 
 #include "App.h"
 
-SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, App& app, UserCollection* pCollection) :
+SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, App& app, UserCollection& userCollection) :
 	IWindow("User collection", "Set User Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	m_hCaller(hCaller),
 	m_app(app),
-	m_pCurrentUserCollection(pCollection),
+	m_userCollection(userCollection),
 	stUsername				(this, "Username:",			10,		10,		80,		20, SS_RIGHT),
 	edUsername				(this, "",					100,	10,		240,	20),
 	stCollectionID			(this, "Collection ID:",	10,		40,		80,		20, SS_RIGHT),
@@ -18,25 +18,25 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, App& app, UserCol
 	btnCancel				(this, "Cancel",			10,		100,	80,		20),
 	btnOk					(this, "Ok",				100,	100,	240,	20)
 {
-	edUsername.setTextW(m_pCurrentUserCollection->settings.wsUsername);
-	purCom.setPurity(m_pCurrentUserCollection->settings.categoriesAndPurity);
+	edUsername.setTextW(m_userCollection.settings.username.c_str());
+	purCom.setPurity(m_userCollection.settings.categoriesAndPurity);
 
 	if (edUsername.isEmpty())
 	{
 		edUsername.setTextW(m_app.getSettings().getData().username);
-		wcscpy_s(m_pCurrentUserCollection->settings.wsUsername, m_app.getSettings().getData().username);
+		m_userCollection.settings.username = m_app.getSettings().getData().username;
 		SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
 		SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)L"Click to update");
 		SendMessageW(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 		validCollection = false;
 	}
 
-	if (m_pCurrentUserCollection->settings.wsCollectionID[0] && m_pCurrentUserCollection->settings.wsCollectionName[0])
+	if (m_userCollection.settings.collectionID.c_str()[0] && m_userCollection.settings.collectionName.c_str()[0])
 	{
 		uciList.clear();
 		UserCollection::UserCollectionInfo info;
-		info.id = _wtoi(m_pCurrentUserCollection->settings.wsCollectionID);
-		wcscpy_s(info.wsLabel, m_pCurrentUserCollection->settings.wsCollectionName);
+		info.id = _wtoi(m_userCollection.settings.collectionID.c_str());
+		wcscpy_s(info.wsLabel, m_userCollection.settings.collectionName.c_str());
 		uciList.push_back(info);
 		SendMessageA(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
 		SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)uciList.begin()->wsLabel);
@@ -134,17 +134,14 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 
 			auto uci = uciList.begin();
 			std::advance(uci, cbCollections.getSelectedItem());
-			wcscpy_s(m_pCurrentUserCollection->settings.wsCollectionName, uci->wsLabel);
-			wchar_t cid[16] = { 0 };
-			_itow_s(uci->id, cid, 10);
-			wcscpy_s(m_pCurrentUserCollection->settings.wsCollectionID, cid);
+			m_userCollection.settings.collectionName = uci->wsLabel;
+			m_userCollection.settings.collectionID = std::to_wstring(uci->id);
 
-			edUsername.getTextW(m_pCurrentUserCollection->settings.wsUsername, 64);
-			m_pCurrentUserCollection->settings.categoriesAndPurity = purCom.getPurity();
-			if (m_pCurrentUserCollection->isValid() == false)
-				m_pCurrentUserCollection->setValid(true);
-			else
-				m_app.getCollectionManager().reloadSettings();
+			wchar_t username[64];
+			edUsername.getTextW(username, 64);
+			m_userCollection.settings.username = username;
+			m_userCollection.settings.categoriesAndPurity = purCom.getPurity();
+			m_userCollection.update();
 			DestroyWindow(hWnd());
 			return 0;
 		}

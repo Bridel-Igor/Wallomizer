@@ -261,11 +261,11 @@
     <ClInclude Include="Collections\CategoriesAndPurity.h">
       <Filter>Collections\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="CollectionTypes.h">
-      <Filter>Collections\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="BinaryIO.h">
       <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Collections\CollectionTypes.h">
+      <Filter>Collections\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

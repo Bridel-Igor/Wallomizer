@@ -202,9 +202,9 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="BinaryIO.h" />
+    <ClInclude Include="Collections\CollectionTypes.h" />
     <ClInclude Include="InstanceGuard.h" />
     <ClInclude Include="Collections\CategoriesAndPurity.h" />
-    <ClInclude Include="CollectionTypes.h" />
     <ClInclude Include="UI\Components\ColorPickerButton.h" />
     <ClInclude Include="UI\Components\Panel.h" />
     <ClInclude Include="UI\Interfaces\IWindow.h" />

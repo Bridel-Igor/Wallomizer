@@ -1,11 +1,17 @@
 #pragma once
 
-#include <Windows.h>
-#include <stdio.h>
+#include <cstdint>
+#include <string>
 
-#include "Wallpaper.h"
 #include "CollectionTypes.h"
 #include "CategoriesAndPurity.h"
+
+struct HWND__;
+using HWND = HWND__*;
+
+class Wallpaper;
+class BinaryWriter;
+class BinaryReader;
 
 class BaseCollection
 {
@@ -17,22 +23,21 @@ public:
 	BaseCollection& operator=(BaseCollection&&) = delete;
 
 	virtual ~BaseCollection() {}
-	virtual bool saveSettings(FILE* pFile) const = 0;
-	virtual bool loadSettings(FILE* pFile, unsigned short fileVersion) = 0;
-	virtual void getCollectionName(wchar_t* pwsName, size_t size) const = 0;
-	virtual Collection::Type getCollectionType() const = 0;
+	virtual bool saveSettings(BinaryWriter& file) const = 0;
+	virtual bool loadSettings(BinaryReader& file, std::uint16_t fileVersion) = 0;
+	virtual std::wstring getCollectionName() const = 0;
 	virtual CategoriesAndPurity getCAP() const = 0;
-	virtual Wallpaper getWallpaper(unsigned int index) const = 0;
-	virtual void openCollectionSettingsWindow(HWND hWnd) = 0;
+	virtual Wallpaper getWallpaper(std::size_t index) const = 0;
+	virtual void openCollectionSettingsWindow(HWND hWnd) = 0; // TODO: extract window call to UI classes or Collection Manager
+	virtual void update() = 0;
 
-	unsigned int getNumber() const	{ return m_uiNumber; }
-	bool isEnabled() const			{ return m_isEnabled; }
-	void setEnabled(bool isEnabled) { m_isEnabled = isEnabled; }
-	bool isValid() const			{ return m_isValid; }
-	void setValid(bool isValid)		{ m_isValid = isValid; }
+	std::uint32_t getNumber() const noexcept		{ return m_number; }
+	bool isEnabled() const noexcept				{ return m_isEnabled; }
+	void setEnabled(bool isEnabled) noexcept	{ m_isEnabled = isEnabled; }
 
 protected:
-	bool m_isEnabled = true;
+	Collection::Type m_type = Collection::Type::none;
+	std::uint8_t m_isEnabled = true;
 	bool m_isValid = false;
-	unsigned int m_uiNumber = 0;
+	std::uint32_t m_number = 0;
 };

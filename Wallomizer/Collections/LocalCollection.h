@@ -3,38 +3,34 @@
 #include <filesystem>
 
 #include "BaseCollection.h"
-#include "CategoriesAndPurity.h"
 
 class CollectionManager;
 class WinUtils;
 
 class LocalCollection : public BaseCollection
 {
-private:
-	struct LocalCollectionSettings
-	{
-		wchar_t wsDirectoryPath[255] = L"";
-		bool bRecursive = false;
-	};
-
 public:
-	LocalCollection(CollectionManager& collectionManager) :
-		m_collectionManager(collectionManager)
-	{}
+	LocalCollection(CollectionManager& collectionManager);
 
-	bool saveSettings(FILE* pFile) const;
-	bool loadSettings(FILE* pFile, unsigned short fileVersion);
-	void getCollectionName(wchar_t* pwsName, size_t size) const;
-	Collection::Type getCollectionType() const { return Collection::Type::local; }
-	CategoriesAndPurity getCAP() const { return 0; }
-	Wallpaper getWallpaper(unsigned int index) const;
+	bool saveSettings(BinaryWriter& file) const;
+	bool loadSettings(BinaryReader& file, std::uint16_t fileVersion);
+	std::wstring getCollectionName() const;
+	CategoriesAndPurity getCAP() const noexcept { return 0; }
+	Wallpaper getWallpaper(std::size_t index) const;
 	void openCollectionSettingsWindow(HWND hCaller);
 
 	static bool loadWallpaper(std::filesystem::path sourcePath, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::filesystem::path sourcePath);
 
-	LocalCollectionSettings settings;
+	const std::filesystem::path& getPath() const noexcept { return m_path; }
+	void setPath(const std::filesystem::path& newPath) { m_path = newPath; }
+	bool isRecursive() const noexcept { return m_isRecursive; }
+	void setRecursive(bool value) noexcept { m_isRecursive = value; }
+	void update();
 
 private:
 	CollectionManager& m_collectionManager;
+	
+	std::filesystem::path m_path;
+	std::uint8_t m_isRecursive = false;
 };

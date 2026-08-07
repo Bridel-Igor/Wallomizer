@@ -1,7 +1,9 @@
 #pragma once
 
+#include <cstdint>
+
 /// All flags are stored in CAP namespace.
-using CategoriesAndPurity = unsigned char;
+using CategoriesAndPurity = std::uint8_t;
 
 /// Bit flags for CategoriesAndPurity type. Can be combined via bit operations.
 namespace CAP

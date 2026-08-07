@@ -134,7 +134,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		if (btnSettings.isClicked(wParam))
 		{
-			m_app.getCollectionManager().openCollectionSettingsWindow();
+			m_app.getCollectionManager().openMainWindow();
 			return 0;
 		}
 		if (btnExit.isClicked(wParam))

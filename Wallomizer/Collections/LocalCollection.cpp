@@ -1,101 +1,112 @@
 #include "LocalCollection.h"
 
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
-#include <string>
+#include <filesystem>
 #include <shlobj_core.h>
 
-#include "SetLocalCollectionWindow.h"
 #include "CollectionManager.h"
 #include "WinUtils.h"
+#include "Wallpaper.h"
+#include "BinaryIO.h"
+#include "SetLocalCollectionWindow.h"
 
-bool isImage(std::experimental::filesystem::path path)
+bool isImage(std::filesystem::path path)
 {
 	const char* extensions[] = { ".jpg", ".jpeg", ".bmp", ".dib", ".png", ".jfif", ".jpe", ".gif", ".tif", ".tiff",
 								".wdp", ".heic", ".heif", ".heics", ".heifs", ".avci", ".avcs", ".avif", ".avifs" };
 	for (auto extension : extensions)
-		if (path.extension().compare((std::experimental::filesystem::path)extension) == 0)
+		if (path.extension().compare((std::filesystem::path)extension) == 0)
 			return true;
 	return false;
 }
 
-bool LocalCollection::saveSettings(FILE* pFile) const
+LocalCollection::LocalCollection(CollectionManager& collectionManager) :
+	m_collectionManager(collectionManager)
 {
-	if (pFile == NULL)
-		return false;
-	const Collection::Type collType = getCollectionType();
-	fwrite(&collType, sizeof(collType), 1, pFile);
-	fwrite(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
-	fwrite(&settings, sizeof(LocalCollection::LocalCollectionSettings), 1, pFile);
-	return true;
+	m_type = Collection::Type::local;
 }
 
-bool LocalCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
+bool LocalCollection::saveSettings(BinaryWriter& file) const
 {
-	if (pFile == NULL)
-		return false;
-	
-	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
+	return file.write(m_type)
+		&& file.write(m_isEnabled)
+		&& file.write(m_isRecursive)
+		&& file.write(m_path);
+}
 
-	if (fileVersion >= 2U && fileVersion <= CollectionManager::COLLECTION_MANAGER_FILE_VERSION)
-		fread(&settings, sizeof(LocalCollection::LocalCollectionSettings), 1, pFile);
-	
-	std::experimental::filesystem::path dirPath{ settings.wsDirectoryPath };
-	m_uiNumber = 0;
-	if (m_isEnabled)
+bool LocalCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersion)
+{
+	switch (fileVersion)
 	{
-		if (settings.bRecursive)
+	case 4U:
+		return file.read(m_isEnabled)
+			&& file.read(m_isRecursive)
+			&& file.read(m_path);
+
+	case 3U:
+	{
+		struct LegacyDataV3
 		{
-			for (auto& path : std::experimental::filesystem::recursive_directory_iterator(dirPath))
-				if (isImage(path))
-					m_uiNumber++;
-		}
-		else
-		{
-			for (auto& path : std::experimental::filesystem::directory_iterator(dirPath))
-				if (isImage(path))
-					m_uiNumber++;
-		}
+			wchar_t path[255] = L"";
+			bool recursive = false;
+		};
+		LegacyDataV3 oldData;
+		if (!file.read(m_isEnabled)
+			|| !file.read(oldData))
+			return false;
+		m_isRecursive = oldData.recursive;
+		m_path = oldData.path;
+		return true;
 	}
-	return true;
+
+	default: 
+		return false;
+	}
 }
 
-void LocalCollection::getCollectionName(wchar_t* pwsName, size_t size) const
+void LocalCollection::update()
 {
-	wcscpy_s(pwsName, size, L" Local: ");
-	wcscat_s(pwsName, 255, settings.wsDirectoryPath);
-}
+	m_number = 0;
+	if (!m_isEnabled)
+		return;
 
-Wallpaper LocalCollection::getWallpaper(unsigned int index) const
-{
-	if (settings.wsDirectoryPath[0] == L'\0' || m_uiNumber <= 0)
-		return Wallpaper::getEmptyWallpaper();
-	unsigned int i = 0;
-	std::experimental::filesystem::path dirPath{ settings.wsDirectoryPath };
-
-	if (settings.bRecursive)
+	if (m_isRecursive)
 	{
-		for (auto& path : std::experimental::filesystem::recursive_directory_iterator(dirPath))
+		for (auto& path : std::filesystem::recursive_directory_iterator(m_path))
 			if (isImage(path))
-			{
-				if (i == index)
-				{
-					return Wallpaper(Collection::Type::local, path.path().generic_wstring());
-				}
-				i++;
-			}
+				m_number++;
 	}
 	else
 	{
-		for (auto& path : std::experimental::filesystem::directory_iterator(dirPath))
+		for (auto& path : std::filesystem::directory_iterator(m_path))
 			if (isImage(path))
-			{
-				if (i == index)
-				{
-					return Wallpaper(Collection::Type::local, path.path().generic_wstring());
-				}
-				i++;
-			}
+				m_number++;
+	}
+}
+
+std::wstring LocalCollection::getCollectionName() const
+{
+	std::wstring name = L" Local: ";
+	name += m_path;
+	return name;
+}
+
+Wallpaper LocalCollection::getWallpaper(std::size_t index) const
+{
+	if (m_path.empty() || m_number == 0)
+		return Wallpaper::getEmptyWallpaper();
+
+	std::size_t current = 0;
+	if (m_isRecursive)
+	{
+		for (auto& path : std::filesystem::recursive_directory_iterator(m_path))
+			if (isImage(path) && current++ == index)
+				return Wallpaper(m_type, path.path().generic_wstring());
+	}
+	else
+	{
+		for (auto& path : std::filesystem::directory_iterator(m_path))
+			if (isImage(path) && current++ == index)
+				return Wallpaper(m_type, path.path().generic_wstring());
 	}
 
 	return Wallpaper::getEmptyWallpaper();
@@ -103,7 +114,7 @@ Wallpaper LocalCollection::getWallpaper(unsigned int index) const
 
 void LocalCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetLocalCollectionWindow setLocalCollectionWindow(hCaller, m_collectionManager, this);
+	SetLocalCollectionWindow setLocalCollectionWindow(hCaller, *this);
 	setLocalCollectionWindow.windowLoop();
 }
 

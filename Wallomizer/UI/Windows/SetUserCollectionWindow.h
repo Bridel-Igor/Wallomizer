@@ -12,7 +12,7 @@ class App;
 class SetUserCollectionWindow : public IWindow
 {
 public:
-	SetUserCollectionWindow(HWND hCaller, App& app, UserCollection *pCollection);
+	SetUserCollectionWindow(HWND hCaller, App& app, UserCollection& userCollection);
 	~SetUserCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -22,7 +22,7 @@ public:
 private:
 	HWND m_hCaller;
 	App& m_app;
-	UserCollection* m_pCurrentUserCollection;
+	UserCollection& m_userCollection;
 	Static stUsername, stCollectionID, stPurity;
 	Edit edUsername;
 	ComboBox cbCollections;

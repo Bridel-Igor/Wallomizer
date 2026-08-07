@@ -2,19 +2,16 @@
 
 #include <ShObjIdl.h>
 
-#include "CollectionManager.h"
-
-SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, CollectionManager& collectionManager, LocalCollection* pCollection) :
+SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, LocalCollection& localCollection) :
 	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 120),
 	m_hCaller(hCaller),
-	m_collectionManager(collectionManager),
-	m_pCurrentLocalCollection(pCollection),
-	stPath		(this, "Enter path to directory:",	10,		10,		390,	20),
-	edPath		(this, m_pCurrentLocalCollection? m_pCurrentLocalCollection->settings.wsDirectoryPath :L"",
+	m_localCollection(localCollection),
+	stPath		(this, "Enter path to directory:",		10,		10,		390,	20),
+	edPath		(this, m_localCollection.getPath().c_str(),
 														10,		30,		360,	20),
 	btnPath		(this, "..",							370,	30,		20,		20),
 	cbRecursive (this,									15,		60,		20,		20, 
-				m_pCurrentLocalCollection ? m_pCurrentLocalCollection->settings.bRecursive : false),
+		m_localCollection.isRecursive()),
 	stRecursive (this, "and all subdirectories.",		40,		60,		150,	20),
 	btnCancel	(this, "Cancel",						10,		90,		185,	20),
 	btnOk		(this, "Ok",							205,	90,		185,	20)
@@ -47,12 +44,11 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 				MessageBoxA(nullptr, "Path can't be empty.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
-			edPath.getTextW(m_pCurrentLocalCollection->settings.wsDirectoryPath, 255);
-			m_pCurrentLocalCollection->settings.bRecursive = cbRecursive.isChecked();
-			if (m_pCurrentLocalCollection->isValid() == false)
-				m_pCurrentLocalCollection->setValid(true);
-			else
-				m_collectionManager.reloadSettings();
+			wchar_t path[255]{};
+			edPath.getTextW(path, 255);
+			m_localCollection.setPath(path);
+			m_localCollection.setRecursive(cbRecursive.isChecked());
+			m_localCollection.update();
 			DestroyWindow(hWnd);
 			return 0;
 		}

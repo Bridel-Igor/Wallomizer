@@ -69,6 +69,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			AddCollectionWindow addCollectionWindow(hWnd(), m_app.getCollectionManager());
 			addCollectionWindow.windowLoop();
+			updateCollectionItems();
 			return 0;
 		}
 		if (player.click(wParam))
@@ -85,13 +86,13 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (collectionItem.btnSettings.isClicked(wParam))
 			{
 				m_app.getCollectionManager().m_pCollections[i]->openCollectionSettingsWindow(hWnd());
+				updateCollectionItems();
 				return 0;
 			}
 			if (collectionItem.btnDelete.isClicked(wParam))
 			{
 				m_app.getCollectionManager().eraseCollection(i);
 				updateCollectionItems();
-				InvalidateRect(collectionsPanel.hWnd(), nullptr, TRUE);
 				return 0;
 			}
 			if (collectionItem.chboEnabled.isClicked(wParam))
@@ -99,6 +100,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				collectionItem.chboEnabled.click();
 				m_app.getCollectionManager().m_pCollections[i]->setEnabled(collectionItem.chboEnabled.isChecked());
 				m_app.getCollectionManager().reloadSettings();
+				updateCollectionItems();
 				return 0;
 			}
 			i++;

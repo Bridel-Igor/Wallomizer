@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <string_view>
 
 #include "BaseCollection.h"
@@ -13,30 +14,30 @@ class UserCollection : public BaseCollection
 public:
 	struct UserCollectionInfo
 	{
-		unsigned int id;
+		std::uint32_t id;
 		wchar_t wsLabel[64];
 	};
 
 private:
 	struct UserCollectionSettings
 	{
-		wchar_t wsUsername[64] = L"";
-		wchar_t wsCollectionID[16] = L"";
-		wchar_t wsCollectionName[64] = L"";
 		CategoriesAndPurity categoriesAndPurity = CAP::puritySFW;
+		std::wstring username = L"";
+		std::wstring collectionID = L"";
+		std::wstring collectionName = L"";
 	};
 
 public:
 	UserCollection(App& app);
 
 	~UserCollection() {};
-	bool saveSettings(FILE* pFile) const;
-	bool loadSettings(FILE* pFile, unsigned short fileVersion);
-	void getCollectionName(wchar_t* pwsName, size_t size) const;
-	Collection::Type getCollectionType() const { return Collection::Type::user; }
+	bool saveSettings(BinaryWriter& file) const;
+	bool loadSettings(BinaryReader& file, std::uint16_t fileVersion);
+	std::wstring getCollectionName() const;
 	CategoriesAndPurity getCAP() const;
-	Wallpaper getWallpaper(unsigned int index) const;
+	Wallpaper getWallpaper(std::size_t index) const;
 	void openCollectionSettingsWindow(HWND hCaller);
+	void update();
 
 	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::wstring_view path);
@@ -45,7 +46,8 @@ public:
 	UserCollectionSettings settings;
 	
 private:
+	std::wstring getURL() const;
+
 	App& m_app;
-	static constexpr int s_nPerPage = 24;
-	wchar_t m_wsCollectionUrl[255] = L"";
+	static constexpr std::uint32_t s_perPage = 24;
 };

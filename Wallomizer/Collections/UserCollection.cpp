@@ -5,69 +5,106 @@
 #include "Internet.h"
 #include "SetUserCollectionWindow.h"
 #include "App.h"
+#include "BinaryIO.h"
 
 UserCollection::UserCollection(App& app) :
 	m_app(app)
 {
+	m_type = Collection::Type::user;
 }
 
-bool UserCollection::saveSettings(FILE* pFile) const
+bool UserCollection::saveSettings(BinaryWriter& file) const
 {
-	if (pFile == NULL)
-		return false;
-	const Collection::Type collType = getCollectionType();
-	fwrite(&collType, sizeof(collType), 1, pFile);
-	fwrite(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
-	fwrite(&settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
-	return true;
+	return file.write(m_type)
+		&& file.write(m_isEnabled)
+		&& file.write(settings.categoriesAndPurity)
+		&& file.write(settings.username)
+		&& file.write(settings.collectionID)
+		&& file.write(settings.collectionName);
 }
 
-bool UserCollection::loadSettings(FILE* pFile, unsigned short fileVersion)
+bool UserCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersion)
 {
-	if (pFile == NULL)
+	switch (fileVersion)
+	{
+	case 4U:
+		return file.read(m_isEnabled)
+			&& file.read(settings.categoriesAndPurity)
+			&& file.read(settings.username)
+			&& file.read(settings.collectionID)
+			&& file.read(settings.collectionName);
+	case 3U:
+	case 2U:
+	{
+		struct LegacyData_V2_V3
+		{
+			wchar_t wsUsername[64] = L"";
+			wchar_t wsCollectionID[16] = L"";
+			wchar_t wsCollectionName[64] = L"";
+			CategoriesAndPurity categoriesAndPurity = CAP::puritySFW;
+		};
+		LegacyData_V2_V3 oldData;
+		if (!file.read(m_isEnabled)
+			|| !file.read(oldData))
+			return false;
+
+		settings.categoriesAndPurity = oldData.categoriesAndPurity;
+		settings.username = oldData.wsUsername;
+		settings.collectionID = oldData.wsCollectionID;
+		settings.collectionName = oldData.wsCollectionName;
+
+		return true;
+	}
+	default:
 		return false;
+	}
+}
 
-	fread(&m_isEnabled, sizeof(m_isEnabled), 1, pFile);
+void UserCollection::update()
+{
+	if (!m_isEnabled)
+		return;
 
-	if (fileVersion >= 2U && fileVersion <= CollectionManager::COLLECTION_MANAGER_FILE_VERSION)
-		fread(&settings, sizeof(UserCollection::UserCollectionSettings), 1, pFile);
-	
-	// Forming collection URL
-	wcscpy_s(m_wsCollectionUrl, L"https://wallhaven.cc/api/v1/collections/");
-	wcscat_s(m_wsCollectionUrl, settings.wsUsername);
-	wcscat_s(m_wsCollectionUrl, L"/");
-	wcscat_s(m_wsCollectionUrl, settings.wsCollectionID);
+	// Getting the META
+	std::wstring url = getURL();
+	Internet internet;
+	internet.DownloadToBuffer(url.c_str());
+	if (!internet.parse("meta"))
+		return;
+	if (!internet.parse("total", m_number, true))
+		return;
+}
 
-	wcscat_s(m_wsCollectionUrl, L"?purity=");
-	wcscat_s(m_wsCollectionUrl, settings.categoriesAndPurity & CAP::puritySFW ? L"1" : L"0");
-	wcscat_s(m_wsCollectionUrl, settings.categoriesAndPurity & CAP::puritySketchy ? L"1" : L"0");
-	wcscat_s(m_wsCollectionUrl, settings.categoriesAndPurity & CAP::purityNSFW ? L"1" : L"0");
+std::wstring UserCollection::getURL() const
+{
+	std::wstring url = L"https://wallhaven.cc/api/v1/collections/";
+	url.reserve(512);
+
+	url += settings.username;
+	url += L"/";
+	url += settings.collectionID;
+
+	url += L"?purity=";
+	url += (settings.categoriesAndPurity & CAP::puritySFW) ? L"1" : L"0";
+	url += (settings.categoriesAndPurity & CAP::puritySketchy) ? L"1" : L"0";
+	url += (settings.categoriesAndPurity & CAP::purityNSFW) ? L"1" : L"0";
 
 	if (m_app.getSettings().isApiKeyUsed())
 	{
-		wcscat_s(m_wsCollectionUrl, L"&apikey=");
-		wcscat_s(m_wsCollectionUrl, m_app.getSettings().getData().apiKey);
+		url += L"&apikey=";
+		url += m_app.getSettings().getData().apiKey;
 	}
 
-	if (!m_isEnabled)
-		return true;
-
-	// Getting the META
-	Internet internet;
-	internet.DownloadToBuffer(m_wsCollectionUrl);
-	if (!internet.parse("meta"))
-		return false;
-	if (!internet.parse("total", m_uiNumber, true))
-		return false;
-	return true;
+	return url;
 }
 
-void UserCollection::getCollectionName(wchar_t* wsName, size_t size) const
+std::wstring UserCollection::getCollectionName() const
 {
-	wcscpy_s(wsName, size, L" ");
-	wcscat_s(wsName, size, settings.wsUsername);
-	wcscat_s(wsName, size, L": ");
-	wcscat_s(wsName, size, settings.wsCollectionName);
+	std::wstring name = L" ";
+	name += settings.username;
+	name += L": ";
+	name += settings.collectionName;
+	return name;
 }
 
 CategoriesAndPurity UserCollection::getCAP() const
@@ -75,20 +112,18 @@ CategoriesAndPurity UserCollection::getCAP() const
 	return settings.categoriesAndPurity;
 }
 
-Wallpaper UserCollection::getWallpaper(unsigned int index) const
+Wallpaper UserCollection::getWallpaper(std::size_t index) const
 {
-	int page = int(index / s_nPerPage);
-	index -= page * s_nPerPage;
+	std::size_t page = index / s_perPage;
+	index -= page * s_perPage;
 	page++;
-	wchar_t wsPageUrl[255];
-	wcscpy_s(wsPageUrl, m_wsCollectionUrl);
-	wcscat_s(wsPageUrl, L"&page=");
-	wchar_t wsCurrentPage[15] = L"";
-	_itow_s(page, wsCurrentPage, 10);
-	wcscat_s(wsPageUrl, wsCurrentPage);
+
+	std::wstring url = getURL();
+	url += L"&page=";
+	url += std::to_wstring(page);
 
 	Internet internet;
-	internet.DownloadToBuffer(wsPageUrl);
+	internet.DownloadToBuffer(url.c_str());
 	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
 			return Wallpaper::getEmptyWallpaper();
@@ -102,7 +137,7 @@ Wallpaper UserCollection::getWallpaper(unsigned int index) const
 
 void UserCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetUserCollectionWindow setUserCollectionWindow(hCaller, m_app, this);
+	SetUserCollectionWindow setUserCollectionWindow(hCaller, m_app, *this);
 	setUserCollectionWindow.windowLoop();
 }
 

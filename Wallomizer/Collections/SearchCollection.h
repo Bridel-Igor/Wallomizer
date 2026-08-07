@@ -1,11 +1,13 @@
 #pragma once
 
+#include <string>
 #include <string_view>
 
 #include "BaseCollection.h"
 #include "CategoriesAndPurityComponents.h"
 
-class App;
+class CollectionManager;
+class Settings;
 class WinUtils;
 
 class SearchCollection : public BaseCollection
@@ -14,23 +16,23 @@ private:
 	struct SearchCollectionSettings
 	{
 		CategoriesAndPurity categoriesAndPurity = CAP::categoryGeneral | CAP::categoryAnime | CAP::categoryPeople | CAP::puritySFW;
-		wchar_t wsTag[255] = L"";
-		wchar_t wsResolution[255] = L"";
-		wchar_t wsRatio[128] = L"";
-		wchar_t wsColor[16] = L"";
+		std::wstring tag = L"";
+		std::wstring resolution = L"";
+		std::wstring ratio = L"";
+		std::wstring color = L"";
 	};
 
 public:
-	SearchCollection(App& app);
-
+	SearchCollection(Settings& settings, CollectionManager& collectionManager);
 	~SearchCollection() {};
-	bool saveSettings(FILE* pFile) const;
-	bool loadSettings(FILE* pFile, unsigned short fileVersion);
-	void getCollectionName(wchar_t* pwsName, size_t size) const;
-	Collection::Type getCollectionType() const { return Collection::Type::search; }
+
+	bool saveSettings(BinaryWriter& file) const;
+	bool loadSettings(BinaryReader& file, std::uint16_t fileVersion);
+	std::wstring getCollectionName() const;
 	CategoriesAndPurity getCAP() const;
-	Wallpaper getWallpaper(unsigned int index) const;
+	Wallpaper getWallpaper(std::size_t index) const;
 	void openCollectionSettingsWindow(HWND hCaller);
+	void update();
 
 	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::wstring_view path);
@@ -38,8 +40,10 @@ public:
 	SearchCollectionSettings settings;
 
 private:
-	App& m_app;
-	wchar_t m_wsSearchUrl[1024] = L"";	
+	std::wstring getURL() const;
 
-	static uint32_t s_perPage;
+	CollectionManager& m_collectionManager;
+	Settings& m_settings;
+
+	static std::uint32_t s_perPage;
 };
