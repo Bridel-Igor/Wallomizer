@@ -2,13 +2,15 @@
 
 #include <Shellapi.h>
 
+#include "WinUtils.h"
+#include "Settings.h"
+#include "Wallpaper.h"
 #include "Internet.h"
 #include "SetUserCollectionWindow.h"
-#include "App.h"
 #include "BinaryIO.h"
 
-UserCollection::UserCollection(App& app) :
-	m_app(app)
+UserCollection::UserCollection(Settings& settings) :
+	m_settings(settings)
 {
 	m_type = Collection::Type::user;
 }
@@ -89,10 +91,10 @@ std::wstring UserCollection::getURL() const
 	url += (settings.categoriesAndPurity & CAP::puritySketchy) ? L"1" : L"0";
 	url += (settings.categoriesAndPurity & CAP::purityNSFW) ? L"1" : L"0";
 
-	if (m_app.getSettings().isApiKeyUsed())
+	if (m_settings.isApiKeyUsed())
 	{
 		url += L"&apikey=";
-		url += m_app.getSettings().getData().apiKey;
+		url += m_settings.getData().apiKey;
 	}
 
 	return url;
@@ -137,7 +139,7 @@ Wallpaper UserCollection::getWallpaper(std::size_t index) const
 
 void UserCollection::openCollectionSettingsWindow(HWND hCaller)
 {
-	SetUserCollectionWindow setUserCollectionWindow(hCaller, m_app, *this);
+	SetUserCollectionWindow setUserCollectionWindow(hCaller, m_settings, *this);
 	setUserCollectionWindow.windowLoop();
 }
 
@@ -170,19 +172,18 @@ void UserCollection::openWallpaperExternal(std::wstring_view path)
 	ShellExecuteW(0, 0, wsImgUrl, 0, 0, SW_SHOW);
 }
 
-void UserCollection::loadCollectionList(App& app, std::list<UserCollectionInfo>& list, const wchar_t* wsUsername, const wchar_t* wsApiKey)
+void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, const std::wstring& username, const std::wstring& apiKey)
 {
-	wchar_t wsCollectionInfoURL[255];
-	wcscpy_s(wsCollectionInfoURL, L"https://wallhaven.cc/api/v1/collections/");
-	wcscat_s(wsCollectionInfoURL, wsUsername);
-	if (wsApiKey[0])
+	std::wstring url =  L"https://wallhaven.cc/api/v1/collections/";
+	url += username;
+	if (!apiKey.empty())
 	{
-		wcscat_s(wsCollectionInfoURL, L"?apikey=");
-		wcscat_s(wsCollectionInfoURL, app.getSettings().getData().apiKey);
+		url += L"?apikey=";
+		url += apiKey;
 	}
 
 	Internet internet;
-	internet.DownloadToBuffer(wsCollectionInfoURL);
+	internet.DownloadToBuffer(url.c_str());
 	UserCollectionInfo uci;
 	while (true)
 	{

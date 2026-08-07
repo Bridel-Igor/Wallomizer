@@ -6,8 +6,8 @@
 #include "BaseCollection.h"
 #include "CategoriesAndPurityComponents.h"
 
-class App;
 class WinUtils;
+class Settings;
 
 class UserCollection : public BaseCollection
 {
@@ -28,7 +28,7 @@ private:
 	};
 
 public:
-	UserCollection(App& app);
+	UserCollection(Settings& settings);
 
 	~UserCollection() {};
 	bool saveSettings(BinaryWriter& file) const;
@@ -41,13 +41,13 @@ public:
 
 	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::wstring_view path);
-	static void loadCollectionList(App& app, std::list<UserCollectionInfo>& list, const wchar_t* sUsername, const wchar_t* sApiKey);
+	static void loadCollectionList(std::list<UserCollectionInfo>& list, const std::wstring& username, const std::wstring& apiKey);
 
 	UserCollectionSettings settings;
 	
 private:
 	std::wstring getURL() const;
 
-	App& m_app;
+	Settings& m_settings;
 	static constexpr std::uint32_t s_perPage = 24;
 };

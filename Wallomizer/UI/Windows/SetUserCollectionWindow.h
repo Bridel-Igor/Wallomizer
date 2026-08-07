@@ -7,12 +7,12 @@
 #include "Button.h"
 #include "ComboBox.h"
 
-class App;
+class Settings;
 
 class SetUserCollectionWindow : public IWindow
 {
 public:
-	SetUserCollectionWindow(HWND hCaller, App& app, UserCollection& userCollection);
+	SetUserCollectionWindow(HWND hCaller, Settings& settings, UserCollection& userCollection);
 	~SetUserCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -21,7 +21,7 @@ public:
 
 private:
 	HWND m_hCaller;
-	App& m_app;
+	Settings& m_settings;
 	UserCollection& m_userCollection;
 	Static stUsername, stCollectionID, stPurity;
 	Edit edUsername;

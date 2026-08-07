@@ -1,11 +1,11 @@
 #include "SetUserCollectionWindow.h"
 
-#include "App.h"
+#include "Settings.h"
 
-SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, App& app, UserCollection& userCollection) :
+SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, Settings& settings, UserCollection& userCollection) :
 	IWindow("User collection", "Set User Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	m_hCaller(hCaller),
-	m_app(app),
+	m_settings(settings),
 	m_userCollection(userCollection),
 	stUsername				(this, "Username:",			10,		10,		80,		20, SS_RIGHT),
 	edUsername				(this, "",					100,	10,		240,	20),
@@ -23,8 +23,8 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, App& app, UserCol
 
 	if (edUsername.isEmpty())
 	{
-		edUsername.setTextW(m_app.getSettings().getData().username);
-		m_userCollection.settings.username = m_app.getSettings().getData().username;
+		edUsername.setTextW(m_settings.getData().username.c_str());
+		m_userCollection.settings.username = m_settings.getData().username;
 		SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
 		SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)L"Click to update");
 		SendMessageW(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
@@ -100,7 +100,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 			wchar_t tmpUsername[64];
 			edUsername.getTextW(tmpUsername, 64);
 			uciList.clear();
-			UserCollection::loadCollectionList(m_app, uciList, tmpUsername, m_app.getSettings().getData().apiKey);
+			UserCollection::loadCollectionList(uciList, tmpUsername, m_settings.getData().apiKey);
 			SendMessageW(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
 			if (uciList.empty())
 			{
