@@ -1,8 +1,23 @@
 #pragma once
 
-#include <fstream>
-#include <filesystem>
+// BinaryWriter/BinaryReader
+//
+// Utility classes for writing and reading binary files.
+//
+// Supported:
+//  - trivially copyable types
+//  - std::wstring
+//  - std::filesystem::path
+//
+// Strings and paths are stored as:
+// [uint16_t length][UTF-16 characters without terminating '\0']
+
+#include <cstdint>
+#include <limits>
 #include <type_traits>
+#include <string>
+#include <filesystem>
+#include <fstream>
 
 class BinaryWriter
 {
@@ -15,27 +30,34 @@ public:
 	BinaryWriter(const BinaryWriter&) = delete;
 	BinaryWriter& operator=(const BinaryWriter&) = delete;
 
-	bool isOpen() const noexcept
+	[[nodiscard]] bool isOpen() const noexcept
 	{
 		return m_file.is_open();
 	}
 
 	template<typename T>
-	bool write(const T& value)
+	[[nodiscard]] bool write(const T& value)
 	{
 		static_assert(std::is_trivially_copyable_v<T>);
 		return static_cast<bool>(m_file.write(reinterpret_cast<const char*>(&value), sizeof(T)));
 	}
 
-	bool write(const std::wstring& value)
+	[[nodiscard]] bool write(const std::wstring& value)
 	{
 		if (value.size() > std::numeric_limits<std::uint16_t>::max())
 			return false;
 
 		std::uint16_t length = static_cast<std::uint16_t>(value.size());
-		write(length);
+		if (!write(length))
+			return false;
+
 		m_file.write(reinterpret_cast<const char*>(value.data()), length * sizeof(wchar_t));
 		return static_cast<bool>(m_file);
+	}
+
+	[[nodiscard]] bool write(const std::filesystem::path& value)
+	{
+		return write(value.wstring());
 	}
 
 private:
@@ -53,31 +75,41 @@ public:
 	BinaryReader(const BinaryReader&) = delete;
 	BinaryReader& operator=(const BinaryReader&) = delete;
 
-	bool isOpen() const noexcept
+	[[nodiscard]] bool isOpen() const noexcept
 	{
 		return m_file.is_open();
 	}
 
 	template<typename T>
-	bool read(T& value)
+	[[nodiscard]] bool read(T& value)
 	{
 		static_assert(std::is_trivially_copyable_v<T>);
 		return static_cast<bool>(m_file.read(reinterpret_cast<char*>(&value), sizeof(T)));
 	}
 
-	bool read(std::wstring& value, std::uint16_t maxLength = MAX_STRING_LENGTH_DEFAULT)
+	[[nodiscard]] bool read(std::wstring& value, std::uint16_t maxLength = DEFAULT_MAX_STRING_LENGTH)
 	{
 		std::uint16_t length = 0;
 		if (!read(length) || length > maxLength)
 			return false;
-		value.resize(length);
 
+		value.resize(length);
 		m_file.read(reinterpret_cast<char*>(value.data()), length * sizeof(wchar_t));
 		return static_cast<bool>(m_file);
+	}
+
+	[[nodiscard]] bool read(std::filesystem::path& path)
+	{
+		std::wstring temp;
+		if (!read(temp))
+			return false;
+
+		path = temp;
+		return true;
 	}
 
 private:
 	std::ifstream m_file;
 
-	static constexpr std::uint16_t MAX_STRING_LENGTH_DEFAULT = 1024;
+	static constexpr std::uint16_t DEFAULT_MAX_STRING_LENGTH = 1024;
 };
