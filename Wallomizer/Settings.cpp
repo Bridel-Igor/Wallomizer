@@ -29,24 +29,45 @@ bool Settings::loadSettings()
 		saveSettings();
 		return true;
 	}
-
 	std::uint16_t fileVersion = 0;
 	BinaryReader file(m_filePath);
 	if (!file.isOpen()
-		|| !file.read(fileVersion)
-		|| fileVersion != FILE_VERSION
-		|| !file.read(m_data.loadOnStartup)
-		|| !file.read(m_data.delay)
-		|| !file.read(m_data.username)
-		|| !file.read(m_data.apiKey)
-		|| !m_data.validate())
+		|| !file.read(fileVersion))
+		return false;
+
+	switch (fileVersion)
+	{
+	case 4U:
+		return file.read(m_data.loadOnStartup)
+			&& file.read(m_data.delay)
+			&& file.read(m_data.username)
+			&& file.read(m_data.apiKey)
+			&& m_data.validate();
+	case 3U:
+	{
+		wchar_t oldUsername[64]{};
+		wchar_t oldApiKey[33]{};
+		if (!file.read(m_data.loadOnStartup)
+			|| !file.read(m_data.delay)
+			|| !file.read(oldUsername)
+			|| !file.read(oldApiKey)
+			|| oldUsername[63] != L'\0'
+			|| oldApiKey[32] != L'\0')
+			return false;
+		m_data.username = oldUsername;
+		m_data.apiKey = oldApiKey;
+		return m_data.validate();
+	}
+	default:
 	{
 		resetSettings();
-		saveSettings();
-		MessageBoxA(nullptr, "Settings file is corrupted or incompatible. Default settings have been restored.", "Wallomizer", MB_OK | MB_ICONINFORMATION);
+		if (saveSettings())
+			MessageBoxA(nullptr, "Settings file is corrupted or incompatible. Default settings have been restored.", "Wallomizer", MB_OK | MB_ICONINFORMATION);
+		else
+			MessageBoxA(nullptr, "Settings file is corrupted or incompatible. Could not overwrite the file.", "Wallomizer", MB_OK | MB_ICONWARNING);
 		return false;
 	}
-	return true;
+	}
 }
 
 bool Settings::Data::validate() const
@@ -64,15 +85,12 @@ bool Settings::Data::validateDelay() const
 
 bool Settings::Data::validateUsername() const
 {
-	return username[63] == L'\0';
+	return username.size() <= 64;
 }
 
 bool Settings::Data::validateApiKeyLength() const
 {
-	if (apiKey[32] != L'\0')
-		return false;
-	const std::size_t length = wcslen(apiKey);
-	return length==0 || length==32;
+	return apiKey.empty() || apiKey.size() == 32;
 }
 
 bool Settings::Data::validateLoadOnStartup() const

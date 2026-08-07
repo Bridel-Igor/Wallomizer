@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <filesystem>
 
 class Settings
@@ -10,8 +11,8 @@ public:
 	{
 		std::uint32_t prevCount = 5;
 		std::uint32_t delay = 300000;
-		wchar_t username[64]{};
-		wchar_t apiKey[33]{};
+		std::wstring username{};
+		std::wstring apiKey{};
 		std::uint8_t loadOnStartup = 0;
 
 		bool validate() const;
@@ -21,8 +22,8 @@ public:
 		bool validateLoadOnStartup() const;
 		
 	private:
-		static constexpr std::uint32_t MIN_DELAY = 10000;
-		static constexpr std::uint32_t MAX_DELAY = 3599999000;
+		static constexpr std::uint32_t MIN_DELAY = 10000U;
+		static constexpr std::uint32_t MAX_DELAY = 3599999000U;
 	};
 
 public:
@@ -32,16 +33,16 @@ public:
 	Settings(Settings&&) = delete;
 	Settings& operator=(Settings&&) = delete;
 
-	void resetSettings() noexcept { m_data = {}; };
+	void resetSettings() { m_data = {}; };
 	bool saveSettings() const;
 	bool loadSettings();
-	bool isApiKeyUsed() const noexcept { return m_data.apiKey[0]; }
+	bool isApiKeyUsed() const noexcept { return !m_data.apiKey.empty(); }
 
 	Data& getData() noexcept { return m_data; }
 	const Data& getData() const noexcept { return m_data; }
 	
 private:
-	static constexpr std::uint16_t FILE_VERSION = 3;
+	static constexpr std::uint16_t FILE_VERSION = 4U;
 	
 	Data m_data;
 	const std::filesystem::path m_filePath;

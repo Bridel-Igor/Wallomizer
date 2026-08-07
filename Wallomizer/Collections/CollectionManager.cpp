@@ -77,7 +77,7 @@ bool CollectionManager::loadSettings()
 				pTmpCollection = new LocalCollection(*this);
 				break;
 			case Collection::Type::user:
-				pTmpCollection = new UserCollection(m_app);
+				pTmpCollection = new UserCollection(m_app.getSettings());
 				break;
 			case Collection::Type::search:
 				pTmpCollection = new SearchCollection(m_app.getSettings(), *this);
@@ -185,7 +185,7 @@ void CollectionManager::addCollection(Collection::Type collectionType)
 	switch (collectionType)
 	{
 	case Collection::Type::local:	pCollection = new LocalCollection(*this);						break;
-	case Collection::Type::user:	pCollection = new UserCollection(m_app);						break;
+	case Collection::Type::user:	pCollection = new UserCollection(m_app.getSettings());			break;
 	case Collection::Type::search:	pCollection = new SearchCollection(m_app.getSettings(), *this);	break;
 	}
 	if (pCollection == nullptr)

@@ -44,8 +44,8 @@ SettingsWindow::SettingsWindow(HWND hCaller, App& app) :
 
 	SetWindowText(stActVersion.hWnd(), m_app.getWinUtils().getAppVersion().c_str());
 
-	edUsername.setTextW(app.getSettings().getData().username);
-	edApiKey.setTextW(app.getSettings().getData().apiKey);
+	edUsername.setTextW(app.getSettings().getData().username.c_str());
+	edApiKey.setTextW(app.getSettings().getData().apiKey.c_str());
 	cbStartup.setChecked(app.getSettings().getData().loadOnStartup);
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
@@ -154,8 +154,11 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 			Settings::Data newData = data;
 			newData.loadOnStartup = cbStartup.isChecked();
 			newData.delay = (udeSeconds.getPos() + (udeMinutes.getPos() * 60) + (udeHours.getPos() * 3600)) * 1000;
-			edApiKey.getTextW(newData.apiKey, 33);
-			edUsername.getTextW(newData.username, 64);
+			wchar_t apiKey[33], username[64];
+			edApiKey.getTextW(apiKey, 33);
+			edUsername.getTextW(username, 64);
+			newData.apiKey = apiKey;
+			newData.username = username;
 
 			if (!newData.validateDelay())
 			{
@@ -177,7 +180,7 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 			
 			Internet internet;
 			wchar_t ws_apiKeyTestUrl[78] = L"https://wallhaven.cc/api/v1/settings?apikey=";
-			wcscat_s(ws_apiKeyTestUrl, newData.apiKey);
+			wcscat_s(ws_apiKeyTestUrl, newData.apiKey.c_str());
 			internet.DownloadToBuffer(ws_apiKeyTestUrl);
 			if (internet.parse("error"))
 			{
