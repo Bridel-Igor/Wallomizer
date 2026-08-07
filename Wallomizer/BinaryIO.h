@@ -27,6 +27,17 @@ public:
 		return static_cast<bool>(m_file.write(reinterpret_cast<const char*>(&value), sizeof(T)));
 	}
 
+	bool write(const std::wstring& value)
+	{
+		if (value.size() > std::numeric_limits<std::uint16_t>::max())
+			return false;
+
+		std::uint16_t length = static_cast<std::uint16_t>(value.size());
+		write(length);
+		m_file.write(reinterpret_cast<const char*>(value.data()), length * sizeof(wchar_t));
+		return static_cast<bool>(m_file);
+	}
+
 private:
 	std::ofstream m_file;
 };
@@ -54,6 +65,19 @@ public:
 		return static_cast<bool>(m_file.read(reinterpret_cast<char*>(&value), sizeof(T)));
 	}
 
+	bool read(std::wstring& value, std::uint16_t maxLength = MAX_STRING_LENGTH_DEFAULT)
+	{
+		std::uint16_t length = 0;
+		if (!read(length) || length > maxLength)
+			return false;
+		value.resize(length);
+
+		m_file.read(reinterpret_cast<char*>(value.data()), length * sizeof(wchar_t));
+		return static_cast<bool>(m_file);
+	}
+
 private:
 	std::ifstream m_file;
+
+	static constexpr std::uint16_t MAX_STRING_LENGTH_DEFAULT = 1024;
 };
