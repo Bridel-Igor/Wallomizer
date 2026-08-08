@@ -1,3 +1,5 @@
+#include <Windows.h>
+
 #include "App.h"
 
 /// Application entry point.

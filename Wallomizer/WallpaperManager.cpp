@@ -1,10 +1,16 @@
 #include "WallpaperManager.h"
 
-#include "App.h"
+#include "WinUtils.h"
+#include "Settings.h"
+#include "CollectionManager.h"
+#include "Timer.h"
 #include "Player.h"
 
-WallpaperManager::WallpaperManager(App& app) :
-	m_app(app),
+WallpaperManager::WallpaperManager(const WinUtils& winUtils, const Settings& settings, CollectionManager& collectionManager, Timer& timer) :
+	m_winUtils(winUtils),
+	m_settings(settings),
+	m_collectionManager(collectionManager),
+	m_timer(timer),
 	m_NextWallpaper(Wallpaper::getEmptyWallpaper())
 {
 }
@@ -30,27 +36,27 @@ bool WallpaperManager::hasPrevious() const
 void WallpaperManager::loadNextWallpaper()
 {
 	std::lock_guard<std::mutex> lock(m_imageModification);
-	m_NextWallpaper = std::move(m_app.getCollectionManager().getRandomWallpaper());
-	m_NextWallpaper.loadWallpaper(m_app.getWinUtils());
+	m_NextWallpaper = std::move(m_collectionManager.getRandomWallpaper());
+	m_NextWallpaper.loadWallpaper(m_winUtils);
 }
 
 void WallpaperManager::setLoadedWallpaper(bool setPrevious)
 {
 	std::lock_guard<std::mutex> lock(m_imageModification);
 
-	std::filesystem::path pathOfLoaded = m_app.getWinUtils().getRoamingDir() / L"Loaded wallpaper.dat";
-	std::filesystem::path pathOfCurrent = m_app.getWinUtils().getRoamingDir() / L"Current wallpaper.jpg";
+	std::filesystem::path pathOfLoaded = m_winUtils.getRoamingDir() / L"Loaded wallpaper.dat";
+	std::filesystem::path pathOfCurrent = m_winUtils.getRoamingDir() / L"Current wallpaper.jpg";
 
 	if (!std::filesystem::exists(pathOfLoaded))
 	{
-		m_app.getTimer().abort();
+		m_timer.abort();
 		return;
 	}
 
 	if (!setPrevious)
 	{
 		m_wallpaperList.push_back(m_NextWallpaper);
-		if (m_wallpaperList.size() > m_app.getSettings().getData().prevCount + 1)
+		if (m_wallpaperList.size() > m_settings.getData().prevCount + 1)
 			m_wallpaperList.pop_front();
 	}
 
@@ -64,7 +70,7 @@ void WallpaperManager::setLoadedWallpaper(bool setPrevious)
 	if (ec)
 		return;
 
-	m_app.getWinUtils().updateDesktopBackground(m_app.getTimer().getStatus() != Timer::Status::stopped);
+	m_winUtils.updateDesktopBackground(m_timer.getStatus() != Timer::Status::stopped);
 	Player::redrawPlayers();
 }
 
@@ -80,7 +86,7 @@ void WallpaperManager::setPreviousWallpaper()
 		return;
 
 	m_wallpaperList.pop_back();
-	m_wallpaperList.back().loadWallpaper(m_app.getWinUtils());
+	m_wallpaperList.back().loadWallpaper(m_winUtils);
 	setLoadedWallpaper(true);
 	loadNextWallpaper();
 	
@@ -91,7 +97,7 @@ void WallpaperManager::deleteLoaded()
 {
 	std::lock_guard<std::mutex> lock(m_imageModification);
 
-	std::filesystem::path pathOfLoaded = m_app.getWinUtils().getRoamingDir() / L"Loaded wallpaper.dat";
+	std::filesystem::path pathOfLoaded = m_winUtils.getRoamingDir() / L"Loaded wallpaper.dat";
 	std::filesystem::remove(pathOfLoaded);
 }
 

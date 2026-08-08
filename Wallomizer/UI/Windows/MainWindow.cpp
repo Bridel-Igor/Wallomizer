@@ -76,8 +76,9 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		if (btnSettings.isClicked(wParam))
 		{
-			SettingsWindow settingsWindow(hWnd(), m_app);
+			SettingsWindow settingsWindow(hWnd(), m_app.getWinUtils(), m_app.getSettings());
 			settingsWindow.windowLoop();
+			Player::updateTimer(m_app.getTimer(), true);
 			return 0;
 		}
 		int i = 0;

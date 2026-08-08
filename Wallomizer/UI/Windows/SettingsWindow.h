@@ -3,17 +3,18 @@
 #include "IWindow.h"
 #include "Static.h"
 #include "Edit.h"
-#include "Button.h"
 #include "UpDownEdit.h"
+#include "Button.h"
 #include "CheckBox.h"
 #include "ColorPickerButton.h"
 
-class App;
+class WinUtils;
+class Settings;
 
 class SettingsWindow : public IWindow
 {
 public:
-	SettingsWindow(HWND hCaller, App& app);
+	SettingsWindow(HWND hCaller, const WinUtils& winUtils, Settings& settings);
 	~SettingsWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -21,8 +22,10 @@ public:
 	static constexpr int height = 370;
 
 private:
+	const WinUtils& m_winUtils;
+	Settings& m_settings;
+
 	HWND m_hCaller;
-	App& m_app;
 	Static stApplication, stSlideshow, stWallhaven;
 	Static stVersion, stActVersion, stDeveloper, stActDeveloper, stHours, stMinutes, stSeconds, stDelay, stBckColor, stApiKey, stUsername, stStartup;
 	Edit edApiKey, edUsername;

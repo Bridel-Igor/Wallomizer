@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstddef>
-#include <windows.h>
 
 namespace Collection
 {
@@ -13,14 +12,14 @@ namespace Collection
 		search
 	};
 
-	constexpr size_t getMaxPathSize(Type type) noexcept
+	constexpr std::size_t getMaxPathSize(Type type) noexcept
 	{
 		switch (type)
 		{
 		case Type::none:
 			return 0;
 		case Type::local:
-			return MAX_PATH;
+			return 260; // MAX_PATH
 		case Type::user:
 			return 255;
 		case Type::search:

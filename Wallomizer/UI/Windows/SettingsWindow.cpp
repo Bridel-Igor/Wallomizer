@@ -2,14 +2,16 @@
 
 #include <Shellapi.h>
 
+#include "WinUtils.h"
+#include "Settings.h"
 #include "Player.h"
 #include "Internet.h"
-#include "App.h"
 
-SettingsWindow::SettingsWindow(HWND hCaller, App& app) :
+SettingsWindow::SettingsWindow(HWND hCaller, const WinUtils& winUtils, Settings& settings) :
 	IWindow("Settings", "Setting Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
+	m_winUtils(winUtils),
+	m_settings(settings),
 	m_hCaller(hCaller),
-	m_app(app),
 	stApplication	(this, "Application",					10,		10,		380,	20, SS_CENTER),
 	stVersion		(this, "Version:",						10,		40,		130,	20, SS_RIGHT),
 	stActVersion	(this, "",								150,	40,		100,	20),
@@ -24,12 +26,12 @@ SettingsWindow::SettingsWindow(HWND hCaller, App& app) :
 	stHours			(this, "Hours",							150,	160,	74,		20, SS_CENTER),
 	stMinutes		(this, "Minutes",						233,	160,	74,		20, SS_CENTER),
 	stSeconds		(this, "Seconds",						316,	160,	74,		20, SS_CENTER),
-	udeHours		(this,									150,	180,	74,		20, 0, 999, int((app.getSettings().getData().delay / 1000) / 3600)),
-	udeMinutes		(this,									233,	180,	74,		20, 0, 59, int((app.getSettings().getData().delay / 1000) / 60) % 60),
-	udeSeconds		(this,									316,	180,	74,		20, 0, 59, int(app.getSettings().getData().delay / 1000) % 60),
+	udeHours		(this,									150,	180,	74,		20, 0, 999, int((m_settings.getData().delay / 1000) / 3600)),
+	udeMinutes		(this,									233,	180,	74,		20, 0, 59, int((m_settings.getData().delay / 1000) / 60) % 60),
+	udeSeconds		(this,									316,	180,	74,		20, 0, 59, int(m_settings.getData().delay / 1000) % 60),
 
 	stBckColor		(this, "Background color:",				10,		210,	130,	20,	SS_RIGHT),
-	cpbBckColor		(this, app.getWinUtils().getBackgroundColor(),	150,	210,	120,	20),
+	cpbBckColor		(this, m_winUtils.getBackgroundColor(),	150,	210,	120,	20),
 
 	stWallhaven		(this, "Wallhaven",						10,		240,	380,	20, SS_CENTER),
 	stApiKey		(this, "Api key:",						10,		270,	130,	20, SS_RIGHT),
@@ -42,11 +44,11 @@ SettingsWindow::SettingsWindow(HWND hCaller, App& app) :
 {
 	EnableWindow(m_hCaller, FALSE);
 
-	SetWindowText(stActVersion.hWnd(), m_app.getWinUtils().getAppVersion().c_str());
+	SetWindowText(stActVersion.hWnd(), m_winUtils.getAppVersion().c_str());
 
-	edUsername.setTextW(app.getSettings().getData().username.c_str());
-	edApiKey.setTextW(app.getSettings().getData().apiKey.c_str());
-	cbStartup.setChecked(app.getSettings().getData().loadOnStartup);
+	edUsername.setTextW(m_settings.getData().username.c_str());
+	edApiKey.setTextW(m_settings.getData().apiKey.c_str());
+	cbStartup.setChecked(m_settings.getData().loadOnStartup);
 
 	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	SendMessage(stApplication.hWnd(), WM_SETFONT, (WPARAM)resources.titleFont, TRUE);
@@ -150,7 +152,7 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 		}
 		if (btnOk.isClicked(wParam))
 		{
-			Settings::Data& data = m_app.getSettings().getData();
+			Settings::Data& data = m_settings.getData();
 			Settings::Data newData = data;
 			newData.loadOnStartup = cbStartup.isChecked();
 			newData.delay = (udeSeconds.getPos() + (udeMinutes.getPos() * 60) + (udeHours.getPos() * 3600)) * 1000;
@@ -192,16 +194,15 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 			Settings::Data backupData = data;
 			data = newData;
-			if (m_app.getSettings().saveSettings() == false)
+			if (m_settings.saveSettings() == false)
 			{
 				data = backupData;
 				MessageBoxA(nullptr, "Unable to save settings.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
 
-			m_app.getWinUtils().setStartup(cbStartup.isChecked());
-			m_app.getWinUtils().setBackgroundColor(cpbBckColor.getColor());
-			Player::updateTimer(m_app.getTimer(), true);
+			m_winUtils.setStartup(cbStartup.isChecked());
+			m_winUtils.setBackgroundColor(cpbBckColor.getColor());
 			DestroyWindow(hWnd());
 			return 0;
 		}

@@ -5,12 +5,15 @@
 
 #include "Wallpaper.h"
 
-class App;
+class WinUtils;
+class Settings;
+class CollectionManager;
+class Timer;
 
 class WallpaperManager
 {
 public:
-	WallpaperManager(App& app);
+	WallpaperManager(const WinUtils& winUtils, const Settings& settings, CollectionManager& collectionManager, Timer& timer);
 	WallpaperManager(const WallpaperManager&) = delete;
 	WallpaperManager& operator=(const WallpaperManager&) = delete;
 	WallpaperManager(WallpaperManager&&) = delete;
@@ -27,7 +30,10 @@ public:
 	void openCurrentWallpaperExternally();
 
 private:
-	App& m_app;
+	const WinUtils& m_winUtils;
+	const Settings& m_settings;
+	CollectionManager& m_collectionManager;
+	Timer& m_timer;
 
 	std::mutex m_imageModification;
 

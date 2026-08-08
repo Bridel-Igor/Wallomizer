@@ -6,7 +6,7 @@
 #include "Player.h"
 #include "BinaryIO.h"
 
-Timer::Timer(const WinUtils& winUtils, Settings& settings, WallpaperManager& wallpaperManager) :
+Timer::Timer(const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager) :
 	m_winUtils(winUtils),
 	m_settings(settings),
 	m_wallpaperManager(wallpaperManager)

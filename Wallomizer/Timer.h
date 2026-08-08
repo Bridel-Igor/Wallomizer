@@ -36,7 +36,7 @@ public:
 	};
 
 public:
-	explicit Timer(const WinUtils& winUtils, Settings& settings, WallpaperManager& wallpaperManager);
+	explicit Timer(const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager);
 	Timer(const Timer&) = delete;
 	Timer& operator=(const Timer&) = delete;
 	Timer(Timer&&) = delete;
@@ -58,7 +58,7 @@ public:
 
 private:
 	const WinUtils& m_winUtils;
-	Settings& m_settings;
+	const Settings& m_settings;
 	WallpaperManager& m_wallpaperManager;
 
 	Status m_status = Status::playing;
