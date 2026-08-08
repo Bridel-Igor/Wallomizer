@@ -28,7 +28,7 @@ private:
 	};
 
 public:
-	UserCollection(Settings& settings);
+	UserCollection(const Settings& settings);
 
 	~UserCollection() {};
 	bool saveSettings(BinaryWriter& file) const;
@@ -36,8 +36,8 @@ public:
 	std::wstring getCollectionName() const;
 	CategoriesAndPurity getCAP() const;
 	Wallpaper getWallpaper(std::size_t index) const;
-	void openCollectionSettingsWindow(HWND hCaller);
 	void update();
+	bool validate() const;
 
 	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::wstring_view path);
@@ -48,6 +48,6 @@ public:
 private:
 	std::wstring getURL() const;
 
-	Settings& m_settings;
+	const Settings& m_settings;
 	static constexpr std::uint32_t s_perPage = 24;
 };

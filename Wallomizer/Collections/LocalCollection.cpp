@@ -7,7 +7,6 @@
 #include "WinUtils.h"
 #include "Wallpaper.h"
 #include "BinaryIO.h"
-#include "SetLocalCollectionWindow.h"
 
 bool isImage(std::filesystem::path path)
 {
@@ -112,12 +111,6 @@ Wallpaper LocalCollection::getWallpaper(std::size_t index) const
 	return Wallpaper::getEmptyWallpaper();
 }
 
-void LocalCollection::openCollectionSettingsWindow(HWND hCaller)
-{
-	SetLocalCollectionWindow setLocalCollectionWindow(hCaller, *this);
-	setLocalCollectionWindow.windowLoop();
-}
-
 bool LocalCollection::loadWallpaper(std::filesystem::path sourcePath, const WinUtils& winUtils)
 {
 	std::error_code ec;
@@ -142,4 +135,9 @@ void LocalCollection::openWallpaperExternal(std::filesystem::path sourcePath)
 		SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0);
 		ILFree(pidl);
 	}
+}
+
+bool LocalCollection::validate() const
+{
+	return !m_path.empty();
 }

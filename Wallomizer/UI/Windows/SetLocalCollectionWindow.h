@@ -15,8 +15,9 @@ public:
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
-	HWND m_hCaller;
 	LocalCollection& m_localCollection;
+
+	HWND m_hCaller;
 	Static stPath, stRecursive;
 	Edit edPath;
 	CheckBox cbRecursive;

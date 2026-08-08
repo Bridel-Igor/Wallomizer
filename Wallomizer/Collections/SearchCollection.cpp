@@ -6,13 +6,12 @@
 #include "Settings.h"
 #include "CollectionManager.h"
 #include "Wallpaper.h"
-#include "SetSearchCollectionWindow.h"
 #include "Internet.h"
 #include "BinaryIO.h"
 
 uint32_t SearchCollection::s_perPage = 64;
 
-SearchCollection::SearchCollection(Settings& settings, CollectionManager& collectionManager) :
+SearchCollection::SearchCollection(const Settings& settings, CollectionManager& collectionManager) :
 	m_settings(settings),
 	m_collectionManager(collectionManager)
 {
@@ -175,12 +174,6 @@ Wallpaper SearchCollection::getWallpaper(std::size_t index) const
 	return Wallpaper(Collection::Type::search, wsPath);
 }
 
-void SearchCollection::openCollectionSettingsWindow(HWND hCaller)
-{
-	SetSearchCollectionWindow setSearchCollectionWindow(hCaller, *this);
-	setSearchCollectionWindow.windowLoop();
-}
-
 bool SearchCollection::loadWallpaper(std::wstring_view path, const WinUtils& winUtils)
 {
 	std::filesystem::path loadedPath = winUtils.getRoamingDir() / L"Loaded wallpaper.dat";
@@ -208,4 +201,9 @@ void SearchCollection::openWallpaperExternal(std::wstring_view path)
 	wsImgUrl[j] = '\0';
 
 	ShellExecuteW(0, 0, wsImgUrl, 0, 0, SW_SHOW);
+}
+
+bool SearchCollection::validate() const
+{
+	return true;
 }

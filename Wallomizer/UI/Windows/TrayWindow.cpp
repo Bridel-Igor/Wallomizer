@@ -6,6 +6,7 @@
 #include <VersionHelpers.h>
 
 #include "App.h"
+#include "MainWindow.h"
 
 #define WM_NOTIFYICONMSG (WM_USER + 2)
 
@@ -134,7 +135,18 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		if (btnSettings.isClicked(wParam))
 		{
-			m_app.getCollectionManager().openMainWindow();
+			std::thread mainWindowThread([&]()
+				{
+					try
+					{
+						MainWindow mainWindow(m_app);
+						mainWindow.windowLoop();
+					}
+					catch (...)
+					{
+					}
+				});
+			mainWindowThread.detach(); // TODO: exception handling. Move thread var to members
 			return 0;
 		}
 		if (btnExit.isClicked(wParam))

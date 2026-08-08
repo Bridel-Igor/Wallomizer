@@ -3,12 +3,11 @@
 #include <ctime>
 
 #include "App.h"
-#include "MainWindow.h"
-#include "TrayWindow.h"
 #include "UserCollection.h"
 #include "LocalCollection.h"
 #include "SearchCollection.h"
 #include "BinaryIO.h"
+#include "Player.h"
 
 CollectionManager::CollectionManager(App& app) :
 	m_app(app)
@@ -138,22 +137,6 @@ Wallpaper CollectionManager::getWallpaper(std::uint32_t index) const
 	return Wallpaper::getEmptyWallpaper();
 }
 
-void CollectionManager::openMainWindow()
-{ 
-	std::thread mainWindowThread([&]()
-		{
-			try 
-			{
-				MainWindow mainWindow(m_app);
-				mainWindow.windowLoop();
-			}
-			catch (...)
-			{
-			}
-		});
-	mainWindowThread.detach(); // TODO: exception handling. Move thread var to members
-}
-
 void CollectionManager::reloadSettings()
 {
 	saveSettings();
@@ -179,21 +162,13 @@ void CollectionManager::updateNumber()
 		m_uniformIntDistribution = std::uniform_int_distribution<int>(0, m_number-1);
 }
 
-void CollectionManager::addCollection(Collection::Type collectionType)
+void CollectionManager::addCollection(BaseCollection* pCollection)
 {
-	BaseCollection* pCollection = nullptr;
-	switch (collectionType)
-	{
-	case Collection::Type::local:	pCollection = new LocalCollection(*this);						break;
-	case Collection::Type::user:	pCollection = new UserCollection(m_app.getSettings());			break;
-	case Collection::Type::search:	pCollection = new SearchCollection(m_app.getSettings(), *this);	break;
-	}
 	if (pCollection == nullptr)
 		return;
-	pCollection->openCollectionSettingsWindow(MainWindow::s_pMainWindow->hWnd());
-
 	m_pCollections.push_back(pCollection);
-	reloadSettings();
+	saveSettings();
+	updateNumber();
 }
 
 void CollectionManager::eraseCollection(std::size_t index)

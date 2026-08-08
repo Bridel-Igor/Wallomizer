@@ -6,10 +6,9 @@
 #include "Settings.h"
 #include "Wallpaper.h"
 #include "Internet.h"
-#include "SetUserCollectionWindow.h"
 #include "BinaryIO.h"
 
-UserCollection::UserCollection(Settings& settings) :
+UserCollection::UserCollection(const Settings& settings) :
 	m_settings(settings)
 {
 	m_type = Collection::Type::user;
@@ -137,12 +136,6 @@ Wallpaper UserCollection::getWallpaper(std::size_t index) const
 	return Wallpaper(Collection::Type::user, wsPath);
 }
 
-void UserCollection::openCollectionSettingsWindow(HWND hCaller)
-{
-	SetUserCollectionWindow setUserCollectionWindow(hCaller, m_settings, *this);
-	setUserCollectionWindow.windowLoop();
-}
-
 bool UserCollection::loadWallpaper(std::wstring_view path, const WinUtils& winUtils)
 {
 	std::filesystem::path loadedPath = winUtils.getRoamingDir() / L"Loaded wallpaper.dat";
@@ -193,4 +186,10 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 			break;
 		list.push_back(uci);
 	}
+}
+
+bool UserCollection::validate() const
+{
+	return !settings.username.empty()
+		&& !settings.collectionID.empty();
 }
