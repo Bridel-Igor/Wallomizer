@@ -28,16 +28,19 @@ private:
 	};
 
 public:
-	UserCollection(const Settings& settings);
+	UserCollection(const Settings& settings) :
+		BaseCollection(Collection::Type::user),
+		m_settings(settings)
+	{}
+	~UserCollection() = default;
 
-	~UserCollection() {};
-	bool saveSettings(BinaryWriter& file) const;
-	bool loadSettings(BinaryReader& file, std::uint16_t fileVersion);
-	std::wstring getCollectionName() const;
-	CategoriesAndPurity getCAP() const;
-	Wallpaper getWallpaper(std::size_t index) const;
-	void update();
-	bool isValid() const;
+	bool saveSettings(BinaryWriter& file) const override;
+	bool loadSettings(BinaryReader& file, std::uint16_t fileVersion) override;
+	std::wstring getCollectionName() const override;
+	CategoriesAndPurity getCAP() const override;
+	Wallpaper getWallpaper(std::size_t index) const override;
+	void update() override;
+	bool isValid() const override;
 
 	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::wstring_view path);

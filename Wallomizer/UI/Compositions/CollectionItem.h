@@ -3,8 +3,9 @@
 #include "Static.h"
 #include "IconButton.h"
 #include "CheckBox.h"
-#include "BaseCollection.h"
 #include "CategoriesAndPurityComponents.h"
+
+class BaseCollection;
 
 class CollectionItem
 {
@@ -24,9 +25,9 @@ public:
 		static unsigned char refCount;
 	}resources;
 public:
-	CollectionItem(IComponent* pParent, int x, int y, int width, BaseCollection* collection, HFONT hFont);
+	CollectionItem(IComponent* pParent, int x, int y, int width, HFONT hFont);
 	~CollectionItem() {}
-	void updateInfo(BaseCollection* collection);
+	void updateInfo(BaseCollection& collection);
 	void reposition(int yPos, bool scrollBarISVisible);
 	bool draw(LPDRAWITEMSTRUCT& pDIS);
 
@@ -34,7 +35,6 @@ public:
 	Static stName, stNumber;
 	IconButton btnSettings, btnDelete;
 	PurityComponent purity;
-	BaseCollection* m_pCollection;
 	static constexpr int height = 26;
 
 private:

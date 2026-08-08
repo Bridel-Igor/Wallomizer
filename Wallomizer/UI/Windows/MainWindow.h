@@ -36,7 +36,7 @@ private:
 	Static stCollections;
 	Panel collectionsPanel;
 	Static stEmpty;
-	Button btnAdd, btnSettings;	
+	Button btnAdd, btnSettings;
 	Player player;
 	
 	std::list<CollectionItem> collectionItems;

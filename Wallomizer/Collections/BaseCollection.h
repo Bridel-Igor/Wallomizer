@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -13,13 +14,15 @@ class BinaryReader;
 class BaseCollection
 {
 public:
-	BaseCollection() = default;
+	explicit BaseCollection(Collection::Type type) noexcept :
+		m_type(type)
+	{}
 	BaseCollection(const BaseCollection&) = delete;
-	BaseCollection(BaseCollection&&) = delete;
 	BaseCollection& operator=(const BaseCollection&) = delete;
+	BaseCollection(BaseCollection&&) = delete;
 	BaseCollection& operator=(BaseCollection&&) = delete;
+	virtual ~BaseCollection() = default;
 
-	virtual ~BaseCollection() {}
 	virtual bool saveSettings(BinaryWriter& file) const = 0;
 	virtual bool loadSettings(BinaryReader& file, std::uint16_t fileVersion) = 0;
 	virtual std::wstring getCollectionName() const = 0;
@@ -28,13 +31,13 @@ public:
 	virtual void update() = 0;
 	virtual bool isValid() const = 0;
 
-	Collection::Type getType() const noexcept	{ return m_type; }
-	std::uint32_t getNumber() const noexcept	{ return m_number; }
-	bool isEnabled() const noexcept				{ return m_isEnabled; }
-	void setEnabled(bool isEnabled) noexcept	{ m_isEnabled = isEnabled; }
+	Collection::Type getType() const noexcept		{ return m_type; }
+	std::size_t getWallpaperCount() const noexcept	{ return m_wallpaperCount; }
+	bool isEnabled() const noexcept					{ return m_isEnabled; }
+	void enableCollection(bool isEnabled) noexcept	{ m_isEnabled = isEnabled; }
 
 protected:
-	Collection::Type m_type = Collection::Type::none;
+	const Collection::Type m_type = Collection::Type::none;
 	std::uint8_t m_isEnabled = true;
-	std::uint32_t m_number = 0;
+	std::size_t m_wallpaperCount = 0;
 };

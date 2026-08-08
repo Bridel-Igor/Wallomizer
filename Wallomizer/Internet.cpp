@@ -145,3 +145,20 @@ bool Internet::parse(const char* sKey, unsigned int& uValue, bool bFromLastPos)
 	uValue = atoi(search);
 	return true;
 }
+
+bool Internet::parse(const char* sKey, std::size_t& uValue, bool bFromLastPos)
+{
+	if (!parse(sKey, bFromLastPos))
+		return false;
+	char search[64] = "";
+	int i = 0;
+	while (m_pCurrent != nullptr && m_pCurrent[i] != '}' && m_pCurrent[i] != ',')
+	{
+		search[i] = m_pCurrent[i];
+		i++;
+	}
+	search[i] = '\0';
+	m_pCurrent += i;
+	uValue = atoi(search);
+	return true;
+}

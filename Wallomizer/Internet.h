@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 #include <Windows.h>
 #include <WinInet.h>
 
@@ -18,6 +20,7 @@ public:
 	bool parse(const char* sKey, bool bFromLastPos = false);
 	bool parse(const char* sKey, wchar_t* wsValue, bool bFromLastPos = false);
 	bool parse(const char* sKey, unsigned int& uValue, bool bFromLastPos = false);
+	bool parse(const char* sKey, std::size_t& uValue, bool bFromLastPos = false);
 
 private:
 	static constexpr DWORD BUFFER_SIZE_DEFAULT = 32768;

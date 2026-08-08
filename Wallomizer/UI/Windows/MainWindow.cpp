@@ -3,9 +3,9 @@
 #include <thread>
 
 #include "App.h"
-#include "AddCollectionWindow.h"
-#include "SettingsWindow.h"
 #include "TrayWindow.h"
+#include "SettingsWindow.h"
+#include "AddCollectionWindow.h"
 #include "SetLocalCollectionWindow.h"
 #include "SetUserCollectionWindow.h"
 #include "SetSearchCollectionWindow.h"
@@ -89,26 +89,24 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (collectionItem.btnSettings.isClicked(wParam))
 			{
-				BaseCollection* collection = m_app.getCollectionManager().m_pCollections[i];
-				if (collection == nullptr)
-					return 0;
-				switch (collection->getType())
+				BaseCollection& collection = m_app.getCollectionManager().getCollection(i);
+				switch (collection.getType())
 				{
 				case Collection::Type::local:
 				{
-					SetLocalCollectionWindow setLocalCollectionWindow(hWnd(), static_cast<LocalCollection&>(*collection));
+					SetLocalCollectionWindow setLocalCollectionWindow(hWnd(), static_cast<LocalCollection&>(collection));
 					setLocalCollectionWindow.windowLoop();
 					break;
 				}
 				case Collection::Type::user:
 				{
-					SetUserCollectionWindow setUserCollectionWindow(hWnd(), m_app.getSettings(), static_cast<UserCollection&>(*collection));
+					SetUserCollectionWindow setUserCollectionWindow(hWnd(), m_app.getSettings(), static_cast<UserCollection&>(collection));
 					setUserCollectionWindow.windowLoop();
 					break;
 				}
 				case Collection::Type::search:
 				{
-					SetSearchCollectionWindow setSearchCollectionWindow(hWnd(), static_cast<SearchCollection&>(*collection));
+					SetSearchCollectionWindow setSearchCollectionWindow(hWnd(), static_cast<SearchCollection&>(collection));
 					setSearchCollectionWindow.windowLoop();
 					break;
 				}
@@ -127,8 +125,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (collectionItem.chboEnabled.isClicked(wParam))
 			{
 				collectionItem.chboEnabled.click();
-				m_app.getCollectionManager().m_pCollections[i]->setEnabled(collectionItem.chboEnabled.isChecked());
-				m_app.getCollectionManager().reloadSettings();
+				m_app.getCollectionManager().enableCollection(i, collectionItem.chboEnabled.isChecked());
 				updateCollectionItems();
 				return 0;
 			}
@@ -234,28 +231,26 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void MainWindow::updateCollectionItems()
 {
-	ShowWindow(stEmpty.hWnd(), SW_HIDE);
+	const std::size_t collectionCount = m_app.getCollectionManager().getCollectionCount();
+	ShowWindow(stEmpty.hWnd(), collectionCount ? SW_HIDE : SW_SHOW);
 
-	size_t i;
-	for (i = m_app.getCollectionManager().m_pCollections.size(); i < collectionItems.size(); i++) //deleting excess items
+	// delete if more then needed
+	while (collectionItems.size() > collectionCount)
 		collectionItems.pop_back();
 
-	i = 0;
-	for (auto& collectionItem : collectionItems) // updating those which won't be created
-		collectionItem.updateInfo(m_app.getCollectionManager().m_pCollections[i++]);
-
-	for (i = collectionItems.size(); i < m_app.getCollectionManager().m_pCollections.size(); i++) // creation
-		if (m_app.getCollectionManager().m_pCollections[i] != nullptr)
-			collectionItems.emplace_back(&collectionsPanel, 0, (int)(i * (CollectionItem::height + 1)), fWidth, m_app.getCollectionManager().m_pCollections[i], IWindow::Resources::mainFont);
+	// create if less then needed
+	for (std::size_t i = collectionItems.size(); i < collectionCount; i++)
+		collectionItems.emplace_back(&collectionsPanel, 0, static_cast<int>(i) * (CollectionItem::height + 1), fWidth, IWindow::Resources::mainFont);
 
 	updateScroll();
+	std::size_t i = 0;
 	for (auto& collectionItem : collectionItems) // placing according to the scrollbar
+	{
+		collectionItem.updateInfo(m_app.getCollectionManager().getCollection(i++));
 		collectionItem.reposition(yCurrentScroll, scrollBarIsVisible);
+	}
 
-	if (collectionItems.size() == 0)
-		ShowWindow(stEmpty.hWnd(), SW_SHOW);
-
-	InvalidateRect(hWnd(), NULL, FALSE);
+	InvalidateRect(hWnd(), nullptr, FALSE);
 }
 
 void MainWindow::destroyCollectionItems()

@@ -6,7 +6,7 @@
 #include "Timer.h"
 #include "Player.h"
 
-WallpaperManager::WallpaperManager(const WinUtils& winUtils, const Settings& settings, CollectionManager& collectionManager, Timer& timer) :
+WallpaperManager::WallpaperManager(const WinUtils& winUtils, const Settings& settings, const CollectionManager& collectionManager, Timer& timer) :
 	m_winUtils(winUtils),
 	m_settings(settings),
 	m_collectionManager(collectionManager),

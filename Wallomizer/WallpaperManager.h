@@ -13,7 +13,7 @@ class Timer;
 class WallpaperManager
 {
 public:
-	WallpaperManager(const WinUtils& winUtils, const Settings& settings, CollectionManager& collectionManager, Timer& timer);
+	WallpaperManager(const WinUtils& winUtils, const Settings& settings, const CollectionManager& collectionManager, Timer& timer);
 	WallpaperManager(const WallpaperManager&) = delete;
 	WallpaperManager& operator=(const WallpaperManager&) = delete;
 	WallpaperManager(WallpaperManager&&) = delete;
@@ -32,7 +32,7 @@ public:
 private:
 	const WinUtils& m_winUtils;
 	const Settings& m_settings;
-	CollectionManager& m_collectionManager;
+	const CollectionManager& m_collectionManager;
 	Timer& m_timer;
 
 	std::mutex m_imageModification;

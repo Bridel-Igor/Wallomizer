@@ -1,5 +1,7 @@
 #include "AddCollectionWindow.h"
 
+#include <memory>
+
 #include "Settings.h"
 #include "CollectionManager.h"
 #include "UserCollection.h"
@@ -41,39 +43,33 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 		if (btnAddUserCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			UserCollection* pCollection = new UserCollection(m_settings);
-			SetUserCollectionWindow setUserCollectionWindow(hWnd(), m_settings, *pCollection);
+			auto collection = std::make_unique<UserCollection>(m_settings);
+			SetUserCollectionWindow setUserCollectionWindow(hWnd(), m_settings, *collection);
 			setUserCollectionWindow.windowLoop();
-			if (pCollection->isValid())
-				m_collectionManager.addCollection(pCollection);
-			else
-				delete pCollection;
+			if (collection->isValid())
+				m_collectionManager.addCollection(std::move(collection));
 			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnAddLocalCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			LocalCollection* pCollection = new LocalCollection(m_collectionManager);
-			SetLocalCollectionWindow setLocalCollectionWindow(hWnd(), *pCollection);
+			auto collection = std::make_unique<LocalCollection>(m_collectionManager);
+			SetLocalCollectionWindow setLocalCollectionWindow(hWnd(), *collection);
 			setLocalCollectionWindow.windowLoop();
-			if (pCollection->isValid())
-				m_collectionManager.addCollection(pCollection);
-			else
-				delete pCollection;
+			if (collection->isValid())
+				m_collectionManager.addCollection(std::move(collection));
 			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnAddSearchCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			SearchCollection* pCollection = new SearchCollection(m_settings, m_collectionManager);
-			SetSearchCollectionWindow setSearchCollectionWindow(hWnd(), *pCollection);
+			auto collection = std::make_unique <SearchCollection>(m_settings, m_collectionManager);
+			SetSearchCollectionWindow setSearchCollectionWindow(hWnd(), *collection);
 			setSearchCollectionWindow.windowLoop();
-			if (pCollection->isValid())
-				m_collectionManager.addCollection(pCollection);
-			else
-				delete pCollection;
+			if (collection->isValid())
+				m_collectionManager.addCollection(std::move(collection));
 			DestroyWindow(hWnd());
 			return 0;
 		}

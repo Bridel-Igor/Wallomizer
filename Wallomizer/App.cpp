@@ -8,7 +8,7 @@ App::App() :
 	m_instanceGuard("Wallomizer"),
 	m_winUtils(),
 	m_settings(m_winUtils.getRoamingDir()),
-	m_collectionManager(*this),
+	m_collectionManager(m_winUtils, m_settings, m_wallpaperManager, m_timer),
 	m_wallpaperManager(m_winUtils, m_settings, m_collectionManager, m_timer),
 	m_timer(m_winUtils, m_settings, m_wallpaperManager)
 {
@@ -33,7 +33,7 @@ int App::run()
 
 	while (m_running)
 	{
-		if (m_collectionManager.getNumber() == 0)
+		if (m_collectionManager.getWallpaperCount() == 0)
 		{
 			if (!m_running)
 				break;

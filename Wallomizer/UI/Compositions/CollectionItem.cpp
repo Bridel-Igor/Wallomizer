@@ -4,6 +4,7 @@
 #include <CommCtrl.h>
 
 #include "resource.h"
+#include "BaseCollection.h"
 
 HICON CollectionItem::Resources::hIOptions, CollectionItem::Resources::hIOptionsHover, 
 	CollectionItem::Resources::hIDelete, CollectionItem::Resources::hIDeleteHover;
@@ -35,8 +36,8 @@ CollectionItem::Resources::~Resources()
 	DestroyIcon(hIOptionsHover);
 }
 
-CollectionItem::CollectionItem(IComponent* pParent, int _x, int _y, int _width, BaseCollection* pCollection, HFONT hFont)
-	: x(_x), y(_y), width(_width), m_pCollection(pCollection),
+CollectionItem::CollectionItem(IComponent* pParent, int _x, int _y, int _width, HFONT hFont)
+	: x(_x), y(_y), width(_width),
 	chboEnabled(pParent,			0, 0, 0, 0, 0, BS_NOTIFY | BS_OWNERDRAW),
 	stName(pParent, L"",			0, 0, 0, 0, 0),
 	purity(pParent,					0, 0, 0, 0),
@@ -47,18 +48,15 @@ CollectionItem::CollectionItem(IComponent* pParent, int _x, int _y, int _width, 
 	SendMessage(stName.hWnd(), WM_SETFONT, (LPARAM)hFont, TRUE);
 	SendMessage(stNumber.hWnd(), WM_SETFONT, (LPARAM)hFont, TRUE);
 	purity.enable(false);
-	updateInfo(m_pCollection);
 }
 
-void CollectionItem::updateInfo(BaseCollection* collection)
+void CollectionItem::updateInfo(BaseCollection& collection)
 {
-	if (collection == nullptr)
-		return;
-	purity.setPurity(collection->getCAP());
-	chboEnabled.setChecked(collection->isEnabled());
-	SetWindowTextW(stName.hWnd(), collection->getCollectionName().c_str());
+	purity.setPurity(collection.getCAP());
+	chboEnabled.setChecked(collection.isEnabled());
+	SetWindowTextW(stName.hWnd(), collection.getCollectionName().c_str());
 	char c[10];
-	_itoa_s(static_cast<std::uint32_t>(collection->getNumber()), c, 10);
+	_itoa_s(static_cast<std::uint32_t>(collection.getWallpaperCount()), c, 10);
 	c[9] = '\0';
 	SetWindowTextA(stNumber.hWnd(), c);
 }

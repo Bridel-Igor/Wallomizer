@@ -18,12 +18,6 @@ bool isImage(std::filesystem::path path)
 	return false;
 }
 
-LocalCollection::LocalCollection(CollectionManager& collectionManager) :
-	m_collectionManager(collectionManager)
-{
-	m_type = Collection::Type::local;
-}
-
 bool LocalCollection::saveSettings(BinaryWriter& file) const
 {
 	return file.write(m_type)
@@ -39,7 +33,8 @@ bool LocalCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersion
 	case 4U:
 		return file.read(m_isEnabled)
 			&& file.read(m_isRecursive)
-			&& file.read(m_path);
+			&& file.read(m_path)
+			&& isValid();
 
 	case 3U:
 	{
@@ -54,7 +49,7 @@ bool LocalCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersion
 			return false;
 		m_isRecursive = oldData.recursive;
 		m_path = oldData.path;
-		return true;
+		return isValid();
 	}
 
 	default: 
@@ -64,7 +59,7 @@ bool LocalCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersion
 
 void LocalCollection::update()
 {
-	m_number = 0;
+	m_wallpaperCount = 0;
 	if (!m_isEnabled)
 		return;
 
@@ -72,13 +67,13 @@ void LocalCollection::update()
 	{
 		for (auto& path : std::filesystem::recursive_directory_iterator(m_path))
 			if (isImage(path))
-				m_number++;
+				m_wallpaperCount++;
 	}
 	else
 	{
 		for (auto& path : std::filesystem::directory_iterator(m_path))
 			if (isImage(path))
-				m_number++;
+				m_wallpaperCount++;
 	}
 }
 
@@ -91,7 +86,7 @@ std::wstring LocalCollection::getCollectionName() const
 
 Wallpaper LocalCollection::getWallpaper(std::size_t index) const
 {
-	if (m_path.empty() || m_number == 0)
+	if (m_path.empty() || m_wallpaperCount == 0)
 		return Wallpaper::getEmptyWallpaper();
 
 	std::size_t current = 0;
@@ -139,5 +134,6 @@ void LocalCollection::openWallpaperExternal(std::filesystem::path sourcePath)
 
 bool LocalCollection::isValid() const
 {
-	return !m_path.empty();
+	return m_type == Collection::Type::local 
+		&& !m_path.empty();
 }

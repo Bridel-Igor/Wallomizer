@@ -1,40 +1,52 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <vector>
 #include <random>
 
-#include "CollectionTypes.h"
-
-class App;
+class WinUtils;
+class Settings;
+class WallpaperManager;
+class Timer;
 class Wallpaper;
 class BaseCollection;
 
 class CollectionManager
 {
 public:
-	CollectionManager(App& app);
+	CollectionManager(const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager, Timer& timer);
+	CollectionManager(const CollectionManager&) = delete;
+	CollectionManager& operator=(const CollectionManager&) = delete;
+	CollectionManager(CollectionManager&&) = delete;
+	CollectionManager& operator=(CollectionManager&&) = delete;
 	~CollectionManager();
 
 	bool saveSettings() const;
 	bool loadSettings();
-	Wallpaper getWallpaper(std::uint32_t index) const;
-
-	void reloadSettings();
-	void clear();
-	void updateNumber();
-	void addCollection(BaseCollection* pCollection);
+	void recountWallpapers();
+	void addCollection(std::unique_ptr<BaseCollection> collection);
 	void eraseCollection(std::size_t index);
-	Wallpaper getRandomWallpaper();
-	std::uint32_t getNumber() const noexcept{ return m_number; }
+	void enableCollection(std::size_t index, bool enabled);
+
+	Wallpaper getWallpaper(std::size_t index) const;
+	Wallpaper getRandomWallpaper() const;
 	
-	std::vector<BaseCollection*> m_pCollections;
+	std::size_t getWallpaperCount() const noexcept					{ return m_wallpaperCount; }
+	BaseCollection& getCollection(std::size_t index)				{ return *m_collections.at(index); }
+	const BaseCollection& getCollection(std::size_t index) const	{ return *m_collections.at(index); }
+	std::size_t getCollectionCount() const noexcept					{ return m_collections.size(); }
 
 private:
 	static constexpr std::uint16_t FILE_VERSION = 4U;
 
-	App& m_app;
+	const WinUtils& m_winUtils;
+	const Settings& m_settings;
+	WallpaperManager& m_wallpaperManager;
+	Timer& m_timer;
 
-	std::uint32_t m_number = 0;
-	std::mt19937 m_randomGenerator;
-	std::uniform_int_distribution<int> m_uniformIntDistribution;
+	std::vector<std::unique_ptr<BaseCollection>> m_collections;
+	std::size_t m_wallpaperCount = 0;
+	mutable std::mt19937 m_randomGenerator;
 };

@@ -8,12 +8,6 @@
 #include "Internet.h"
 #include "BinaryIO.h"
 
-UserCollection::UserCollection(const Settings& settings) :
-	m_settings(settings)
-{
-	m_type = Collection::Type::user;
-}
-
 bool UserCollection::saveSettings(BinaryWriter& file) const
 {
 	return file.write(m_type)
@@ -33,7 +27,8 @@ bool UserCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersion)
 			&& file.read(settings.categoriesAndPurity)
 			&& file.read(settings.username)
 			&& file.read(settings.collectionID)
-			&& file.read(settings.collectionName);
+			&& file.read(settings.collectionName)
+			&& isValid();
 	case 3U:
 	case 2U:
 	{
@@ -54,7 +49,7 @@ bool UserCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersion)
 		settings.collectionID = oldData.wsCollectionID;
 		settings.collectionName = oldData.wsCollectionName;
 
-		return true;
+		return isValid();
 	}
 	default:
 		return false;
@@ -72,7 +67,7 @@ void UserCollection::update()
 	internet.DownloadToBuffer(url.c_str());
 	if (!internet.parse("meta"))
 		return;
-	if (!internet.parse("total", m_number, true))
+	if (!internet.parse("total", m_wallpaperCount, true))
 		return;
 }
 
@@ -190,6 +185,8 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 
 bool UserCollection::isValid() const
 {
-	return !settings.username.empty()
-		&& !settings.collectionID.empty();
+	return m_type == Collection::Type::user
+		&& !settings.username.empty()
+		&& !settings.collectionID.empty()
+		&& !settings.collectionName.empty();
 }

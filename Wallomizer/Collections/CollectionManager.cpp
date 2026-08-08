@@ -2,30 +2,32 @@
 
 #include <ctime>
 
-#include "App.h"
+#include "WinUtils.h"
+#include "Settings.h"
+#include "WallpaperManager.h"
+#include "Timer.h"
 #include "UserCollection.h"
 #include "LocalCollection.h"
 #include "SearchCollection.h"
 #include "BinaryIO.h"
 #include "Player.h"
 
-CollectionManager::CollectionManager(App& app) :
-	m_app(app)
+CollectionManager::CollectionManager(const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager, Timer& timer) :
+	m_winUtils(winUtils),
+	m_settings(settings),
+	m_wallpaperManager(wallpaperManager),
+	m_timer(timer),
+	m_randomGenerator(static_cast<std::mt19937::result_type>(time(nullptr)))
 {
-	m_randomGenerator = std::mt19937(static_cast<unsigned int>(time(0)));
-	m_uniformIntDistribution = std::uniform_int_distribution<int>(0, 0);
 	loadSettings();
 }
 
-CollectionManager::~CollectionManager()
-{
-	clear();
-}
+CollectionManager::~CollectionManager() = default;
 
 bool CollectionManager::saveSettings() const
 {
-	std::filesystem::path filePath = m_app.getWinUtils().getRoamingDir() / L"CollectionManager.dat";
-	const std::uint32_t collectionsCount = static_cast<std::uint32_t>(m_pCollections.size());
+	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"CollectionManager.dat";
+	const std::uint32_t collectionsCount = static_cast<std::uint32_t>(m_collections.size());
 
 	BinaryWriter file(filePath);
 	if (!file.isOpen()
@@ -33,8 +35,8 @@ bool CollectionManager::saveSettings() const
 		|| !file.write(collectionsCount))
 		return false;
 
-	for (auto pCollection : m_pCollections)
-		if (!pCollection->saveSettings(file))
+	for (const auto& collection : m_collections)
+		if (!collection->saveSettings(file))
 			return false;
 
 	return true;
@@ -42,10 +44,10 @@ bool CollectionManager::saveSettings() const
 
 bool CollectionManager::loadSettings()
 {
-	Timer::LoadingGuard loading = m_app.getTimer().loadingGuard();
-	Player::updateTimer(m_app.getTimer(), true);
+	Timer::LoadingGuard loading = m_timer.loadingGuard();
+	Player::updateTimer(m_timer, true);
 
-	std::filesystem::path filePath = m_app.getWinUtils().getRoamingDir() / L"CollectionManager.dat";
+	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"CollectionManager.dat";
 
 	BinaryReader file(filePath);
 	std::uint16_t fileVersion;
@@ -53,7 +55,8 @@ bool CollectionManager::loadSettings()
 		|| !file.read(fileVersion))
 		return false;
 
-	clear();
+	m_collections.clear();
+	recountWallpapers();
 
 	switch (fileVersion)
 	{
@@ -63,37 +66,40 @@ bool CollectionManager::loadSettings()
 		std::uint32_t collectionCount;
 		if (!file.read(collectionCount))
 			return false;
-		BaseCollection* pTmpCollection = nullptr;
+
 		for (std::uint32_t i = 0; i < collectionCount; i++)
 		{
-			pTmpCollection = nullptr;
 			Collection::Type collectionType;
 			if (!file.read(collectionType))
 				return false;
+
+			std::unique_ptr<BaseCollection> collection;
 			switch (collectionType)
 			{
 			case Collection::Type::local:
-				pTmpCollection = new LocalCollection(*this);
+				collection = std::make_unique<LocalCollection>(*this);
 				break;
+
 			case Collection::Type::user:
-				pTmpCollection = new UserCollection(m_app.getSettings());
+				collection = std::make_unique<UserCollection>(m_settings);
 				break;
+
 			case Collection::Type::search:
-				pTmpCollection = new SearchCollection(m_app.getSettings(), *this);
+				collection = std::make_unique<SearchCollection>(m_settings, *this);
 				break;
+
+			default:
+				return false;
 			}
-			if (pTmpCollection != nullptr)
+
+			if (collection->loadSettings(file, fileVersion))
 			{
-				if (pTmpCollection->loadSettings(file, fileVersion))
-				{
-					pTmpCollection->update();
-					m_pCollections.push_back(pTmpCollection);
-				}
-				else
-				{
-					delete pTmpCollection;
-				}
+				collection->update();
+				m_collections.push_back(std::move(collection));
 			}
+			else
+				return false;
+
 		}
 		break;
 	}
@@ -107,85 +113,70 @@ bool CollectionManager::loadSettings()
 	if (fileVersion != FILE_VERSION)
 		saveSettings();
 
-	updateNumber();
+	recountWallpapers();
 
-	// TODO: is any of these needed?
-	// seems like a code to open a main window if there are no collections in list
-	//if (m_app.getTimer().getStatus() == Timer::Status::playing)
-	//	m_app.getTimer().abortDelay();
-	// BUG: this thread runs faster than tray's thread
-	// if (m_uiNumber == 0 && TrayWindow::s_pTrayWindow && TrayWindow::s_pTrayWindow->isReady()) 
-	//	PostMessageA(TrayWindow::s_pTrayWindow->hWnd(), WM_COMMAND, (WPARAM)TrayWindow::s_pTrayWindow->btnSettings.hMenu(), NULL);
+	if (m_timer.getStatus() == Timer::Status::playing)
+		m_timer.abort();
+
 	return true;
 }
 
-Wallpaper CollectionManager::getWallpaper(std::uint32_t index) const
+void CollectionManager::recountWallpapers()
 {
-	std::int64_t current = index;
-	for (std::size_t i = 0; i < m_pCollections.size(); i++)
-	{
-		if (!m_pCollections[i]->isEnabled())
-			continue;
-		current -= m_pCollections[i]->getNumber();
-		if (current < 0)
-		{
-			if (m_pCollections[i] == nullptr || i >= m_pCollections.size() || m_pCollections[i]->getNumber() <= (current + m_pCollections[i]->getNumber()))
-				return Wallpaper::getEmptyWallpaper();
-			return m_pCollections[i]->getWallpaper(current + m_pCollections[i]->getNumber());
-		}
-	}
-	return Wallpaper::getEmptyWallpaper();
+	m_wallpaperCount = 0;
+	for (std::size_t i = 0; i < m_collections.size(); i++)
+		m_wallpaperCount += m_collections[i]->isEnabled() * static_cast<std::uint32_t>(m_collections[i]->getWallpaperCount());
 }
 
-void CollectionManager::reloadSettings()
+void CollectionManager::addCollection(std::unique_ptr<BaseCollection> collection)
 {
-	saveSettings();
-	loadSettings();
-	m_app.getWallpaperManager().deleteLoaded();
-	m_app.getTimer().repeat();
-	Player::updateTimer(m_app.getTimer(), true);
-}
-
-void CollectionManager::clear()
-{
-	for (auto pCollection : m_pCollections)
-		delete pCollection;
-	m_pCollections.clear();
-}
-
-void CollectionManager::updateNumber()
-{
-	m_number = 0;
-	for (std::size_t i = 0; i < m_pCollections.size(); i++)
-		m_number += m_pCollections[i]->isEnabled() * static_cast<std::uint32_t>(m_pCollections[i]->getNumber());
-	if (m_number>0)
-		m_uniformIntDistribution = std::uniform_int_distribution<int>(0, m_number-1);
-}
-
-void CollectionManager::addCollection(BaseCollection* pCollection)
-{
-	if (pCollection == nullptr)
+	if (!collection)
 		return;
-	m_pCollections.push_back(pCollection);
+	m_collections.push_back(std::move(collection));
 	saveSettings();
-	updateNumber();
+	recountWallpapers();
+	m_wallpaperManager.deleteLoaded();
 }
 
 void CollectionManager::eraseCollection(std::size_t index)
 {
-	if (m_pCollections[index]!=nullptr)
-		delete m_pCollections[index];
-	m_pCollections.erase(CollectionManager::m_pCollections.begin() + index);
+	if (index >= m_collections.size())
+		return;
+	m_collections.erase(m_collections.begin() + index);
+	recountWallpapers();
 	saveSettings();
-	updateNumber();
-	m_app.getWallpaperManager().deleteLoaded();
-	m_app.getTimer().abort();
+	m_wallpaperManager.deleteLoaded();
 }
 
-Wallpaper CollectionManager::getRandomWallpaper()
+void CollectionManager::enableCollection(std::size_t index, bool enabled)
 {
-	if (m_number <= 0)
+	if (index >= m_collections.size())
+		return;
+	m_collections.at(index)->enableCollection(enabled);
+	m_collections.at(index)->update();
+	recountWallpapers();
+	saveSettings();
+	m_wallpaperManager.deleteLoaded();
+}
+
+Wallpaper CollectionManager::getWallpaper(std::size_t index) const
+{
+	for (const auto& collection : m_collections)
+	{
+		if (!collection || !collection->isEnabled())
+			continue;
+		const std::size_t count = collection->getWallpaperCount();
+		if (index < count)
+			return collection->getWallpaper(index);
+		index -= count;
+	}
+	return Wallpaper::getEmptyWallpaper();
+}
+
+Wallpaper CollectionManager::getRandomWallpaper() const
+{
+	if (m_wallpaperCount == 0)
 		return Wallpaper(Collection::Type::none, L"");
-	const int randomFromAll = m_uniformIntDistribution(m_randomGenerator);
-	return getWallpaper(randomFromAll);
+	std::uniform_int_distribution<std::size_t> uniformIntDistribution(0, m_wallpaperCount - 1);
+	return getWallpaper(uniformIntDistribution(m_randomGenerator));
 }

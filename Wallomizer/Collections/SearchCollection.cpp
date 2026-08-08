@@ -11,13 +11,6 @@
 
 uint32_t SearchCollection::s_perPage = 64;
 
-SearchCollection::SearchCollection(const Settings& settings, CollectionManager& collectionManager) :
-	m_settings(settings),
-	m_collectionManager(collectionManager)
-{
-	m_type = Collection::Type::search;
-}
-
 bool SearchCollection::saveSettings(BinaryWriter& file) const
 {
 	return file.write(m_type)
@@ -39,7 +32,8 @@ bool SearchCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersio
 			&& file.read(settings.tag)
 			&& file.read(settings.resolution)
 			&& file.read(settings.ratio)
-			&& file.read(settings.color);
+			&& file.read(settings.color)
+			&& isValid();
 	case 3U:
 	case 2U:
 	{
@@ -60,7 +54,7 @@ bool SearchCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersio
 		settings.resolution = oldData.wsResolution;
 		settings.ratio = oldData.wsRatio;
 		settings.color = oldData.wsColor;
-		return true;
+		return isValid();
 	}
 	default:
 		return false;
@@ -85,7 +79,7 @@ void SearchCollection::update()
 		return;
 	s_perPage = wcstoul(wsPerPage, nullptr, 10);
 
-	if (!internet.parse("total", m_number, true))
+	if (!internet.parse("total", m_wallpaperCount, true))
 		return;
 }
 
@@ -205,5 +199,5 @@ void SearchCollection::openWallpaperExternal(std::wstring_view path)
 
 bool SearchCollection::isValid() const
 {
-	return true;
+	return m_type == Collection::Type::search;
 }

@@ -10,13 +10,19 @@ class WinUtils;
 class LocalCollection : public BaseCollection
 {
 public:
-	LocalCollection(CollectionManager& collectionManager);
+	LocalCollection(CollectionManager& collectionManager) :
+		BaseCollection(Collection::Type::local),
+		m_collectionManager(collectionManager)
+	{}
+	~LocalCollection() = default;
 
-	bool saveSettings(BinaryWriter& file) const;
-	bool loadSettings(BinaryReader& file, std::uint16_t fileVersion);
-	std::wstring getCollectionName() const;
-	CategoriesAndPurity getCAP() const noexcept { return 0; }
-	Wallpaper getWallpaper(std::size_t index) const;
+	bool saveSettings(BinaryWriter& file) const override;
+	bool loadSettings(BinaryReader& file, std::uint16_t fileVersion) override;
+	std::wstring getCollectionName() const override;
+	CategoriesAndPurity getCAP() const noexcept override { return 0; }
+	Wallpaper getWallpaper(std::size_t index) const override;
+	void update() override;
+	bool isValid() const override;
 
 	static bool loadWallpaper(std::filesystem::path sourcePath, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::filesystem::path sourcePath);
@@ -25,8 +31,6 @@ public:
 	void setPath(const std::filesystem::path& newPath) { m_path = newPath; }
 	bool isRecursive() const noexcept { return m_isRecursive; }
 	void setRecursive(bool value) noexcept { m_isRecursive = value; }
-	void update();
-	bool isValid() const;
 
 private:
 	CollectionManager& m_collectionManager;
