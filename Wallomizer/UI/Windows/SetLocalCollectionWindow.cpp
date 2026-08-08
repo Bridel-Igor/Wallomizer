@@ -4,8 +4,8 @@
 
 SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, LocalCollection& localCollection) :
 	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 120),
-	m_hCaller(hCaller),
 	m_localCollection(localCollection),
+	m_hCaller(hCaller),
 	stPath		(this, "Enter path to directory:",		10,		10,		390,	20),
 	edPath		(this, m_localCollection.getPath().c_str(),
 														10,		30,		360,	20),

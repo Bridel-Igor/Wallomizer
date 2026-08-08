@@ -18,12 +18,11 @@ public:
 	bool saveSettings() const;
 	bool loadSettings();
 	Wallpaper getWallpaper(std::uint32_t index) const;
-	void openMainWindow();
 
 	void reloadSettings();
 	void clear();
 	void updateNumber();
-	void addCollection(Collection::Type collectionType);
+	void addCollection(BaseCollection* pCollection);
 	void eraseCollection(std::size_t index);
 	Wallpaper getRandomWallpaper();
 	std::uint32_t getNumber() const noexcept{ return m_number; }

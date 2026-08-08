@@ -17,7 +17,6 @@ public:
 	std::wstring getCollectionName() const;
 	CategoriesAndPurity getCAP() const noexcept { return 0; }
 	Wallpaper getWallpaper(std::size_t index) const;
-	void openCollectionSettingsWindow(HWND hCaller);
 
 	static bool loadWallpaper(std::filesystem::path sourcePath, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::filesystem::path sourcePath);
@@ -27,6 +26,7 @@ public:
 	bool isRecursive() const noexcept { return m_isRecursive; }
 	void setRecursive(bool value) noexcept { m_isRecursive = value; }
 	void update();
+	bool isValid() const;
 
 private:
 	CollectionManager& m_collectionManager;

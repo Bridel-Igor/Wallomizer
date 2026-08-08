@@ -2,7 +2,7 @@
 
 #include "Settings.h"
 
-SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, Settings& settings, UserCollection& userCollection) :
+SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, const Settings& settings, UserCollection& userCollection) :
 	IWindow("User collection", "Set User Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
 	m_hCaller(hCaller),
 	m_settings(settings),

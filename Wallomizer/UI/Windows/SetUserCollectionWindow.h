@@ -12,7 +12,7 @@ class Settings;
 class SetUserCollectionWindow : public IWindow
 {
 public:
-	SetUserCollectionWindow(HWND hCaller, Settings& settings, UserCollection& userCollection);
+	SetUserCollectionWindow(HWND hCaller, const Settings& settings, UserCollection& userCollection);
 	~SetUserCollectionWindow();
 	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -20,9 +20,10 @@ public:
 	static constexpr int height = 130;
 
 private:
-	HWND m_hCaller;
-	Settings& m_settings;
+	const Settings& m_settings;
 	UserCollection& m_userCollection;
+
+	HWND m_hCaller;
 	Static stUsername, stCollectionID, stPurity;
 	Edit edUsername;
 	ComboBox cbCollections;

@@ -2,10 +2,13 @@
 
 #include <thread>
 
+#include "App.h"
 #include "AddCollectionWindow.h"
 #include "SettingsWindow.h"
 #include "TrayWindow.h"
-#include "App.h"
+#include "SetLocalCollectionWindow.h"
+#include "SetUserCollectionWindow.h"
+#include "SetSearchCollectionWindow.h"
 
 MainWindow* MainWindow::s_pMainWindow = nullptr;
 
@@ -67,7 +70,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (btnAdd.isClicked(wParam))
 		{
-			AddCollectionWindow addCollectionWindow(hWnd(), m_app.getCollectionManager());
+			AddCollectionWindow addCollectionWindow(hWnd(), m_app.getSettings(), m_app.getCollectionManager());
 			addCollectionWindow.windowLoop();
 			updateCollectionItems();
 			return 0;
@@ -86,7 +89,32 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (collectionItem.btnSettings.isClicked(wParam))
 			{
-				m_app.getCollectionManager().m_pCollections[i]->openCollectionSettingsWindow(hWnd());
+				BaseCollection* collection = m_app.getCollectionManager().m_pCollections[i];
+				if (collection == nullptr)
+					return 0;
+				switch (collection->getType())
+				{
+				case Collection::Type::local:
+				{
+					SetLocalCollectionWindow setLocalCollectionWindow(hWnd(), static_cast<LocalCollection&>(*collection));
+					setLocalCollectionWindow.windowLoop();
+					break;
+				}
+				case Collection::Type::user:
+				{
+					SetUserCollectionWindow setUserCollectionWindow(hWnd(), m_app.getSettings(), static_cast<UserCollection&>(*collection));
+					setUserCollectionWindow.windowLoop();
+					break;
+				}
+				case Collection::Type::search:
+				{
+					SetSearchCollectionWindow setSearchCollectionWindow(hWnd(), static_cast<SearchCollection&>(*collection));
+					setSearchCollectionWindow.windowLoop();
+					break;
+				}
+				default:
+					break;
+				}
 				updateCollectionItems();
 				return 0;
 			}
