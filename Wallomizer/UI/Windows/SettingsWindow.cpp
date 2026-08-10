@@ -181,9 +181,9 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 			}
 			
 			Internet internet;
-			wchar_t ws_apiKeyTestUrl[78] = L"https://wallhaven.cc/api/v1/settings?apikey=";
-			wcscat_s(ws_apiKeyTestUrl, newData.apiKey.c_str());
-			internet.DownloadToBuffer(ws_apiKeyTestUrl);
+			std::wstring apiKeyTestUrl = L"https://wallhaven.cc/api/v1/settings?apikey=";
+			apiKeyTestUrl += newData.apiKey;
+			internet.downloadToBuffer(apiKeyTestUrl);
 			if (internet.parse("error"))
 			{
 				MessageBoxA(nullptr, "Unknown API key!", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);

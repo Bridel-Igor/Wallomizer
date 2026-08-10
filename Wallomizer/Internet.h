@@ -1,9 +1,11 @@
 #pragma once
 
 #include <cstddef>
+#include <string>
+#include <string_view>
+#include <filesystem>
 
-#include <Windows.h>
-#include <WinInet.h>
+using InternetHandle = void*;
 
 class Internet
 {
@@ -15,17 +17,16 @@ public:
 	Internet& operator=(Internet&&) = delete;
 	~Internet();
 
-	bool DownloadToBuffer(const wchar_t* wsURL, DWORD bufferSize = BUFFER_SIZE_DEFAULT);
-	bool DownloadToFile(const wchar_t* wsURL, const wchar_t* wsPath);
-	bool parse(const char* sKey, bool bFromLastPos = false);
-	bool parse(const char* sKey, wchar_t* wsValue, bool bFromLastPos = false);
-	bool parse(const char* sKey, unsigned int& uValue, bool bFromLastPos = false);
-	bool parse(const char* sKey, std::size_t& uValue, bool bFromLastPos = false);
+	bool downloadToBuffer(const std::wstring& URL, std::size_t bufferSize = BUFFER_SIZE_DEFAULT);
+	bool downloadToFile(const std::wstring& URL, const std::filesystem::path& path);
+	bool parse(std::string_view key, bool fromLastPosition = false);
+	bool parse(std::string_view key, std::wstring& value, bool fromLastPos = false);
+	bool parse(std::string_view key, std::size_t& value, bool fromLastPos = false);
 
 private:
-	static constexpr DWORD BUFFER_SIZE_DEFAULT = 32768;
+	static constexpr std::size_t BUFFER_SIZE_DEFAULT = 32768;
 
-	HINTERNET m_hInternetSession = nullptr;
-	char *m_pBuffer = nullptr, *m_pCurrent = nullptr;
-	DWORD m_currentBufferSize = 0;
+	InternetHandle m_hInternetSession = nullptr;
+	std::string m_buffer;
+	std::size_t m_currentPosition = 0;
 };

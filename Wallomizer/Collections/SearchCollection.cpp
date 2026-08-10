@@ -9,7 +9,7 @@
 #include "Internet.h"
 #include "BinaryIO.h"
 
-uint32_t SearchCollection::s_perPage = 64;
+std::size_t SearchCollection::s_perPage = 64;
 
 bool SearchCollection::saveSettings(BinaryWriter& file) const
 {
@@ -63,24 +63,18 @@ bool SearchCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersio
 
 void SearchCollection::update()
 {
-	if (!m_isEnabled)
-		return;
-
-	std::wstring url = getURL();
-
+	m_wallpaperCount = 0;
 	Internet internet;
-	internet.DownloadToBuffer(url.c_str(), s_perPage * 750);
+	std::wstring perPage;
 
-	if (!internet.parse("meta"))
+	if (!m_isEnabled
+		|| !internet.downloadToBuffer(getURL(), s_perPage * 750)
+		|| !internet.parse("meta")
+		|| !internet.parse("per_page", perPage, true)
+		|| !internet.parse("total", m_wallpaperCount, true))
 		return;
 
-	wchar_t wsPerPage[4]{};
-	if (!internet.parse("per_page", wsPerPage, true))
-		return;
-	s_perPage = wcstoul(wsPerPage, nullptr, 10);
-
-	if (!internet.parse("total", m_wallpaperCount, true))
-		return;
+	s_perPage = std::stoull(perPage);
 }
 
 std::wstring SearchCollection::getURL() const
@@ -142,59 +136,54 @@ CategoriesAndPurity SearchCollection::getCAP() const
 
 Wallpaper SearchCollection::getWallpaper(std::size_t index) const
 {
-	std::size_t page = index / s_perPage;
-	index -= page * s_perPage;
-	page++;
+	const std::size_t page = index / s_perPage + 1;
+	index %= s_perPage;
 
 	std::wstring url = getURL();
 	url += L"&page=";
 	url += std::to_wstring(page);
 
 	Internet internet;
-	internet.DownloadToBuffer(url.c_str(), s_perPage * 750);
-	for (unsigned int i = 0; i < index; i++)
+	if (!internet.downloadToBuffer(url, s_perPage * 750))
+		return Wallpaper::getEmptyWallpaper();
+
+	for (std::size_t i = 0; i < index; i++)
 		if (!internet.parse("path", true))
 			return Wallpaper::getEmptyWallpaper();
 
-	wchar_t wsPath[Collection::getMaxPathSize(Collection::Type::search) + 1] = {};
-	if (!internet.parse("path", wsPath, true))
+	std::wstring path;
+	if (!internet.parse("path", path, true))
 		return Wallpaper::getEmptyWallpaper();
 
-	internet.parse("meta", true);
-	wchar_t wsPerPage[4]{};
-	if (internet.parse("per_page", wsPerPage, true))
-		s_perPage = wcstoul(wsPerPage, nullptr, 10);
+	std::wstring perPage;
+	if (internet.parse("per_page", perPage, true))
+		s_perPage = std::stoull(perPage);
 
-	return Wallpaper(Collection::Type::search, wsPath);
+	return Wallpaper(Collection::Type::search, path);
 }
 
-bool SearchCollection::loadWallpaper(std::wstring_view path, const WinUtils& winUtils)
+bool SearchCollection::loadWallpaper(const std::wstring& url, const WinUtils& winUtils)
 {
-	std::filesystem::path loadedPath = winUtils.getRoamingDir() / L"Loaded wallpaper.dat";
 	Internet internet;
-	return internet.DownloadToFile(path.data(), loadedPath.c_str());
+	return internet.downloadToFile(url, winUtils.getRoamingDir() / L"Loaded wallpaper.dat");
 }
 
 void SearchCollection::openWallpaperExternal(std::wstring_view path)
 {
-	wchar_t wsImgUrl[255] = L"https://wallhaven.cc/w/";
-	bool isDashFound = false;
-	int j = (int)wcslen(wsImgUrl);
-	for (int i = 0; path.data()[i]; i++)
-	{
-		if (isDashFound)
-		{
-			if (path.data()[i] == '.')
-				break;
-			wsImgUrl[j] = path.data()[i];
-			j++;
-		}
-		if (path.data()[i] == '-')
-			isDashFound = true;
-	}
-	wsImgUrl[j] = '\0';
+	const std::size_t dash = path.find_last_of(L"-");
+	const std::size_t dot = path.find(L'.', dash);
 
-	ShellExecuteW(0, 0, wsImgUrl, 0, 0, SW_SHOW);
+	if (dash == std::wstring_view::npos
+		|| dot == std::wstring_view::npos
+		|| dash + 1 >= dot)
+		return;
+
+	const std::wstring_view id = path.substr(dash + 1, dot - dash - 1);
+
+	std::wstring url = L"https://wallhaven.cc/w/";
+	url += id;
+
+	ShellExecuteW(nullptr, nullptr, url.c_str(), nullptr, nullptr, SW_SHOW);
 }
 
 bool SearchCollection::isValid() const

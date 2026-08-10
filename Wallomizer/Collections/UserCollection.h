@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 
 #include "BaseCollection.h"
 #include "CategoriesAndPurityComponents.h"
@@ -14,17 +13,17 @@ class UserCollection : public BaseCollection
 public:
 	struct UserCollectionInfo
 	{
-		std::uint32_t id;
-		wchar_t wsLabel[64];
+		std::size_t id;
+		std::wstring label;
 	};
 
 private:
 	struct UserCollectionSettings
 	{
 		CategoriesAndPurity categoriesAndPurity = CAP::puritySFW;
-		std::wstring username = L"";
-		std::wstring collectionID = L"";
-		std::wstring collectionName = L"";
+		std::wstring username;
+		std::wstring collectionID;
+		std::wstring collectionName;
 	};
 
 public:
@@ -42,7 +41,7 @@ public:
 	void update() override;
 	bool isValid() const override;
 
-	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);
+	static bool loadWallpaper(const std::wstring& url, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::wstring_view path);
 	static void loadCollectionList(std::list<UserCollectionInfo>& list, const std::wstring& username, const std::wstring& apiKey);
 
@@ -52,5 +51,5 @@ private:
 	std::wstring getURL() const;
 
 	const Settings& m_settings;
-	static constexpr std::uint32_t s_perPage = 24;
+	static constexpr std::size_t s_perPage = 24;
 };

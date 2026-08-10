@@ -58,16 +58,13 @@ bool UserCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersion)
 
 void UserCollection::update()
 {
-	if (!m_isEnabled)
-		return;
-
-	// Getting the META
-	std::wstring url = getURL();
+	m_wallpaperCount = 0;
 	Internet internet;
-	internet.DownloadToBuffer(url.c_str());
-	if (!internet.parse("meta"))
-		return;
-	if (!internet.parse("total", m_wallpaperCount, true))
+
+	if (!m_isEnabled
+		|| !internet.downloadToBuffer(getURL())
+		|| !internet.parse("meta")
+		|| !internet.parse("total", m_wallpaperCount, true))
 		return;
 }
 
@@ -110,54 +107,50 @@ CategoriesAndPurity UserCollection::getCAP() const
 
 Wallpaper UserCollection::getWallpaper(std::size_t index) const
 {
-	std::size_t page = index / s_perPage;
-	index -= page * s_perPage;
-	page++;
+	const std::size_t page = index / s_perPage + 1;
+	index %= s_perPage;
 
 	std::wstring url = getURL();
 	url += L"&page=";
 	url += std::to_wstring(page);
 
 	Internet internet;
-	internet.DownloadToBuffer(url.c_str());
+	if (!internet.downloadToBuffer(url))
+		return Wallpaper::getEmptyWallpaper();
+
 	for (unsigned int i = 0; i < index; i++)
 		if (!internet.parse("path", true))
 			return Wallpaper::getEmptyWallpaper();
 
-	wchar_t wsPath[Collection::getMaxPathSize(Collection::Type::user) + 1] = {};
-	if (!internet.parse("path", wsPath, true))
+	std::wstring path;
+	if (!internet.parse("path", path, true))
 		return Wallpaper::getEmptyWallpaper();
 
-	return Wallpaper(Collection::Type::user, wsPath);
+	return Wallpaper(Collection::Type::user, path);
 }
 
-bool UserCollection::loadWallpaper(std::wstring_view path, const WinUtils& winUtils)
+bool UserCollection::loadWallpaper(const std::wstring& url, const WinUtils& winUtils)
 {
-	std::filesystem::path loadedPath = winUtils.getRoamingDir() / L"Loaded wallpaper.dat";
 	Internet internet;
-	return internet.DownloadToFile(path.data(), loadedPath.c_str());
+	return internet.downloadToFile(url, winUtils.getRoamingDir() / L"Loaded wallpaper.dat");
 }
 
 void UserCollection::openWallpaperExternal(std::wstring_view path)
 {
-	wchar_t wsImgUrl[255] = L"https://wallhaven.cc/w/";
-	bool isDashFound = false;
-	int j = (int)wcslen(wsImgUrl);
-	for (int i = 0; path.data()[i]; i++)
-	{
-		if (isDashFound)
-		{
-			if (path.data()[i] == '.')
-				break;
-			wsImgUrl[j] = path.data()[i];
-			j++;
-		}
-		if (path.data()[i] == '-')
-			isDashFound = true;
-	}
-	wsImgUrl[j] = '\0';
+	const std::size_t dash = path.find_last_of(L"-");
+	const std::size_t dot = path.find(L'.', dash);
 
-	ShellExecuteW(0, 0, wsImgUrl, 0, 0, SW_SHOW);
+	if (dash == std::wstring_view::npos 
+		|| dot == std::wstring_view::npos
+		|| dash + 1 >= dot)
+		return;
+
+	const std::wstring_view id = path.substr(dash + 1, dot - dash - 1);
+
+	std::wstring url = L"https://wallhaven.cc/w/";
+	url += id;
+
+	ShellExecuteW(nullptr, nullptr, url.c_str(), nullptr, nullptr, SW_SHOW);
 }
 
 void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, const std::wstring& username, const std::wstring& apiKey)
@@ -171,13 +164,14 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 	}
 
 	Internet internet;
-	internet.DownloadToBuffer(url.c_str());
+	if (!internet.downloadToBuffer(url))
+		return;
+
 	UserCollectionInfo uci;
 	while (true)
 	{
-		if (!internet.parse("id", uci.id, true))
-			break;
-		if (!internet.parse("label", uci.wsLabel, true))
+		if (!internet.parse("id", uci.id, true)
+			|| !internet.parse("label", uci.label, true))
 			break;
 		list.push_back(uci);
 	}

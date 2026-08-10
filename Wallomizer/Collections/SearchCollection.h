@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 
 #include "BaseCollection.h"
 #include "CategoriesAndPurityComponents.h"
@@ -16,10 +15,10 @@ private:
 	struct SearchCollectionSettings
 	{
 		CategoriesAndPurity categoriesAndPurity = CAP::categoryGeneral | CAP::categoryAnime | CAP::categoryPeople | CAP::puritySFW;
-		std::wstring tag = L"";
-		std::wstring resolution = L"";
-		std::wstring ratio = L"";
-		std::wstring color = L"";
+		std::wstring tag;
+		std::wstring resolution;
+		std::wstring ratio;
+		std::wstring color;
 	};
 
 public:
@@ -38,7 +37,7 @@ public:
 	void update() override;
 	bool isValid() const override;
 
-	static bool loadWallpaper(std::wstring_view path, const WinUtils& winUtils);
+	static bool loadWallpaper(const std::wstring& url, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::wstring_view path);
 
 	SearchCollectionSettings settings;
@@ -49,5 +48,5 @@ private:
 	CollectionManager& m_collectionManager;
 	const Settings& m_settings;
 
-	static std::uint32_t s_perPage;
+	static std::size_t s_perPage;
 };

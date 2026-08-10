@@ -36,10 +36,10 @@ SetUserCollectionWindow::SetUserCollectionWindow(HWND hCaller, const Settings& s
 		uciList.clear();
 		UserCollection::UserCollectionInfo info;
 		info.id = _wtoi(m_userCollection.settings.collectionID.c_str());
-		wcscpy_s(info.wsLabel, m_userCollection.settings.collectionName.c_str());
+		info.label = m_userCollection.settings.collectionName;
 		uciList.push_back(info);
 		SendMessageA(cbCollections.hWnd(), CB_RESETCONTENT, NULL, NULL);
-		SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)uciList.begin()->wsLabel);
+		SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)uciList.begin()->label.c_str());
 		SendMessageA(cbCollections.hWnd(), CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 		validCollection = true;
 	}
@@ -85,12 +85,12 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 		}
 		if ((HWND)lParam == cbCollections.hWnd() && HIWORD(wParam) == CBN_DROPDOWN)
 		{
-			wchar_t prevName[64] = {0};
+			std::wstring prevName;
 			if (!uciList.empty() && validCollection)
 			{
 				auto uci = uciList.begin();
 				std::advance(uci, cbCollections.getSelectedItem());
-				wcscpy_s(prevName, uci->wsLabel);
+				prevName = uci->label;
 			}
 
 			validCollection = false;
@@ -110,12 +110,12 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 				return 0;
 			}
 			for (const auto& item : uciList)
-				SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)item.wsLabel);
+				SendMessageW(cbCollections.hWnd(), CB_ADDSTRING, NULL, (LPARAM)item.label.c_str());
 
 			int index = 0;
-			if (prevName[0])
+			if (!prevName.empty())
 			{
-				index = (int)SendMessageW(cbCollections.hWnd(), CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)prevName);
+				index = (int)SendMessageW(cbCollections.hWnd(), CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)prevName.c_str());
 				if (index == CB_ERR)
 					index = 0;
 			}
@@ -134,7 +134,7 @@ LRESULT SetUserCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, L
 
 			auto uci = uciList.begin();
 			std::advance(uci, cbCollections.getSelectedItem());
-			m_userCollection.settings.collectionName = uci->wsLabel;
+			m_userCollection.settings.collectionName = uci->label;
 			m_userCollection.settings.collectionID = std::to_wstring(uci->id);
 
 			wchar_t username[64];
