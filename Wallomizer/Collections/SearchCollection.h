@@ -23,7 +23,7 @@ private:
 
 public:
 	SearchCollection(const Settings& settings, CollectionManager& collectionManager) :
-		BaseCollection(Collection::Type::search),
+		BaseCollection(CollectionType::search),
 		m_settings(settings),
 		m_collectionManager(collectionManager)
 	{}

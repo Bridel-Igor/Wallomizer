@@ -34,7 +34,7 @@ bool Timer::loadSession()
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
 	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
 
-	Collection::Type type;
+	CollectionType type;
 	std::wstring path;
 
 	BinaryReader file(filePath);

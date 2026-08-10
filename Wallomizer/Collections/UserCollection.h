@@ -28,7 +28,7 @@ private:
 
 public:
 	UserCollection(const Settings& settings) :
-		BaseCollection(Collection::Type::user),
+		BaseCollection(CollectionType::user),
 		m_settings(settings)
 	{}
 	~UserCollection() = default;

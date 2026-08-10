@@ -159,7 +159,7 @@ Wallpaper SearchCollection::getWallpaper(std::size_t index) const
 	if (internet.parse("per_page", perPage, true))
 		s_perPage = std::stoull(perPage);
 
-	return Wallpaper(Collection::Type::search, path);
+	return Wallpaper(CollectionType::search, path);
 }
 
 bool SearchCollection::loadWallpaper(const std::wstring& url, const WinUtils& winUtils)
@@ -188,5 +188,5 @@ void SearchCollection::openWallpaperExternal(std::wstring_view path)
 
 bool SearchCollection::isValid() const
 {
-	return m_type == Collection::Type::search;
+	return m_type == CollectionType::search;
 }

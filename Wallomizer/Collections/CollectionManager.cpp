@@ -69,22 +69,22 @@ bool CollectionManager::loadSettings()
 
 		for (std::uint32_t i = 0; i < collectionCount; i++)
 		{
-			Collection::Type collectionType;
+			CollectionType collectionType;
 			if (!file.read(collectionType))
 				return false;
 
 			std::unique_ptr<BaseCollection> collection;
 			switch (collectionType)
 			{
-			case Collection::Type::local:
+			case CollectionType::local:
 				collection = std::make_unique<LocalCollection>(*this);
 				break;
 
-			case Collection::Type::user:
+			case CollectionType::user:
 				collection = std::make_unique<UserCollection>(m_settings);
 				break;
 
-			case Collection::Type::search:
+			case CollectionType::search:
 				collection = std::make_unique<SearchCollection>(m_settings, *this);
 				break;
 
@@ -176,7 +176,7 @@ Wallpaper CollectionManager::getWallpaper(std::size_t index) const
 Wallpaper CollectionManager::getRandomWallpaper() const
 {
 	if (m_wallpaperCount == 0)
-		return Wallpaper(Collection::Type::none, L"");
+		return Wallpaper(CollectionType::none, L"");
 	std::uniform_int_distribution<std::size_t> uniformIntDistribution(0, m_wallpaperCount - 1);
 	return getWallpaper(uniformIntDistribution(m_randomGenerator));
 }

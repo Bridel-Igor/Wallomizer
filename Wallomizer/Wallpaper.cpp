@@ -8,13 +8,13 @@ bool Wallpaper::loadWallpaper(const WinUtils& winUtils) const
 {
 	switch (m_type)
 	{
-	case Collection::Type::local:
+	case CollectionType::local:
 		return LocalCollection::loadWallpaper(m_path, winUtils);
 
-	case Collection::Type::user:
+	case CollectionType::user:
 		return UserCollection::loadWallpaper(m_path, winUtils);
 
-	case Collection::Type::search:
+	case CollectionType::search:
 		return SearchCollection::loadWallpaper(m_path, winUtils);
 
 	default:
@@ -26,15 +26,15 @@ void Wallpaper::openExternally() const
 {
 	switch (m_type)
 	{
-	case Collection::Type::local:
+	case CollectionType::local:
 		LocalCollection::openWallpaperExternal(m_path);
 		break;
 
-	case Collection::Type::user:
+	case CollectionType::user:
 		UserCollection::openWallpaperExternal(m_path);
 		break;
 
-	case Collection::Type::search:
+	case CollectionType::search:
 		SearchCollection::openWallpaperExternal(m_path);
 		break;
 

@@ -92,19 +92,19 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				BaseCollection& collection = m_app.getCollectionManager().getCollection(i);
 				switch (collection.getType())
 				{
-				case Collection::Type::local:
+				case CollectionType::local:
 				{
 					SetLocalCollectionWindow setLocalCollectionWindow(hWnd(), static_cast<LocalCollection&>(collection));
 					setLocalCollectionWindow.windowLoop();
 					break;
 				}
-				case Collection::Type::user:
+				case CollectionType::user:
 				{
 					SetUserCollectionWindow setUserCollectionWindow(hWnd(), m_app.getSettings(), static_cast<UserCollection&>(collection));
 					setUserCollectionWindow.windowLoop();
 					break;
 				}
-				case Collection::Type::search:
+				case CollectionType::search:
 				{
 					SetSearchCollectionWindow setSearchCollectionWindow(hWnd(), static_cast<SearchCollection&>(collection));
 					setSearchCollectionWindow.windowLoop();

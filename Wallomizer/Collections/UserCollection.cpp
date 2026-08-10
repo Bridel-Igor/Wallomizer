@@ -126,7 +126,7 @@ Wallpaper UserCollection::getWallpaper(std::size_t index) const
 	if (!internet.parse("path", path, true))
 		return Wallpaper::getEmptyWallpaper();
 
-	return Wallpaper(Collection::Type::user, path);
+	return Wallpaper(CollectionType::user, path);
 }
 
 bool UserCollection::loadWallpaper(const std::wstring& url, const WinUtils& winUtils)
@@ -179,7 +179,7 @@ void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, con
 
 bool UserCollection::isValid() const
 {
-	return m_type == Collection::Type::user
+	return m_type == CollectionType::user
 		&& !settings.username.empty()
 		&& !settings.collectionID.empty()
 		&& !settings.collectionName.empty();

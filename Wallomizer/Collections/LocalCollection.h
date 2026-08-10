@@ -11,7 +11,7 @@ class LocalCollection : public BaseCollection
 {
 public:
 	LocalCollection(CollectionManager& collectionManager) :
-		BaseCollection(Collection::Type::local),
+		BaseCollection(CollectionType::local),
 		m_collectionManager(collectionManager)
 	{}
 	~LocalCollection() = default;

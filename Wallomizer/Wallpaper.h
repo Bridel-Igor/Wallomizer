@@ -11,7 +11,7 @@ class WinUtils;
 class Wallpaper
 {
 public:
-	explicit Wallpaper(Collection::Type type, std::wstring path) :
+	explicit Wallpaper(CollectionType type, std::wstring path) :
 		m_type(type),
 		m_path(path)
 	{}
@@ -21,14 +21,14 @@ public:
 	Wallpaper(Wallpaper&&) noexcept = default;
 	Wallpaper& operator=(Wallpaper&&) noexcept = default;
 
-	Collection::Type getType() const noexcept { return m_type; }
+	CollectionType getType() const noexcept { return m_type; }
 	const std::wstring& getPath() const noexcept { return m_path; }
 
 	bool loadWallpaper(const WinUtils& winUtils) const;
 	void openExternally() const;
-	static Wallpaper getEmptyWallpaper() { return Wallpaper(Collection::Type::none, L"" ); }
+	static Wallpaper getEmptyWallpaper() { return Wallpaper(CollectionType::none, L"" ); }
 
 private:
-	Collection::Type m_type = Collection::Type::none;
+	CollectionType m_type = CollectionType::none;
 	std::wstring m_path;
 };

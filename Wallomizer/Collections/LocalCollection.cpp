@@ -134,6 +134,6 @@ void LocalCollection::openWallpaperExternal(std::filesystem::path sourcePath)
 
 bool LocalCollection::isValid() const
 {
-	return m_type == Collection::Type::local 
+	return m_type == CollectionType::local 
 		&& !m_path.empty();
 }

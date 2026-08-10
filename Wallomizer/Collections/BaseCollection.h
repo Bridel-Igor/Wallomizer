@@ -14,7 +14,7 @@ class BinaryReader;
 class BaseCollection
 {
 public:
-	explicit BaseCollection(Collection::Type type) noexcept :
+	explicit BaseCollection(CollectionType type) noexcept :
 		m_type(type)
 	{}
 	BaseCollection(const BaseCollection&) = delete;
@@ -31,13 +31,13 @@ public:
 	virtual void update() = 0;
 	virtual bool isValid() const = 0;
 
-	Collection::Type getType() const noexcept		{ return m_type; }
+	CollectionType getType() const noexcept		{ return m_type; }
 	std::size_t getWallpaperCount() const noexcept	{ return m_wallpaperCount; }
 	bool isEnabled() const noexcept					{ return m_isEnabled; }
 	void enableCollection(bool isEnabled) noexcept	{ m_isEnabled = isEnabled; }
 
 protected:
-	const Collection::Type m_type = Collection::Type::none;
+	const CollectionType m_type = CollectionType::none;
 	std::uint8_t m_isEnabled = true;
 	std::size_t m_wallpaperCount = 0;
 };
