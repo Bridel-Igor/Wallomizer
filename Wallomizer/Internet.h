@@ -5,8 +5,6 @@
 #include <string_view>
 #include <filesystem>
 
-using InternetHandle = void*;
-
 class Internet
 {
 public:
@@ -26,7 +24,7 @@ public:
 private:
 	static constexpr std::size_t BUFFER_SIZE_DEFAULT = 32768;
 
-	InternetHandle m_hInternetSession = nullptr;
+	void* m_hInternetSession = nullptr;
 	std::string m_buffer;
 	std::size_t m_currentPosition = 0;
 };
