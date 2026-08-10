@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <atomic>
 
 class WinUtils;
 class Settings;
@@ -52,7 +53,7 @@ public:
 	void abort() noexcept { m_abort = true; }
 	void repeat() noexcept { m_repeat = true; }
 	Status getStatus() const noexcept { return m_status; }
-	unsigned long getRemainingTime() const noexcept;
+	std::uint32_t getRemainingTime() const noexcept;
 	LoadingGuard loadingGuard() { return LoadingGuard(*this); }
 	bool isLoading() const noexcept { return m_loading; }
 
@@ -61,11 +62,10 @@ private:
 	const Settings& m_settings;
 	WallpaperManager& m_wallpaperManager;
 
-	Status m_status = Status::playing;
 	std::mutex m_sessionFileAccess;
-
-	bool m_abort = false;
-	bool m_repeat = false;
-	unsigned long m_timePassed = 0;
-	bool m_loading = false;
+	std::atomic<Status> m_status = Status::playing;
+	std::atomic_bool m_abort = false;
+	std::atomic_bool m_repeat = false;
+	std::atomic<std::uint32_t> m_timePassed = 0;
+	std::atomic_bool m_loading = false;
 };

@@ -19,12 +19,14 @@ bool Timer::saveSession()
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
 	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
 
+	const Timer::Status status = m_status;
+	const std::uint32_t timePassed = m_timePassed;
 	const Wallpaper& wallpaper = m_wallpaperManager.getCurrentWallpaper();
 
 	BinaryWriter file(filePath);
 	return file.isOpen()
-		&& file.write(m_status)
-		&& file.write(m_timePassed)
+		&& file.write(status)
+		&& file.write(timePassed)
 		&& file.write(wallpaper.getType())
 		&& file.write(wallpaper.getPath());
 }
@@ -34,17 +36,21 @@ bool Timer::loadSession()
 	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
 	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
 
+	Timer::Status status;
+	std::uint32_t timePassed;
 	CollectionType type;
 	std::wstring path;
 
 	BinaryReader file(filePath);
 	if (!file.isOpen()
-		|| !file.read(m_status)
-		|| !file.read(m_timePassed)
+		|| !file.read(status)
+		|| !file.read(timePassed)
 		|| !file.read(type)
 		|| !file.read(path))
 		return false;
 		
+	m_status = status;
+	m_timePassed = timePassed;
 	Wallpaper loadedWallpaper(type, path);
 	m_wallpaperManager.setCurrentWallpaper(std::move(loadedWallpaper));
 	return true;
@@ -96,9 +102,9 @@ void Timer::stop() noexcept
 	saveSession();
 }
 
-unsigned long Timer::getRemainingTime() const noexcept
+std::uint32_t Timer::getRemainingTime() const noexcept
 {
-	const unsigned long delay = m_settings.getData().delay;
+	const std::uint32_t delay = m_settings.getData().delay;
 	return delay > m_timePassed ? 
 			delay - m_timePassed : 
 			0;

@@ -1,8 +1,7 @@
 #include "App.h"
 
-#include <thread>
-
 #include "TrayWindow.h"
+#include "UIThreadedWindow.h"
 
 App::App() :
 	m_instanceGuard("Wallomizer"),
@@ -16,41 +15,27 @@ App::App() :
 
 int App::run()
 {
-	// opening and processing UI in different thread
-	std::exception_ptr trayWindowException = nullptr;
-	std::thread trayWindowThread([this, &trayWindowException]()
-		{
-			try
-			{
-				TrayWindow trayWindow(*this);
-				trayWindow.windowLoop();
-			}
-			catch (...)
-			{
-				trayWindowException = std::current_exception();
-			}
-		});
+	UIThreadedWindow<TrayWindow> trayWindow(*this);
 
 	while (m_running)
 	{
 		if (m_collectionManager.getWallpaperCount() == 0)
 		{
-			if (!m_running)
-				break;
 			Sleep(100);
 			continue;
 		}
-		std::thread timerThread(&Timer::run, &m_timer);
-		m_wallpaperManager.loadNextWallpaper();
-		timerThread.join();
+
+		std::thread loaderThread(&WallpaperManager::loadNextWallpaper, &m_wallpaperManager);
+		m_timer.run();
+		loaderThread.join();
+
 		if (!m_running)
 			break;
+
 		m_wallpaperManager.setLoadedWallpaper();
 	}
 
-	trayWindowThread.join();
-	if (trayWindowException)
-		std::rethrow_exception(trayWindowException);
+	trayWindow.join();
 	return 0;
 }
 

@@ -1,11 +1,13 @@
 #pragma once
 
+#include <atomic>
+
 #include "InstanceGuard.h"
 #include "WinUtils.h"
-#include "Timer.h"
+#include "Settings.h"
 #include "CollectionManager.h"
 #include "WallpaperManager.h"
-#include "Settings.h"
+#include "Timer.h"
 
 /// Root application class responsible for managing the application lifecycle
 /// and owning all major subsystems.
@@ -37,5 +39,5 @@ private:
 	WallpaperManager m_wallpaperManager;
 	Timer m_timer;
 
-	bool m_running = true;
+	std::atomic_bool m_running = true;
 };
