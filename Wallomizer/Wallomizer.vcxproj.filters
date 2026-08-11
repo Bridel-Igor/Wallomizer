@@ -79,7 +79,7 @@
     <ClCompile Include="UI\Compositions\Player.cpp">
       <Filter>UI\Compositions</Filter>
     </ClCompile>
-    <ClCompile Include="UI\Interfaces\HMenuGenerator.cpp">
+    <ClCompile Include="UI\Interfaces\HMenuId.cpp">
       <Filter>UI\Interfaces</Filter>
     </ClCompile>
     <ClCompile Include="UI\Components\ComboBox.cpp">
@@ -93,9 +93,6 @@
     </ClCompile>
     <ClCompile Include="UI\Components\Button.cpp">
       <Filter>UI\Components\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="UI\Interfaces\IClickable.cpp">
-      <Filter>UI\Interfaces</Filter>
     </ClCompile>
     <ClCompile Include="UI\Interfaces\IHoverable.cpp">
       <Filter>UI\Interfaces</Filter>
@@ -231,7 +228,7 @@
     <ClInclude Include="UI\Compositions\CollectionItem.h">
       <Filter>UI\Compositions</Filter>
     </ClInclude>
-    <ClInclude Include="UI\Interfaces\HMenuGenerator.h">
+    <ClInclude Include="UI\Interfaces\HMenuId.h">
       <Filter>UI\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="InstanceGuard.h">
