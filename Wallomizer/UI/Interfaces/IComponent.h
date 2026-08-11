@@ -1,12 +1,11 @@
 #pragma once
 
 #include <Windows.h>
-#include <list>
 #include <functional>
+#include <vector>
 
-/// Interface, that should be derived by any visual WinAPI component directly or by deriving another Interface that derives it.
-/// Contains Handle to window. Handle can be used by numerous WinAPI functions.
-/// Handle lifetime needs to be controlled by derived component class.
+/// Base interface for visual WinAPI components.
+/// Provides a window handle and parent-child component hierarchy.
 class IComponent
 {
 public:
@@ -16,25 +15,28 @@ public:
 	IComponent& operator=(const IComponent&) = delete;
 	IComponent& operator=(IComponent&&) = delete;
 	
-	/// Method that traverses all children components recursively applying given operation.
+	/// Traverses all child components in depth-first order and applies the given operation.
 	/// 
-	/// @param operation - function that will be applied to every child component.
-	void traverseChildren(std::function<void(IComponent* pComponent)> operation);
-	/// @return Handle to window.
-	HWND hWnd() const { return m_hWnd; }
+	/// @param operation - Function applied to every child component.
+	void traverseChildren(const std::function<void(IComponent* pComponent)>& operation);
+
+	/// Returns the WinAPI window handle.
+	HWND hWnd() const noexcept { return m_hWnd; }
+
+protected:
+	/// Protected constructor to prevent direct instantiation.
+	/// 
+	/// @param pParent - pointer to parent component
+	explicit IComponent(IComponent* pParent);
+	virtual ~IComponent();
+
+	/// WinAPI window handle.
+	HWND m_hWnd = nullptr;
 
 	/// Pointer to parent component.
 	IComponent* m_pParent = nullptr;
-	/// List of children components.
-	std::list<IComponent*> m_pChildren;
 
-protected:
-	/// Protected constructor to prevent allocation of an interface object.
-	/// 
-	/// @param pParent - pointer to parent component
-	IComponent(IComponent* pParent);
-	virtual ~IComponent();
-
-	/// Handle to window
-	HWND m_hWnd = nullptr;
+private:
+	/// Child components.
+	std::vector<IComponent*> m_children;
 };

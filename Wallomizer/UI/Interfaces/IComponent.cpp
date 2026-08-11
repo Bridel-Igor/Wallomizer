@@ -1,41 +1,37 @@
 #include "IComponent.h"
 
+#include <algorithm>
 #include <stack>
 
 IComponent::IComponent(IComponent* pParent) :
 	m_pParent(pParent)
 {
 	if (m_pParent)
-		m_pParent->m_pChildren.push_back(this);
+		m_pParent->m_children.push_back(this);
 }
 
 IComponent::~IComponent()
 {
 	if (m_pParent)
-		m_pParent->m_pChildren.remove(this);
-	m_pChildren.clear();
+	{
+		auto it = std::find(m_pParent->m_children.begin(), m_pParent->m_children.end(), this);
+		m_pParent->m_children.erase(it);
+	}
 }
 
-void IComponent::traverseChildren(std::function<void(IComponent* pComponent)> operation)
+void IComponent::traverseChildren(const std::function<void(IComponent* pComponent)>& operation)
 {
-	std::stack<std::pair<std::list<IComponent*>::iterator, std::list<IComponent*>::iterator>> depth;
-	depth.push(std::make_pair(this->m_pChildren.begin(), this->m_pChildren.end()));
-	bool popped = false;
-	do
+	std::stack<IComponent*> depth;
+	for (IComponent* child : m_children)
+		depth.push(child);
+	while (!depth.empty())
 	{
-		while (popped == false && (*depth.top().first)->m_pChildren.size())
-			depth.push(std::make_pair((*depth.top().first)->m_pChildren.begin(), (*depth.top().first)->m_pChildren.end()));
+		IComponent* component = depth.top();
+		depth.pop();
 
-		operation(*depth.top().first);
+		operation(component);
 
-		depth.top().first++;
-		popped = false;
-		while (depth.top().first == depth.top().second)
-		{
-			depth.pop();
-			popped = true;
-			if (depth.empty())
-				break;
-		}
-	} while (depth.size());
+		for (IComponent* child : component->m_children)
+			depth.push(child);
+	}
 }
