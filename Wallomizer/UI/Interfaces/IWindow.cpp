@@ -142,7 +142,7 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 			{
 				IHoverable* pHoverable = nullptr;
 				if ((pHoverable = dynamic_cast<IHoverable*>(pComponent)) != nullptr)
-					pHoverable->mouseHovering(wParam);
+					pHoverable->handleMouseHover(wParam);
 			});
 			// Fallthrough. Don't return as defWindowProc must be executed anyway.
 		}

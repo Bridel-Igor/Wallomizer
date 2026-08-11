@@ -2,27 +2,27 @@
 
 #include "IClickable.h"
 
-/// Interface that derrives IClickable interface.
-/// Needs to be derived by copmonent classes that will recieve mouse hovering and click messages from WinAPI.
-/// Provides methods that react to mouseHovering messages.
+/// Interface for components that react to mouse hovering.
+/// Provides hover state and invalidates the component when the state changes.
 class IHoverable : public IClickable
 {
 public:
-	/// Method that reacts to mouse hovering notifications.
-	/// Should be called in reaction to WM_SETCURSOR message.
-	/// If mouse hovering status has changed initiates redraw of component.
-	/// 
-	/// @param wParam - WPARAM value that was recieved with WM_SETCURSOR message
-	void mouseHovering(WPARAM wParam);
+	/// Updates the mouse hovering state.
+	/// Should be called in response to WM_SETCURSOR.
+	///
+	/// @param wParam - WPARAM received with WM_SETCURSOR.
+	void handleMouseHover(WPARAM wParam) noexcept;
 
 protected:
-	/// Protected constructor to prevent allocation of an interface object.
+	/// Protected constructor to prevent direct instantiation.
 	/// 
 	/// @param pParent - pointer to parent component
-	IHoverable(IComponent* pParent) : IClickable(pParent) {}
+	explicit IHoverable(IComponent* pParent) : 
+		IClickable(pParent) 
+	{}
 
-	/// Indicates mouse hovering status.
-	/// Changed by the mouseHovering method.
-	/// Used by draw method of components.
+	~IHoverable() = default;
+
+	/// Indicates whether the mouse is currently over the component.
 	bool m_hovering = false;
 };

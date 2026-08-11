@@ -10,7 +10,7 @@
 /// Return TRUE from function that handles WinAPI messages if component is drawn.
 /// To check for click event you should check result of isClicked method when WM_COMMAND message recieved.
 /// After click event processed you should return 0 from function that handles WinAPI messages.
-/// To process hovering events you should call mouseHovering method in response to WM_SETCURSOR message.
+/// To process hovering events you should call handleMouseHover method in response to WM_SETCURSOR message.
 class ColorButton : public IHoverable
 {
 private:
