@@ -160,7 +160,6 @@
     <ClCompile Include="InstanceGuard.cpp" />
     <ClCompile Include="UI\Components\ColorPickerButton.cpp" />
     <ClCompile Include="UI\Components\Panel.cpp" />
-    <ClCompile Include="UI\Interfaces\IClickable.cpp" />
     <ClCompile Include="UI\Interfaces\IComponent.cpp" />
     <ClCompile Include="UI\Interfaces\IHoverable.cpp" />
     <ClCompile Include="UI\Interfaces\IWindow.cpp" />
@@ -178,7 +177,7 @@
     <ClCompile Include="UI\Components\Edit.cpp" />
     <ClCompile Include="UI\Components\IconButton.cpp" />
     <ClCompile Include="Collections\LocalCollection.cpp" />
-    <ClCompile Include="UI\Interfaces\HMenuGenerator.cpp" />
+    <ClCompile Include="UI\Interfaces\HMenuId.cpp" />
     <ClCompile Include="UI\Compositions\Player.cpp" />
     <ClCompile Include="UI\Components\PushButton.cpp" />
     <ClCompile Include="UI\Windows\ResPickerWindow.cpp" />
@@ -226,7 +225,7 @@
     <ClInclude Include="UI\Interfaces\IHoverable.h" />
     <ClInclude Include="Collections\LocalCollection.h" />
     <ClInclude Include="UI\Components\Edit.h" />
-    <ClInclude Include="UI\Interfaces\HMenuGenerator.h" />
+    <ClInclude Include="UI\Interfaces\HMenuId.h" />
     <ClInclude Include="Internet.h" />
     <ClInclude Include="UI\Compositions\Player.h" />
     <ClInclude Include="UI\Components\PushButton.h" />

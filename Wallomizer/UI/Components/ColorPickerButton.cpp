@@ -8,7 +8,7 @@ ColorPickerButton::ColorPickerButton(IComponent* pParent, COLORREF color, int x,
 	IHoverable(pParent),
 	m_color(color)
 {
-	m_hWnd = CreateWindowExA(NULL, TEXT("Button"), "", WS_CHILD | WS_VISIBLE | BS_OWNERDRAW, x, y, width, height, m_pParent->hWnd(), m_hMenu, NULL, NULL);
+	m_hWnd = CreateWindowExA(NULL, TEXT("Button"), "", WS_CHILD | WS_VISIBLE | BS_OWNERDRAW, x, y, width, height, m_pParent->hWnd(), hMenu(), NULL, NULL);
 }
 
 ColorPickerButton::~ColorPickerButton()

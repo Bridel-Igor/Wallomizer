@@ -5,7 +5,7 @@
 IconButton::IconButton(IComponent* pParent, int x, int y, int width, int height, HICON& hIcon, HICON& hIconHovered, const char* toolTip, DWORD additionalStyles, DWORD additionalExStyles) :
 	IHoverable(pParent)
 {
-	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), TEXT(""), WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, m_pParent->hWnd(), m_hMenu, NULL, NULL);
+	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), TEXT(""), WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, m_pParent->hWnd(), hMenu(), NULL, NULL);
 	m_hIcon = hIcon;
 	m_hIconHovered = hIconHovered;
 
