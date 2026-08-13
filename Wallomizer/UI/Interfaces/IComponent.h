@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <functional>
 #include <vector>
+#include <string>
 
 /// Base interface for visual WinAPI components.
 /// Provides a window handle and parent-child component hierarchy.
@@ -23,11 +24,25 @@ public:
 	/// Returns the WinAPI window handle.
 	HWND hWnd() const noexcept { return m_hWnd; }
 
+	/// Sets the font used to draw the component's text.
+	/// The component does not take ownership of the font.
+	/// The caller must ensure that the font remains valid while it is used by the component.
+	///
+	/// @param hFont - handle to the font. Ignored if nullptr.
+	void setFont(HFONT hFont) noexcept;
+
+	void setText(const std::string& text) noexcept;
+	void setText(const std::wstring& text) noexcept;
+
+	std::string textA() const;
+	std::wstring textW() const;
+
 protected:
 	/// Protected constructor to prevent direct instantiation.
 	/// 
 	/// @param pParent - pointer to parent component
 	explicit IComponent(IComponent* pParent);
+
 	virtual ~IComponent();
 
 	/// WinAPI window handle.
