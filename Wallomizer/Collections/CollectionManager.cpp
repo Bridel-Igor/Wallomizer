@@ -105,7 +105,7 @@ bool CollectionManager::loadSettings()
 	}
 	default:
 	{
-		MessageBox(NULL, "Incompatible collection list file. Collection list was reset.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+		MessageBox(nullptr, "Incompatible collection list file. Collection list was reset.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 		break;
 	}
 	}

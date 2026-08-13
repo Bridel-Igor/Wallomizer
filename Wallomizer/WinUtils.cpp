@@ -2,7 +2,7 @@
 
 #include <shlobj.h>
 #include <Windows.h>
-#include <exception>
+#include <stdexcept>
 #include <vector>
 #include <wrl/client.h>
 
@@ -41,7 +41,7 @@ WinUtils::WinUtils()
 	PWSTR tmp_path = nullptr;
 	const HRESULT result = SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &tmp_path);
 	if (FAILED(result))
-		throw std::exception("Can't get AppData/Roaming path.");
+		throw std::runtime_error("Can't get AppData/Roaming path.");
 
 	m_roamingPath = std::filesystem::path(tmp_path) / L"Wallomizer";
 
@@ -71,7 +71,7 @@ void WinUtils::flipWallpaperStyle() const
 		const BYTE fill[3] = "10";
 		TCHAR style[32] = "";
 		DWORD size = sizeof(style);
-		LSTATUS resultQuery = RegQueryValueExA(hKey, "WallpaperStyle", 0, NULL, (LPBYTE)style, &size);
+		LSTATUS resultQuery = RegQueryValueExA(hKey, "WallpaperStyle", 0, nullptr, (LPBYTE)style, &size);
 		RegSetValueExA(hKey, "WallpaperStyle", 0, REG_SZ, (LPBYTE)((resultQuery != ERROR_SUCCESS) || (style[0] != fit[0])) ? fit : fill, 3);
 		RegCloseKey(hKey);
 	}

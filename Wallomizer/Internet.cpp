@@ -10,7 +10,7 @@
 
 Internet::Internet()
 {
-	m_hInternetSession = InternetOpenA("Wallomizer", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	m_hInternetSession = InternetOpenA("Wallomizer", INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, 0);
 }
 
 Internet::~Internet()
