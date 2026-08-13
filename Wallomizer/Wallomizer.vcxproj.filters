@@ -267,6 +267,9 @@
     <ClInclude Include="UI\UIThreadedWindow.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="UI\UIColor.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="UI\Icons\Prev_disabled.ico">
