@@ -9,13 +9,13 @@ class PurityComponent
 {
 public:
 	PurityComponent(IComponent* pParent, int x, int y, int width, int height);
-	~PurityComponent() {}
-	void setPurity(CategoriesAndPurity cap);
-	CategoriesAndPurity getPurity() const;	
-	bool draw(LPDRAWITEMSTRUCT &pDIS);
-	bool click(WPARAM wParam);
-	void enable(bool enable);
-	void moveComponent(int x, int y, int width, int height);
+	~PurityComponent() = default;
+	void setPurity(CategoriesAndPurity cap) noexcept;
+	[[nodiscard]] CategoriesAndPurity getPurity() const noexcept;
+	bool draw(LPDRAWITEMSTRUCT pDIS) const noexcept;
+	bool click(WPARAM wParam) noexcept;
+	void enable(bool enable) noexcept;
+	void moveComponent(int x, int y, int width, int height) noexcept;
 
 private:
 	PushButton pbSFW, pbSketchy, pbNSFW;
@@ -25,11 +25,11 @@ class CategoryComponent
 {
 public:
 	CategoryComponent(IComponent* pParent, int x, int y, int width, int height);
-	~CategoryComponent() {}
-	void setCategory(CategoriesAndPurity cap);
-	CategoriesAndPurity getCategory() const;
-	bool draw(LPDRAWITEMSTRUCT& pDIS);
-	bool click(WPARAM wParam);
+	~CategoryComponent() = default;
+	void setCategory(CategoriesAndPurity cap) noexcept;
+	[[nodiscard]] CategoriesAndPurity getCategory() const noexcept;
+	bool draw(LPDRAWITEMSTRUCT pDIS) const noexcept;
+	bool click(WPARAM wParam) noexcept;
 
 private:
 	PushButton pbGeneral, pbAnime, pbPeople;

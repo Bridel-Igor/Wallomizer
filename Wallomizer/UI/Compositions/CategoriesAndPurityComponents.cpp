@@ -4,44 +4,30 @@ PurityComponent::PurityComponent(IComponent* pParent, int x, int y, int width, i
 	pbSFW		(pParent, "SFW",		x,							y, width / 3 - 1,	height, 0, 0, RGB(85,150,85), RGB(55,88,55)),
 	pbSketchy	(pParent, "Sketchy",	x + width / 3,				y, width / 3,		height, 0, 0, RGB(150,150,85), RGB(88,88,55)),
 	pbNSFW		(pParent, "NSFW",		1 + x + (2 * width / 3),	y, width / 3 - 1,	height, 0, 0, RGB(150,85,85), RGB(88,55,55))
-{
-}
+{}
 
-void PurityComponent::setPurity(CategoriesAndPurity cap)
+void PurityComponent::setPurity(CategoriesAndPurity cap) noexcept
 {
 	pbSFW.check(cap & CAP::puritySFW);
 	pbSketchy.check(cap & CAP::puritySketchy);
 	pbNSFW.check(cap & CAP::purityNSFW);
 }
 
-CategoriesAndPurity PurityComponent::getPurity() const
+CategoriesAndPurity PurityComponent::getPurity() const noexcept
 {
-	return	CAP::puritySFW * pbSFW.isChecked() |
-			CAP::puritySketchy * pbSketchy.isChecked() |
-			CAP::purityNSFW * pbNSFW.isChecked();
+	return CAP::puritySFW * pbSFW.isChecked()
+		| CAP::puritySketchy * pbSketchy.isChecked()
+		| CAP::purityNSFW * pbNSFW.isChecked();
 }
 
-bool PurityComponent::draw(LPDRAWITEMSTRUCT &pDIS)
+bool PurityComponent::draw(LPDRAWITEMSTRUCT pDIS) const noexcept
 {
-	if (pDIS->hwndItem == pbSFW.hWnd())
-	{
-		pbSFW.draw(pDIS);
-		return true;
-	}
-	if (pDIS->hwndItem == pbSketchy.hWnd())
-	{
-		pbSketchy.draw(pDIS);
-		return true;
-	}
-	if (pDIS->hwndItem == pbNSFW.hWnd())
-	{
-		pbNSFW.draw(pDIS);
-		return true;
-	}
-	return false;
+	return pbSFW.draw(pDIS)
+		|| pbSketchy.draw(pDIS)
+		|| pbNSFW.draw(pDIS);
 }
 
-bool PurityComponent::click(WPARAM wParam)
+bool PurityComponent::click(WPARAM wParam) noexcept
 {
 	if (pbSFW.isClicked(wParam))
 	{
@@ -61,14 +47,14 @@ bool PurityComponent::click(WPARAM wParam)
 	return false;
 }
 
-void PurityComponent::enable(bool enable)
+void PurityComponent::enable(bool enable) noexcept
 {
 	EnableWindow(pbSFW.hWnd(), enable);
 	EnableWindow(pbSketchy.hWnd(), enable);
 	EnableWindow(pbNSFW.hWnd(), enable);
 }
 
-void PurityComponent::moveComponent(int x, int y, int width, int height)
+void PurityComponent::moveComponent(int x, int y, int width, int height) noexcept
 {
 	MoveWindow(pbSFW.hWnd(),		x,							y, width / 3 - 1,	height, FALSE);
 	MoveWindow(pbSketchy.hWnd(),	x + width / 3,				y, width / 3,		height, FALSE);
@@ -81,44 +67,30 @@ CategoryComponent::CategoryComponent(IComponent* pParent, int x, int y, int widt
 	pbGeneral	(pParent, "General",	x,						y,	width / 3 - 1,	height),
 	pbAnime		(pParent, "Anime",		x + width / 3,			y,	width / 3,		height),
 	pbPeople	(pParent, "People",		1+x + (2 * width / 3),	y,	width / 3-1,	height)
-{
-}
+{}
 
-void CategoryComponent::setCategory(CategoriesAndPurity cap)
+void CategoryComponent::setCategory(CategoriesAndPurity cap) noexcept
 {
 	pbGeneral.check(cap & CAP::categoryGeneral);
 	pbAnime.check(cap & CAP::categoryAnime);
 	pbPeople.check(cap & CAP::categoryPeople);
 }
 
-CategoriesAndPurity CategoryComponent::getCategory() const
+CategoriesAndPurity CategoryComponent::getCategory() const noexcept
 {
-	return	CAP::categoryGeneral * pbGeneral.isChecked() |
-			CAP::categoryAnime * pbAnime.isChecked() |
-			CAP::categoryPeople * pbPeople.isChecked();
+	return CAP::categoryGeneral * pbGeneral.isChecked()
+		| CAP::categoryAnime * pbAnime.isChecked()
+		| CAP::categoryPeople * pbPeople.isChecked();
 }
 
-bool CategoryComponent::draw(LPDRAWITEMSTRUCT& pDIS)
+bool CategoryComponent::draw(LPDRAWITEMSTRUCT pDIS) const noexcept
 {
-	if (pDIS->hwndItem == pbGeneral.hWnd())
-	{
-		pbGeneral.draw(pDIS);
-		return true;
-	}
-	if (pDIS->hwndItem == pbAnime.hWnd())
-	{
-		pbAnime.draw(pDIS);
-		return true;
-	}
-	if (pDIS->hwndItem == pbPeople.hWnd())
-	{
-		pbPeople.draw(pDIS);
-		return true;
-	}
-	return false;
+	return pbGeneral.draw(pDIS)
+		|| pbAnime.draw(pDIS)
+		|| pbPeople.draw(pDIS);
 }
 
-bool CategoryComponent::click(WPARAM wParam)
+bool CategoryComponent::click(WPARAM wParam) noexcept
 {
 	if (pbGeneral.isClicked(wParam))
 	{

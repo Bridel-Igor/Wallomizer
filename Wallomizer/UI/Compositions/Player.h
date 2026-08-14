@@ -1,9 +1,10 @@
 #pragma once
 
-#include <list>
+#include <cstdint>
+#include <vector>
 
-#include "Static.h"
 #include "IconButton.h"
+#include "Static.h"
 
 class WinUtils;
 class Timer;
@@ -27,26 +28,24 @@ private:
 						hIStop,			hIStopHover,		hIStopActive,
 						hIFit,			hIFitHover;
 	private:
-		static unsigned char refCount;
+		static std::uint8_t refCount;
 	}resources;
 
 public:
 	Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, const WinUtils& winUtils, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles = 0UL);
 	~Player();
-	bool click(WPARAM& wParam);
-	bool draw(LPDRAWITEMSTRUCT& pDIS);
+	bool click(WPARAM wParam);
+	bool draw(LPDRAWITEMSTRUCT pDIS) const;
 	static void updateTimer(Timer& timer, bool isForced = false);
-	static void redrawPlayers();
+	static void redrawPlayers() noexcept;
 	
 private:
-	void updateText(const char* text);
-
-	IconButton btnPrev, btnOpenExternal, btnStop, btnPlay, btnPause, btnFit, btnNext;
-	Static stDelayRemained;
-
 	const WinUtils& m_winUtils;
 	Timer& m_timer;
 	WallpaperManager& m_wallpaperManager;
 
-	static std::list<Player*> pPlayers;
+	IconButton btnPrev, btnOpenExternal, btnStop, btnPlay, btnPause, btnFit, btnNext;
+	Static stDelayRemained;
+
+	static std::vector<Player*> pPlayers;
 };
