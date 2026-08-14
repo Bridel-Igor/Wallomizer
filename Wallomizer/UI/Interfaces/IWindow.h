@@ -4,12 +4,13 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
+#include <set>
 #include <Windows.h>
 
 #include "IComponent.h"
 #include "resource.h"
 
-#define RESULT_DEFAULT -1
+class IHoverable;
 
 class IWindow : public IComponent
 {
@@ -38,13 +39,20 @@ public:
 	virtual void windowLoop();
 	void centerWindow(HWND hParent);
 	bool isReady() const { return m_isReady; }
+	void registerHoverable(IHoverable* pHoverable);
+
+	void unregisterHoverable(IHoverable* pHoverable);
 
 protected:
 	virtual LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 	static BOOL CALLBACK SetChildFont(HWND hChild, LPARAM lParam);
 	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	/// Indicates that a message was not handled by the component.
+	static constexpr LRESULT RESULT_DEFAULT = -1;
+
 private:
 	LPCSTR m_sName;
 	bool m_isReady = false;
+	std::set<IHoverable*> m_hoverables;
 };

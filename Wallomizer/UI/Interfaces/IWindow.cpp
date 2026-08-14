@@ -105,6 +105,18 @@ BOOL CALLBACK IWindow::SetChildFont(HWND hChild, LPARAM lParam)
 	return TRUE;
 }
 
+void IWindow::registerHoverable(IHoverable* pHoverable)
+{
+	if (pHoverable)
+		m_hoverables.insert(pHoverable);
+}
+
+void IWindow::unregisterHoverable(IHoverable* pHoverable)
+{
+	if (pHoverable)
+		m_hoverables.erase(pHoverable);
+}
+
 LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	IWindow* pThis = NULL;
@@ -134,19 +146,9 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 	if (pThis && pThis->m_isReady)
 	{
-		switch (uMsg)
-		{
-		case WM_SETCURSOR:
-		{
-			pThis->traverseChildren([&wParam](IComponent* pComponent) 
-			{
-				IHoverable* pHoverable = nullptr;
-				if ((pHoverable = dynamic_cast<IHoverable*>(pComponent)) != nullptr)
-					pHoverable->handleMouseHover(wParam);
-			});
-			// Fallthrough. Don't return as defWindowProc must be executed anyway.
-		}
-		}
+		if(uMsg == WM_SETCURSOR)
+			for (IHoverable* hoverable : pThis->m_hoverables)
+				hoverable->handleMouseHover(wParam);
 
 		LRESULT result = pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
 		if (result != RESULT_DEFAULT)

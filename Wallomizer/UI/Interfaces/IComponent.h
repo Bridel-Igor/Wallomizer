@@ -1,12 +1,10 @@
 #pragma once
 
 #include <Windows.h>
-#include <functional>
-#include <vector>
 #include <string>
 
-/// Base interface for visual WinAPI components.
-/// Provides a window handle and parent-child component hierarchy.
+/// Base class for visual WinAPI components.
+/// Provides a window handle and access to the parent component.
 class IComponent
 {
 public:
@@ -16,13 +14,11 @@ public:
 	IComponent& operator=(const IComponent&) = delete;
 	IComponent& operator=(IComponent&&) = delete;
 	
-	/// Traverses all child components in depth-first order and applies the given operation.
-	/// 
-	/// @param operation - Function applied to every child component.
-	void traverseChildren(const std::function<void(IComponent* pComponent)>& operation);
-
-	/// Returns the WinAPI window handle.
+	/// @return The WinAPI window handle.
 	HWND hWnd() const noexcept { return m_hWnd; }
+
+	/// @return Pointer to the parent component.
+	IComponent* parent() const noexcept { return m_pParent; }
 
 	/// Sets the font used to draw the component's text.
 	/// The component does not take ownership of the font.
@@ -41,17 +37,16 @@ protected:
 	/// Protected constructor to prevent direct instantiation.
 	/// 
 	/// @param pParent - pointer to parent component
-	explicit IComponent(IComponent* pParent);
+	explicit IComponent(IComponent* pParent) :
+		m_pParent(pParent)
+	{}
 
-	virtual ~IComponent();
+	virtual ~IComponent() = default;
 
 	/// WinAPI window handle.
 	HWND m_hWnd = nullptr;
 
+private:
 	/// Pointer to parent component.
 	IComponent* m_pParent = nullptr;
-
-private:
-	/// Child components.
-	std::vector<IComponent*> m_children;
 };

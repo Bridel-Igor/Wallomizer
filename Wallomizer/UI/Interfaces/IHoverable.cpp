@@ -1,5 +1,24 @@
 #include "IHoverable.h"
 
+#include "IWindow.h"
+
+IHoverable::IHoverable(IComponent* pParent) :
+	IClickable(pParent)
+{
+	IComponent* component = this;
+
+	while (component->parent())
+		component = component->parent();
+
+	m_pParentWindow = static_cast<IWindow*>(component);
+	m_pParentWindow->registerHoverable(this);
+}
+
+IHoverable::~IHoverable()
+{
+	m_pParentWindow->unregisterHoverable(this);
+}
+
 void IHoverable::handleMouseHover(WPARAM wParam) noexcept
 {
 	const bool isHovering = reinterpret_cast<HWND>(wParam) == m_hWnd;
@@ -7,6 +26,5 @@ void IHoverable::handleMouseHover(WPARAM wParam) noexcept
 		return;
 
 	m_hovering = isHovering;
-	if (m_hWnd)
-		InvalidateRect(m_hWnd, nullptr, FALSE);
+	InvalidateRect(m_hWnd, nullptr, FALSE);
 }
