@@ -2,53 +2,44 @@
 
 #include "IComponent.h"
 
-/// Class of generic "up down" with "edit" components. Derrives IComponent interface.
-/// Component usually used for recieving user's choice of number in certain range.
-/// Needs to be dynamically allocated in response to WinAPI WM_CREATE message.
-/// Needs to be destroyed in response to WM_DESTROY message.
+/// Generic numeric input component combining an edit control with an up-down control. 
+/// Derrives IComponent interface.
+/// Component is used for receiving a numeric value within a specified range.
 class UpDownEdit : public IComponent
 {
 public:
-    /// Up down edit component construction.
+    /// Constructs an UpDown edit component.
     /// 
-    /// @param pParent - pointer to parent component
-    /// @param x, y - coordinates, relative to parent window.
-    /// @param width, height - size of button in pixels.
-    /// @param minPos, maxPos - range of possible values.
+    /// @param pParent - pointer to the parent component
+    /// @param x, y - coordinates, relative to the parent window.
+    /// @param width, height - size of the component in pixels.
+    /// @param minPos - minimum allowed value.
+    /// @param maxPos - maximum allowed value.
     /// @param pos - initial value.
     UpDownEdit(IComponent* pParent, int x, int y, int width, int height, int minPos = 0, int maxPos = 100, int pos = 1);
+    
     ~UpDownEdit();
 
-    /// Sets current value of component.
+    /// Sets current value of the component.
     /// 
     /// @param Pos - desired value.
-    void setPos(int pos);
+    void setPos(int pos) noexcept;
 
-    /// Gets current value of component.
-    /// 
-    /// @return Current value.
-    int getPos();
+    /// @return Current value of the up-down control.
+    int getPos() const noexcept;
 
-    /// Gets ASCII representation of current value of component.
-    /// 
-    /// @return Pointer to char array, that holds value in ASCII form.
-    char* getPosA();
+    /// @return True if the edit value is within the allowed range, false otherwise.
+    bool isEditValid() const;
 
-    /// Get an ASCII text from edit component. You should provide char array to write it to.
-    /// 
-    /// @param buffer - pointer to char array
-    /// @param size - size of the char array
-    void getTextA(char* buffer, int size);
+    /// Synchronizes the edit control with the current value of the up-down control.
+    void syncEdit() noexcept;
 
-    /// Updates edit component according to value of ud down component.
-    void update();
-
-    /// Handle to edit component.
-    HWND m_edithWnd;
-    /// Flag that says if set value is valid. Needs to be set externally.
-    bool m_invalid;
+    /// Handle to edit control.
+    HWND m_editHWnd = nullptr;
 
 private:
-    /// @brief temporary char buffer for some methods.
-    char m_buffer[10];
+    /// @return Numeric value currently entered in the edit control.
+    int getEditValue() const;
+
+    int m_minPos, m_maxPos;
 };

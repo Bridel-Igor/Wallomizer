@@ -1,61 +1,59 @@
 #include "Panel.h"
 
-#include <exception>
+#include <utility>
+#include <stdexcept>
 
 #include "IWindow.h"
 #include "IHoverable.h"
 
-Panel::Panel(IComponent* pParent, LPCSTR className, int x, int y, int width, int height, HBRUSH bkBrush) :
+Panel::Panel(IComponent* pParent, std::string className, int x, int y, int width, int height, HBRUSH bkBrush) :
 	IComponent(pParent),
-	m_sName(className),
+	m_className(std::move(className)),
 	m_bkBrush(bkBrush)
 {
-	m_hWnd = FindWindowA(m_sName, nullptr);
-	if (m_hWnd)
-	{
-		throw std::exception("Panel is already opened!");
-		// HACK: change this to custom exception, or handle this differently!!!
-	}
-
-	WNDCLASS wc = { 0 };
+	WNDCLASS wc{};
 	wc.lpfnWndProc = WindowProc;
-	wc.hInstance = GetModuleHandleA(NULL);
-	wc.lpszClassName = m_sName;
+	wc.hInstance = GetModuleHandleA(nullptr);
+	wc.lpszClassName = m_className.c_str();
 	if (RegisterClassA(&wc) == 0)
-		throw std::exception("Panel creation failed.");
+		throw std::runtime_error("Panel creation failed.");
 
-	RECT rc = { 0 };
+	RECT rc{};
 	rc.left = x;
 	rc.right = x + width;
 	rc.top = y;
 	rc.bottom = y + height;
-	AdjustWindowRect(&rc, WS_CHILD | WS_BORDER | WS_VSCROLL, FALSE);
+
+	const DWORD STYLE = WS_CHILD | WS_BORDER | WS_VSCROLL | WS_VISIBLE;
+	AdjustWindowRect(&rc, STYLE, FALSE);
 
 	m_hWnd = CreateWindowExA(
-		NULL, m_sName, "", WS_CHILD | WS_BORDER | WS_VSCROLL, rc.left, rc.top,
-		rc.right - rc.left, rc.bottom - rc.top, m_pParent->hWnd(), 0, GetModuleHandle(NULL), this);
-	if (m_hWnd == FALSE)
-		throw std::exception("Panel creation failed.");
+		0, m_className.c_str(), "", STYLE, rc.left, rc.top,
+		rc.right - rc.left, rc.bottom - rc.top, parent()->hWnd(), 0, GetModuleHandle(nullptr), this);
+	if (!m_hWnd)
+	{
+		UnregisterClassA(m_className.c_str(), GetModuleHandleA(nullptr));
+		throw std::runtime_error("Panel creation failed.");
+	}
 }
 
 Panel::~Panel()
 {
 	DestroyWindow(m_hWnd);
-	UnregisterClassA(m_sName, GetModuleHandleA(NULL));
+	UnregisterClassA(m_className.c_str(), GetModuleHandleA(nullptr));
 }
 
 LRESULT CALLBACK Panel::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	Panel* pThis = NULL;
+	Panel* pThis = nullptr;
 	if (uMsg == WM_NCCREATE)
 	{
-		CREATESTRUCT* pCreate = (CREATESTRUCT*)lParam;
-		pThis = (Panel*)pCreate->lpCreateParams;
-		SetWindowLongPtrA(hWnd, GWLP_USERDATA, (LONG_PTR)pThis);
-		pThis->m_hWnd = hWnd;
+		CREATESTRUCTA* pCreate = reinterpret_cast<CREATESTRUCTA*>(lParam);
+		pThis = static_cast<Panel*>(pCreate->lpCreateParams);
+		SetWindowLongPtrA(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
 	}
 	else
-		pThis = (Panel*)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
+		pThis = reinterpret_cast<Panel*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
 
 	if (pThis)
 		return pThis->HandleMessage(hWnd, uMsg, wParam, lParam);
@@ -66,11 +64,6 @@ LRESULT Panel::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-	case WM_CREATE:
-	{
-		ShowWindow(hWnd, SW_SHOWNORMAL);
-		return 0;
-	}
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
@@ -78,16 +71,20 @@ LRESULT Panel::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		FillRect(hdc, &ps.rcPaint, m_bkBrush);
 		EndPaint(hWnd, &ps);
 		return 0;
-	}	
+	}
 	case WM_COMMAND:
+	case WM_SETCURSOR:
 	case WM_DRAWITEM:
 	case WM_CTLCOLORBTN:
 	case WM_CTLCOLORSTATIC:
 	case WM_VSCROLL:
 	case WM_MOUSEWHEEL:
-		LRESULT res = SendMessageA(m_pParent->hWnd(), uMsg, wParam, lParam);
-		if (res != RESULT_DEFAULT)
+	{
+		const LRESULT res = SendMessageA(parent()->hWnd(), uMsg, wParam, lParam);
+		if (res != RESULT_NOT_HANDLED)
 			return res;
+		break;
+	}
 	}
 	return DefWindowProcA(hWnd, uMsg, wParam, lParam);
 }

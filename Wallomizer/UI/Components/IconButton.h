@@ -1,31 +1,34 @@
 #pragma once
 
+#include <string_view>
+
 #include "IHoverable.h"
 
 /// Class of custom drawn "button" component. Derrives IHoverable interface.
 /// Component usually used for recieving click events.
-/// Needs to be dynamically allocated in response to WinAPI WM_CREATE message.
-/// Needs to be destroyed in response to WM_DESTROY message.
-/// Draw method should be called in response to WM_DRAWITEM message. 
-/// Return TRUE from function that handles WinAPI messages if component is drawn.
-/// To check for click event you should check result of isClicked method when WM_COMMAND message recieved.
-/// After click event processed you should return 0 from function that handles WinAPI messages.
-/// To process hovering events you should call handleMouseHover method in response to WM_SETCURSOR message.
+/// 
+/// Click events are detected by calling isClicked in response to WM_COMMAND.
+/// Hover state is updated by calling handleMouseHover in response to WM_SETCURSOR.
+/// The component is drawn by calling draw in response to WM_DRAWITEM.
 class IconButton : public IHoverable
 {
 public:
-	/// Icon button component construction.
+	/// Constructs an IconButton component.
 	/// 
-	/// @param pParent - pointer to parent component
+	/// @param pParent - pointer to parent component.
 	/// @param x, y - coordinates, relative to parent window.
 	/// @param width, height - size of button in pixels.
 	/// @param hIcon - handle to icon that represents button in it's basic state.
 	/// @param hIconHover - handle to icon that represents button in it's hovered state.
+	/// @param toolTip - optional tooltip text. The button does not own this string.
+    ///                  The referenced string must outlive the button.
 	/// @param additionalStyles - WinAPI style flags that will be added to WS_CHILD, WS_VISIBLE and BS_OWNERDRAW flags. Can be ignored.
 	/// @param additionalExStyles - WinAPI extended style flags. Can be ignored.
-	IconButton(IComponent* pParent, int x, int y, int width, int height, HICON& hIcon, HICON& hIconHovered, const char *toolTip = "", DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
+	IconButton(IComponent* pParent, int x, int y, int width, int height, HICON hIcon, HICON hIconHovered, std::string_view toolTip = {}, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
+	
 	~IconButton();
 
+	/// Draws the button.
 	/// Call this method from reaction to WM_DRAWITEM message.
 	/// 
 	/// @param pDIS - LPDRAWITEMSTRUCT casted from lParam.
@@ -33,12 +36,18 @@ public:
 	/// 
 	/// @return True if component is drawn, false otherwise. 
 	///			If it's true return TRUE from function that handles WinAPI messages. 
-	bool draw(LPDRAWITEMSTRUCT& pDIS, HBRUSH bkgrnd, int x = 0, int y = 0);
+	bool draw(LPDRAWITEMSTRUCT pDIS, HBRUSH bkgrnd, int x = 0, int y = 0) const;
 
 private:
-	/// Handles to icons which represents button in basic and hovered state.
-	HICON m_hIcon, m_hIconHovered;
+	/// Icon displayed in the normal state. The button does not own this handle.
+	HICON m_hIcon;
+
+	/// Icon displayed while the button is hovered. The button does not own this handle.
+	HICON m_hIconHovered;
 
 	/// Handle to looltip window.
-	HWND m_hToolTip;
+	HWND m_hTooltip = nullptr;
+
+	/// Non-owning view of the tooltip text.
+	std::string_view m_tooltip;
 };

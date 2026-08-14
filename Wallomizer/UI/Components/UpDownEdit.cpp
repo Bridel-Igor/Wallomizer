@@ -3,48 +3,56 @@
 #include <CommCtrl.h>
 
 UpDownEdit::UpDownEdit(IComponent* pParent, int x, int y, int width, int height, int minPos, int maxPos, int pos) :
-    IComponent(pParent)
+    IComponent(pParent),
+    m_minPos(minPos), 
+    m_maxPos(maxPos)
 {
-    m_edithWnd = CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, NULL, WS_CHILDWINDOW | WS_VISIBLE | WS_BORDER | ES_NUMBER,
-        x, y, width, height, m_pParent->hWnd(), NULL, NULL, NULL);
+    m_editHWnd = CreateWindowExA(WS_EX_CLIENTEDGE, WC_EDIT, nullptr, WS_CHILDWINDOW | WS_VISIBLE | WS_BORDER | ES_NUMBER,
+        x, y, width, height, parent()->hWnd(), nullptr, nullptr, nullptr);
 
-    m_hWnd = CreateWindowEx(WS_EX_LEFT | WS_EX_LTRREADING, UPDOWN_CLASS, NULL, WS_CHILDWINDOW | WS_VISIBLE | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_ARROWKEYS | UDS_HOTTRACK,
-        0, 0, 0, 0, m_pParent->hWnd(), NULL, NULL, NULL);
+    m_hWnd = CreateWindowExA(WS_EX_LEFT | WS_EX_LTRREADING, UPDOWN_CLASS, nullptr, WS_CHILDWINDOW | WS_VISIBLE | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_ARROWKEYS | UDS_HOTTRACK,
+        0, 0, 0, 0, parent()->hWnd(), nullptr, nullptr, nullptr);
 
-    SendMessageA(m_hWnd, UDM_SETBUDDY, (WPARAM)m_edithWnd, NULL);
-    SendMessageA(m_hWnd, UDM_SETRANGE32, (WPARAM)minPos, (LPARAM)maxPos);
+    SendMessageA(m_hWnd, UDM_SETBUDDY, reinterpret_cast<WPARAM>(m_editHWnd), 0);
+    SendMessageA(m_hWnd, UDM_SETRANGE32, static_cast<WPARAM>(minPos), static_cast<LPARAM>(maxPos));
     setPos(pos);
-    m_invalid = false;
 }
 
 UpDownEdit::~UpDownEdit()
 {
     DestroyWindow(m_hWnd);
-    DestroyWindow(m_edithWnd);
+    DestroyWindow(m_editHWnd);
 }
 
-void UpDownEdit::setPos(int pos)
+void UpDownEdit::setPos(int pos) noexcept
 {
-    SendMessageA(m_hWnd, UDM_SETPOS32, NULL, (LPARAM)pos);
+    SendMessageA(m_hWnd, UDM_SETPOS32, 0, static_cast<LPARAM>(pos));
 }
 
-int UpDownEdit::getPos()
+int UpDownEdit::getPos() const noexcept
 {
-    return (int)SendMessageA(m_hWnd, UDM_GETPOS32, NULL, NULL);
+    return static_cast<int>(SendMessageA(m_hWnd, UDM_GETPOS32, 0, 0));
 }
 
-char* UpDownEdit::getPosA()
+bool UpDownEdit::isEditValid() const
 {
-    _itoa_s(getPos(), m_buffer, 10);
-    return m_buffer;
+    const int value = getEditValue();
+    return value >= m_minPos && value <= m_maxPos;
 }
 
-void UpDownEdit::getTextA(char* buffer, int size)
+void UpDownEdit::syncEdit() noexcept
 {
-    GetWindowTextA(m_edithWnd, buffer, size);
+    SetWindowTextW(m_editHWnd, std::to_wstring(getPos()).c_str());
 }
 
-void UpDownEdit::update()
+int UpDownEdit::getEditValue() const
 {
-    SetWindowTextA(m_edithWnd, getPosA());
+    const int length = GetWindowTextLengthA(m_editHWnd);
+    if (length == 0)
+        return 0;
+
+    std::string text(length, L'\0');
+    GetWindowTextA(m_editHWnd, text.data(), length + 1);
+
+    return std::stol(text.c_str(), nullptr, 10);
 }

@@ -2,57 +2,52 @@
 
 #include <CommCtrl.h>
 
-IconButton::IconButton(IComponent* pParent, int x, int y, int width, int height, HICON& hIcon, HICON& hIconHovered, const char* toolTip, DWORD additionalStyles, DWORD additionalExStyles) :
-	IHoverable(pParent)
+IconButton::IconButton(IComponent* pParent, int x, int y, int width, int height, HICON hIcon, HICON hIconHovered, std::string_view toolTip, DWORD additionalStyles, DWORD additionalExStyles) :
+	IHoverable(pParent),
+	m_hIcon(hIcon),
+	m_hIconHovered(hIconHovered),
+    m_tooltip(toolTip)
 {
-	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), TEXT(""), WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, m_pParent->hWnd(), hMenu(), NULL, NULL);
-	m_hIcon = hIcon;
-	m_hIconHovered = hIconHovered;
+	m_hWnd = CreateWindowExA(additionalExStyles, "Button", "", WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, parent()->hWnd(), hMenu(), nullptr, nullptr);
 
-    m_hToolTip = nullptr;
-    if (toolTip[0] != 0)
+    if (!toolTip.empty())
     {
         // Create a tooltip.
-        m_hToolTip = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL,
+        m_hTooltip = CreateWindowExA(WS_EX_TOPMOST, TOOLTIPS_CLASS, nullptr,
             WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
             CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-            m_hWnd, NULL, NULL, NULL);
+            m_hWnd, nullptr, nullptr, nullptr);
 
-        if (!m_hToolTip)
+        if (!m_hTooltip)
             return;
 
-        SetWindowPos(m_hToolTip, HWND_TOPMOST, 0, 0, 0, 0,
-            SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
-
-        // Set up "tool" information. In this case, the "tool" is the entire parent window.
-        TOOLINFO ti = { 0 };
-        ti.cbSize = sizeof(TOOLINFO);
+        // Set up tooltip information for the entire button.
+        TOOLINFOA ti{};
+        ti.cbSize = sizeof(ti);
         ti.uFlags = TTF_SUBCLASS;
         ti.hwnd = m_hWnd;
-        ti.hinst = NULL;
-        char tooltip[32];
-        strcpy_s(tooltip, toolTip);
-        ti.lpszText = tooltip;
+        ti.hinst = nullptr;
+        ti.lpszText = const_cast<char*>(m_tooltip.data());
 
         GetClientRect(m_hWnd, &ti.rect);
 
         // Associate the tooltip with the "tool" window.
-        SendMessage(m_hToolTip, TTM_ADDTOOL, 0, (LPARAM)(LPTOOLINFO)&ti);
+        SendMessageA(m_hTooltip, TTM_ADDTOOLA, 0, reinterpret_cast<LPARAM>(&ti));
     }
 }
 
 IconButton::~IconButton()
 {
-    if (m_hToolTip)
-        DestroyWindow(m_hToolTip);
+    if (m_hTooltip)
+        DestroyWindow(m_hTooltip);
 	DestroyWindow(m_hWnd);
 }
 
-bool IconButton::draw(LPDRAWITEMSTRUCT& pDIS, HBRUSH bkgrnd, int x, int y)
+bool IconButton::draw(LPDRAWITEMSTRUCT pDIS, HBRUSH bkgrnd, int x, int y) const
 {
 	if (pDIS->hwndItem != m_hWnd)
 		return false;
 	FillRect(pDIS->hDC, &pDIS->rcItem, bkgrnd);
-	DrawIconEx(pDIS->hDC, x, y, m_hovering ? m_hIconHovered : m_hIcon, 0, 0, 0, NULL, DI_NORMAL);
+	DrawIconEx(pDIS->hDC, x, y, m_hovering ? m_hIconHovered : m_hIcon, 0, 0, 0, nullptr, DI_NORMAL);
 	return true;
 }

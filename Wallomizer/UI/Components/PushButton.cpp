@@ -1,11 +1,15 @@
 #include "PushButton.h"
 
-PushButton::PushButton(IComponent* pParent, LPCSTR text, int x, int y, int width, int height, DWORD additionalStyles, DWORD additionalExStyles, COLORREF color1, COLORREF color2) :
-	IHoverable(pParent)
+#include "UIColor.h"
+
+#pragma comment(lib, "Msimg32.lib")
+
+PushButton::PushButton(IComponent* pParent, const std::string& text, int x, int y, int width, int height, DWORD additionalStyles, DWORD additionalExStyles, COLORREF checkedColorTop, COLORREF checkedColorBottom) :
+	IHoverable(pParent),
+	m_checkedColorTop(checkedColorTop),
+	m_checkedColorBottom(checkedColorBottom)
 {
-	m_hWnd = CreateWindowExA(additionalExStyles, TEXT("Button"), text, WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, m_pParent->hWnd(), hMenu(), NULL, NULL);
-	m_checkedColorTop = color1;
-	m_checkedColorBottom = color2;
+	m_hWnd = CreateWindowExA(additionalExStyles, "Button", text.c_str(), WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, parent()->hWnd(), hMenu(), nullptr, nullptr);
 }
 
 PushButton::~PushButton()
@@ -13,7 +17,7 @@ PushButton::~PushButton()
 	DestroyWindow(m_hWnd);
 }
 
-void PushButton::check(bool state)
+void PushButton::check(bool state) noexcept
 {
 	if (m_checked != state)
 	{
@@ -22,53 +26,55 @@ void PushButton::check(bool state)
 	}
 }
 
-bool PushButton::isChecked() const
+bool PushButton::draw(LPDRAWITEMSTRUCT pDIS) const
 {
-	return m_checked;
-}
+	if (pDIS->hwndItem != m_hWnd)
+		return false;
 
-void PushButton::draw(LPDRAWITEMSTRUCT& pDIS)
-{
-	int r1 = 70, g1 = 70, b1 = 70;
-	int r2 = 40, g2 = 40, b2 = 40;
+	const BYTE hoverOffset = m_hovering ? 10 : 0;
 
-	if (m_checked)
-	{
-		r1 = GetRValue(m_checkedColorTop),		g1 = GetGValue(m_checkedColorTop),		b1 = GetBValue(m_checkedColorTop);
-		r2 = GetRValue(m_checkedColorBottom),	g2 = GetGValue(m_checkedColorBottom),	b2 = GetBValue(m_checkedColorBottom);
-	}
-	for (int i = 0; i < pDIS->rcItem.bottom; i++)
-	{
-		int r, g, b;
-		r = r1 + (i * (r2 - r1) / pDIS->rcItem.bottom);
-		g = g1 + (i * (g2 - g1) / pDIS->rcItem.bottom);
-		b = b1 + (i * (b2 - b1) / pDIS->rcItem.bottom);
+	const BYTE topUnchecked = 70 + hoverOffset;
+	const BYTE bottomUnchecked = 40 + hoverOffset;
 
-		if (!m_checked && m_hovering)
+	const COLORREF colorTop = m_checked ?
+		m_checkedColorTop :
+		RGB(topUnchecked, topUnchecked, topUnchecked);
+
+	const COLORREF colorBottom = m_checked ?
+		m_checkedColorBottom :
+		RGB(bottomUnchecked, bottomUnchecked, bottomUnchecked);
+
+	TRIVERTEX vertices[2]{
 		{
-			r = (r + 10) > 255 ? 255 : r + 10;
-			g = (g + 10) > 255 ? 255 : r + 10;
-			b = (b + 10) > 255 ? 255 : r + 10;
+			pDIS->rcItem.left,
+			pDIS->rcItem.top,
+			static_cast<COLOR16>(GetRValue(colorTop) << 8),
+			static_cast<COLOR16>(GetGValue(colorTop) << 8),
+			static_cast<COLOR16>(GetBValue(colorTop) << 8),
+			0
+		},
+		{
+			pDIS->rcItem.right,
+			pDIS->rcItem.bottom,
+			static_cast<COLOR16>(GetRValue(colorBottom) << 8),
+			static_cast<COLOR16>(GetGValue(colorBottom) << 8),
+			static_cast<COLOR16>(GetBValue(colorBottom) << 8),
+			0
 		}
+	};
 
-		m_temp.left = 0;
-		m_temp.top = i;
-		m_temp.right = pDIS->rcItem.right;
-		m_temp.bottom = i + 1;
+	GRADIENT_RECT gradient{ 0, 1 };
+	GradientFill(pDIS->hDC, vertices, 2, &gradient, 1, GRADIENT_FILL_RECT_V);
 
-		m_color = CreateSolidBrush(RGB(r, g, b));
-		FillRect(pDIS->hDC, &m_temp, m_color);
-		DeleteObject(m_color);
-	}
 	// draw text only if button is horizontal
-	if (((double)(pDIS->rcItem.right - pDIS->rcItem.left) / (double)(pDIS->rcItem.bottom - pDIS->rcItem.top)) > 1.1) 
+	if ((pDIS->rcItem.right - pDIS->rcItem.left) > (pDIS->rcItem.bottom - pDIS->rcItem.top))
 	{
-		SetTextColor(pDIS->hDC, m_checked ? RGB(255, 255, 255) : RGB(200, 200, 200));
+		SetTextColor(pDIS->hDC, m_checked ? UIColor::pbTextActive : UIColor::pbTextInactive);
 		SetBkMode(pDIS->hDC, TRANSPARENT);
 		SetTextAlign(pDIS->hDC, TA_CENTER);
-		char staticText[32];
-		staticText[31] = '\0';
-		int len = (int)SendMessageA(pDIS->hwndItem, WM_GETTEXT, 31, (LPARAM)staticText);
-		TextOutA(pDIS->hDC, (pDIS->rcItem.right - pDIS->rcItem.left) / 2, pDIS->rcItem.left + 3, staticText, len);
+		const std::string text = textA();
+		TextOutA(pDIS->hDC, (pDIS->rcItem.right - pDIS->rcItem.left) / 2, pDIS->rcItem.top + 3, text.c_str(), static_cast<int>(text.length()));
 	}
+
+	return true;
 }

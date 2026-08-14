@@ -1,16 +1,15 @@
 #pragma once
 
+#include <stdint.h>
+
 #include "IHoverable.h"
 
-/// Class of custom drawn "check box" component. Derrives IHoverable interface.
-/// Component usually used for recieving logical (true or false) answers from user.
-/// Needs to be dynamically allocated in response to WinAPI WM_CREATE message.
-/// Needs to be destroyed in response to WM_DESTROY message.
-/// Draw method should be called in response to WM_DRAWITEM message. 
-/// Return TRUE from function that handles WinAPI messages if component is drawn.
-/// To check for click event you should check result of isClicked method when WM_COMMAND message recieved.
-/// After click event processed you should return 0 from function that handles WinAPI messages.
-/// To process hovering events you should call handleMouseHover method in response to WM_SETCURSOR message.
+/// Custom-drawn check box component.
+/// Derives from IHoverable and maintains its checked state.
+/// 
+/// Click events are detected by calling isClicked in response to WM_COMMAND.
+/// Hover state is updated by calling handleMouseHover in response to WM_SETCURSOR.
+/// The component is drawn by calling draw in response to WM_DRAWITEM.
 class CheckBox : public IHoverable
 {
 private:
@@ -23,42 +22,42 @@ private:
 
 		static HICON hICheckBox, hICheckBoxChecked, hICheckBoxHover, hICheckBoxCheckedHover;
 	private:
-		static unsigned char refCount;
+		static std::uint16_t refCount;
 	}resources;
 public:
-	/// Check box component construction.
+	/// Constructs a CheckBox component.
 	/// 
-	/// @param pParent - pointer to parent component
-	/// @param x, y - coordinates, relative to parent window.
-	/// @param width, height - size of button in pixels.
-	/// @param isChecked - initial state of component. Can be ignored.
+	/// @param pParent - pointer to the parent component.
+	/// @param x, y - coordinates, relative to the parent window.
+	/// @param width, height - size of the component in pixels.
+	/// @param isChecked - initial state of the component. Can be ignored.
 	/// @param additionalStyles - WinAPI style flags that will be added to WS_CHILD, WS_VISIBLE and BS_OWNERDRAW flags. Can be ignored.
 	/// @param additionalExStyles - WinAPI extended style flags. Can be ignored.
 	CheckBox(IComponent* pParent, int x, int y, int width, int height, bool isChecked = false, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
 	~CheckBox();
 
-	/// Flips state of check box. 
-	/// Use in reaction to click event.
-	void click();
+	/// Toggles the checked state of the check box.
+	/// Use in response to a click event.
+	void toggle() noexcept { setChecked(!m_checked); };
 
-	/// Changes state of check box.
+	/// Sets the checked state of the check box.
 	/// 
-	/// @param state - desired state of check box.
-	void setChecked(bool state);
+	/// @param state - desired checked state.
+	void setChecked(bool state) noexcept;
 
-	/// Check the state of check box.
-	/// 
 	/// @return True if check box is checked, false otherwise.
-	bool isChecked() const;
+	bool isChecked() const noexcept { return m_checked; }
 
-	/// Call this method from reaction to WM_DRAWITEM message.
+	/// Draws the check box.
+	///
+	/// Should be called in response to WM_DRAWITEM.
 	/// 
 	/// @param pDIS - LPDRAWITEMSTRUCT casted from lParam.
-	/// @param bkgrnd - brush for background to draw on.
+	/// @param bkgrnd - brush used to fill the background.
 	/// 
-	/// @return True if component is drawn, false otherwise. 
-	///			If it's true return TRUE from function that handles WinAPI messages. 
-	bool draw(LPDRAWITEMSTRUCT& pDIS, HBRUSH bkgrnd);
+	/// @return True if this component was drawn, false otherwise.
+	/// If true is returned, the WM_DRAWITEM handler must return TRUE.
+	bool draw(LPDRAWITEMSTRUCT pDIS, HBRUSH bkgrnd);
 
 private:
 	/// Holds the current state of check box.

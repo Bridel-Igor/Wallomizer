@@ -1,17 +1,9 @@
 #include "ComboBox.h"
 
-ComboBox::ComboBox(IComponent* pParent, LPCSTR text, int x, int y, int width, int height, int nOfItems, int lenOfItems, CHAR* items, int selectedItem, DWORD additionalStyles) :
+ComboBox::ComboBox(IComponent* pParent, const std::wstring& text, int x, int y, int width, int height, DWORD additionalStyles) :
 	IComponent(pParent)
 {
-	m_hWnd = CreateWindowA("COMBOBOX", text, CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE | WS_VSCROLL | additionalStyles, x, y, width, height, m_pParent->hWnd(), NULL, NULL, NULL);
-
-	for (int i = 0; i < nOfItems; i++)
-	{
-		SendMessage(m_hWnd, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)(CHAR*)items);
-		items += lenOfItems;
-	}
-
-	SendMessage(m_hWnd, CB_SETCURSEL, (WPARAM)selectedItem, (LPARAM)0);
+	m_hWnd = CreateWindowW(L"COMBOBOX", text.c_str(), CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_VISIBLE | WS_VSCROLL | additionalStyles, x, y, width, height, parent()->hWnd(), nullptr, nullptr, nullptr);
 }
 
 ComboBox::~ComboBox()
@@ -19,24 +11,27 @@ ComboBox::~ComboBox()
 	DestroyWindow(m_hWnd);
 }
 
-int ComboBox::getSelectedItem()
+void ComboBox::addOption(const std::wstring& text)
 {
-	return (int)SendMessage(m_hWnd, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+	SendMessageW(m_hWnd, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(text.c_str()));
 }
 
-void ComboBox::getTextA(char* buffer, int size)
+void ComboBox::clear()
 {
-	GetWindowTextA(m_hWnd, buffer, size);
+	SendMessageW(m_hWnd, CB_RESETCONTENT, 0, 0);
 }
 
-void ComboBox::setTextA(LPCSTR text)
+void ComboBox::selectOption(int index) noexcept
 {
-	SetWindowTextA(m_hWnd, text);
+	SendMessageW(m_hWnd, CB_SETCURSEL, index, 0);
 }
 
-bool ComboBox::isEmpty()
+int ComboBox::getSelectedOption() const noexcept
 {
-	char buf[2] = { 0 };
-	GetWindowTextA(m_hWnd, buf, 2);
-	return !buf[0];
+	return static_cast<int>(SendMessageW(m_hWnd, CB_GETCURSEL, 0, 0));
+}
+
+int ComboBox::findOption(const std::wstring& text) const noexcept
+{
+	return static_cast<int>(SendMessageW(m_hWnd, CB_FINDSTRINGEXACT, static_cast<WPARAM>(-1), reinterpret_cast<LPARAM>(text.c_str())));
 }

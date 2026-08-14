@@ -3,42 +3,47 @@
 #include <Commdlg.h>
 
 #include "IWindow.h"
+#include "UIColor.h"
 
 ColorPickerButton::ColorPickerButton(IComponent* pParent, COLORREF color, int x, int y, int width, int height) :
 	IHoverable(pParent),
-	m_color(color)
+	m_color(color),
+	m_brush(CreateSolidBrush(m_color)),
+	m_outlinePen(CreatePen(PS_SOLID, 2, UIColor::white))
 {
-	m_hWnd = CreateWindowExA(NULL, TEXT("Button"), "", WS_CHILD | WS_VISIBLE | BS_OWNERDRAW, x, y, width, height, m_pParent->hWnd(), hMenu(), NULL, NULL);
+	m_hWnd = CreateWindowExA(0, "Button", "", WS_CHILD | WS_VISIBLE | BS_OWNERDRAW, x, y, width, height, parent()->hWnd(), hMenu(), nullptr, nullptr);
 }
 
 ColorPickerButton::~ColorPickerButton()
 {
+	DeleteObject(m_outlinePen);
+	DeleteObject(m_brush);
 	DestroyWindow(m_hWnd);
 }
 
-bool ColorPickerButton::draw(LPDRAWITEMSTRUCT& pDIS)
+bool ColorPickerButton::draw(LPDRAWITEMSTRUCT pDIS) const
 {
 	if (pDIS->hwndItem != m_hWnd)
 		return false;
 
-	HBRUSH brush = CreateSolidBrush(m_color);
 	FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
-	SelectObject(pDIS->hDC, brush);
+	HBRUSH oldBrush = static_cast<HBRUSH>(SelectObject(pDIS->hDC, m_brush));
 	RoundRect(pDIS->hDC, pDIS->rcItem.left, pDIS->rcItem.top, pDIS->rcItem.right, pDIS->rcItem.bottom, 5, 5);
+	SelectObject(pDIS->hDC, oldBrush);
 
 	if (m_hovering)
 	{
-		HPEN outline = CreatePen(PS_SOLID, 2, RGB(255, 255, 255));
+		HPEN oldPen = static_cast<HPEN>(SelectObject(pDIS->hDC, m_outlinePen));
 
-		SelectObject(pDIS->hDC, outline);
-
-		MoveToEx(pDIS->hDC, pDIS->rcItem.left + 1, pDIS->rcItem.top + 1, NULL);
+		MoveToEx(pDIS->hDC, pDIS->rcItem.left + 1, pDIS->rcItem.top + 1, nullptr);
 		LineTo(pDIS->hDC, pDIS->rcItem.left + 1, pDIS->rcItem.bottom - 1);
 		LineTo(pDIS->hDC, pDIS->rcItem.right - 1, pDIS->rcItem.bottom - 1);
 		LineTo(pDIS->hDC, pDIS->rcItem.right - 1, pDIS->rcItem.top + 1);
 		LineTo(pDIS->hDC, pDIS->rcItem.left + 1, pDIS->rcItem.top + 1);
 
-		RECT tmp = { 0 };
+		SelectObject(pDIS->hDC, oldPen);
+
+		RECT tmp{};
 		tmp.left = pDIS->rcItem.left, tmp.right = tmp.left + 1;
 		tmp.top = pDIS->rcItem.bottom, tmp.bottom = tmp.top - 1;
 		FillRect(pDIS->hDC, &tmp, IWindow::Resources::mainBkBrush);
@@ -52,19 +57,18 @@ bool ColorPickerButton::draw(LPDRAWITEMSTRUCT& pDIS)
 
 void ColorPickerButton::click()
 {
-	COLORREF custom[16] = { 0 };
-	CHOOSECOLOR cc = { 0 };
-	cc.hwndOwner = m_pParent->hWnd();
+	COLORREF custom[16]{};
+	CHOOSECOLOR cc{};
+	cc.hwndOwner = parent()->hWnd();
 	cc.lpCustColors = custom;
 	cc.rgbResult = m_color;
 	cc.Flags = CC_RGBINIT | CC_ANYCOLOR | CC_FULLOPEN;
 	cc.lStructSize = sizeof(cc);
-	ChooseColor(&cc);
-	m_color = cc.rgbResult;
-	InvalidateRgn(m_hWnd, nullptr, false);
-}
+	if (!ChooseColor(&cc))
+		return;
 
-COLORREF ColorPickerButton::getColor() const
-{
-	return m_color;
+	m_color = cc.rgbResult;
+	DeleteObject(m_brush);
+	m_brush = CreateSolidBrush(m_color);
+	InvalidateRect(m_hWnd, nullptr, FALSE);
 }
