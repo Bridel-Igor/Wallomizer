@@ -31,7 +31,7 @@ public:
 	virtual void update() = 0;
 	virtual bool isValid() const = 0;
 
-	CollectionType getType() const noexcept		{ return m_type; }
+	CollectionType getType() const noexcept			{ return m_type; }
 	std::size_t getWallpaperCount() const noexcept	{ return m_wallpaperCount; }
 	bool isEnabled() const noexcept					{ return m_isEnabled; }
 	void enableCollection(bool isEnabled) noexcept	{ m_isEnabled = isEnabled; }
