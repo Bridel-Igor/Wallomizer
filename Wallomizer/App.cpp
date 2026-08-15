@@ -9,14 +9,13 @@ App::App() :
 	m_settings(m_winUtils.getRoamingDir()),
 	m_collectionManager(m_winUtils, m_settings, m_wallpaperManager, m_timer),
 	m_wallpaperManager(m_winUtils, m_settings, m_collectionManager, m_timer),
-	m_timer(m_winUtils, m_settings, m_wallpaperManager)
+	m_timer(m_winUtils, m_settings, m_wallpaperManager),
+	m_ui(*this)
 {
 }
 
 int App::run()
 {
-	UIThreadedWindow<TrayWindow> trayWindow(*this);
-
 	while (m_running)
 	{
 		if (m_collectionManager.getWallpaperCount() == 0)
@@ -35,13 +34,13 @@ int App::run()
 		m_wallpaperManager.setLoadedWallpaper();
 	}
 
-	trayWindow.join();
+	m_ui.requestClose();
 	return 0;
 }
 
 void App::requestExit()
 {
-	m_timer.saveSession();
-	m_timer.abort();
 	m_running = false;
+	m_timer.abort();
+	m_timer.saveSession();
 }

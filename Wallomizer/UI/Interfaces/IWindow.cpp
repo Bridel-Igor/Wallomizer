@@ -1,87 +1,79 @@
 #include "IWindow.h"
 
-#include <stack>
-#include <exception>
+#include <algorithm>
+#include <stdexcept>
 
 #include "IHoverable.h"
-#include "Edit.h"
+#include "UIColor.h"
+#include "resource.h"
 
-COLORREF IWindow::Resources::mainFontColor;
-COLORREF IWindow::Resources::titleFontColor;
 HFONT IWindow::Resources::mainFont;
 HFONT IWindow::Resources::titleFont;
 HBRUSH IWindow::Resources::mainBkBrush;
 
-unsigned char IWindow::Resources::refCount = 0;
+std::uint16_t IWindow::Resources::refCount = 0;
 
-IWindow::Resources::Resources()
+IWindow::Resources::Resources() noexcept
 {
-	if (refCount++) // Loading icons only if this is the first player creating
+	if (refCount++) // Loading resources only if this is the first created window
 		return;
 	mainFont = CreateFontA(15, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, FF_DONTCARE, "Arial");
 	titleFont = CreateFontA(15, 0, 0, 0, FW_SEMIBOLD, FALSE, TRUE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, FF_DONTCARE, "Arial");
-	mainFontColor = RGB(129, 193, 193);
-	titleFontColor = RGB(220, 220, 220);
-	mainBkBrush = CreateSolidBrush(RGB(26, 26, 26));
+	mainBkBrush = CreateSolidBrush(UIColor::windowBk);
 }
 
-IWindow::Resources::~Resources()
+IWindow::Resources::~Resources() noexcept
 {
-	if (--refCount) // Destroying objects only if this is the last player destroying
+	if (--refCount) // Destroying resources only if this is the last window destroyed
 		return;
 	DeleteObject(mainBkBrush);
 	DeleteObject(mainFont);
 	DeleteObject(titleFont);
 }
 
-IWindow::IWindow(LPCSTR sWindowName, LPCSTR sClassName, DWORD dwStyle, DWORD dwExStyle,
+IWindow::IWindow(LPCSTR sWindowName, std::string className, DWORD dwStyle, DWORD dwExStyle,
 		int x, int y, int nWidth, int nHeight, IComponent* pParent) :
 	IComponent(pParent),
-	m_sName(sClassName)
+	m_name(std::move(className))
 {
-	// Checking if this window is already exists
-	m_hWnd = FindWindowA(sClassName, nullptr);
-	if (m_hWnd) 
-	{ 
-		// if it exists then highlight it and cease construction of new one
-		SetForegroundWindow(m_hWnd);
-		throw std::exception("Window is already opened!");
-		// HACK: change this to custom exception, or handle this differently!!!
-	}
-
-	WNDCLASS wc = { 0 };
+	WNDCLASS wc{};
 	wc.lpfnWndProc = WindowProc;
-	wc.hInstance = GetModuleHandleA(NULL);
-	wc.lpszClassName = m_sName;
-	wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_APP));
+	wc.hInstance = GetModuleHandleA(nullptr);
+	wc.lpszClassName = m_name.c_str();
+	wc.hIcon = LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_APP));
 	if (RegisterClassA(&wc) == 0)
-		throw std::exception("Window creation failed.");
+		throw std::runtime_error("Window class registration failed.");
 
-	RECT rc = { 0 };
+	RECT rc{};
 	rc.left = x;
 	rc.right = x + nWidth;
 	rc.top = y;
 	rc.bottom = y + nHeight;
 	AdjustWindowRect(&rc, dwStyle, FALSE);
 
-	m_hWnd = CreateWindowExA(
-		dwExStyle, m_sName, sWindowName, dwStyle, rc.left, rc.top,
-		rc.right - rc.left, rc.bottom - rc.top, m_pParent ? m_pParent->hWnd() : nullptr, 0, GetModuleHandle(NULL), this);
-	if (m_hWnd == FALSE)
-		throw std::exception("Window creation failed.");
+	m_hWnd = CreateWindowExA(dwExStyle, m_name.c_str(), sWindowName, dwStyle, rc.left, rc.top,
+		rc.right - rc.left, rc.bottom - rc.top, parent() ? parent()->hWnd() : nullptr, 0, GetModuleHandle(nullptr), this);
+	if (!m_hWnd)
+	{
+		UnregisterClassA(m_name.c_str(), GetModuleHandleA(nullptr));
+		throw std::runtime_error("Window creation failed.");
+	}
 }
 
-IWindow::~IWindow()
+IWindow::~IWindow() noexcept
 {
-	DestroyWindow(m_hWnd);
-	UnregisterClassA(m_sName, GetModuleHandleA(NULL));
+	if (m_hWnd)
+		DestroyWindow(m_hWnd);
+
+	if (!m_name.empty())
+		UnregisterClassA(m_name.c_str(), GetModuleHandleA(nullptr));
 }
 
 void IWindow::windowLoop()
 {
 	m_isReady = true;
 	MSG msg = { };
-	while (GetMessageA(&msg, NULL, 0, 0) > 0)
+	while (GetMessageA(&msg, nullptr, 0, 0) > 0)
 	{
 		TranslateMessage(&msg);
 		DispatchMessageA(&msg);
@@ -89,46 +81,66 @@ void IWindow::windowLoop()
 	m_isReady = false;
 }
 
-void IWindow::centerWindow(HWND hParent)
+void IWindow::focus()
 {
+	if (!m_hWnd)
+		return;
+
+	ShowWindow(m_hWnd, SW_RESTORE);
+	SetForegroundWindow(m_hWnd);
+}
+
+void IWindow::requestClose()
+{
+	if (m_hWnd)
+		PostMessageA(m_hWnd, WM_CLOSE, 0, 0);
+}
+
+void IWindow::centerWindow(HWND hParent) noexcept
+{
+	if (!hParent)
+		return;
+
 	RECT parentRect, rect;
 	GetWindowRect(hParent, &parentRect);
 	GetWindowRect(m_hWnd, &rect);
-	SetWindowPos(m_hWnd, NULL, parentRect.left + ((parentRect.right - parentRect.left) / 2) - ((rect.right - rect.left) / 2),
+	SetWindowPos(m_hWnd, nullptr, parentRect.left + ((parentRect.right - parentRect.left) / 2) - ((rect.right - rect.left) / 2),
 		parentRect.top + ((parentRect.bottom - parentRect.top) / 2) - ((rect.bottom - rect.top) / 2),
 		0, 0, SWP_NOSIZE | SWP_NOZORDER);
 }
 
 BOOL CALLBACK IWindow::SetChildFont(HWND hChild, LPARAM lParam)
 {
-	SendMessage(hChild, WM_SETFONT, (WPARAM)(HFONT)lParam, TRUE);
+	SendMessage(hChild, WM_SETFONT, static_cast<WPARAM>(lParam), TRUE);
 	return TRUE;
 }
 
 void IWindow::registerHoverable(IHoverable* pHoverable)
 {
 	if (pHoverable)
-		m_hoverables.insert(pHoverable);
+		m_hoverables.push_back(pHoverable);
 }
 
 void IWindow::unregisterHoverable(IHoverable* pHoverable)
 {
-	if (pHoverable)
-		m_hoverables.erase(pHoverable);
+	const auto it = std::find(m_hoverables.begin(), m_hoverables.end(), pHoverable);
+
+	if (it != m_hoverables.end())
+		m_hoverables.erase(it);
 }
 
 LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	IWindow* pThis = NULL;
+	IWindow* pThis = nullptr;
 	if (uMsg == WM_NCCREATE)
 	{
-		CREATESTRUCT* pCreate = (CREATESTRUCT*)lParam;
-		pThis = (IWindow*)pCreate->lpCreateParams;
-		SetWindowLongPtrA(hWnd, GWLP_USERDATA, (LONG_PTR)pThis);
+		const auto* createStruct = reinterpret_cast<const CREATESTRUCTA*>(lParam);
+		pThis = static_cast<IWindow*>(createStruct->lpCreateParams);
+		SetWindowLongPtrA(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
 		pThis->m_hWnd = hWnd;
 	}
 	else
-		pThis = (IWindow*)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
+		pThis = reinterpret_cast<IWindow*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
 
 	switch (uMsg)
 	{
@@ -137,6 +149,10 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 	case WM_DESTROY:
 		PostQuitMessage(0);
+	return 0;
+
+	case WM_NCDESTROY:
+		SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
 	return 0;
 
 	case WM_CLOSE:
@@ -169,22 +185,22 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	case WM_CTLCOLOREDIT:
 	{
 		HDC hdc = (HDC)wParam;
-		SetTextColor(hdc, Edit::fontColor);
-		SetBkColor(hdc, Edit::bkColor);
-		SetDCBrushColor(hdc, Edit::bkColor);
-		return (LRESULT)GetStockObject(DC_BRUSH);
+		SetTextColor(hdc, UIColor::editText);
+		SetBkColor(hdc, UIColor::editBk);
+		SetDCBrushColor(hdc, UIColor::editBk);
+		return reinterpret_cast<LRESULT>(GetStockObject(DC_BRUSH));
 	}
 
 	case WM_CTLCOLORSTATIC:
 	{
 		HDC hdcStatic = (HDC)wParam;
-		SetTextColor(hdcStatic, Resources::mainFontColor);
-		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)Resources::mainBkBrush;
+		SetTextColor(hdcStatic, UIColor::staticText);
+		SetBkColor(hdcStatic, UIColor::windowBk);
+		return reinterpret_cast<LRESULT>(Resources::mainBkBrush);
 	}
 
 	case WM_CTLCOLORBTN:
-	return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
+	return reinterpret_cast<LRESULT>(GetSysColorBrush(COLOR_WINDOW + 1));
 	}
 
 	return DefWindowProcA(hWnd, uMsg, wParam, lParam);

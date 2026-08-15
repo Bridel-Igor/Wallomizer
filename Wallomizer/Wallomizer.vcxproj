@@ -163,6 +163,8 @@
     <ClCompile Include="UI\Interfaces\IComponent.cpp" />
     <ClCompile Include="UI\Interfaces\IHoverable.cpp" />
     <ClCompile Include="UI\Interfaces\IWindow.cpp" />
+    <ClCompile Include="UI\TrayIcon.cpp" />
+    <ClCompile Include="UI\UI.cpp" />
     <ClCompile Include="UI\Windows\AddCollectionWindow.cpp" />
     <ClCompile Include="UI\Windows\AspRatPickerWindow.cpp" />
     <ClCompile Include="UI\Components\Button.cpp" />
@@ -207,6 +209,8 @@
     <ClInclude Include="UI\Components\ColorPickerButton.h" />
     <ClInclude Include="UI\Components\Panel.h" />
     <ClInclude Include="UI\Interfaces\IWindow.h" />
+    <ClInclude Include="UI\TrayIcon.h" />
+    <ClInclude Include="UI\UI.h" />
     <ClInclude Include="UI\UIColor.h" />
     <ClInclude Include="UI\UIThreadedWindow.h" />
     <ClInclude Include="UI\Windows\AddCollectionWindow.h" />

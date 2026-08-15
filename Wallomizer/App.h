@@ -8,6 +8,7 @@
 #include "CollectionManager.h"
 #include "WallpaperManager.h"
 #include "Timer.h"
+#include "UI.h"
 
 /// Root application class responsible for managing the application lifecycle
 /// and owning all major subsystems.
@@ -30,6 +31,7 @@ public:
 	CollectionManager& getCollectionManager()	noexcept { return m_collectionManager; }
 	WallpaperManager& getWallpaperManager()		noexcept { return m_wallpaperManager; }
 	Timer& getTimer()							noexcept { return m_timer; }
+	UI& getUI()									noexcept { return m_ui; }
 
 private:
 	const InstanceGuard m_instanceGuard;
@@ -38,6 +40,7 @@ private:
 	CollectionManager m_collectionManager;
 	WallpaperManager m_wallpaperManager;
 	Timer m_timer;
+	UI m_ui;
 
 	std::atomic_bool m_running = true;
 };

@@ -124,6 +124,12 @@
     <ClCompile Include="Wallpaper.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="UI\TrayIcon.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UI.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI\Windows\AddCollectionWindow.h">
@@ -268,6 +274,12 @@
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="UI\UIColor.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\TrayIcon.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UI.h">
       <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
