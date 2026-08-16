@@ -19,11 +19,11 @@ void UI::openMainWindowAsync()
 	m_mainWindow.start(std::ref(m_app));
 }
 
-void UI::requestClose()
+void UI::requestQuit()
 {
-	m_mainWindow.requestClose();
-	m_trayWindow.requestClose();
-	m_trayIcon.requestClose();
+	m_mainWindow.requestQuit();
+	m_trayWindow.requestQuit();
+	m_trayIcon.requestQuit();
 }
 
 void UI::queryEndSession()

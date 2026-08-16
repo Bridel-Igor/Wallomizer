@@ -8,7 +8,7 @@
 #include "resource.h"
 
 TrayIcon::TrayIcon(UI& ui) :
-	IWindow("Wallomizer", "TrayIconClass", 0, 0, 0, 0, 0, 0, nullptr),
+	IWindow(nullptr, "Wallomizer", "TrayIconClass", 0, 0, 0, 0, 0, 0),
 	m_ui(ui)
 {
 	m_hIcon = LoadIcon(GetModuleHandleA(nullptr), MAKEINTRESOURCE(IDI_APP));

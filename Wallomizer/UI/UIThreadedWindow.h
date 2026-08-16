@@ -26,7 +26,7 @@ class IWindow;
 /// Constructor arguments are stored by value before the worker thread is
 /// started. Use std::ref() for objects that must be passed by reference.
 ///
-/// requestClose() requests the window to close and waits for the worker
+/// requestQuit() requests the window to close and waits for the worker
 /// thread to finish. Exceptions thrown by the worker thread are captured and
 /// rethrown by the controlling thread when the worker is joined.
 template <class T>
@@ -123,7 +123,7 @@ public:
 	}
 
 	/// Requests the window to close and waits for its UI thread to finish.
-	void requestClose()
+	void requestQuit()
 	{
 		if (!m_thread.joinable())
 			return;
@@ -132,7 +132,7 @@ public:
 		waitUntilReady();
 
 		if (m_window)
-			m_window->requestClose();
+			m_window->requestQuit();
 
 		join();
 	}

@@ -5,7 +5,7 @@
 #include "App.h"
 
 TrayWindow::TrayWindow(App& app, POINT pt) :
-	IWindow("Wallomizer", "Tray Window Class", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 
+	IWindow(nullptr, "Wallomizer", "Tray Window Class", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 
 											500,	500,	width,	height),
 	m_app(app),
 	btnSettings			(this, "Settings",	40,		60,		65,		20),
@@ -13,7 +13,6 @@ TrayWindow::TrayWindow(App& app, POINT pt) :
 	player				(this,				10,		10,
 											10,		35,		200,	20, m_app.getWinUtils(), m_app.getTimer(), m_app.getWallpaperManager(), SS_CENTER)
 {
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
 	player.updateTimer(m_app.getTimer(), true);
 	positionWindow(pt);
 	SetForegroundWindow(hWnd());
@@ -26,7 +25,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_NCACTIVATE:
 		if (wParam == FALSE)
-			requestClose();
+			DestroyWindow(hWnd());
 		return 0;
 
 	case WM_DRAWITEM:
@@ -40,7 +39,7 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (btnSettings.isClicked(wParam))
 		{
 			m_app.getUI().openMainWindowAsync();
-			requestClose();
+			DestroyWindow(hWnd());
 			return 0;
 		}
 		if (btnExit.isClicked(wParam))

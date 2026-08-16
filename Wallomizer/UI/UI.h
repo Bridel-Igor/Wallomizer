@@ -26,7 +26,7 @@ public:
 	void openMainWindowAsync();
 
 	/// Requests all UI windows to close and waits for their UI threads to finish.
-	void requestClose();
+	void requestQuit();
 
 	/// Handles the Windows session-end notification.
 	void queryEndSession();

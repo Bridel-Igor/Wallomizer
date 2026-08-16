@@ -45,10 +45,9 @@ public:
 	/// @param pParent - parent component, or nullptr for a top-level window.
 	/// 
 	/// @throws std::runtime_error If window class registration or window creation fails.
-	IWindow(LPCSTR sWindowName, std::string className, DWORD dwStyle, DWORD dwExStyle = 0,
+	IWindow(IWindow* pOwner, LPCSTR sWindowName, std::string className, DWORD dwStyle, DWORD dwExStyle = 0,
 		int x = CW_USEDEFAULT, int y = CW_USEDEFAULT,
-		int nWidth = CW_USEDEFAULT, int nHeight = CW_USEDEFAULT, 
-		IComponent* pParent = nullptr);
+		int nWidth = CW_USEDEFAULT, int nHeight = CW_USEDEFAULT);
 
 	~IWindow() noexcept;
 
@@ -58,8 +57,8 @@ public:
 	/// Restores and brings the window to the foreground.
 	void focus();
 
-	/// Posts a request for the window to close.
-	void requestClose();
+	/// Requests quit on all windows on this thread.
+	void requestQuit();
 
 	/// Centers the window relative to the specified parent window.
 	void centerWindow(HWND hParent) noexcept;
@@ -88,6 +87,10 @@ private:
 	/// Native Win32 window procedure.
 	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	static constexpr UINT WM_INITIALIZE_WINDOW = WM_APP + 1;
+	static constexpr UINT QUIT_APPLICATION = 1;
+
+	IWindow* m_pOwner;
 	std::vector<IHoverable*> m_hoverables;
 	std::string m_name;
 	bool m_isReady = false;

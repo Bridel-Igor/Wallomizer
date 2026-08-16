@@ -31,9 +31,10 @@ IWindow::Resources::~Resources() noexcept
 	DeleteObject(titleFont);
 }
 
-IWindow::IWindow(LPCSTR sWindowName, std::string className, DWORD dwStyle, DWORD dwExStyle,
-		int x, int y, int nWidth, int nHeight, IComponent* pParent) :
-	IComponent(pParent),
+IWindow::IWindow(IWindow* pOwner, LPCSTR sWindowName, std::string className, DWORD dwStyle, DWORD dwExStyle,
+		int x, int y, int nWidth, int nHeight) :
+	IComponent(nullptr),
+	m_pOwner(pOwner),
 	m_name(std::move(className))
 {
 	WNDCLASS wc{};
@@ -52,7 +53,7 @@ IWindow::IWindow(LPCSTR sWindowName, std::string className, DWORD dwStyle, DWORD
 	AdjustWindowRect(&rc, dwStyle, FALSE);
 
 	m_hWnd = CreateWindowExA(dwExStyle, m_name.c_str(), sWindowName, dwStyle, rc.left, rc.top,
-		rc.right - rc.left, rc.bottom - rc.top, parent() ? parent()->hWnd() : nullptr, 0, GetModuleHandle(nullptr), this);
+		rc.right - rc.left, rc.bottom - rc.top, m_pOwner ? m_pOwner->hWnd() : nullptr, 0, GetModuleHandle(nullptr), this);
 	if (!m_hWnd)
 	{
 		UnregisterClassA(m_name.c_str(), GetModuleHandleA(nullptr));
@@ -63,7 +64,16 @@ IWindow::IWindow(LPCSTR sWindowName, std::string className, DWORD dwStyle, DWORD
 IWindow::~IWindow() noexcept
 {
 	if (m_hWnd)
+	{
+		ShowWindow(hWnd(), SW_HIDE);
 		DestroyWindow(m_hWnd);
+	}
+
+	if (m_pOwner)
+	{
+		EnableWindow(m_pOwner->hWnd(), TRUE);
+		SetForegroundWindow(m_pOwner->hWnd());
+	}
 
 	if (!m_name.empty())
 		UnregisterClassA(m_name.c_str(), GetModuleHandleA(nullptr));
@@ -72,13 +82,18 @@ IWindow::~IWindow() noexcept
 void IWindow::windowLoop()
 {
 	m_isReady = true;
-	MSG msg = { };
+	PostMessageA(m_hWnd, WM_INITIALIZE_WINDOW, 0, 0);
+
+	MSG msg{};
 	while (GetMessageA(&msg, nullptr, 0, 0) > 0)
 	{
 		TranslateMessage(&msg);
 		DispatchMessageA(&msg);
 	}
 	m_isReady = false;
+
+	if (static_cast<UINT>(msg.wParam) == QUIT_APPLICATION && m_pOwner)
+		m_pOwner->requestQuit();
 }
 
 void IWindow::focus()
@@ -90,10 +105,9 @@ void IWindow::focus()
 	SetForegroundWindow(m_hWnd);
 }
 
-void IWindow::requestClose()
+void IWindow::requestQuit()
 {
-	if (m_hWnd)
-		PostMessageA(m_hWnd, WM_CLOSE, 0, 0);
+	PostMessageA(hWnd(), WM_QUIT, QUIT_APPLICATION, 0);
 }
 
 void IWindow::centerWindow(HWND hParent) noexcept
@@ -144,6 +158,19 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 	switch (uMsg)
 	{
+	case WM_INITIALIZE_WINDOW:
+	{
+		EnumChildWindows(pThis->hWnd(), SetChildFont, reinterpret_cast<LPARAM>(pThis->resources.mainFont));
+		if (pThis->m_pOwner)
+		{
+			EnableWindow(pThis->m_pOwner->hWnd(), FALSE);
+			pThis->centerWindow(pThis->m_pOwner->hWnd());
+			ShowWindow(pThis->hWnd(), SW_SHOWNORMAL);
+			SetForegroundWindow(pThis->hWnd());
+		}
+	}
+	return 0;
+
 	case WM_CREATE:
 	return 0;
 

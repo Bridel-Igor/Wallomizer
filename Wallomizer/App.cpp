@@ -34,7 +34,7 @@ int App::run()
 		m_wallpaperManager.setLoadedWallpaper();
 	}
 
-	m_ui.requestClose();
+	m_ui.requestQuit();
 	return 0;
 }
 
