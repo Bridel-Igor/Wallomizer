@@ -1,7 +1,10 @@
 #include "MainWindow.h"
 
-#include <thread>
+#include <algorithm>
 
+#include "LocalCollection.h"
+#include "UserCollection.h"
+#include "SearchCollection.h"
 #include "App.h"
 #include "TrayWindow.h"
 #include "SettingsWindow.h"
@@ -9,35 +12,29 @@
 #include "SetLocalCollectionWindow.h"
 #include "SetUserCollectionWindow.h"
 #include "SetSearchCollectionWindow.h"
-
-MainWindow* MainWindow::s_pMainWindow = nullptr;
+#include "UIColor.h"
 
 MainWindow::MainWindow(App& app) :
-	IWindow("Wallomizer", "Main Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, width, height),
+	IWindow(nullptr, "Wallomizer", "Main Window Class", WS_CAPTION | WS_SYSMENU, 0, 100, 100, width, height),
 	m_app(app),
+	bkBrush(CreateSolidBrush(UIColor::collectionPanelBk)),
 	stCollections		(this, "Collections:",			20,		10,		100,	20),
 	btnAdd				(this, "Add collection..",		530,	10,		100,	20),
-	fX(10), fY(40), fWidth(width - 20), fHeight(400), bkColor(RGB(15, 15, 15)), bkBrush(CreateSolidBrush(bkColor)),
-	collectionsPanel	(this, "CollectionPanelClass",	fX,		fY,		fWidth, fHeight, bkBrush),
+	collectionsPanel	(this, "CollectionPanelClass",	panelX,		panelY,		panelWidth, panelHeight, bkBrush),
 	stEmpty				(&collectionsPanel, "Collection list is empty. Click \"Add collection..\" button to add one.", 
 														5,		0,		480,	20),
 	btnSettings			(this, "Settings",				10,		450,	95,		20),
 	player				(this,							220,	450,
 														430,	450,	100,	20, m_app.getWinUtils(), m_app.getTimer(), m_app.getWallpaperManager())
 {
-	s_pMainWindow = this;
 	centerWindow(GetDesktopWindow());
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)IWindow::Resources::mainFont);
 	player.updateTimer(m_app.getTimer(), true);
 	updateCollectionItems();
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
 
-MainWindow::~MainWindow()
+MainWindow::~MainWindow() noexcept
 {
-	s_pMainWindow = nullptr;
-	ShowWindow(hWnd(), SW_HIDE);
-	destroyCollectionItems();
 	DeleteObject(bkBrush);
 }
 
@@ -52,25 +49,14 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			player.updateTimer(m_app.getTimer(), true);
 			player.redrawPlayers();
 		}
+		break;
 	}
-	return 0;
-
-	case WM_DRAWITEM:
-	{
-		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
-		if (player.draw(pDIS))
-			return TRUE;
-		for (auto& item : collectionItems)
-			if (item.draw(pDIS))
-				return TRUE;
-	}
-	return 0;
 
 	case WM_COMMAND:
 	{
 		if (btnAdd.isClicked(wParam))
 		{
-			AddCollectionWindow addCollectionWindow(hWnd(), m_app.getSettings(), m_app.getCollectionManager());
+			AddCollectionWindow addCollectionWindow(this, m_app.getWinUtils(), m_app.getSettings(), m_app.getCollectionManager());
 			addCollectionWindow.windowLoop();
 			updateCollectionItems();
 			return 0;
@@ -79,7 +65,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		if (btnSettings.isClicked(wParam))
 		{
-			SettingsWindow settingsWindow(hWnd(), m_app.getWinUtils(), m_app.getSettings());
+			SettingsWindow settingsWindow(this, m_app.getWinUtils(), m_app.getSettings());
 			settingsWindow.windowLoop();
 			Player::updateTimer(m_app.getTimer(), true);
 			return 0;
@@ -94,19 +80,19 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				{
 				case CollectionType::local:
 				{
-					SetLocalCollectionWindow setLocalCollectionWindow(hWnd(), static_cast<LocalCollection&>(collection));
+					SetLocalCollectionWindow setLocalCollectionWindow(this, m_app.getWinUtils(), static_cast<LocalCollection&>(collection));
 					setLocalCollectionWindow.windowLoop();
 					break;
 				}
 				case CollectionType::user:
 				{
-					SetUserCollectionWindow setUserCollectionWindow(hWnd(), m_app.getSettings(), static_cast<UserCollection&>(collection));
+					SetUserCollectionWindow setUserCollectionWindow(this, m_app.getSettings(), static_cast<UserCollection&>(collection));
 					setUserCollectionWindow.windowLoop();
 					break;
 				}
 				case CollectionType::search:
 				{
-					SetSearchCollectionWindow setSearchCollectionWindow(hWnd(), static_cast<SearchCollection&>(collection));
+					SetSearchCollectionWindow setSearchCollectionWindow(this, static_cast<SearchCollection&>(collection));
 					setSearchCollectionWindow.windowLoop();
 					break;
 				}
@@ -124,15 +110,15 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 			if (collectionItem.chboEnabled.isClicked(wParam))
 			{
-				collectionItem.chboEnabled.click();
+				collectionItem.chboEnabled.toggle();
 				m_app.getCollectionManager().enableCollection(i, collectionItem.chboEnabled.isChecked());
 				updateCollectionItems();
 				return 0;
 			}
 			i++;
 		}
+		break;
 	}
-	return 0;
 
 	case WM_MOUSEWHEEL:
 	{
@@ -140,8 +126,8 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SendMessage(collectionsPanel.hWnd(), WM_VSCROLL, SB_LINEUP, 0L);
 		else
 			SendMessage(collectionsPanel.hWnd(), WM_VSCROLL, SB_LINEDOWN, 0L);
+		break;
 	}
-	return 0;
 
 	case WM_VSCROLL:
 	{
@@ -182,10 +168,21 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		for (auto& p : collectionItems) // placing according to the scrollbar
 			p.reposition(yCurrentScroll, scrollBarIsVisible);
 
-		ScrollWindowEx(collectionsPanel.hWnd(), 0, -yDelta, nullptr, nullptr, (HRGN)NULL, (PRECT)NULL, SW_INVALIDATE);
+		ScrollWindowEx(collectionsPanel.hWnd(), 0, -yDelta, nullptr, nullptr, nullptr, nullptr, SW_INVALIDATE);
 		UpdateWindow(collectionsPanel.hWnd());
+		break;
 	}
-	return 0;
+
+	case WM_DRAWITEM:
+	{
+		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
+		if (player.draw(pDIS))
+			return TRUE;
+		for (auto& item : collectionItems)
+			if (item.draw(pDIS))
+				return TRUE;
+		break;
+	}
 
 	case WM_CTLCOLORSTATIC:
 	case WM_CTLCOLORBTN:
@@ -197,35 +194,36 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (hWnd == item.stNumber.hWnd() || hWnd == item.stName.hWnd())
 			{
 				if (item.chboEnabled.isChecked())
-					SetTextColor(hdc, CollectionItem::Resources::collItemFontColor);
+					SetTextColor(hdc, UIColor::collectionItemText);
 				else
-					SetTextColor(hdc, RGB(80, 80, 80));
-				SetBkColor(hdc, CollectionItem::Resources::collItemBkColor);
+					SetTextColor(hdc, UIColor::collectionItemTextInactive);
+				SetBkColor(hdc, UIColor::collectionItemBk);
 				return (LRESULT)CollectionItem::Resources::collItemBkBrush;
 			}
 			if (hWnd == item.chboEnabled.hWnd() ||
 				hWnd == item.btnDelete.hWnd() ||
 				hWnd == item.btnSettings.hWnd())
 			{
-				SetTextColor(hdc, CollectionItem::Resources::collItemFontColor);
-				SetBkColor(hdc, CollectionItem::Resources::collItemBkColor);
+				SetTextColor(hdc, UIColor::collectionItemText);
+				SetBkColor(hdc, UIColor::collectionItemBk);
 				return (LRESULT)CollectionItem::Resources::collItemBkBrush;
 			}
 		}
 		if (hWnd == stEmpty.hWnd())
 		{
-			SetTextColor(hdc, CollectionItem::Resources::collItemFontColor);
+			SetTextColor(hdc, UIColor::collectionItemText);
 			SetBkMode(hdc, TRANSPARENT);
 			return (LRESULT)bkBrush;
 		}
 		if (hWnd == collectionsPanel.hWnd())
 		{
-			SetBkColor(hdc, bkColor);
+			SetBkColor(hdc, UIColor::collectionPanelBk);
 			return (LRESULT)bkBrush;
 		}
-		// Don't return so IWindow could process another components
+		break;
 	}
 	}
+
 	return RESULT_DEFAULT;
 }
 
@@ -240,7 +238,7 @@ void MainWindow::updateCollectionItems()
 
 	// create if less then needed
 	for (std::size_t i = collectionItems.size(); i < collectionCount; i++)
-		collectionItems.emplace_back(&collectionsPanel, 0, static_cast<int>(i) * (CollectionItem::height + 1), fWidth, IWindow::Resources::mainFont);
+		collectionItems.emplace_back(&collectionsPanel, 0, static_cast<int>(i) * (CollectionItem::height + 1), panelWidth);
 
 	updateScroll();
 	std::size_t i = 0;
@@ -253,27 +251,21 @@ void MainWindow::updateCollectionItems()
 	InvalidateRect(hWnd(), nullptr, FALSE);
 }
 
-void MainWindow::destroyCollectionItems()
-{
-	collectionItems.clear();
-	updateScroll();
-}
-
 void MainWindow::updateScroll()
 {
 	int itemListHeight = (int)collectionItems.size() * (CollectionItem::height + 1);
-	yMaxScroll = std::max(itemListHeight - fHeight, 0);
+	yMaxScroll = std::max(itemListHeight - panelHeight, 0);
 	yCurrentScroll = std::min(yCurrentScroll, yMaxScroll);
 	yCurrentScroll = yCurrentScroll < 0 ? 0 : yCurrentScroll;
 	si.cbSize = sizeof(si);
 	si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
 	si.nMin = yMinScroll;
 	si.nMax = itemListHeight;
-	si.nPage = fHeight;
+	si.nPage = panelHeight;
 	si.nPos = yCurrentScroll;
 
-	scrollBarIsVisible = itemListHeight <= fHeight ? FALSE : TRUE;
+	scrollBarIsVisible = itemListHeight > panelHeight;
 	SetScrollInfo(collectionsPanel.hWnd(), SB_VERT, &si, TRUE);
 	ShowScrollBar(collectionsPanel.hWnd(), SB_VERT, scrollBarIsVisible);
-	EnableScrollBar(collectionsPanel.hWnd(), SB_VERT, itemListHeight <= fHeight ? ESB_DISABLE_BOTH : ESB_ENABLE_BOTH);
+	EnableScrollBar(collectionsPanel.hWnd(), SB_VERT, itemListHeight <= panelHeight ? ESB_DISABLE_BOTH : ESB_ENABLE_BOTH);
 }

@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "WinUtils.h"
 #include "Settings.h"
 #include "CollectionManager.h"
 #include "UserCollection.h"
@@ -11,28 +12,16 @@
 #include "SetUserCollectionWindow.h"
 #include "SetSearchCollectionWindow.h"
 
-AddCollectionWindow::AddCollectionWindow(HWND hCaller, const Settings& settings, CollectionManager& collectionManager) :
-	IWindow("Add collection", "Add Collection Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100,	100,	240,	140),
+AddCollectionWindow::AddCollectionWindow(IWindow* pOwner, const WinUtils& winUtils, const Settings& settings, CollectionManager& collectionManager) :
+	IWindow(pOwner, "Add collection", "Add Collection Window Class", WS_CAPTION | WS_SYSMENU, 0, 100,	100,	240,	140),
+	m_winUtils(winUtils),
 	m_settings(settings),
 	m_collectionManager(collectionManager),
-	m_hCaller(hCaller),
-	btnAddLocalCollection(this, "Add local collection",					10,		10,		220,	20),
+	btnAddLocalCollection(this, "Add local collection",				10,		10,		220,	20),
 	btnAddUserCollection(this, "Add wallhaven user collection",		10,		40,		220,	20),
 	btnAddSearchCollection(this, "Add wallhaven search collection",	10,		70,		220,	20),
-	btnCancel(this, "Cancel",											10,		110,	220,	20)
-{
-	centerWindow(m_hCaller);
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
-	ShowWindow(hWnd(), SW_SHOWNORMAL);
-	EnableWindow(m_hCaller, FALSE);
-}
-
-AddCollectionWindow::~AddCollectionWindow()
-{
-	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(m_hCaller, TRUE);
-	SetForegroundWindow(m_hCaller);
-}
+	btnCancel(this, "Cancel",										10,		110,	220,	20)
+{}
 
 LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM)
 {
@@ -44,9 +33,9 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 		{
 			ShowWindow(hWnd(), SW_HIDE);
 			auto collection = std::make_unique<UserCollection>(m_settings);
-			SetUserCollectionWindow setUserCollectionWindow(hWnd(), m_settings, *collection);
+			SetUserCollectionWindow setUserCollectionWindow(this, m_settings, *collection);
 			setUserCollectionWindow.windowLoop();
-			if (collection->isValid())
+			if (setUserCollectionWindow.isOk() && collection->isValid())
 				m_collectionManager.addCollection(std::move(collection));
 			DestroyWindow(hWnd());
 			return 0;
@@ -55,9 +44,9 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 		{
 			ShowWindow(hWnd(), SW_HIDE);
 			auto collection = std::make_unique<LocalCollection>(m_collectionManager);
-			SetLocalCollectionWindow setLocalCollectionWindow(hWnd(), *collection);
+			SetLocalCollectionWindow setLocalCollectionWindow(this, m_winUtils, *collection);
 			setLocalCollectionWindow.windowLoop();
-			if (collection->isValid())
+			if (setLocalCollectionWindow.isOk() && collection->isValid())
 				m_collectionManager.addCollection(std::move(collection));
 			DestroyWindow(hWnd());
 			return 0;
@@ -65,10 +54,10 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 		if (btnAddSearchCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			auto collection = std::make_unique <SearchCollection>(m_settings, m_collectionManager);
-			SetSearchCollectionWindow setSearchCollectionWindow(hWnd(), *collection);
+			auto collection = std::make_unique<SearchCollection>(m_settings, m_collectionManager);
+			SetSearchCollectionWindow setSearchCollectionWindow(this, *collection);
 			setSearchCollectionWindow.windowLoop();
-			if (collection->isValid())
+			if (setSearchCollectionWindow.isOk() && collection->isValid())
 				m_collectionManager.addCollection(std::move(collection));
 			DestroyWindow(hWnd());
 			return 0;
@@ -78,10 +67,9 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 			DestroyWindow(hWnd());
 			return 0;
 		}
+		break;
 	}
-	return 0;
-
-	default:
-		return RESULT_DEFAULT;
 	}
+	
+	return RESULT_DEFAULT;
 }

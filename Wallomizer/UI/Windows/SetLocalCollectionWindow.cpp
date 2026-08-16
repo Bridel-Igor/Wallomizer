@@ -1,37 +1,22 @@
 #include "SetLocalCollectionWindow.h"
 
-#include <ShObjIdl.h>
+#include "LocalCollection.h"
+#include "WinUtils.h"
 
-SetLocalCollectionWindow::SetLocalCollectionWindow(HWND hCaller, LocalCollection& localCollection) :
-	IWindow("Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 400, 120),
+SetLocalCollectionWindow::SetLocalCollectionWindow(IWindow* pOwner, const WinUtils& winUtils, LocalCollection& localCollection) :
+	IWindow(pOwner, "Local collection", "Set Local Collection Window Class",WS_CAPTION | WS_SYSMENU, 0, 100, 100, 400, 120),
 	m_localCollection(localCollection),
-	m_hCaller(hCaller),
-	stPath		(this, "Enter path to directory:",		10,		10,		390,	20),
-	edPath		(this, m_localCollection.getPath().c_str(),
-														10,		30,		360,	20),
-	btnPath		(this, "..",							370,	30,		20,		20),
-	cbRecursive (this,									15,		60,		20,		20, 
-		m_localCollection.isRecursive()),
-	stRecursive (this, "and all subdirectories.",		40,		60,		150,	20),
-	btnCancel	(this, "Cancel",						10,		90,		185,	20),
-	btnOk		(this, "Ok",							205,	90,		185,	20)
-{
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
-	centerWindow(m_hCaller);
-	EnableWindow(m_hCaller, FALSE);
-	SetForegroundWindow(m_hCaller);
-	ShowWindow(hWnd(), SW_SHOWNORMAL);
-	SetForegroundWindow(hWnd());
-}
+	m_winUtils(winUtils),
+	stPath		(this, "Enter path to directory:",			10,		10,		390,	20),
+	edPath		(this, m_localCollection.getPath().c_str(),	10,		30,		360,	20),
+	btnPath		(this, "..",								370,	30,		20,		20),
+	cbRecursive (this,										15,		60,		20,		20, m_localCollection.isRecursive()),
+	stRecursive (this, "and all subdirectories.",			40,		60,		150,	20),
+	btnCancel	(this, "Cancel",							10,		90,		185,	20),
+	btnOk		(this, "Ok",								205,	90,		185,	20)
+{}
 
-SetLocalCollectionWindow::~SetLocalCollectionWindow()
-{
-	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(m_hCaller, TRUE);
-	SetForegroundWindow(m_hCaller);
-}
-
-LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT SetLocalCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -44,67 +29,41 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wPa
 				MessageBoxA(nullptr, "Path can't be empty.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
 				return 0;
 			}
-			wchar_t path[255]{};
-			edPath.getTextW(path, 255);
-			m_localCollection.setPath(path);
+			m_localCollection.setPath(edPath.textW());
 			m_localCollection.setRecursive(cbRecursive.isChecked());
 			m_localCollection.update();
-			DestroyWindow(hWnd);
+			m_isOk = true;
+			DestroyWindow(hWnd());
 			return 0;
 		}
-
 		if (btnCancel.isClicked(wParam))
 		{
-			DestroyWindow(hWnd);
+			DestroyWindow(hWnd());
 			return 0;
 		}
-
 		if (btnPath.isClicked(wParam))
 		{
-			IFileDialog* pfd;
-			LPWSTR g_path;
-			if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd))))
-			{
-				DWORD dwOptions;
-				if (SUCCEEDED(pfd->GetOptions(&dwOptions)))
-				{
-					pfd->SetOptions(dwOptions | FOS_PICKFOLDERS);
-				}
-				if (SUCCEEDED(pfd->Show(NULL)))
-				{
-					IShellItem* psi;
-					if (SUCCEEDED(pfd->GetResult(&psi)))
-					{
-						if (!SUCCEEDED(psi->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &g_path)))
-						{
-							MessageBox(NULL, "GetIDListName() failed", NULL, NULL);
-						}
-						else
-							edPath.setTextW(g_path);
-						psi->Release();
-					}
-				}
-				pfd->Release();
-			}
+			const auto path = m_winUtils.pickDirectory();
+			if (!path.empty())
+				edPath.setText(path.wstring());
 			return 0;
 		}
 		if (cbRecursive.isClicked(wParam))
 		{
-			cbRecursive.click();
+			cbRecursive.toggle();
 			return 0;
 		}
+		break;
 	}
-	return 0;
 
 	case WM_DRAWITEM:
 	{
-		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
-		if (cbRecursive.draw(pDIS, resources.mainBkBrush))
+		LPDRAWITEMSTRUCT drawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+		if (cbRecursive.draw(drawItem, resources.mainBkBrush))
 			return TRUE;
+		break;
 	}
-	return 0;
-
-	default:
-		return RESULT_DEFAULT;
 	}
+	
+	return RESULT_DEFAULT;
 }

@@ -1,12 +1,12 @@
 #include "SetSearchCollectionWindow.h"
 
+#include "SearchCollection.h"
 #include "ResPickerWindow.h"
 #include "AspRatPickerWindow.h"
 #include "ColorPickerWindow.h"
 
-SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, SearchCollection& searchCollection) :
-	IWindow("Search collection", "Set Search Collection Window Class",WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 470, 260),
-	m_hCaller(hCaller),
+SetSearchCollectionWindow::SetSearchCollectionWindow(IWindow* pOwner, SearchCollection& searchCollection) :
+	IWindow(pOwner, "Search collection", "Set Search Collection Window Class",WS_CAPTION | WS_SYSMENU, 0, 100, 100, 470, 260),
 	m_searchCollection(searchCollection),
 	stCategory		(this, "Category:",													10,		10,		60,		20),
 	catCom			(this,																80,		10,		159,	20),
@@ -20,7 +20,7 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, SearchCollect
 	btnColor		(this, "Pick color",												340,	40,		120,	20),
 
 	stTag			(this, "Tags:",														10,		70,		60,		20),
-	edTag			(this, L"",															80,		70,		380,	20),
+	edTag			(this, m_searchCollection.settings.tag,								80,		70,		380,	20),
 	stTagInstruct { {this, "tagname - search fuzzily for a tag/keyword",				80,		100,	380,	15},
 					{this, "- tagname - exclude a tag / keyword",						80,		115,	380,	15},
 					{this, "+ tag1 + tag2 - must have tag1 and tag2",					80,		130,	380,	15},
@@ -31,29 +31,13 @@ SetSearchCollectionWindow::SetSearchCollectionWindow(HWND hCaller, SearchCollect
 					{this, "like : wallpaper ID - Find wallpapers with similar tags",	80,		205,	380,	15} },
 
 	btnCancel		(this, "Cancel",													80,		230,	185,	20),
-	btnOk			(this, "Ok",														275,	230,	185,	20)
+	btnOk			(this, "Ok",														275,	230,	185,	20),
+	tmpRes(m_searchCollection.settings.resolution),
+	tmpAR(m_searchCollection.settings.ratio),
+	tmpColor(m_searchCollection.settings.color)
 {
 	catCom.setCategory(m_searchCollection.settings.categoriesAndPurity);
 	purCom.setPurity(m_searchCollection.settings.categoriesAndPurity);
-	edTag.setTextW(m_searchCollection.settings.tag.c_str());
-	wcscpy_s(tmpRes, m_searchCollection.settings.resolution.c_str());
-	wcscpy_s(tmpAR, m_searchCollection.settings.ratio.c_str());
-	wcscpy_s(tmpColor, m_searchCollection.settings.color.c_str());
-
-
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
-	centerWindow(m_hCaller);
-	EnableWindow(m_hCaller, FALSE);
-	SetForegroundWindow(m_hCaller);
-	ShowWindow(hWnd(), SW_SHOWNORMAL);
-	SetForegroundWindow(hWnd());
-}
-
-SetSearchCollectionWindow::~SetSearchCollectionWindow()
-{
-	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(m_hCaller, TRUE);
-	SetForegroundWindow(m_hCaller);
 }
 
 LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -62,13 +46,13 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 	{
 	case WM_DRAWITEM:
 	{
-		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
-		if (purCom.draw(pDIS))
+		LPDRAWITEMSTRUCT drawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+		if (purCom.draw(drawItem))
 			return TRUE;
-		if (catCom.draw(pDIS))
+		if (catCom.draw(drawItem))
 			return TRUE;
+		break;
 	}
-	return 0;
 
 	case WM_COMMAND:
 	{
@@ -78,39 +62,31 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 			return 0;
 		if (btnRes.isClicked(wParam))
 		{
-			ResPickerWindow resPickerWindow(hWnd(), tmpRes);
+			ResPickerWindow resPickerWindow(this, tmpRes);
 			resPickerWindow.windowLoop();
-			SetForegroundWindow(m_hCaller);
-			SetForegroundWindow(hWnd());
 			return 0;
 		}
 		if (btnAR.isClicked(wParam))
 		{
-			AspRatPickerWindow aspRatPickerWindow(hWnd(), tmpAR);
+			AspRatPickerWindow aspRatPickerWindow(this, tmpAR);
 			aspRatPickerWindow.windowLoop();
-			SetForegroundWindow(m_hCaller);
-			SetForegroundWindow(hWnd());
 			return 0;
 		}
 		if (btnColor.isClicked(wParam))
 		{
-			ColorPickerWindow colorPickerWindow(hWnd(), tmpColor);
+			ColorPickerWindow colorPickerWindow(this, tmpColor);
 			colorPickerWindow.windowLoop();
-			SetForegroundWindow(m_hCaller);
-			SetForegroundWindow(hWnd());
 			return 0;
 		}
 		if (btnOk.isClicked(wParam))
 		{
-			m_searchCollection.settings.categoriesAndPurity = 0;
 			m_searchCollection.settings.categoriesAndPurity = catCom.getCategory() | purCom.getPurity();
-			wchar_t tag[255]{};
-			edTag.getTextW(tag, 255);
-			m_searchCollection.settings.tag = tag;
+			m_searchCollection.settings.tag = edTag.textW();
 			m_searchCollection.settings.resolution = tmpRes;
 			m_searchCollection.settings.ratio = tmpAR;
 			m_searchCollection.settings.color = tmpColor;
 			m_searchCollection.update();
+			m_isOk = true;
 			DestroyWindow(hWnd());
 			return 0;
 		}
@@ -119,10 +95,9 @@ LRESULT SetSearchCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam,
 			DestroyWindow(hWnd());
 			return 0;
 		}
+		break;
 	}
-	return 0;
+	}
 
-	default:
-		return RESULT_DEFAULT;
-	}
+	return RESULT_DEFAULT;
 }

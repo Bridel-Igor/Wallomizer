@@ -1,22 +1,23 @@
 #pragma once
 
+#include <string>
+
 #include "IWindow.h"
-#include "Button.h"
-#include "PushButton.h"
 #include "Static.h"
-#include "SearchCollection.h"
+#include "PushButton.h"
+#include "Button.h"
 
 class AspRatPickerWindow : public IWindow
 {
 public:
-	AspRatPickerWindow(HWND hCaller, wchar_t* sAspRat);
-	~AspRatPickerWindow();
-	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	AspRatPickerWindow(IWindow* pOwner, std::wstring& aspRat);
 
 private:
-	HWND m_hCaller;
-	wchar_t* m_sAspRat;
+	LRESULT HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
 	Static stWide, stUltrawide, stPortrait, stSquare;
 	PushButton btnAR[12], btnAllWide, btnAllPortrait;
 	Button btnOk, btnCancel;	
+
+	std::wstring& m_aspRat;
 };

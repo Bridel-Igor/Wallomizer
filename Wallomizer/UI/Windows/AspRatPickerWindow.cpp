@@ -1,9 +1,7 @@
 #include "AspRatPickerWindow.h"
 
-AspRatPickerWindow::AspRatPickerWindow(HWND hCaller, wchar_t* sAspRat) :
-	IWindow("Ratio", "Aspect Ratio Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 315, 195),
-	m_hCaller(hCaller),
-	m_sAspRat(sAspRat),
+AspRatPickerWindow::AspRatPickerWindow(IWindow* pOwner, std::wstring& aspRat) :
+	IWindow(pOwner, "Ratio", "Aspect Ratio Window Class", WS_CAPTION | WS_SYSMENU, 0, 100, 100, 315, 195),
 	btnAllWide		(this, "All Wide",		10,		35,		145,	20),
 	btnAllPortrait	(this, "All Portrait",	160,	35,		70,		20),
 	stWide			(this, "Wide",			10,		10,		70,		20, SS_CENTER),
@@ -23,33 +21,17 @@ AspRatPickerWindow::AspRatPickerWindow(HWND hCaller, wchar_t* sAspRat) :
 					{this, "4x3",			235,	110,	70,		20},
 					{this, "5x4",			235,	135,	70,		20}},
 	btnCancel		(this, "Cancel",		10,		165,	142,	20),
-	btnOk			(this, "Ok",			162,	165,	143,	20)
+	btnOk			(this, "Ok",			162,	165,	143,	20),
+	m_aspRat(aspRat)
 {
-	EnableWindow(m_hCaller, FALSE);
-
-	//initializing
-	if (wcsstr(m_sAspRat, L"landscape") != NULL)
+	if (m_aspRat.find(L"landscape") != std::wstring::npos)
 		btnAllWide.check(true);
-	if (wcsstr(m_sAspRat, L"portrait") != NULL)
+	if (m_aspRat.find(L"portrait") != std::wstring::npos)
 		btnAllPortrait.check(true);
-	for (int i = 0; i < 12; i++)
-	{
-		wchar_t buf[16] = { 0 };
-		GetWindowTextW(btnAR[i].hWnd(), buf, 15);
-		if (wcsstr(m_sAspRat, buf) != NULL)
-			btnAR[i].check(true);
-	}
-	
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
-	centerWindow(m_hCaller);
-	ShowWindow(hWnd(), SW_SHOWNORMAL);
-}
 
-AspRatPickerWindow::~AspRatPickerWindow()
-{
-	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(m_hCaller, TRUE);
-	SetForegroundWindow(m_hCaller);
+	for (auto& button : btnAR)
+		if (m_aspRat.find(button.textW()) != std::wstring::npos)
+			button.check(true);
 }
 
 LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -58,25 +40,16 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM
 	{
 	case WM_DRAWITEM:
 	{
-		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
-		if (pDIS->hwndItem == btnAllPortrait.hWnd())
-		{
-			btnAllPortrait.draw(pDIS);
+		LPDRAWITEMSTRUCT drawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+		if (btnAllPortrait.draw(drawItem))
 			return TRUE;
-		}
-		if (pDIS->hwndItem == btnAllWide.hWnd())
-		{
-			btnAllWide.draw(pDIS);
+		if (btnAllWide.draw(drawItem))
 			return TRUE;
-		}
-		for (int i = 0; i < 12; i++)
-			if (pDIS->hwndItem == btnAR[i].hWnd())
-			{
-				btnAR[i].draw(pDIS);
+		for (auto& button : btnAR)
+			if (button.draw(drawItem))
 				return TRUE;
-			}
+		break;
 	}
-	return 0;
 
 	case WM_COMMAND:
 	{
@@ -90,43 +63,36 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM
 			btnAllPortrait.check(!btnAllPortrait.isChecked());
 			return 0;
 		}
-		for (int i = 0; i < 12; i++)
-			if (btnAR[i].isClicked(wParam))
+		for (auto& button : btnAR)
+			if (button.isClicked(wParam))
 			{
-				btnAR[i].check(!btnAR[i].isChecked());
+				button.check(!button.isChecked());
 				return 0;
 			}
 		if (btnOk.isClicked(wParam))
 		{
-			wcscpy_s(m_sAspRat, 128, L"");
 			bool empty = true;
-			if (btnAllWide.isChecked() || btnAllPortrait.isChecked())
-				empty = false;
-			int i = 0;
-			while (empty && i < 12)
-			{
-				if (btnAR[i].isChecked())
-					empty = false;
-				i++;
-			}
-			if (empty)
-			{
-				DestroyWindow(hWnd());
-				return 0;
-			}
-			wcscpy_s(m_sAspRat, 128, L"&ratios=");
-			if (btnAllWide.isChecked())
-				wcscat_s(m_sAspRat, 128, L"landscape");
-			if (btnAllPortrait.isChecked())
-				wcscat_s(m_sAspRat, 128, L",portrait");
-			for (i = 0; i < 12; i++)
-				if (btnAR[i].isChecked())
+			auto append = [&](const std::wstring& value)
 				{
-					wcscat_s(m_sAspRat, 128, L",");
-					wchar_t buf[16] = { 0 };
-					GetWindowTextW(btnAR[i].hWnd(), buf, 15);
-					wcscat_s(m_sAspRat, 128, buf);
-				}
+					if (!empty)
+						m_aspRat += L',';
+
+					m_aspRat += value;
+					empty = false;
+				};
+
+			m_aspRat = L"&ratios=";
+			if (btnAllWide.isChecked())
+				append( L"landscape");
+			if (btnAllPortrait.isChecked())
+				append(L"portrait");
+			for (auto& button : btnAR)
+				if (button.isChecked())
+					append(button.textW());
+
+			if (empty)
+				m_aspRat.clear();
+
 			DestroyWindow(hWnd());
 			return 0;
 		}
@@ -135,10 +101,9 @@ LRESULT AspRatPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM
 			DestroyWindow(hWnd());
 			return 0;
 		}
+		break;
 	}
-	return 0;
+	}
 
-	default:
-		return RESULT_DEFAULT;
-	}
+	return RESULT_DEFAULT;
 }

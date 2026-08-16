@@ -20,13 +20,14 @@ public:
 	
 private:
 	/// Handles window activation, owner-draw messages and control commands.
-	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	
 	/// Positions the popup around the tray icon while keeping it inside
 	/// the work area of the monitor containing the icon.
 	void positionWindow(POINT point);
 
-	static constexpr int width = 220, height = 90;
+	static constexpr int width = 220;
+	static constexpr int height = 90;
 
 	App& m_app;
 

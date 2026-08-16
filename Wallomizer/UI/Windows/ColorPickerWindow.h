@@ -1,20 +1,21 @@
 #pragma once
 
+#include <string>
+
 #include "IWindow.h"
-#include "Button.h"
 #include "ColorButton.h"
-#include "SearchCollection.h"
+#include "Button.h"
 
 class ColorPickerWindow : public IWindow
 {
 public:
-	ColorPickerWindow(HWND hCaller, wchar_t* wsColor);
-	~ColorPickerWindow();
-	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	ColorPickerWindow(IWindow* pOwner, std::wstring& color);
 
 private:
-	HWND m_hCaller;
-	wchar_t* m_sColor;
+	LRESULT HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
 	ColorButton btnClr[30];
 	Button btnOk, btnCancel;
+	
+	std::wstring& m_color;
 };

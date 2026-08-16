@@ -14,18 +14,17 @@ class Settings;
 class SettingsWindow : public IWindow
 {
 public:
-	SettingsWindow(HWND hCaller, const WinUtils& winUtils, Settings& settings);
-	~SettingsWindow();
-	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	SettingsWindow(IWindow* pOwner, const WinUtils& winUtils, Settings& settings);
+
+private:
+	LRESULT HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 	static constexpr int width = 400;
 	static constexpr int height = 370;
 
-private:
 	const WinUtils& m_winUtils;
 	Settings& m_settings;
 
-	HWND m_hCaller;
 	Static stApplication, stSlideshow, stWallhaven;
 	Static stVersion, stActVersion, stDeveloper, stActDeveloper, stHours, stMinutes, stSeconds, stDelay, stBckColor, stApiKey, stUsername, stStartup;
 	Edit edApiKey, edUsername;

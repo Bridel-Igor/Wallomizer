@@ -28,7 +28,7 @@ private:
 	/// Returns the screen-space center of the tray icon.
 	POINT getPosition() const;
 
-	static constexpr UINT WM_NOTIFYICONMSG = WM_USER + 2;
+	static constexpr UINT WM_NOTIFYICONMSG = WM_APP + 2;
 	static constexpr UINT id = 1;
 
 	UI& m_ui;

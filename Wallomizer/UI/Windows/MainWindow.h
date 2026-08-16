@@ -1,5 +1,7 @@
 #pragma once
 
+#include <list>
+
 #include "IWindow.h"
 #include "Static.h"
 #include "Button.h"
@@ -15,23 +17,23 @@ class MainWindow : public IWindow
 {
 public:
 	MainWindow(App& app);
-	~MainWindow();
-	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	~MainWindow() noexcept;
+
+private:
+	LRESULT HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	void updateCollectionItems();
+	void updateScroll();
 
 	static constexpr int width = 640;
 	static constexpr int height = 480;
-	static MainWindow* s_pMainWindow;
-	
-private:
-	void destroyCollectionItems();
-	void updateScroll();
+
+	static constexpr int panelWidth = width - 20;
+	static constexpr int panelHeight = 400;
+	static constexpr int panelX = 10;
+	static constexpr int panelY = 40;
 
 	App& m_app;
-
-	COLORREF bkColor;
 	HBRUSH bkBrush;
-	int fWidth, fHeight, fX, fY;
 
 	Static stCollections;
 	Panel collectionsPanel;
@@ -40,7 +42,7 @@ private:
 	Player player;
 	
 	std::list<CollectionItem> collectionItems;
-	SCROLLINFO si;
+	SCROLLINFO si{};
 	int yMinScroll = 0;
 	int yCurrentScroll = 0;
 	int yMaxScroll = 0;

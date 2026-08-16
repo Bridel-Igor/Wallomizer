@@ -1,5 +1,6 @@
 #include "SearchCollection.h"
 
+#include <Windows.h>
 #include <Shellapi.h>
 
 #include "WinUtils.h"

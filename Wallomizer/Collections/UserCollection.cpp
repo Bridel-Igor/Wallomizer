@@ -1,5 +1,6 @@
 #include "UserCollection.h"
 
+#include <Windows.h>
 #include <Shellapi.h>
 
 #include "WinUtils.h"
@@ -153,7 +154,7 @@ void UserCollection::openWallpaperExternal(std::wstring_view path)
 	ShellExecuteW(nullptr, nullptr, url.c_str(), nullptr, nullptr, SW_SHOW);
 }
 
-void UserCollection::loadCollectionList(std::list<UserCollectionInfo>& list, const std::wstring& username, const std::wstring& apiKey)
+void UserCollection::loadCollectionList(std::vector<UserCollectionInfo>& list, const std::wstring& username, const std::wstring& apiKey)
 {
 	std::wstring url =  L"https://wallhaven.cc/api/v1/collections/";
 	url += username;

@@ -1,25 +1,31 @@
 #pragma once
 
-#include "LocalCollection.h"
 #include "IWindow.h"
 #include "Static.h"
-#include "Button.h"
 #include "Edit.h"
 #include "CheckBox.h"
+#include "Button.h"
+
+class LocalCollection;
+class WinUtils;
 
 class SetLocalCollectionWindow : public IWindow
 {
 public:
-	SetLocalCollectionWindow(HWND hCaller, LocalCollection& localCollection);
-	~SetLocalCollectionWindow();
-	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	SetLocalCollectionWindow(IWindow* pOwner, const WinUtils& winUtils, LocalCollection& localCollection);
+
+	bool isOk() const noexcept { return m_isOk; }
 
 private:
-	LocalCollection& m_localCollection;
+	LRESULT HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-	HWND m_hCaller;
+	LocalCollection& m_localCollection;
+	const WinUtils& m_winUtils;
+
 	Static stPath, stRecursive;
 	Edit edPath;
 	CheckBox cbRecursive;
 	Button btnOk, btnCancel, btnPath;
+
+	bool m_isOk = false;
 };

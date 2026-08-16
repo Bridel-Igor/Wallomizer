@@ -26,12 +26,12 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_NCACTIVATE:
 		if (wParam == FALSE)
 			DestroyWindow(hWnd());
-		return 0;
+		break;
 
 	case WM_DRAWITEM:
 		if (player.draw(reinterpret_cast<LPDRAWITEMSTRUCT>(lParam)))
 			return TRUE;
-		return 0;
+		break;
 
 	case WM_COMMAND:
 		if (player.click(wParam))
@@ -48,10 +48,10 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 		return 0;
-
-	default:
-		return RESULT_DEFAULT;
+		break;
 	}
+	
+	return RESULT_DEFAULT;
 }
 
 void TrayWindow::positionWindow(POINT pt)

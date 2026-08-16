@@ -178,7 +178,6 @@ void WinUtils::setStartup(bool enabled) const
 bool WinUtils::createShortcut(const std::filesystem::path& target, const std::filesystem::path& link, const std::filesystem::path& workingDirectory) const
 {
 	ComInitializer com;
-
 	if (!com.isInitialized())
 		return false;
 
@@ -200,4 +199,36 @@ bool WinUtils::createShortcut(const std::filesystem::path& target, const std::fi
 		return false;
 
 	return SUCCEEDED(persistFile->Save(link.c_str(), TRUE));
+}
+
+std::filesystem::path WinUtils::pickDirectory() const
+{
+	std::filesystem::path path;
+
+	ComInitializer com;
+	if (!com.isInitialized())
+		return path;
+
+	Microsoft::WRL::ComPtr<IFileDialog> dialog;
+	if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&dialog))))
+	{
+		DWORD options;
+		if (SUCCEEDED(dialog->GetOptions(&options)))
+			dialog->SetOptions(options | FOS_PICKFOLDERS);
+		if (SUCCEEDED(dialog->Show(nullptr)))
+		{
+			Microsoft::WRL::ComPtr<IShellItem> item;
+			if (SUCCEEDED(dialog->GetResult(&item)))
+			{
+				LPWSTR rawPath = nullptr;
+				if (SUCCEEDED(item->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &rawPath)))
+				{
+					path = rawPath;
+					CoTaskMemFree(rawPath);
+				}
+			}
+		}
+	}
+
+	return path;
 }

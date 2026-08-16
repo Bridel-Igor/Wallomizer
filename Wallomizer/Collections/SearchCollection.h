@@ -3,7 +3,6 @@
 #include <string>
 
 #include "BaseCollection.h"
-#include "CategoriesAndPurityComponents.h"
 
 class CollectionManager;
 class Settings;

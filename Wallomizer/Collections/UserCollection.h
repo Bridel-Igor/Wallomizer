@@ -1,10 +1,9 @@
 #pragma once
 
 #include <string>
-#include <list>
+#include <vector>
 
 #include "BaseCollection.h"
-#include "CategoriesAndPurityComponents.h"
 
 class WinUtils;
 class Settings;
@@ -44,7 +43,7 @@ public:
 
 	static bool loadWallpaper(const std::wstring& url, const WinUtils& winUtils);
 	static void openWallpaperExternal(std::wstring_view path);
-	static void loadCollectionList(std::list<UserCollectionInfo>& list, const std::wstring& username, const std::wstring& apiKey);
+	static void loadCollectionList(std::vector<UserCollectionInfo>& list, const std::wstring& username, const std::wstring& apiKey);
 
 	UserCollectionSettings settings;
 	

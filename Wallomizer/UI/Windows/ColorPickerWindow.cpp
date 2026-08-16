@@ -1,9 +1,7 @@
 #include "ColorPickerWindow.h"
 
-ColorPickerWindow::ColorPickerWindow(HWND hCaller, wchar_t* wsColor) :
-	IWindow("Color", "Color Picker Window Class", WS_CAPTION | WS_SYSMENU, NULL, 100, 100, 405, 195),
-	m_hCaller(hCaller),
-	m_sColor(wsColor),
+ColorPickerWindow::ColorPickerWindow(IWindow* pOwner, std::wstring& color) :
+	IWindow(pOwner, "Color", "Color Picker Window Class", WS_CAPTION | WS_SYSMENU, 0, 100, 100, 405, 195),
 	btnClr     {{this, 0x66, 0x00, 0x00,	10,		10,		60,		25},
 				{this, 0x99, 0x00, 0x00,	75,		10,		60,		25},
 				{this, 0xcc, 0x00, 0x00,	140,	10,		60,		25},
@@ -40,36 +38,18 @@ ColorPickerWindow::ColorPickerWindow(HWND hCaller, wchar_t* wsColor) :
 				{this, 0xff, 0xff, 0xff,	335,	130,	60,		25, true}},
 
 	btnCancel	(this, "Cancel",			10,		165,	187,	20),
-	btnOk		(this, "Ok",				207,	165,	188,	20)
+	btnOk		(this, "Ok",				207,	165,	188,	20),
+	m_color(color)
 {
-	EnableWindow(m_hCaller, FALSE);
-
-	//initializing
-	if (wcsstr(m_sColor, L"&colors=") == NULL)
-		btnClr[29].check(true);
+	if (m_color.find(L"&colors=") == std::wstring::npos)
+		btnClr[29].setChecked(true);
 	else
-		for (int i = 0; i < 29; i++)
-		{
-			wchar_t sBuf[16] = { 0 };
-			btnClr[i].getColor(sBuf, 15);
-			if (wcsstr(m_sColor, sBuf) != NULL)
+		for (auto& button : btnClr)
+			if (m_color.find(button.getColor()) != std::wstring::npos)
 			{
-				btnClr[i].check(true);
+				button.setChecked(true);
 				break;
 			}
-		}
-
-	EnumChildWindows(hWnd(), SetChildFont, (LPARAM)resources.mainFont);
-
-	centerWindow(m_hCaller);
-	ShowWindow(hWnd(), SW_SHOWNORMAL);
-}
-
-ColorPickerWindow::~ColorPickerWindow()
-{
-	ShowWindow(hWnd(), SW_HIDE);
-	EnableWindow(m_hCaller, TRUE);
-	SetForegroundWindow(m_hCaller);
 }
 
 LRESULT ColorPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -78,45 +58,49 @@ LRESULT ColorPickerWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM 
 	{
 	case WM_DRAWITEM:
 	{
-		LPDRAWITEMSTRUCT pDIS = (LPDRAWITEMSTRUCT)lParam;
-		for (int i = 0; i < 30; i++)
-			if (btnClr[i].draw(pDIS))
+		LPDRAWITEMSTRUCT drawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+		for (auto& button : btnClr)
+			if (button.draw(drawItem))
 				return TRUE;
+		break;
 	}
-	return 0;
 
 	case WM_COMMAND:
 	{
-		for (int i = 0; i < 30; i++)
-			if (btnClr[i].isClicked(wParam))
-			{
-				for (int j = 0; j < 30; j++)
-					btnClr[j].check(false);
-				btnClr[i].check(true);
-				return 0;
-			}
+		for (auto& button : btnClr)
+		{
+			if (!button.isClicked(wParam))
+				continue;
+
+			for (auto& other : btnClr)
+				other.setChecked(false);
+
+			button.setChecked(true);
+			return 0;
+		}
+
 		if (btnOk.isClicked(wParam))
 		{
-			wcscpy_s(m_sColor, 16, L"");
-			for (int i = 0; i < 29; i++)
-				if (btnClr[i].isChecked())
+			m_color = L"";
+			for (auto& button : btnClr)
+				if (button.isChecked())
 				{
-					wcscpy_s(m_sColor, 16, L"&colors=");
-					btnClr[i].getColor(m_sColor, 16);
+					m_color = L"&colors=";
+					m_color += button.getColor();
 					break;
 				}
 			DestroyWindow(hWnd());
 			return 0;
 		}
+
 		if (btnCancel.isClicked(wParam))
 		{
 			DestroyWindow(hWnd());
 			return 0;
 		}
+		break;
 	}
-	return 0;
+	}
 
-	default:
-		return RESULT_DEFAULT;
-	}
+	return RESULT_DEFAULT;
 }

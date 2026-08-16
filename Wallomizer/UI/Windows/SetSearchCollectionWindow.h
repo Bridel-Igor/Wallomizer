@@ -1,27 +1,33 @@
 #pragma once
 
-#include "SearchCollection.h"
+#include <string>
+
 #include "IWindow.h"
-#include "Button.h"
 #include "Static.h"
 #include "Edit.h"
+#include "Button.h"
+#include "CategoriesAndPurityComponents.h"
+
+class SearchCollection;
 
 class SetSearchCollectionWindow : public IWindow
 {
 public:
-	SetSearchCollectionWindow(HWND hCaller, SearchCollection& collection);
-	~SetSearchCollectionWindow();
-	LRESULT HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	SetSearchCollectionWindow(IWindow* pOwner, SearchCollection& collection);
+
+	bool isOk() const noexcept { return m_isOk; }
 
 private:
+	LRESULT HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+
 	SearchCollection& m_searchCollection;
 
-	HWND m_hCaller;
 	Static stCategory, stPurity, stTag, stFilt, stTagInstruct[8];
 	Edit edTag;
 	Button btnOk, btnCancel, btnRes, btnAR, btnColor;
 	CategoryComponent catCom;
 	PurityComponent purCom;
 
-	wchar_t tmpRes[255] = L"", tmpAR[128] = L"", tmpColor[16] = L"";
+	std::wstring tmpRes, tmpAR, tmpColor;
+	bool m_isOk = false;
 };

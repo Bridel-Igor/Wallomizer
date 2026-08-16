@@ -38,6 +38,9 @@ public:
 	/// Add or remove app from startup.
 	void setStartup(bool enabled) const;
 
+	/// Opens a folder selection dialog and returns the selected directory path.
+	std::filesystem::path pickDirectory() const;
+
 private:
 	bool createShortcut(const std::filesystem::path& target, const std::filesystem::path& link, const std::filesystem::path& workingDirectory) const;
 

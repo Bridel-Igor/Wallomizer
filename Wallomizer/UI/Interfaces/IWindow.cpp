@@ -65,18 +65,18 @@ IWindow::~IWindow() noexcept
 {
 	if (m_hWnd)
 	{
-		ShowWindow(hWnd(), SW_HIDE);
 		DestroyWindow(m_hWnd);
-	}
-
-	if (m_pOwner)
-	{
-		EnableWindow(m_pOwner->hWnd(), TRUE);
-		SetForegroundWindow(m_pOwner->hWnd());
+		m_hWnd = nullptr;
 	}
 
 	if (!m_name.empty())
 		UnregisterClassA(m_name.c_str(), GetModuleHandleA(nullptr));
+
+	if (m_pOwner)
+	{
+		EnableWindow(m_pOwner->hWnd(), TRUE);
+		m_pOwner->focus();
+	}
 }
 
 void IWindow::windowLoop()
@@ -101,7 +101,14 @@ void IWindow::focus()
 	if (!m_hWnd)
 		return;
 
-	ShowWindow(m_hWnd, SW_RESTORE);
+	std::vector<HWND> chain;
+	for (IWindow* window = this; window; window = window->m_pOwner)
+		chain.push_back(window->hWnd());
+	for (auto it = chain.rbegin(); it != chain.rend(); ++it)
+	{
+		ShowWindow(*it, SW_SHOWNOACTIVATE);
+		SetWindowPos(*it, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	}
 	SetForegroundWindow(m_hWnd);
 }
 
