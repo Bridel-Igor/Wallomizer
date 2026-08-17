@@ -63,9 +63,6 @@ public:
 	/// Centers the window relative to the specified parent window.
 	void centerWindow(HWND hParent) noexcept;
 
-	/// Indicates that the window message loop has started processing messages.
-	bool isReady() const noexcept { return m_isReady; }
-
 	/// Registers a component that should receive mouse-hover notifications.
 	void registerHoverable(IHoverable* pHoverable);
 
@@ -92,6 +89,6 @@ private:
 
 	IWindow* m_pOwner;
 	std::vector<IHoverable*> m_hoverables;
-	std::string m_name;
+	std::string m_className;
 	bool m_isReady = false;
 };

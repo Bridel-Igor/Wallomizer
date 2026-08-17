@@ -35,12 +35,12 @@ IWindow::IWindow(IWindow* pOwner, LPCSTR sWindowName, std::string className, DWO
 		int x, int y, int nWidth, int nHeight) :
 	IComponent(nullptr),
 	m_pOwner(pOwner),
-	m_name(std::move(className))
+	m_className(std::move(className))
 {
 	WNDCLASS wc{};
 	wc.lpfnWndProc = WindowProc;
 	wc.hInstance = GetModuleHandleA(nullptr);
-	wc.lpszClassName = m_name.c_str();
+	wc.lpszClassName = m_className.c_str();
 	wc.hIcon = LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_APP));
 	if (RegisterClassA(&wc) == 0)
 		throw std::runtime_error("Window class registration failed.");
@@ -52,11 +52,11 @@ IWindow::IWindow(IWindow* pOwner, LPCSTR sWindowName, std::string className, DWO
 	rc.bottom = y + nHeight;
 	AdjustWindowRect(&rc, dwStyle, FALSE);
 
-	m_hWnd = CreateWindowExA(dwExStyle, m_name.c_str(), sWindowName, dwStyle, rc.left, rc.top,
+	m_hWnd = CreateWindowExA(dwExStyle, m_className.c_str(), sWindowName, dwStyle, rc.left, rc.top,
 		rc.right - rc.left, rc.bottom - rc.top, m_pOwner ? m_pOwner->hWnd() : nullptr, 0, GetModuleHandle(nullptr), this);
 	if (!m_hWnd)
 	{
-		UnregisterClassA(m_name.c_str(), GetModuleHandleA(nullptr));
+		UnregisterClassA(m_className.c_str(), GetModuleHandleA(nullptr));
 		throw std::runtime_error("Window creation failed.");
 	}
 }
@@ -69,8 +69,8 @@ IWindow::~IWindow() noexcept
 		m_hWnd = nullptr;
 	}
 
-	if (!m_name.empty())
-		UnregisterClassA(m_name.c_str(), GetModuleHandleA(nullptr));
+	if (!m_className.empty())
+		UnregisterClassA(m_className.c_str(), GetModuleHandleA(nullptr));
 
 	if (m_pOwner)
 	{
