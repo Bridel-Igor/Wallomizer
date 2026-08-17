@@ -79,8 +79,8 @@ Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yT
 	btnNext(pParent,			xPlayer + 180,	yPlayer,	20,		20, resources.hINext,			resources.hINextHover,			"Next"),
 	stDelayRemained(pParent, "",			xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles)
 {	
-	updateTimer(m_timer);
 	pPlayers.push_back(this);
+	redrawPlayers();
 }
 
 Player::~Player()
@@ -92,43 +92,43 @@ Player::~Player()
 
 bool Player::click(WPARAM wParam)
 {
-	if (btnPrev.isClicked(wParam))
+	if (btnPrev.isClicked(wParam) && !m_timer.isLoading())
 	{
 		m_wallpaperManager.previousWallpaper();
 		redrawPlayers();
 		return true;
 	}
-	if (btnOpenExternal.isClicked(wParam))
+	if (btnOpenExternal.isClicked(wParam) && !m_timer.isLoading())
 	{
 		m_wallpaperManager.openCurrentWallpaperExternally();
 		return true;
 	}
-	if (btnStop.isClicked(wParam))
+	if (btnStop.isClicked(wParam) && !m_timer.isLoading())
 	{ 
 		m_timer.stop();
 		redrawPlayers();
 		return true;
 	}
-	if (btnPlay.isClicked(wParam))
+	if (btnPlay.isClicked(wParam) && !m_timer.isLoading())
 	{
 		m_timer.play();
 		redrawPlayers();
 		return true;
 	}
-	if (btnPause.isClicked(wParam))
+	if (btnPause.isClicked(wParam) && !m_timer.isLoading())
 	{
 		m_timer.pause();
 		redrawPlayers();
 		return true;
 	}
-	if (btnFit.isClicked(wParam)) 
+	if (btnFit.isClicked(wParam) && !m_timer.isLoading())
 	{
 		m_winUtils.flipWallpaperStyle();
 		m_winUtils.updateDesktopBackground(m_timer.getStatus() != Timer::Status::stopped);
 		Player::redrawPlayers();
 		return true;
 	}
-	if (btnNext.isClicked(wParam))
+	if (btnNext.isClicked(wParam) && !m_timer.isLoading())
 	{
 		m_wallpaperManager.nextWallpaper();
 		redrawPlayers();
@@ -197,18 +197,12 @@ bool Player::draw(LPDRAWITEMSTRUCT pDIS) const
 	return false;
 }
 
-void Player::updateTimer(Timer& timer)
+void Player::updateTimer()
 {
-	bool isForced = false;
-	for (auto pPlayer : pPlayers)
-	{
-		if (!IsWindowVisible(GetParent(pPlayer->btnPrev.hWnd())))
-			continue;
-		isForced = true;
-		break;
-	}
-	if (!isForced)
+	if (pPlayers.empty())
 		return;
+
+	Timer& timer = pPlayers[0]->m_timer;
 
 	char text[16] = "loading...";
 	if (!timer.isLoading())
@@ -224,8 +218,6 @@ void Player::updateTimer(Timer& timer)
 
 	for (auto pPlayer : pPlayers)
 	{
-		if (!isForced && !IsWindowVisible(GetParent(pPlayer->btnPrev.hWnd())))
-			continue;
 		pPlayer->stDelayRemained.setText(text);
 		InvalidateRect(pPlayer->stDelayRemained.hWnd(), nullptr, FALSE);
 	}
@@ -233,10 +225,9 @@ void Player::updateTimer(Timer& timer)
 
 void Player::redrawPlayers() noexcept
 {
+	updateTimer();
 	for (auto pPlayer : pPlayers)
 	{
-		if (!IsWindowVisible(GetParent(pPlayer->btnPrev.hWnd())))
-			continue;
 		InvalidateRect(pPlayer->btnPrev.hWnd(), nullptr, FALSE);
 		InvalidateRect(pPlayer->btnOpenExternal.hWnd(), nullptr, FALSE);
 		InvalidateRect(pPlayer->btnStop.hWnd(), nullptr, FALSE);

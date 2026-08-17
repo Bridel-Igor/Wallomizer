@@ -36,7 +36,7 @@ public:
 	~Player();
 	bool click(WPARAM wParam);
 	bool draw(LPDRAWITEMSTRUCT pDIS) const;
-	static void updateTimer(Timer& timer);
+	static void updateTimer();
 	static void redrawPlayers() noexcept;
 	
 private:

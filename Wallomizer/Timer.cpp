@@ -69,7 +69,7 @@ void Timer::run()
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		if (m_status == Status::playing)
 		{
-			Player::updateTimer(*this);
+			Player::updateTimer();
 			m_timePassed += 100;
 		}
 	}

@@ -28,7 +28,6 @@ MainWindow::MainWindow(App& app) :
 														430,	450,	100,	20, m_app.getWinUtils(), m_app.getTimer(), m_app.getWallpaperManager())
 {
 	centerWindow(GetDesktopWindow());
-	player.updateTimer(m_app.getTimer());
 	updateCollectionItems();
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
@@ -42,16 +41,6 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-	case WM_SHOWWINDOW:
-	{
-		if (wParam == TRUE)
-		{
-			player.updateTimer(m_app.getTimer());
-			player.redrawPlayers();
-		}
-		break;
-	}
-
 	case WM_COMMAND:
 	{
 		if (btnAdd.isClicked(wParam))
@@ -67,7 +56,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			SettingsWindow settingsWindow(this, m_app.getWinUtils(), m_app.getSettings());
 			settingsWindow.windowLoop();
-			Player::updateTimer(m_app.getTimer());
+			Player::redrawPlayers();
 			return 0;
 		}
 		int i = 0;

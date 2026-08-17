@@ -45,7 +45,7 @@ bool CollectionManager::saveSettings() const
 bool CollectionManager::loadSettings()
 {
 	Timer::LoadingGuard loading = m_timer.loadingGuard();
-	Player::updateTimer(m_timer);
+	Player::redrawPlayers();
 
 	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"CollectionManager.dat";
 
