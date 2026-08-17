@@ -1,5 +1,7 @@
 #include "App.h"
 
+#include <thread>
+
 #include "TrayWindow.h"
 #include "UIThreadedWindow.h"
 
@@ -24,7 +26,7 @@ int App::run()
 			continue;
 		}
 
-		std::thread loaderThread(&WallpaperManager::loadNextWallpaper, &m_wallpaperManager);
+		std::thread loaderThread(&WallpaperManager::loadImage, &m_wallpaperManager);
 		m_timer.run();
 		loaderThread.join();
 
@@ -41,6 +43,6 @@ int App::run()
 void App::requestExit()
 {
 	m_running = false;
-	m_timer.abort();
+	m_timer.cancel();
 	m_timer.saveSession();
 }

@@ -104,17 +104,20 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 				return 0;
 			}
 			
-			Internet internet;
-			std::wstring apiKeyTestUrl = L"https://wallhaven.cc/api/v1/settings?apikey=";
-			apiKeyTestUrl += newData.apiKey;
-			internet.downloadToBuffer(apiKeyTestUrl);
-			if (internet.parse("error"))
+			if (!newData.apiKey.empty())
 			{
-				MessageBoxA(nullptr, "Unknown API key!", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
-				return 0;
+				Internet internet;
+				std::wstring apiKeyTestUrl = L"https://wallhaven.cc/api/v1/settings?apikey=";
+				apiKeyTestUrl += newData.apiKey;
+				internet.downloadToBuffer(apiKeyTestUrl);
+				if (internet.parse("error"))
+				{
+					MessageBoxA(nullptr, "Unknown API key!", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
+					return 0;
+				}
+				if (!internet.parse("data"))
+					MessageBoxA(nullptr, "Can't check API key! Wallhaven API is down, or no internet connection.", "Wallomizer", MB_OK | MB_ICONINFORMATION);
 			}
-			if (!internet.parse("data"))
-				MessageBoxA(nullptr, "Can't check API key! Wallhaven API is down, or no internet connection.", "Wallomizer", MB_OK | MB_ICONINFORMATION);
 
 			Settings::Data backupData = data;
 			data = newData;

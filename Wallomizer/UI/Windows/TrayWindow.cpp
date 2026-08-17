@@ -13,7 +13,7 @@ TrayWindow::TrayWindow(App& app, POINT pt) :
 	player				(this,				10,		10,
 											10,		35,		200,	20, m_app.getWinUtils(), m_app.getTimer(), m_app.getWallpaperManager(), SS_CENTER)
 {
-	player.updateTimer(m_app.getTimer(), true);
+	player.updateTimer(m_app.getTimer());
 	positionWindow(pt);
 	SetForegroundWindow(hWnd());
 	SendMessage(hWnd(), WM_SETCURSOR, 0, 0);

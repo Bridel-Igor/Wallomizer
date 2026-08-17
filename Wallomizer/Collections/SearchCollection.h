@@ -7,6 +7,7 @@
 class CollectionManager;
 class Settings;
 class WinUtils;
+class Internet;
 
 class SearchCollection : public BaseCollection
 {
@@ -32,7 +33,7 @@ public:
 	bool loadSettings(BinaryReader& file, std::uint16_t fileVersion) override;
 	std::wstring getCollectionName() const override;
 	CategoriesAndPurity getCAP() const override;
-	Wallpaper getWallpaper(std::size_t index) const override;
+	Wallpaper getWallpaper(std::size_t index) override;
 	void update() override;
 	bool isValid() const override;
 
@@ -43,6 +44,7 @@ public:
 
 private:
 	std::wstring getURL() const;
+	bool parseMeta(Internet& internet);
 
 	CollectionManager& m_collectionManager;
 	const Settings& m_settings;

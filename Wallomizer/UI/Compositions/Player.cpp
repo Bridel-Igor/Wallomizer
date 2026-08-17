@@ -79,7 +79,7 @@ Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yT
 	btnNext(pParent,			xPlayer + 180,	yPlayer,	20,		20, resources.hINext,			resources.hINextHover,			"Next"),
 	stDelayRemained(pParent, "",			xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles)
 {	
-	updateTimer(m_timer, true);
+	updateTimer(m_timer);
 	pPlayers.push_back(this);
 }
 
@@ -92,22 +92,22 @@ Player::~Player()
 
 bool Player::click(WPARAM wParam)
 {
+	if (btnPrev.isClicked(wParam))
+	{
+		m_wallpaperManager.previousWallpaper();
+		redrawPlayers();
+		return true;
+	}
 	if (btnOpenExternal.isClicked(wParam))
 	{
 		m_wallpaperManager.openCurrentWallpaperExternally();
-		return true;
-	}
-	if (btnPrev.isClicked(wParam))
-	{
-		m_timer.repeat();
-		m_wallpaperManager.setPreviousWallpaper();
 		return true;
 	}
 	if (btnStop.isClicked(wParam))
 	{ 
 		m_timer.stop();
 		redrawPlayers();
-		return 0;
+		return true;
 	}
 	if (btnPlay.isClicked(wParam))
 	{
@@ -130,8 +130,8 @@ bool Player::click(WPARAM wParam)
 	}
 	if (btnNext.isClicked(wParam))
 	{
-		m_timer.repeat();
-		m_wallpaperManager.setNextWallpaper();
+		m_wallpaperManager.nextWallpaper();
+		redrawPlayers();
 		return true;
 	}
 	return false;
@@ -152,6 +152,12 @@ bool Player::draw(LPDRAWITEMSTRUCT pDIS) const
 	if (pDIS->hwndItem == btnOpenExternal.hWnd())
 	{
 		// TODO: gray out if there is no wallpaper in manager
+		if (!m_wallpaperManager.hasCurrent())
+		{
+			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
+			DrawIconEx(pDIS->hDC, 0, 0, resources.hIOpenExternal, 0, 0, 0, nullptr, DI_NORMAL);
+			return true;
+		}
 		return btnOpenExternal.draw(pDIS, IWindow::Resources::mainBkBrush);
 	}
 	if (pDIS->hwndItem == btnStop.hWnd())
@@ -191,8 +197,9 @@ bool Player::draw(LPDRAWITEMSTRUCT pDIS) const
 	return false;
 }
 
-void Player::updateTimer(Timer& timer, bool isForced)
+void Player::updateTimer(Timer& timer)
 {
+	bool isForced = false;
 	for (auto pPlayer : pPlayers)
 	{
 		if (!IsWindowVisible(GetParent(pPlayer->btnPrev.hWnd())))

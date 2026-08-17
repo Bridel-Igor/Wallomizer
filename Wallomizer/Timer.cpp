@@ -60,17 +60,11 @@ void Timer::run()
 {
 	while (m_timePassed < m_settings.getData().delay)
 	{
-		if (m_abort)
+		if (m_cancel)
 		{
-			m_abort = false;
+			m_cancel = false;
 			m_timePassed = 0;
 			return;
-		}
-		if (m_repeat)
-		{
-			m_repeat = false;
-			m_timePassed = 0;
-			continue;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		if (m_status == Status::playing)

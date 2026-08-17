@@ -50,8 +50,7 @@ public:
 	void play() noexcept;
 	void pause() noexcept;
 	void stop() noexcept;
-	void abort() noexcept { m_abort = true; }
-	void repeat() noexcept { m_repeat = true; }
+	void cancel() noexcept { m_cancel = true; }
 	Status getStatus() const noexcept { return m_status; }
 	std::uint32_t getRemainingTime() const noexcept;
 	LoadingGuard loadingGuard() { return LoadingGuard(*this); }
@@ -64,8 +63,7 @@ private:
 
 	std::mutex m_sessionFileAccess;
 	std::atomic<Status> m_status = Status::playing;
-	std::atomic_bool m_abort = false;
-	std::atomic_bool m_repeat = false;
+	std::atomic_bool m_cancel = false;
 	std::atomic<std::uint32_t> m_timePassed = 0;
 	std::atomic_bool m_loading = false;
 };

@@ -106,7 +106,7 @@ CategoriesAndPurity UserCollection::getCAP() const
 	return settings.categoriesAndPurity;
 }
 
-Wallpaper UserCollection::getWallpaper(std::size_t index) const
+Wallpaper UserCollection::getWallpaper(std::size_t index)
 {
 	const std::size_t page = index / s_perPage + 1;
 	index %= s_perPage;
@@ -126,6 +126,9 @@ Wallpaper UserCollection::getWallpaper(std::size_t index) const
 	std::wstring path;
 	if (!internet.parse("path", path, true))
 		return Wallpaper::getEmptyWallpaper();
+
+	if (internet.parse("meta"))
+		internet.parse("total", m_wallpaperCount, true);
 
 	return Wallpaper(CollectionType::user, path);
 }

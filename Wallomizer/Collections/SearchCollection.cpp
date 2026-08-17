@@ -10,7 +10,7 @@
 #include "Internet.h"
 #include "BinaryIO.h"
 
-std::size_t SearchCollection::s_perPage = 64;
+std::size_t SearchCollection::s_perPage = 24;
 
 bool SearchCollection::saveSettings(BinaryWriter& file) const
 {
@@ -66,16 +66,11 @@ void SearchCollection::update()
 {
 	m_wallpaperCount = 0;
 	Internet internet;
-	std::wstring perPage;
 
 	if (!m_isEnabled
-		|| !internet.downloadToBuffer(getURL(), s_perPage * 750)
-		|| !internet.parse("meta")
-		|| !internet.parse("per_page", perPage, true)
-		|| !internet.parse("total", m_wallpaperCount, true))
+		|| !internet.downloadToBuffer(getURL())
+		|| !parseMeta(internet))
 		return;
-
-	s_perPage = std::stoull(perPage);
 }
 
 std::wstring SearchCollection::getURL() const
@@ -135,20 +130,20 @@ CategoriesAndPurity SearchCollection::getCAP() const
 	return settings.categoriesAndPurity;
 }
 
-Wallpaper SearchCollection::getWallpaper(std::size_t index) const
+Wallpaper SearchCollection::getWallpaper(std::size_t index)
 {
 	const std::size_t page = index / s_perPage + 1;
-	index %= s_perPage;
+	const std::size_t pageIndex = index % s_perPage;
 
 	std::wstring url = getURL();
 	url += L"&page=";
 	url += std::to_wstring(page);
 
 	Internet internet;
-	if (!internet.downloadToBuffer(url, s_perPage * 750))
+	if (!internet.downloadToBuffer(url))
 		return Wallpaper::getEmptyWallpaper();
 
-	for (std::size_t i = 0; i < index; i++)
+	for (std::size_t i = 0; i < pageIndex; i++)
 		if (!internet.parse("path", true))
 			return Wallpaper::getEmptyWallpaper();
 
@@ -156,9 +151,7 @@ Wallpaper SearchCollection::getWallpaper(std::size_t index) const
 	if (!internet.parse("path", path, true))
 		return Wallpaper::getEmptyWallpaper();
 
-	std::wstring perPage;
-	if (internet.parse("per_page", perPage, true))
-		s_perPage = std::stoull(perPage);
+	parseMeta(internet);
 
 	return Wallpaper(CollectionType::search, path);
 }
@@ -190,4 +183,29 @@ void SearchCollection::openWallpaperExternal(std::wstring_view path)
 bool SearchCollection::isValid() const
 {
 	return m_type == CollectionType::search;
+}
+
+bool SearchCollection::parseMeta(Internet& internet)
+{
+	if (!internet.parse("meta")
+		|| !internet.parse("total", m_wallpaperCount, true))
+		return false;
+
+	// In case per_page came as a number.
+	if (internet.parse("meta")
+		&& internet.parse("per_page", s_perPage, true))
+		return true;
+
+	// In case per_page came as a string.
+	std::wstring perPage;
+	if (internet.parse("meta")
+		&& internet.parse("per_page", perPage, true))
+	{
+		s_perPage = std::stoull(perPage);
+		return true;
+	}
+
+	// Fallback.
+	s_perPage = 24;
+	return true;
 }

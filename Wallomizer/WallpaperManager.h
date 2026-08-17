@@ -2,6 +2,7 @@
 
 #include <list>
 #include <mutex>
+#include <filesystem>
 
 #include "Wallpaper.h"
 
@@ -21,22 +22,28 @@ public:
 
 	void setCurrentWallpaper(Wallpaper&& wallpaper);
 	const Wallpaper getCurrentWallpaper() const;
+	bool hasCurrent() const;
 	bool hasPrevious() const;
-	void loadNextWallpaper();
-	void setLoadedWallpaper(bool setPrevious = false);
-	void setNextWallpaper();
-	void setPreviousWallpaper();
+
+	void loadImage();
+	void setLoadedWallpaper();
+	void nextWallpaper();
+	void previousWallpaper();
 	void deleteLoaded();
 	void openCurrentWallpaperExternally();
 
 private:
+
 	const WinUtils& m_winUtils;
 	const Settings& m_settings;
 	const CollectionManager& m_collectionManager;
 	Timer& m_timer;
 
-	std::mutex m_imageModification;
+	const std::filesystem::path pathOfLoaded;
+	const std::filesystem::path pathOfCurrent;
+	mutable std::mutex m_imageModification;
 
 	std::list<Wallpaper> m_wallpaperList;
-	Wallpaper m_NextWallpaper;
+	Wallpaper m_nextWallpaper;
+	bool m_settingPrevious = false;
 };

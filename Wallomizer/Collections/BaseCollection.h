@@ -27,7 +27,7 @@ public:
 	virtual bool loadSettings(BinaryReader& file, std::uint16_t fileVersion) = 0;
 	virtual std::wstring getCollectionName() const = 0;
 	virtual CategoriesAndPurity getCAP() const = 0;
-	virtual Wallpaper getWallpaper(std::size_t index) const = 0;
+	virtual Wallpaper getWallpaper(std::size_t index) = 0;
 	virtual void update() = 0;
 	virtual bool isValid() const = 0;
 

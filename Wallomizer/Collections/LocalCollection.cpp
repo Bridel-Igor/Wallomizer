@@ -84,7 +84,7 @@ std::wstring LocalCollection::getCollectionName() const
 	return name;
 }
 
-Wallpaper LocalCollection::getWallpaper(std::size_t index) const
+Wallpaper LocalCollection::getWallpaper(std::size_t index)
 {
 	if (m_path.empty() || m_wallpaperCount == 0)
 		return Wallpaper::getEmptyWallpaper();

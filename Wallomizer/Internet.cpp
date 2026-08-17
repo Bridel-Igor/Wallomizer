@@ -18,41 +18,44 @@ Internet::~Internet()
 	InternetCloseHandle(m_hInternetSession);
 }
 
-bool Internet::downloadToBuffer(const std::wstring& url, std::size_t bufferSize)
+bool Internet::downloadToBuffer(const std::wstring& url)
 {
-	if (url.empty() || bufferSize == 0)
+	if (url.empty())
 		return false;
 
 	HINTERNET hURL = InternetOpenUrlW(m_hInternetSession, url.c_str(), nullptr, 0, INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
-
-	if (hURL == nullptr)
+	if (!hURL)
 		return false;
 
 	m_currentPosition = 0;
-	m_buffer.assign(bufferSize, '\0');
+	m_buffer.clear();
 	
-	constexpr std::size_t READ_BUFFER_SIZE = 1024;
+	constexpr std::size_t MAX_RESPONSE_SIZE = 256 * 1024;
+	constexpr std::size_t READ_BUFFER_SIZE = 4096;
+	char buffer[READ_BUFFER_SIZE];
 
-	while (m_currentPosition < m_buffer.size())
+	while (true)
 	{
-		const std::size_t bytesAvailable = m_buffer.size() - m_currentPosition;
-		const DWORD bytesToRead = static_cast<DWORD>(std::min(bytesAvailable, READ_BUFFER_SIZE));
 		DWORD bytesRead = 0;
 
-		if (!InternetReadFile(hURL, m_buffer.data() + m_currentPosition, bytesToRead, &bytesRead))
+		if (!InternetReadFile(hURL, buffer, sizeof(buffer), &bytesRead))
 		{
-			m_currentPosition = 0;
 			InternetCloseHandle(hURL);
 			return false;
 		}
 		if (bytesRead == 0)
 			break;
 
-		m_currentPosition += bytesRead;
+		if (m_buffer.size() + bytesRead > MAX_RESPONSE_SIZE)
+		{
+			InternetCloseHandle(hURL);
+			m_buffer.clear();
+			return false;
+		}
+
+		m_buffer.append(buffer, bytesRead);
 	}
 
-	m_buffer.resize(m_currentPosition);
-	m_currentPosition = 0;
 	InternetCloseHandle(hURL);
 	return true;
 }

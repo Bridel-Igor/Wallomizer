@@ -45,7 +45,7 @@ bool CollectionManager::saveSettings() const
 bool CollectionManager::loadSettings()
 {
 	Timer::LoadingGuard loading = m_timer.loadingGuard();
-	Player::updateTimer(m_timer, true);
+	Player::updateTimer(m_timer);
 
 	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"CollectionManager.dat";
 
@@ -116,7 +116,7 @@ bool CollectionManager::loadSettings()
 	recountWallpapers();
 
 	if (m_timer.getStatus() == Timer::Status::playing)
-		m_timer.abort();
+		m_timer.cancel();
 
 	return true;
 }

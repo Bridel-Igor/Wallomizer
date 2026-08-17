@@ -28,7 +28,7 @@ MainWindow::MainWindow(App& app) :
 														430,	450,	100,	20, m_app.getWinUtils(), m_app.getTimer(), m_app.getWallpaperManager())
 {
 	centerWindow(GetDesktopWindow());
-	player.updateTimer(m_app.getTimer(), true);
+	player.updateTimer(m_app.getTimer());
 	updateCollectionItems();
 	ShowWindow(hWnd(), SW_SHOWNORMAL);
 }
@@ -46,7 +46,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (wParam == TRUE)
 		{
-			player.updateTimer(m_app.getTimer(), true);
+			player.updateTimer(m_app.getTimer());
 			player.redrawPlayers();
 		}
 		break;
@@ -67,7 +67,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			SettingsWindow settingsWindow(this, m_app.getWinUtils(), m_app.getSettings());
 			settingsWindow.windowLoop();
-			Player::updateTimer(m_app.getTimer(), true);
+			Player::updateTimer(m_app.getTimer());
 			return 0;
 		}
 		int i = 0;
@@ -82,18 +82,24 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				{
 					SetLocalCollectionWindow setLocalCollectionWindow(this, m_app.getWinUtils(), static_cast<LocalCollection&>(collection));
 					setLocalCollectionWindow.windowLoop();
+					if (setLocalCollectionWindow.isOk())
+						m_app.getCollectionManager().saveSettings();
 					break;
 				}
 				case CollectionType::user:
 				{
 					SetUserCollectionWindow setUserCollectionWindow(this, m_app.getSettings(), static_cast<UserCollection&>(collection));
 					setUserCollectionWindow.windowLoop();
+					if (setUserCollectionWindow.isOk())
+						m_app.getCollectionManager().saveSettings();
 					break;
 				}
 				case CollectionType::search:
 				{
 					SetSearchCollectionWindow setSearchCollectionWindow(this, static_cast<SearchCollection&>(collection));
 					setSearchCollectionWindow.windowLoop();
+					if (setSearchCollectionWindow.isOk())
+						m_app.getCollectionManager().saveSettings();
 					break;
 				}
 				default:

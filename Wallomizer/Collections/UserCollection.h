@@ -37,7 +37,7 @@ public:
 	bool loadSettings(BinaryReader& file, std::uint16_t fileVersion) override;
 	std::wstring getCollectionName() const override;
 	CategoriesAndPurity getCAP() const override;
-	Wallpaper getWallpaper(std::size_t index) const override;
+	Wallpaper getWallpaper(std::size_t index) override;
 	void update() override;
 	bool isValid() const override;
 
