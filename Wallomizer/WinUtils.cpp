@@ -53,37 +53,42 @@ WinUtils::WinUtils()
 
 void WinUtils::updateDesktopBackground(bool isImageVisible) const
 {
-	std::filesystem::path path = getRoamingDir() / L"Current wallpaper.jpg";
+	const std::filesystem::path path = getRoamingDir() / L"Current wallpaper.jpg";
+	const bool shouldShow = isImageVisible && std::filesystem::exists(path);
 
-	if (!isImageVisible || !std::filesystem::exists(path))
-	{
+	setDesktopWallpaper(nullptr);
+	if (!shouldShow || !setDesktopWallpaper(path.c_str()))
 		setDesktopWallpaper(L"");
-		return;
-	}
-	
-	if (!setDesktopWallpaper(path.c_str()))
-		setDesktopWallpaper(L"");
+	setDesktopWallpaper(nullptr);
 }
 
 void WinUtils::flipWallpaperStyle() const
 {
-	HKEY hUserKey, hKey;
-	LRESULT lResult = RegOpenCurrentUser(KEY_ALL_ACCESS, &hUserKey);
-	if (lResult != ERROR_SUCCESS)
-		hUserKey = HKEY_CURRENT_USER;
-	LSTATUS result = RegOpenKeyExA(hUserKey, "Control Panel\\Desktop", 0, KEY_ALL_ACCESS, &hKey);
-	if (result == ERROR_SUCCESS)
+	HKEY userKey = HKEY_CURRENT_USER;
+	bool closeUserKey = false;
+	if (RegOpenCurrentUser(KEY_READ | KEY_WRITE, &userKey) == ERROR_SUCCESS)
+		closeUserKey = true;
+
+	HKEY desktopKey = nullptr;
+	if (RegOpenKeyExW(userKey, L"Control Panel\\Desktop", 0, KEY_READ | KEY_WRITE, &desktopKey) != ERROR_SUCCESS)
 	{
-		const BYTE fit[3] = "6";
-		const BYTE fill[3] = "10";
-		TCHAR style[32] = "";
-		DWORD size = sizeof(style);
-		LSTATUS resultQuery = RegQueryValueExA(hKey, "WallpaperStyle", 0, nullptr, reinterpret_cast<LPBYTE>(style), &size);
-		const BYTE* wallpaperStyle = (resultQuery != ERROR_SUCCESS || style[0] != fit[0]) ? fit : fill;
-		RegSetValueExA(hKey, "WallpaperStyle", 0, REG_SZ, wallpaperStyle, 3);
-		RegCloseKey(hKey);
-		setDesktopWallpaper(nullptr);
+		if (closeUserKey)
+			RegCloseKey(userKey);
+		return;
 	}
+
+	char style[32] = {};
+	DWORD size = sizeof(style);
+	LSTATUS queryResult = RegQueryValueExA(desktopKey, "WallpaperStyle", nullptr, nullptr, reinterpret_cast<LPBYTE>(style), &size);
+	const char* wallpaperStyle = (queryResult != ERROR_SUCCESS || style[0] != '6') ? "6" : "10";
+	
+	RegSetValueExA(desktopKey, "WallpaperStyle", 0, REG_SZ, reinterpret_cast<const BYTE*>(wallpaperStyle), static_cast<DWORD>((strlen(wallpaperStyle) + 1) * sizeof(wchar_t)));
+	
+	RegCloseKey(desktopKey);
+	if (closeUserKey)
+		RegCloseKey(userKey);
+
+	setDesktopWallpaper(nullptr);
 }
 
 void WinUtils::setBackgroundColor(Color color) const
