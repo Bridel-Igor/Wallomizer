@@ -7,6 +7,8 @@ UI::UI(App& app) :
 {
 	m_trayIcon.start(std::ref(m_app.getUI()));
 	m_trayIcon.waitUntilReady();
+	if (m_app.getAppState().isFirstLaunch())
+		openMainWindowAsync();
 }
 
 void UI::openTrayWindowAsync(POINT pt)
@@ -28,5 +30,5 @@ void UI::requestQuit()
 
 void UI::queryEndSession()
 {
-	m_app.getTimer().saveSession();
+	m_app.getWallpaperManager().saveSession();
 }

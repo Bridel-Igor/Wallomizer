@@ -25,7 +25,7 @@ MainWindow::MainWindow(App& app) :
 														5,		0,		480,	20),
 	btnSettings			(this, "Settings",				10,		450,	95,		20),
 	player				(this,							220,	450,
-														430,	450,	100,	20, m_app.getWinUtils(), m_app.getTimer(), m_app.getWallpaperManager())
+														430,	450,	100,	20, m_app.getAppState(), m_app.getTimer(), m_app.getWallpaperManager())
 {
 	centerWindow(GetDesktopWindow());
 	updateCollectionItems();
@@ -72,7 +72,10 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					SetLocalCollectionWindow setLocalCollectionWindow(this, m_app.getWinUtils(), static_cast<LocalCollection&>(collection));
 					setLocalCollectionWindow.windowLoop();
 					if (setLocalCollectionWindow.isOk())
+					{
 						m_app.getCollectionManager().saveSettings();
+						m_app.getCollectionManager().recountWallpapers();
+					}
 					break;
 				}
 				case CollectionType::user:
@@ -80,7 +83,10 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					SetUserCollectionWindow setUserCollectionWindow(this, m_app.getSettings(), static_cast<UserCollection&>(collection));
 					setUserCollectionWindow.windowLoop();
 					if (setUserCollectionWindow.isOk())
+					{
 						m_app.getCollectionManager().saveSettings();
+						m_app.getCollectionManager().recountWallpapers();
+					}
 					break;
 				}
 				case CollectionType::search:
@@ -88,7 +94,10 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					SetSearchCollectionWindow setSearchCollectionWindow(this, static_cast<SearchCollection&>(collection));
 					setSearchCollectionWindow.windowLoop();
 					if (setSearchCollectionWindow.isOk())
+					{
 						m_app.getCollectionManager().saveSettings();
+						m_app.getCollectionManager().recountWallpapers();
+					}
 					break;
 				}
 				default:

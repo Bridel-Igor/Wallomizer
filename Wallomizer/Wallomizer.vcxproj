@@ -202,6 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="AppState.h" />
     <ClInclude Include="BinaryIO.h" />
     <ClInclude Include="Collections\CollectionTypes.h" />
     <ClInclude Include="InstanceGuard.h" />

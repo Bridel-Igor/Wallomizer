@@ -11,7 +11,7 @@ TrayWindow::TrayWindow(App& app, POINT pt) :
 	btnSettings			(this, "Settings",	40,		60,		65,		20),
 	btnExit				(this, "Exit",		115,	60,		65,		20),
 	player				(this,				10,		10,
-											10,		35,		200,	20, m_app.getWinUtils(), m_app.getTimer(), m_app.getWallpaperManager(), SS_CENTER)
+											10,		35,		200,	20, m_app.getAppState(), m_app.getTimer(), m_app.getWallpaperManager(), SS_CENTER)
 {
 	positionWindow(pt);
 	SetForegroundWindow(hWnd());
@@ -23,22 +23,27 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_NCACTIVATE:
+	{
 		if (wParam == FALSE)
-			DestroyWindow(hWnd());
+			PostMessageW(hWnd(), WM_CLOSE, 0, 0);
 		break;
+	}
 
 	case WM_DRAWITEM:
+	{
 		if (player.draw(reinterpret_cast<LPDRAWITEMSTRUCT>(lParam)))
 			return TRUE;
 		break;
+	}
 
 	case WM_COMMAND:
+	{
 		if (player.click(wParam))
 			return 0;
 		if (btnSettings.isClicked(wParam))
 		{
 			m_app.getUI().openMainWindowAsync();
-			DestroyWindow(hWnd());
+			PostMessageW(hWnd(), WM_CLOSE, 0, 0);
 			return 0;
 		}
 		if (btnExit.isClicked(wParam))
@@ -46,8 +51,8 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			m_app.requestExit();
 			return 0;
 		}
-		return 0;
 		break;
+	}
 	}
 	
 	return RESULT_DEFAULT;

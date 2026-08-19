@@ -7,33 +7,38 @@
 
 App::App() :
 	m_instanceGuard("Wallomizer"),
+	m_appState(),
 	m_winUtils(),
 	m_settings(m_winUtils.getRoamingDir()),
-	m_collectionManager(m_winUtils, m_settings, m_wallpaperManager, m_timer),
-	m_wallpaperManager(m_winUtils, m_settings, m_collectionManager, m_timer),
-	m_timer(m_winUtils, m_settings, m_wallpaperManager),
+	m_timer(m_settings),
+	m_collectionManager(m_appState, m_winUtils, m_settings, m_wallpaperManager, m_timer),
+	m_wallpaperManager(m_appState, m_winUtils, m_settings, m_collectionManager, m_timer),
 	m_ui(*this)
 {
 }
 
 int App::run()
 {
-	while (m_running)
+	while (!m_appState.isExiting())
 	{
-		if (m_collectionManager.getWallpaperCount() == 0)
+		if (m_appState.isNoWallpapers() || m_timer.isStopped())
 		{
 			Sleep(100);
 			continue;
 		}
+		m_appState.running();
 
 		std::thread loaderThread(&WallpaperManager::loadImage, &m_wallpaperManager);
 		m_timer.run();
-		loaderThread.join();
+		{
+			AppState::LoadingGuard loading = m_appState.loadingGuard();
+			loaderThread.join();
+		}
 
-		if (!m_running)
-			break;
+		if (m_appState.isExiting() || m_timer.isStopped())
+			continue;
 
-		m_wallpaperManager.setLoadedWallpaper();
+		m_wallpaperManager.setLoadedImage();
 	}
 
 	m_ui.requestQuit();
@@ -42,7 +47,7 @@ int App::run()
 
 void App::requestExit()
 {
-	m_running = false;
+	m_appState.exiting();
+	m_wallpaperManager.saveSession();
 	m_timer.cancel();
-	m_timer.saveSession();
 }

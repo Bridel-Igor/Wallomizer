@@ -282,6 +282,9 @@
     <ClInclude Include="UI\UI.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="AppState.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="UI\Icons\Prev_disabled.ico">

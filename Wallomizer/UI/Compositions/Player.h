@@ -6,7 +6,7 @@
 #include "IconButton.h"
 #include "Static.h"
 
-class WinUtils;
+class AppState;
 class Timer;
 class WallpaperManager;
 
@@ -32,15 +32,15 @@ private:
 	}resources;
 
 public:
-	Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, const WinUtils& winUtils, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles = 0UL);
+	Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, const AppState& appState, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles = 0UL);
 	~Player();
 	bool click(WPARAM wParam);
 	bool draw(LPDRAWITEMSTRUCT pDIS) const;
 	static void updateTimer();
-	static void redrawPlayers() noexcept;
+	static void redrawPlayers();
 	
 private:
-	const WinUtils& m_winUtils;
+	const AppState& m_appState;
 	Timer& m_timer;
 	WallpaperManager& m_wallpaperManager;
 

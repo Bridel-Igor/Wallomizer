@@ -6,6 +6,7 @@
 #include <vector>
 #include <random>
 
+class AppState;
 class WinUtils;
 class Settings;
 class WallpaperManager;
@@ -16,7 +17,7 @@ class BaseCollection;
 class CollectionManager
 {
 public:
-	CollectionManager(const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager, Timer& timer);
+	CollectionManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager, Timer& timer);
 	CollectionManager(const CollectionManager&) = delete;
 	CollectionManager& operator=(const CollectionManager&) = delete;
 	CollectionManager(CollectionManager&&) = delete;
@@ -41,6 +42,7 @@ public:
 private:
 	static constexpr std::uint16_t FILE_VERSION = 4U;
 
+	AppState& m_appState;
 	const WinUtils& m_winUtils;
 	const Settings& m_settings;
 	WallpaperManager& m_wallpaperManager;

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <atomic>
 
 #include "InstanceGuard.h"
+#include "AppState.h"
 #include "WinUtils.h"
 #include "Settings.h"
+#include "Timer.h"
 #include "CollectionManager.h"
 #include "WallpaperManager.h"
-#include "Timer.h"
 #include "UI.h"
 
 /// Root application class responsible for managing the application lifecycle
@@ -26,21 +26,22 @@ public:
 	int run();
 	void requestExit();
 
+
+	AppState& getAppState()						noexcept { return m_appState; }
 	const WinUtils& getWinUtils() const			noexcept { return m_winUtils; }
 	Settings& getSettings()						noexcept { return m_settings; }
+	Timer& getTimer()							noexcept { return m_timer; }
 	CollectionManager& getCollectionManager()	noexcept { return m_collectionManager; }
 	WallpaperManager& getWallpaperManager()		noexcept { return m_wallpaperManager; }
-	Timer& getTimer()							noexcept { return m_timer; }
 	UI& getUI()									noexcept { return m_ui; }
 
 private:
 	const InstanceGuard m_instanceGuard;
+	AppState m_appState;
 	const WinUtils m_winUtils;
 	Settings m_settings;
+	Timer m_timer;
 	CollectionManager m_collectionManager;
 	WallpaperManager m_wallpaperManager;
-	Timer m_timer;
 	UI m_ui;
-
-	std::atomic_bool m_running = true;
 };

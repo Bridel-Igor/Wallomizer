@@ -1,11 +1,9 @@
 #pragma once
 
-#include <mutex>
+#include <cstdint>
 #include <atomic>
 
-class WinUtils;
 class Settings;
-class WallpaperManager;
 
 class Timer
 {
@@ -18,52 +16,40 @@ public:
 	};
 
 public:
-	class LoadingGuard
+	struct State
 	{
-	private:
-		friend class Timer;
-		explicit LoadingGuard(Timer& timer) noexcept :
-			m_timer(timer)
-		{
-			m_timer.m_loading = true;
-		}
-	public:
-		~LoadingGuard() noexcept
-		{
-			m_timer.m_loading = false;
-		}
-	private:
-		Timer& m_timer;
+		Status status;
+		std::uint32_t timePassed;
 	};
 
+	State getState() const noexcept;
+	void setState(State state) noexcept;
+
 public:
-	explicit Timer(const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager);
+	explicit Timer(const Settings& settings) :
+		m_settings(settings)
+	{}
+
 	Timer(const Timer&) = delete;
 	Timer& operator=(const Timer&) = delete;
 	Timer(Timer&&) = delete;
 	Timer& operator=(Timer&&) = delete;
 
-	bool saveSession();
-	bool loadSession();
 	void run();
 
-	void play() noexcept;
-	void pause() noexcept;
-	void stop() noexcept;
-	void cancel() noexcept { m_cancel = true; }
-	Status getStatus() const noexcept { return m_status; }
+	void play() noexcept { m_status.store(Status::playing, std::memory_order_relaxed); }
+	void pause() noexcept { m_status.store(Status::paused, std::memory_order_relaxed); }
+	void stop() noexcept { m_status.store(Status::stopped, std::memory_order_relaxed); cancel(); }
+	void cancel() noexcept { m_cancel.store(true, std::memory_order_relaxed); }
+
+	bool isStopped() noexcept { return m_status.load(std::memory_order_relaxed) == Status::stopped; }
+	Status getStatus() const noexcept { return m_status.load(std::memory_order_relaxed); }
 	std::uint32_t getRemainingTime() const noexcept;
-	LoadingGuard loadingGuard() { return LoadingGuard(*this); }
-	bool isLoading() const noexcept { return m_loading; }
 
 private:
-	const WinUtils& m_winUtils;
 	const Settings& m_settings;
-	WallpaperManager& m_wallpaperManager;
 
-	std::mutex m_sessionFileAccess;
-	std::atomic<Status> m_status = Status::playing;
+	std::atomic<Status> m_status = Status::stopped;
 	std::atomic_bool m_cancel = false;
 	std::atomic<std::uint32_t> m_timePassed = 0;
-	std::atomic_bool m_loading = false;
 };

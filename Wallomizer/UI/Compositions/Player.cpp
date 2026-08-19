@@ -4,9 +4,9 @@
 
 #include "resource.h"
 #include "IWindow.h"
-#include "WinUtils.h"
 #include "Timer.h"
 #include "WallpaperManager.h"
+#include "AppState.h"
 
 std::vector<Player*> Player::pPlayers;
 HICON	Player::Resources::hIPlay,			Player::Resources::hIPlayHover,			Player::Resources::hIPlayActive,
@@ -66,8 +66,8 @@ Player::Resources::~Resources()
 	DestroyIcon(hIFitHover);
 }
 
-Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, const WinUtils& winUtils, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles) :
-	m_winUtils(winUtils),
+Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, const AppState& appState, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles) :
+	m_appState(appState),
 	m_timer(timer),
 	m_wallpaperManager(wallpaperManager),
 	btnPrev(pParent,			xPlayer,		yPlayer,	20,		20, resources.hIPrev,			resources.hIPrevHover,			"Previous"),
@@ -92,45 +92,41 @@ Player::~Player()
 
 bool Player::click(WPARAM wParam)
 {
-	if (btnPrev.isClicked(wParam) && !m_timer.isLoading())
+	if (btnPrev.isClicked(wParam))
 	{
 		m_wallpaperManager.previousWallpaper();
-		redrawPlayers();
 		return true;
 	}
-	if (btnOpenExternal.isClicked(wParam) && !m_timer.isLoading())
+	if (btnOpenExternal.isClicked(wParam))
 	{
 		m_wallpaperManager.openCurrentWallpaperExternally();
 		return true;
 	}
-	if (btnStop.isClicked(wParam) && !m_timer.isLoading())
+	if (btnStop.isClicked(wParam))
 	{ 
-		m_timer.stop();
+		m_wallpaperManager.stop();
+		return true;
+	}
+	if (btnPlay.isClicked(wParam))
+	{
+		m_wallpaperManager.play();
 		redrawPlayers();
 		return true;
 	}
-	if (btnPlay.isClicked(wParam) && !m_timer.isLoading())
+	if (btnPause.isClicked(wParam))
 	{
-		m_timer.play();
+		m_wallpaperManager.pause();
 		redrawPlayers();
 		return true;
 	}
-	if (btnPause.isClicked(wParam) && !m_timer.isLoading())
+	if (btnFit.isClicked(wParam))
 	{
-		m_timer.pause();
-		redrawPlayers();
+		m_wallpaperManager.fit();
 		return true;
 	}
-	if (btnFit.isClicked(wParam) && !m_timer.isLoading())
-	{
-		m_winUtils.flipWallpaperStyle();
-		Player::redrawPlayers();
-		return true;
-	}
-	if (btnNext.isClicked(wParam) && !m_timer.isLoading())
+	if (btnNext.isClicked(wParam))
 	{
 		m_wallpaperManager.nextWallpaper();
-		redrawPlayers();
 		return true;
 	}
 	return false;
@@ -201,10 +197,23 @@ void Player::updateTimer()
 	if (pPlayers.empty())
 		return;
 
-	Timer& timer = pPlayers[0]->m_timer;
+	const AppState& appState = pPlayers[0]->m_appState;
+	const Timer& timer = pPlayers[0]->m_timer;
+	char text[16]{};
 
-	char text[16] = "loading...";
-	if (!timer.isLoading())
+	if (appState.isExiting())
+		sprintf_s(text, 16, "Exiting...");
+
+	else if (appState.isLoading() || appState.isStarting())
+		sprintf_s(text, 16, "Loading...");
+
+	else if (appState.isNoWallpapers())
+		sprintf_s(text, 16, "No wallpapers.");
+
+	else if (timer.getStatus() == Timer::Status::stopped)
+		sprintf_s(text, 16, "Stopped.");
+
+	else if (appState.isRunning())
 	{
 		const uint32_t remainingSeconds = (timer.getRemainingTime() + 999) / 1000;
 
@@ -222,7 +231,7 @@ void Player::updateTimer()
 	}
 }
 
-void Player::redrawPlayers() noexcept
+void Player::redrawPlayers()
 {
 	updateTimer();
 	for (auto pPlayer : pPlayers)

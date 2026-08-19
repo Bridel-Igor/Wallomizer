@@ -1,105 +1,48 @@
 #include "Timer.h"
 
-#include "WinUtils.h"
+#include <thread>
+#include <chrono>
+
 #include "Settings.h"
-#include "WallpaperManager.h"
 #include "Player.h"
-#include "BinaryIO.h"
 
-Timer::Timer(const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager) :
-	m_winUtils(winUtils),
-	m_settings(settings),
-	m_wallpaperManager(wallpaperManager)
+Timer::State Timer::getState() const noexcept
 {
-	loadSession();
+	return {
+		m_status.load(std::memory_order_relaxed), 
+		m_timePassed.load(std::memory_order_relaxed)
+	};
 }
 
-bool Timer::saveSession()
+void Timer::setState(State state) noexcept
 {
-	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
-	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
-
-	const Timer::Status status = m_status;
-	const std::uint32_t timePassed = m_timePassed;
-	const Wallpaper& wallpaper = m_wallpaperManager.getCurrentWallpaper();
-
-	BinaryWriter file(filePath);
-	return file.isOpen()
-		&& file.write(status)
-		&& file.write(timePassed)
-		&& file.write(wallpaper.getType())
-		&& file.write(wallpaper.getPath());
-}
-
-bool Timer::loadSession()
-{
-	std::lock_guard<std::mutex> lock(m_sessionFileAccess);
-	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
-
-	Timer::Status status;
-	std::uint32_t timePassed;
-	CollectionType type;
-	std::wstring path;
-
-	BinaryReader file(filePath);
-	if (!file.isOpen()
-		|| !file.read(status)
-		|| !file.read(timePassed)
-		|| !file.read(type)
-		|| !file.read(path))
-		return false;
-		
-	m_status = status;
-	m_timePassed = timePassed;
-	Wallpaper loadedWallpaper(type, path);
-	m_wallpaperManager.setCurrentWallpaper(std::move(loadedWallpaper));
-	return true;
+	m_status.store(state.status, std::memory_order_relaxed);
+	m_timePassed.store(state.timePassed, std::memory_order_relaxed);
 }
 
 void Timer::run()
 {
-	while (m_timePassed < m_settings.getData().delay)
+	constexpr std::chrono::milliseconds tick = std::chrono::milliseconds(100);
+	m_timePassed = 0;
+	while (m_timePassed.load(std::memory_order_relaxed) < m_settings.getData().delay)
 	{
-		if (m_cancel)
-		{
-			m_cancel = false;
-			m_timePassed = 0;
+		if (m_cancel.exchange(false, std::memory_order_relaxed))
 			return;
-		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(tick);
 		if (m_status == Status::playing)
 		{
 			Player::updateTimer();
-			m_timePassed += 100;
+			m_timePassed.fetch_add(static_cast<std::uint32_t>(tick.count()), std::memory_order_relaxed);
 		}
 	}
-	m_timePassed = 0;
-}
-
-void Timer::play() noexcept
-{
-	m_status = Status::playing;
-	m_winUtils.updateDesktopBackground(true);
-}
-
-void Timer::pause() noexcept
-{
-	m_status = Status::paused;
-	m_winUtils.updateDesktopBackground(true);
-	saveSession();
-}
-
-void Timer::stop() noexcept
-{
-	m_status = Status::stopped;
-	m_winUtils.updateDesktopBackground(false);
-	saveSession();
 }
 
 std::uint32_t Timer::getRemainingTime() const noexcept
 {
 	const std::uint32_t delay = m_settings.getData().delay;
-	return delay > m_timePassed ? 
-			delay - m_timePassed : 
+	const std::uint32_t timePassed = m_timePassed.load(std::memory_order_relaxed);
+
+	return delay > timePassed ?
+			delay - timePassed :
 			0;
 }
