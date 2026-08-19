@@ -1,7 +1,6 @@
 #include "LocalCollection.h"
 
 #include <filesystem>
-#include <shlobj_core.h>
 
 #include "CollectionManager.h"
 #include "WinUtils.h"
@@ -122,14 +121,9 @@ bool LocalCollection::loadWallpaper(std::filesystem::path sourcePath, const WinU
 	return true;
 }
 
-void LocalCollection::openWallpaperExternal(std::filesystem::path sourcePath)
+void LocalCollection::openWallpaperExternal(std::filesystem::path sourcePath, const WinUtils& winUtils)
 {
-	PIDLIST_ABSOLUTE pidl = ILCreateFromPathW(sourcePath.make_preferred().c_str());
-	if (pidl) 
-	{
-		SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0);
-		ILFree(pidl);
-	}
+	winUtils.openInFolderAsync(sourcePath);
 }
 
 bool LocalCollection::isValid() const

@@ -22,12 +22,12 @@ bool Wallpaper::loadWallpaper(const WinUtils& winUtils) const
 	}
 }
 
-void Wallpaper::openExternally() const
+void Wallpaper::openExternally(const WinUtils& winUtils) const
 {
 	switch (m_type)
 	{
 	case CollectionType::local:
-		LocalCollection::openWallpaperExternal(m_path);
+		LocalCollection::openWallpaperExternal(m_path, winUtils);
 		break;
 
 	case CollectionType::user:

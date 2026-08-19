@@ -25,7 +25,7 @@ public:
 	bool isValid() const override;
 
 	static bool loadWallpaper(std::filesystem::path sourcePath, const WinUtils& winUtils);
-	static void openWallpaperExternal(std::filesystem::path sourcePath);
+	static void openWallpaperExternal(std::filesystem::path sourcePath, const WinUtils& winUtils);
 
 	const std::filesystem::path& getPath() const noexcept { return m_path; }
 	void setPath(const std::filesystem::path& newPath) { m_path = newPath; }

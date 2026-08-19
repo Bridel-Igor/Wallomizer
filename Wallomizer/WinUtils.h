@@ -41,6 +41,10 @@ public:
 	/// Opens a folder selection dialog and returns the selected directory path.
 	std::filesystem::path pickDirectory() const;
 
+	/// Opens the specified file in Windows Explorer and selects it.
+	/// The operation runs asynchronously in a detached thread.
+	void openInFolderAsync(std::filesystem::path sourcePath) const;
+
 private:
 	bool createShortcut(const std::filesystem::path& target, const std::filesystem::path& link, const std::filesystem::path& workingDirectory) const;
 

@@ -1,5 +1,6 @@
 #include "WinUtils.h"
 
+#include <thread>
 #include <shlobj.h>
 #include <Windows.h>
 #include <stdexcept>
@@ -18,7 +19,7 @@ namespace
 		{
 		}
 
-		~ComInitializer()
+		~ComInitializer() noexcept
 		{
 			if (SUCCEEDED(m_hr))
 				CoUninitialize();
@@ -231,4 +232,24 @@ std::filesystem::path WinUtils::pickDirectory() const
 	}
 
 	return path;
+}
+
+void WinUtils::openInFolderAsync(std::filesystem::path sourcePath) const
+{
+	std::wstring path = sourcePath.make_preferred().wstring();
+	std::thread(
+		[path = std::move(path)]
+		{
+			ComInitializer com;
+			if (!com.isInitialized())
+				return;
+
+			PIDLIST_ABSOLUTE pidl = ILCreateFromPathW(path.c_str());
+			if (!pidl)
+				return;
+
+			SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0);
+			ILFree(pidl);
+		}
+	).detach();
 }

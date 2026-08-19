@@ -25,7 +25,7 @@ public:
 	const std::wstring& getPath() const noexcept { return m_path; }
 
 	bool loadWallpaper(const WinUtils& winUtils) const;
-	void openExternally() const;
+	void openExternally(const WinUtils& winUtils) const;
 	static Wallpaper getEmptyWallpaper() { return Wallpaper(CollectionType::none, L"" ); }
 
 private:
