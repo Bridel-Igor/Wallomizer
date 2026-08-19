@@ -47,6 +47,7 @@ public:
 
 private:
 	bool createShortcut(const std::filesystem::path& target, const std::filesystem::path& link, const std::filesystem::path& workingDirectory) const;
+	bool setDesktopWallpaper(const wchar_t* path) const;
 
 	std::filesystem::path m_roamingPath;
 };

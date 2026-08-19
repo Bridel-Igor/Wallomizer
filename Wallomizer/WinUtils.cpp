@@ -53,10 +53,16 @@ WinUtils::WinUtils()
 
 void WinUtils::updateDesktopBackground(bool isImageVisible) const
 {
-	std::filesystem::path path;
-	if (isImageVisible)
-		path = getRoamingDir() / L"Current wallpaper.jpg";
-	SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, const_cast<wchar_t*>(path.c_str()), SPIF_UPDATEINIFILE);
+	std::filesystem::path path = getRoamingDir() / L"Current wallpaper.jpg";
+
+	if (!isImageVisible || !std::filesystem::exists(path))
+	{
+		setDesktopWallpaper(L"");
+		return;
+	}
+	
+	if (!setDesktopWallpaper(path.c_str()))
+		setDesktopWallpaper(L"");
 }
 
 void WinUtils::flipWallpaperStyle() const
@@ -72,9 +78,11 @@ void WinUtils::flipWallpaperStyle() const
 		const BYTE fill[3] = "10";
 		TCHAR style[32] = "";
 		DWORD size = sizeof(style);
-		LSTATUS resultQuery = RegQueryValueExA(hKey, "WallpaperStyle", 0, nullptr, (LPBYTE)style, &size);
-		RegSetValueExA(hKey, "WallpaperStyle", 0, REG_SZ, (LPBYTE)((resultQuery != ERROR_SUCCESS) || (style[0] != fit[0])) ? fit : fill, 3);
+		LSTATUS resultQuery = RegQueryValueExA(hKey, "WallpaperStyle", 0, nullptr, reinterpret_cast<LPBYTE>(style), &size);
+		const BYTE* wallpaperStyle = (resultQuery != ERROR_SUCCESS || style[0] != fit[0]) ? fit : fill;
+		RegSetValueExA(hKey, "WallpaperStyle", 0, REG_SZ, wallpaperStyle, 3);
 		RegCloseKey(hKey);
+		setDesktopWallpaper(nullptr);
 	}
 }
 
@@ -106,7 +114,7 @@ void WinUtils::setBackgroundColor(Color color) const
 		tmp[3] = 0;
 		strcat_s(szColor, tmp);
 
-		RegSetValueExA(hKey, "Background", 0, REG_SZ, (LPBYTE)szColor, sizeof(szColor));
+		RegSetValueExA(hKey, "Background", 0, REG_SZ, reinterpret_cast<LPBYTE>(szColor), sizeof(szColor));
 		RegCloseKey(hKey);
 	}
 }
@@ -252,4 +260,9 @@ void WinUtils::openInFolderAsync(std::filesystem::path sourcePath) const
 			ILFree(pidl);
 		}
 	).detach();
+}
+
+bool WinUtils::setDesktopWallpaper(const wchar_t* path) const
+{
+	return SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, const_cast<wchar_t*>(path), SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
 }

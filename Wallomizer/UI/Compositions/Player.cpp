@@ -124,7 +124,6 @@ bool Player::click(WPARAM wParam)
 	if (btnFit.isClicked(wParam) && !m_timer.isLoading())
 	{
 		m_winUtils.flipWallpaperStyle();
-		m_winUtils.updateDesktopBackground(m_timer.getStatus() != Timer::Status::stopped);
 		Player::redrawPlayers();
 		return true;
 	}
