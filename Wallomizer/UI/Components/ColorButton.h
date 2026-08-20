@@ -1,9 +1,9 @@
 #pragma once
 
-#include <cstdint>
 #include <string>
 
 #include "IHoverable.h"
+#include "SharedResources.h"
 
 /// Custom-drawn color button component.
 /// Derives from IHoverable and represents a selectable color.
@@ -14,22 +14,19 @@
 class ColorButton : public IHoverable
 {
 private:
-	/// Class manages resources (de)allocation for all ColorButton resources.
-	class Resources
+	/// Contains resources used by ColorButton instances.
+	struct Resources
 	{
 	public:
 		Resources();
 		~Resources();
 
 		/// Handles to pens to draw outlines.
-		static HPEN s_checkedPenWhite, s_checkedPenBlack, s_nullPen;
+		HPEN penCheckedWhite = nullptr, penCheckedBlack = nullptr, penNull = nullptr;
 
 		/// Icons used to draw the check mark and empty-color state.
-		static HICON s_hICheckWhite, s_hICheckBlack, s_hIColorEmpty;
-
-	private:
-		static std::uint16_t s_refCount;
-	}resources;
+		HICON iconCheckWhite = nullptr, iconCheckBlack = nullptr, iconEmptyColor = nullptr;
+	};
 
 public:
 	/// Constructs a ColorButton component.
@@ -60,12 +57,15 @@ public:
 	///
 	/// @return True if this component was drawn, false otherwise.
 	/// If true is returned, the WM_DRAWITEM handler must return TRUE.
-	bool draw(LPDRAWITEMSTRUCT pDIS);
+	bool draw(LPDRAWITEMSTRUCT drawItem);
 
 	/// @return Color represented as a lowercase hexadecimal RGB string.
 	std::wstring getColor() const;
 
 private:
+	/// Shared resources for all ColorButton instances.
+	SharedResources<Resources> m_resources;
+
 	/// Indicates whether the button is checked.
 	bool m_checked = false;
 
@@ -76,8 +76,8 @@ private:
 	const BYTE m_red, m_green, m_blue;
 
 	/// Indicates whether the check mark should be drawn in white.
-	const bool m_checkedPenIsWhite;
+	const bool m_useWhiteCheck;
 
 	/// Brush used to draw the button's selected color.
-	HBRUSH m_brush;
+	HBRUSH m_brush = nullptr;
 };

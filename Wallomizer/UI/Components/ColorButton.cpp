@@ -3,43 +3,32 @@
 #include "resource.h"
 #include "IWindow.h"
 #include "UIColor.h"
-
-std::uint16_t ColorButton::Resources::s_refCount = 0;
-HPEN	ColorButton::Resources::s_checkedPenWhite = nullptr,
-		ColorButton::Resources::s_checkedPenBlack = nullptr,
-		ColorButton::Resources::s_nullPen = nullptr;
-HICON	ColorButton::Resources::s_hICheckWhite = nullptr,
-		ColorButton::Resources::s_hICheckBlack = nullptr,
-		ColorButton::Resources::s_hIColorEmpty = nullptr;
+#include "GraphicsUtils.h"
 
 ColorButton::Resources::Resources()
 {
-	if (s_refCount++) // Loading icons only if this is the first player creating
-		return;
-	s_nullPen = CreatePen(PS_NULL, 0, 0);
-	s_checkedPenWhite = CreatePen(PS_SOLID, 2, UIColor::white);
-	s_checkedPenBlack = CreatePen(PS_SOLID, 2, UIColor::black);
-	s_hICheckWhite = static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECK_WHITE), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	s_hICheckBlack = static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_CHECK_BLACK), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	s_hIColorEmpty = static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_COLOR_EMPTY), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
+	penCheckedWhite = CreatePen(PS_SOLID, 2, UIColor::white);
+	penCheckedBlack = CreatePen(PS_SOLID, 2, UIColor::black);
+	penNull = CreatePen(PS_NULL, 0, 0);
+	iconCheckWhite = GraphicsUtils::loadIcon(IDI_CHECK_WHITE);
+	iconCheckBlack = GraphicsUtils::loadIcon(IDI_CHECK_BLACK);
+	iconEmptyColor = GraphicsUtils::loadIcon(IDI_COLOR_EMPTY);
 }
 
 ColorButton::Resources::~Resources()
 {
-	if (--s_refCount) // Destroying icons only if this is the last player destroying
-		return;
-	DeleteObject(s_nullPen);
-	DeleteObject(s_checkedPenWhite);
-	DeleteObject(s_checkedPenBlack);
-	DestroyIcon(s_hICheckBlack);
-	DestroyIcon(s_hICheckWhite);
-	DestroyIcon(s_hIColorEmpty);
+	DeleteObject(penCheckedWhite);
+	DeleteObject(penCheckedBlack);
+	DeleteObject(penNull);
+	DestroyIcon(iconCheckWhite);
+	DestroyIcon(iconCheckBlack);
+	DestroyIcon(iconEmptyColor);
 }
 
 ColorButton::ColorButton(IComponent* pParent, BYTE red, BYTE green, BYTE blue, int x, int y, int width, int height, bool empty) :
 	IHoverable(pParent),
 	m_empty(empty), m_red(red), m_green(green), m_blue(blue),
-	m_checkedPenIsWhite(m_red + m_green + m_blue < 255)
+	m_useWhiteCheck(m_red + m_green + m_blue < 255)
 {
 	m_hWnd = CreateWindowExA(0, "Button", "", WS_CHILD | WS_VISIBLE | BS_OWNERDRAW, x, y, width, height, parent()->hWnd(), hMenu(), nullptr, nullptr);
 	m_brush = CreateSolidBrush(RGB(m_red, m_green, m_blue));
@@ -60,38 +49,40 @@ void ColorButton::setChecked(bool state)
 	}
 }
 
-bool ColorButton::draw(LPDRAWITEMSTRUCT pDIS)
+bool ColorButton::draw(LPDRAWITEMSTRUCT drawItem)
 {
-	if (pDIS->hwndItem != m_hWnd)
+	if (drawItem->hwndItem != m_hWnd)
 		return false;
 
-	FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
-	SelectObject(pDIS->hDC, resources.s_nullPen);
-	SelectObject(pDIS->hDC, m_brush);
-	RoundRect(pDIS->hDC, pDIS->rcItem.left, pDIS->rcItem.top, pDIS->rcItem.right, pDIS->rcItem.bottom, 5, 5);
+	const Resources& resources = m_resources.get();
+
+	FillRect(drawItem->hDC, &drawItem->rcItem, IWindow::Resources::mainBkBrush);
+	SelectObject(drawItem->hDC, resources.penNull);
+	SelectObject(drawItem->hDC, m_brush);
+	RoundRect(drawItem->hDC, drawItem->rcItem.left, drawItem->rcItem.top, drawItem->rcItem.right, drawItem->rcItem.bottom, 5, 5);
 	if (m_empty)
-		DrawIconEx(pDIS->hDC, 0, 0, resources.s_hIColorEmpty, 0, 0, 0, nullptr, DI_NORMAL);
+		DrawIconEx(drawItem->hDC, 0, 0, resources.iconEmptyColor, 0, 0, 0, nullptr, DI_NORMAL);
 	if ((m_hovering && !m_checked) || m_checked)
 	{
-		SelectObject(pDIS->hDC, m_checkedPenIsWhite ? resources.s_checkedPenWhite : resources.s_checkedPenBlack);
+		SelectObject(drawItem->hDC, m_useWhiteCheck ? resources.penCheckedWhite : resources.penCheckedBlack);
 
-		MoveToEx(pDIS->hDC, pDIS->rcItem.left + 1, pDIS->rcItem.top + 1, nullptr);
-		LineTo(pDIS->hDC, pDIS->rcItem.left + 1, pDIS->rcItem.bottom - 1);
-		LineTo(pDIS->hDC, pDIS->rcItem.right - 1, pDIS->rcItem.bottom - 1);
-		LineTo(pDIS->hDC, pDIS->rcItem.right - 1, pDIS->rcItem.top + 1);
-		LineTo(pDIS->hDC, pDIS->rcItem.left + 1, pDIS->rcItem.top + 1);
+		MoveToEx(drawItem->hDC, drawItem->rcItem.left + 1, drawItem->rcItem.top + 1, nullptr);
+		LineTo(drawItem->hDC, drawItem->rcItem.left + 1, drawItem->rcItem.bottom - 1);
+		LineTo(drawItem->hDC, drawItem->rcItem.right - 1, drawItem->rcItem.bottom - 1);
+		LineTo(drawItem->hDC, drawItem->rcItem.right - 1, drawItem->rcItem.top + 1);
+		LineTo(drawItem->hDC, drawItem->rcItem.left + 1, drawItem->rcItem.top + 1);
 
 		RECT tmp = { 0 };
-		tmp.left = pDIS->rcItem.left, tmp.right = tmp.left + 1;
-		tmp.top = pDIS->rcItem.bottom, tmp.bottom = tmp.top - 1;
-		FillRect(pDIS->hDC, &tmp, IWindow::Resources::mainBkBrush);
-		tmp.left = pDIS->rcItem.right, tmp.right = tmp.left - 1;
-		tmp.top = pDIS->rcItem.bottom, tmp.bottom = tmp.top - 1;
-		FillRect(pDIS->hDC, &tmp, IWindow::Resources::mainBkBrush);
+		tmp.left = drawItem->rcItem.left, tmp.right = tmp.left + 1;
+		tmp.top = drawItem->rcItem.bottom, tmp.bottom = tmp.top - 1;
+		FillRect(drawItem->hDC, &tmp, IWindow::Resources::mainBkBrush);
+		tmp.left = drawItem->rcItem.right, tmp.right = tmp.left - 1;
+		tmp.top = drawItem->rcItem.bottom, tmp.bottom = tmp.top - 1;
+		FillRect(drawItem->hDC, &tmp, IWindow::Resources::mainBkBrush);
 	}
 	if (m_checked)
-		DrawIconEx(pDIS->hDC, (pDIS->rcItem.right - 20) / 2, (pDIS->rcItem.bottom - 20) / 2,
-					m_checkedPenIsWhite ? resources.s_hICheckWhite : resources.s_hICheckBlack,
+		DrawIconEx(drawItem->hDC, (drawItem->rcItem.right - 20) / 2, (drawItem->rcItem.bottom - 20) / 2,
+					m_useWhiteCheck ? resources.iconCheckWhite : resources.iconCheckBlack,
 					0, 0, 0, nullptr, DI_NORMAL);
 
 	return true;
