@@ -6,35 +6,24 @@
 #include "BaseCollection.h"
 #include "IWindow.h"
 #include "UIColor.h"
-
-HICON CollectionItem::Resources::hIOptions, 
-	CollectionItem::Resources::hIOptionsHover, 
-	CollectionItem::Resources::hIDelete, 
-	CollectionItem::Resources::hIDeleteHover;
-HBRUSH CollectionItem::Resources::collItemBkBrush;
-
-std::uint16_t CollectionItem::Resources::refCount = 0;
+#include "GraphicsUtils.h"
 
 CollectionItem::Resources::Resources()
 {
-	if (refCount++) // Loading icons only if this is the first player creating
-		return;
-	collItemBkBrush = CreateSolidBrush(UIColor::collectionItemBk);
-	hIDelete =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_DELETE),		IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIDeleteHover =		static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_DELETE_HOVER),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIOptions =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPTIONS),		IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIOptionsHover =	static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPTIONS_HOVER),IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
+	brushBk =			CreateSolidBrush(UIColor::collectionItemBk);
+	iconDelete =		GraphicsUtils::loadIcon(IDI_DELETE);
+	iconDeleteHover =	GraphicsUtils::loadIcon(IDI_DELETE_HOVER);
+	iconOptions =		GraphicsUtils::loadIcon(IDI_OPTIONS);
+	iconOptionsHover =	GraphicsUtils::loadIcon(IDI_OPTIONS_HOVER);
 }
 
 CollectionItem::Resources::~Resources()
 {
-	if (--refCount) // Destroying icons only if this is the last player destroying
-		return;
-	DeleteObject(collItemBkBrush);
-	DestroyIcon(hIDelete);
-	DestroyIcon(hIDeleteHover);
-	DestroyIcon(hIOptions);
-	DestroyIcon(hIOptionsHover);
+	DeleteObject(brushBk);
+	DestroyIcon(iconDelete);
+	DestroyIcon(iconDeleteHover);
+	DestroyIcon(iconOptions);
+	DestroyIcon(iconOptionsHover);
 }
 
 CollectionItem::CollectionItem(IComponent* pParent, int _x, int _y, int _width)
@@ -43,8 +32,8 @@ CollectionItem::CollectionItem(IComponent* pParent, int _x, int _y, int _width)
 	stName(pParent, L"",	0, 0, 0, 0),
 	purity(pParent,			0, 0, 0, 0),
 	stNumber(pParent, "0",	0, 0, 0, 0, SS_CENTER),
-	btnSettings(pParent,	0, 0, 0, height, resources.hIOptions, resources.hIOptionsHover),
-	btnDelete(pParent,		0, 0, 0, height, resources.hIDelete, resources.hIDeleteHover)
+	btnSettings(pParent,	0, 0, 0, height, m_resources.get().iconOptions, m_resources.get().iconOptionsHover),
+	btnDelete(pParent,		0, 0, 0, height, m_resources.get().iconDelete, m_resources.get().iconDeleteHover)
 {
 	stName.setFont(IWindow::Resources::mainFont);
 	stNumber.setFont(IWindow::Resources::mainFont);
@@ -70,10 +59,38 @@ void CollectionItem::reposition(int yPos, bool scrollbarVisible)
 	MoveWindow(btnDelete.hWnd(),	x + width - 22 - offset,				y - yPos,	22,									height, FALSE);
 }
 
-bool CollectionItem::draw(LPDRAWITEMSTRUCT pDIS)
+bool CollectionItem::draw(LPDRAWITEMSTRUCT drawItem)
 {
-	return chboEnabled.draw(pDIS, resources.collItemBkBrush)
-		|| purity.draw(pDIS)
-		|| btnSettings.draw(pDIS, false, false, resources.collItemBkBrush, 1, (height - 20) / 2)
-		|| btnDelete.draw(pDIS, false, false, resources.collItemBkBrush, 1, (height - 20) / 2);
+	return chboEnabled.draw(drawItem, m_resources.get().brushBk)
+		|| purity.draw(drawItem)
+		|| btnSettings.draw(drawItem, false, false, m_resources.get().brushBk, 1, (height - 20) / 2)
+		|| btnDelete.draw(drawItem, false, false, m_resources.get().brushBk, 1, (height - 20) / 2);
+}
+
+LRESULT CollectionItem::handleColor(HWND hWnd, HDC hdc) const
+{
+	if (hWnd == stNumber.hWnd() || hWnd == stName.hWnd())
+	{
+		if (chboEnabled.isChecked())
+			SetTextColor(hdc, UIColor::collectionItemText);
+		else
+			SetTextColor(hdc, UIColor::collectionItemTextInactive);
+		SetBkColor(hdc, UIColor::collectionItemBk);
+		return reinterpret_cast<LRESULT>(m_resources.get().brushBk);
+	}
+	if (hWnd == chboEnabled.hWnd() ||
+		hWnd == btnDelete.hWnd() ||
+		hWnd == btnSettings.hWnd())
+	{
+		SetTextColor(hdc, UIColor::collectionItemText);
+		SetBkColor(hdc, UIColor::collectionItemBk);
+		return reinterpret_cast<LRESULT>(m_resources.get().brushBk);
+	}
+	return 0;
+}
+
+bool CollectionItem::toggle() noexcept
+{
+	chboEnabled.toggle();
+	return chboEnabled.isChecked();
 }

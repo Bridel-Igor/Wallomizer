@@ -62,7 +62,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		int i = 0;
 		for (auto& collectionItem : collectionItems)
 		{
-			if (collectionItem.btnSettings.isClicked(wParam))
+			if (collectionItem.isSettingsClicked(wParam))
 			{
 				BaseCollection& collection = m_app.getCollectionManager().getCollection(i);
 				switch (collection.getType())
@@ -106,16 +106,15 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				updateCollectionItems();
 				return 0;
 			}
-			if (collectionItem.btnDelete.isClicked(wParam))
+			if (collectionItem.isDeleteClicked(wParam))
 			{
 				m_app.getCollectionManager().eraseCollection(i);
 				updateCollectionItems();
 				return 0;
 			}
-			if (collectionItem.chboEnabled.isClicked(wParam))
+			if (collectionItem.isCheckboxClicked(wParam))
 			{
-				collectionItem.chboEnabled.toggle();
-				m_app.getCollectionManager().enableCollection(i, collectionItem.chboEnabled.isChecked());
+				m_app.getCollectionManager().enableCollection(i, collectionItem.toggle());
 				updateCollectionItems();
 				return 0;
 			}
@@ -194,25 +193,9 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		HWND hWnd = (HWND)lParam;
 		HDC hdc = (HDC)wParam;
 		for (auto& item : collectionItems)
-		{
-			if (hWnd == item.stNumber.hWnd() || hWnd == item.stName.hWnd())
-			{
-				if (item.chboEnabled.isChecked())
-					SetTextColor(hdc, UIColor::collectionItemText);
-				else
-					SetTextColor(hdc, UIColor::collectionItemTextInactive);
-				SetBkColor(hdc, UIColor::collectionItemBk);
-				return (LRESULT)CollectionItem::Resources::collItemBkBrush;
-			}
-			if (hWnd == item.chboEnabled.hWnd() ||
-				hWnd == item.btnDelete.hWnd() ||
-				hWnd == item.btnSettings.hWnd())
-			{
-				SetTextColor(hdc, UIColor::collectionItemText);
-				SetBkColor(hdc, UIColor::collectionItemBk);
-				return (LRESULT)CollectionItem::Resources::collItemBkBrush;
-			}
-		}
+			if (LRESULT lresult = item.handleColor(hWnd, hdc))
+				return lresult;
+
 		if (hWnd == stEmpty.hWnd())
 		{
 			SetTextColor(hdc, UIColor::collectionItemText);
