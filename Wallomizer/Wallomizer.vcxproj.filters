@@ -130,6 +130,9 @@
     <ClCompile Include="UI\UI.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="UI\GraphicsUtils.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI\Windows\AddCollectionWindow.h">

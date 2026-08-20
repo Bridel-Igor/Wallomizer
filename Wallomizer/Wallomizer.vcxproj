@@ -160,6 +160,7 @@
     <ClCompile Include="InstanceGuard.cpp" />
     <ClCompile Include="UI\Components\ColorPickerButton.cpp" />
     <ClCompile Include="UI\Components\Panel.cpp" />
+    <ClCompile Include="UI\GraphicsUtils.cpp" />
     <ClCompile Include="UI\Interfaces\IComponent.cpp" />
     <ClCompile Include="UI\Interfaces\IHoverable.cpp" />
     <ClCompile Include="UI\Interfaces\IWindow.cpp" />
