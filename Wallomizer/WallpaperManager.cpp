@@ -19,7 +19,7 @@ WallpaperManager::WallpaperManager(AppState& appState, const WinUtils& winUtils,
 	m_nextWallpaper(Wallpaper::getEmptyWallpaper())
 {
 	loadSession();
-	if (m_collectionManager.getCollectionCount() == 0 || m_timer.getStatus() == Timer::Status::stopped)
+	if (m_collectionManager.getCollectionCount() == 0 || m_timer.isStopped())
 		stop();
 }
 
@@ -72,8 +72,9 @@ bool WallpaperManager::loadSession()
 
 void WallpaperManager::previousWallpaper()
 {
-	if (!hasPrevious() || m_appState.isLoading())
+	if (!canPrevious())
 		return;
+
 	std::lock_guard<std::mutex> lock(m_imageModification);
 	AppState::LoadingGuard loading = m_appState.loadingGuard();
 
@@ -85,8 +86,9 @@ void WallpaperManager::previousWallpaper()
 
 void WallpaperManager::openCurrentWallpaperExternally()
 {
-	if (m_appState.isLoading())
+	if (!canOpen())
 		return;
+
 	std::lock_guard<std::mutex> lock(m_imageModification);
 	if (!m_wallpaperList.empty())
 		m_wallpaperList.back().openExternally(m_winUtils);
@@ -94,6 +96,9 @@ void WallpaperManager::openCurrentWallpaperExternally()
 
 void WallpaperManager::stop()
 {
+	if (!canStop())
+		return;
+
 	m_winUtils.updateDesktopBackground(false);
 	m_timer.stop();
 	Player::redrawPlayers();
@@ -111,13 +116,14 @@ void WallpaperManager::stop()
 
 void WallpaperManager::play()
 {
+	if (!canPlay())
+		return;
+
 	if (m_collectionManager.getCollectionCount() == 0)
 	{
 		stop();
 		return;
 	}
-	if (m_appState.isLoading())
-		return;
 
 	m_timer.play();
 	if (m_wallpaperList.empty())
@@ -127,13 +133,14 @@ void WallpaperManager::play()
 
 void WallpaperManager::pause()
 {
+	if (!canPause())
+		return;
+
 	if (m_collectionManager.getCollectionCount() == 0)
 	{
 		stop();
 		return;
 	}
-	if (m_appState.isLoading())
-		return;
 	m_timer.pause();
 	m_winUtils.updateDesktopBackground(true);
 	saveSession();
@@ -141,20 +148,21 @@ void WallpaperManager::pause()
 
 void WallpaperManager::fit()
 {
-	if (m_appState.isLoading())
+	if (!canFit())
 		return;
+
 	m_winUtils.flipWallpaperStyle();
 }
 
 void WallpaperManager::nextWallpaper()
 {
-	if (m_appState.isLoading())
+	if (!canNext())
 		return;
+
 	m_timer.cancel();
 }
 
 // End of player buttons
-
 
 void WallpaperManager::loadImage()
 {
@@ -201,4 +209,39 @@ void WallpaperManager::deleteLoadedImage()
 {
 	std::lock_guard<std::mutex> lock(m_imageModification);
 	std::filesystem::remove(pathOfLoaded);
+}
+
+bool WallpaperManager::canPrevious() const noexcept
+{
+	return !m_appState.isLoading() && !m_timer.isStopped() && hasPrevious();
+}
+
+bool WallpaperManager::canOpen() const noexcept
+{
+	return !m_appState.isLoading() && !m_timer.isStopped() && hasCurrent();
+}
+
+bool WallpaperManager::canStop() const noexcept
+{
+	return !m_timer.isStopped();
+}
+
+bool WallpaperManager::canPlay() const noexcept
+{
+	return !m_appState.isLoading() && !m_timer.isPlaying() && !m_appState.isNoWallpapers();
+}
+
+bool WallpaperManager::canPause() const noexcept
+{
+	return !m_appState.isLoading() && m_timer.isPlaying() && !m_appState.isNoWallpapers();
+}
+
+bool WallpaperManager::canFit() const noexcept
+{
+	return !m_appState.isLoading() && hasCurrent() && !m_timer.isStopped();
+}
+
+bool WallpaperManager::canNext() const noexcept
+{
+	return !m_appState.isLoading() && !m_appState.isNoWallpapers() && !m_timer.isStopped();
 }

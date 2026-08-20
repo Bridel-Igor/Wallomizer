@@ -285,15 +285,18 @@
     <ClInclude Include="AppState.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="UI\GraphicsUtils.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\SharedResources.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="UI\Icons\Prev_disabled.ico">
+    <Image Include="UI\Icons\Play_toggled.ico">
       <Filter>UI\Resources</Filter>
     </Image>
-    <Image Include="UI\Icons\Play_activated.ico">
-      <Filter>UI\Resources</Filter>
-    </Image>
-    <Image Include="UI\Icons\Pause_activated.ico">
+    <Image Include="UI\Icons\Pause_toggled.ico">
       <Filter>UI\Resources</Filter>
     </Image>
     <Image Include="UI\Icons\Open_external.ico">
@@ -365,7 +368,7 @@
     <Image Include="UI\Icons\Stop_hover.ico">
       <Filter>UI\Resources</Filter>
     </Image>
-    <Image Include="UI\Icons\Stop_activated.ico">
+    <Image Include="UI\Icons\Stop_toggled.ico">
       <Filter>UI\Resources</Filter>
     </Image>
     <Image Include="UI\Icons\Stop.ico">

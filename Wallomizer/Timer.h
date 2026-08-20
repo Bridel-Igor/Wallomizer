@@ -42,8 +42,9 @@ public:
 	void stop() noexcept { m_status.store(Status::stopped, std::memory_order_relaxed); cancel(); }
 	void cancel() noexcept { m_cancel.store(true, std::memory_order_relaxed); }
 
-	bool isStopped() noexcept { return m_status.load(std::memory_order_relaxed) == Status::stopped; }
-	Status getStatus() const noexcept { return m_status.load(std::memory_order_relaxed); }
+	bool isStopped() const noexcept { return m_status.load(std::memory_order_relaxed) == Status::stopped; }
+	bool isPaused() const noexcept { return m_status.load(std::memory_order_relaxed) == Status::paused; }
+	bool isPlaying() const noexcept { return m_status.load(std::memory_order_relaxed) == Status::playing; }
 	std::uint32_t getRemainingTime() const noexcept;
 
 private:

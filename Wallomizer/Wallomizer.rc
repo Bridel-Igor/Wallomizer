@@ -62,11 +62,9 @@ IDI_NEXT                ICON                    "UI/Icons/Next.ico"
 
 IDI_PREV                ICON                    "UI/Icons/Prev.ico"
 
-IDI_PLAY_ACTIVE         ICON                    "UI/Icons/Play_activated.ico"
+IDI_PLAY_TOGGLED         ICON                   "UI/Icons/Play_toggled.ico"
 
-IDI_PAUSE_ACTIVE        ICON                    "UI/Icons/Pause_activated.ico"
-
-IDI_PREV_DISABLED       ICON                    "UI/Icons/Prev_disabled.ico"
+IDI_PAUSE_TOGGLED        ICON                   "UI/Icons/Pause_toggled.ico"
 
 IDI_OPEN_EXTERNAL       ICON                    "UI/Icons/Open_external.ico"
 
@@ -78,7 +76,7 @@ IDI_CHECKBOX            ICON                    "UI/Icons/CheckBox.ico"
 
 IDI_CHECKBOX_CHECKED    ICON                    "UI/Icons/CheckBox_checked.ico"
 
-IDI_CHECKBOX_CHECKED_HOVER ICON                    "UI/Icons/CheckBox_checked_hover.ico"
+IDI_CHECKBOX_CHECKED_HOVER ICON                 "UI/Icons/CheckBox_checked_hover.ico"
 
 IDI_CHECKBOX_HOVER      ICON                    "UI/Icons/CheckBox_hover.ico"
 
@@ -106,7 +104,7 @@ IDI_STOP                ICON                    "UI/Icons/Stop.ico"
 
 IDI_STOP_HOVER          ICON                    "UI/Icons/Stop_hover.ico"
 
-IDI_STOP_ACTIVE         ICON                    "UI/Icons/Stop_activated.ico"
+IDI_STOP_TOGGLED         ICON                   "UI/Icons/Stop_toggled.ico"
 
 IDI_FIT                 ICON                    "UI/Icons/Fit.ico"
 

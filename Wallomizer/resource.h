@@ -1,15 +1,14 @@
 //{{NO_DEPENDENCIES}}
-// Включаемый файл, созданный в Microsoft Visual C++.
-// Используется Wallomizer.rc
+// Microsoft Visual C++ generated include file.
+// Used by Wallomizer.rc
 //
 #define IDI_APP                         101
 #define IDI_PLAY                        102
 #define IDI_PAUSE                       103
 #define IDI_NEXT                        104
 #define IDI_PREV                        105
-#define IDI_PLAY_ACTIVE                 106
-#define IDI_PAUSE_ACTIVE                107
-#define IDI_PREV_DISABLED               108
+#define IDI_PLAY_TOGGLED                106
+#define IDI_PAUSE_TOGGLED               107
 #define IDI_OPEN_EXTERNAL               109
 #define IDI_DELETE_HOVER                110
 #define IDI_OPTIONS                     111
@@ -29,7 +28,7 @@
 #define IDI_COLOR_EMPTY                 125
 #define IDI_STOP                        126
 #define IDI_STOP_HOVER                  127
-#define IDI_STOP_ACTIVE                 128
+#define IDI_STOP_TOGGLED                128
 #define IDI_FIT                         129
 #define IDI_FIT_HOVER                   130
 

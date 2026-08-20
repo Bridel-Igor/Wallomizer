@@ -74,6 +74,6 @@ bool CollectionItem::draw(LPDRAWITEMSTRUCT pDIS)
 {
 	return chboEnabled.draw(pDIS, resources.collItemBkBrush)
 		|| purity.draw(pDIS)
-		|| btnSettings.draw(pDIS, resources.collItemBkBrush, 1, (height - 20) / 2)
-		|| btnDelete.draw(pDIS, resources.collItemBkBrush, 1, (height - 20) / 2);
+		|| btnSettings.draw(pDIS, false, false, resources.collItemBkBrush, 1, (height - 20) / 2)
+		|| btnDelete.draw(pDIS, false, false, resources.collItemBkBrush, 1, (height - 20) / 2);
 }

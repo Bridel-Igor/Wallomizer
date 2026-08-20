@@ -40,6 +40,14 @@ public:
 	void setLoadedImage();
 	void deleteLoadedImage();
 
+	bool canPrevious() const noexcept;
+	bool canOpen() const noexcept;
+	bool canStop() const noexcept;
+	bool canPlay() const noexcept;
+	bool canPause() const noexcept;
+	bool canFit() const noexcept;
+	bool canNext() const noexcept;
+
 private:
 	AppState& m_appState;
 	const WinUtils& m_winUtils;

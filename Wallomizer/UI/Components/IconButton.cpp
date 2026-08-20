@@ -2,10 +2,16 @@
 
 #include <CommCtrl.h>
 
-IconButton::IconButton(IComponent* pParent, int x, int y, int width, int height, HICON hIcon, HICON hIconHovered, std::string_view toolTip, DWORD additionalStyles, DWORD additionalExStyles) :
-	IHoverable(pParent),
-	m_hIcon(hIcon),
-	m_hIconHovered(hIconHovered),
+#include "IWindow.h"
+
+IconButton::IconButton(IComponent* pParent, int x, int y, int width, int height, 
+    HICON hIcon, HICON hIconHovered, HICON hIconDisabled, HICON hIconToggled,
+    std::string_view toolTip, DWORD additionalStyles, DWORD additionalExStyles) :
+    IHoverable(pParent),
+    m_hIcon(hIcon),
+    m_hIconHovered(hIconHovered),
+    m_hIconDisabled(hIconDisabled),
+    m_hIconToggled(hIconToggled),
     m_tooltip(toolTip)
 {
 	m_hWnd = CreateWindowExA(additionalExStyles, "Button", "", WS_CHILD | WS_VISIBLE | BS_OWNERDRAW | additionalStyles, x, y, width, height, parent()->hWnd(), hMenu(), nullptr, nullptr);
@@ -43,11 +49,20 @@ IconButton::~IconButton()
 	DestroyWindow(m_hWnd);
 }
 
-bool IconButton::draw(LPDRAWITEMSTRUCT pDIS, HBRUSH bkgrnd, int x, int y) const
+bool IconButton::draw(LPDRAWITEMSTRUCT pDIS, bool enabled, bool toggled, HBRUSH bkgrnd, int x, int y) const
 {
 	if (pDIS->hwndItem != m_hWnd)
 		return false;
-	FillRect(pDIS->hDC, &pDIS->rcItem, bkgrnd);
-	DrawIconEx(pDIS->hDC, x, y, m_hovering ? m_hIconHovered : m_hIcon, 0, 0, 0, nullptr, DI_NORMAL);
+	FillRect(pDIS->hDC, &pDIS->rcItem, bkgrnd ? bkgrnd : IWindow::Resources::mainBkBrush);
+
+    HICON hIcon = m_hIcon;
+    if (toggled && m_hIconToggled)
+        hIcon = m_hIconToggled;
+    else if (!enabled && m_hIconDisabled)
+        hIcon = m_hIconDisabled;
+    else if (m_hovering && m_hIconHovered)
+        hIcon = m_hIconHovered;
+
+	DrawIconEx(pDIS->hDC, x, y, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
 	return true;
 }

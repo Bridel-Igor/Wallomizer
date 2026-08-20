@@ -24,7 +24,9 @@ public:
     ///                  The referenced string must outlive the button.
 	/// @param additionalStyles - WinAPI style flags that will be added to WS_CHILD, WS_VISIBLE and BS_OWNERDRAW flags. Can be ignored.
 	/// @param additionalExStyles - WinAPI extended style flags. Can be ignored.
-	IconButton(IComponent* pParent, int x, int y, int width, int height, HICON hIcon, HICON hIconHovered, std::string_view toolTip = {}, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
+	IconButton(IComponent* pParent, int x, int y, int width, int height, 
+		HICON hIcon, HICON hIconHovered, HICON hIconDisabled = nullptr, HICON hIconToggled = nullptr, 
+		std::string_view toolTip = {}, DWORD additionalStyles = 0, DWORD additionalExStyles = 0);
 	
 	~IconButton();
 
@@ -36,14 +38,11 @@ public:
 	/// 
 	/// @return True if component is drawn, false otherwise. 
 	///			If it's true return TRUE from function that handles WinAPI messages. 
-	bool draw(LPDRAWITEMSTRUCT pDIS, HBRUSH bkgrnd, int x = 0, int y = 0) const;
+	bool draw(LPDRAWITEMSTRUCT pDIS, bool enabled = true, bool toggled = false, HBRUSH bkgrnd = nullptr, int x = 0, int y = 0) const;
 
 private:
-	/// Icon displayed in the normal state. The button does not own this handle.
-	HICON m_hIcon;
-
-	/// Icon displayed while the button is hovered. The button does not own this handle.
-	HICON m_hIconHovered;
+	/// Icon displayed in the normal, hovered, disabled and toggled states. The button does not own those handles.
+	HICON m_hIcon, m_hIconHovered, m_hIconDisabled, m_hIconToggled;
 
 	/// Handle to looltip window.
 	HWND m_hTooltip = nullptr;

@@ -209,7 +209,9 @@
     <ClInclude Include="Collections\CategoriesAndPurity.h" />
     <ClInclude Include="UI\Components\ColorPickerButton.h" />
     <ClInclude Include="UI\Components\Panel.h" />
+    <ClInclude Include="UI\GraphicsUtils.h" />
     <ClInclude Include="UI\Interfaces\IWindow.h" />
+    <ClInclude Include="UI\SharedResources.h" />
     <ClInclude Include="UI\TrayIcon.h" />
     <ClInclude Include="UI\UI.h" />
     <ClInclude Include="UI\UIColor.h" />
@@ -275,17 +277,16 @@
     <Image Include="UI\Icons\Open_external_hover.ico" />
     <Image Include="UI\Icons\Options.ico" />
     <Image Include="UI\Icons\Options_hover.ico" />
-    <Image Include="UI\Icons\Pause_activated.ico" />
+    <Image Include="UI\Icons\Pause_toggled.ico" />
     <Image Include="UI\Icons\Pause.ico" />
     <Image Include="UI\Icons\Pause_hover.ico" />
-    <Image Include="UI\Icons\Play_activated.ico" />
+    <Image Include="UI\Icons\Play_toggled.ico" />
     <Image Include="UI\Icons\Play.ico" />
     <Image Include="UI\Icons\Play_hover.ico" />
-    <Image Include="UI\Icons\Prev_disabled.ico" />
     <Image Include="UI\Icons\Prev.ico" />
     <Image Include="UI\Icons\Prev_hover.ico" />
     <Image Include="UI\Icons\Stop.ico" />
-    <Image Include="UI\Icons\Stop_activated.ico" />
+    <Image Include="UI\Icons\Stop_toggled.ico" />
     <Image Include="UI\Icons\Stop_hover.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

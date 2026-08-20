@@ -1,5 +1,6 @@
 #include "Player.h"
 
+#include <cstdint>
 #include <algorithm>
 
 #include "resource.h"
@@ -7,87 +8,77 @@
 #include "Timer.h"
 #include "WallpaperManager.h"
 #include "AppState.h"
+#include "GraphicsUtils.h"
 
-std::vector<Player*> Player::pPlayers;
-HICON	Player::Resources::hIPlay,			Player::Resources::hIPlayHover,			Player::Resources::hIPlayActive,
-		Player::Resources::hIPause,			Player::Resources::hIPauseHover,		Player::Resources::hIPauseActive,
-		Player::Resources::hIPrev,			Player::Resources::hIPrevHover,			Player::Resources::hIPrevDisabled,
-		Player::Resources::hINext,			Player::Resources::hINextHover,
-		Player::Resources::hIOpenExternal,	Player::Resources::hIOpenExternalHover,
-		Player::Resources::hIStop,			Player::Resources::hIStopHover,			Player::Resources::hIStopActive,
-		Player::Resources::hIFit,			Player::Resources::hIFitHover;
-std::uint8_t Player::Resources::refCount = 0;
+std::vector<Player*> Player::s_players;
 
-Player::Resources::Resources()
+Player::Icons::Icons()
 {
-	if (refCount++) // Loading icons only if this is the first player creating
-		return;
-	hIPlay =				static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PLAY),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIPlayHover =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PLAY_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIPlayActive =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PLAY_ACTIVE),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIPause =				static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PAUSE),				IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIPauseHover =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PAUSE_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIPauseActive =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PAUSE_ACTIVE),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIPrev =				static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PREV),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIPrevHover =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PREV_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIPrevDisabled =		static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_PREV_DISABLED),		IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hINext =				static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_NEXT),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hINextHover =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_NEXT_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIOpenExternal =		static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPEN_EXTERNAL),		IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIOpenExternalHover =	static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_OPEN_EXTERNAL_HOVER),	IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIStop =				static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_STOP),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIStopHover =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_STOP_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIStopActive =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_STOP_ACTIVE),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIFit =					static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_FIT),					IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
-	hIFitHover =			static_cast<HICON>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDI_FIT_HOVER),			IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT));
+	prev = GraphicsUtils::loadIcon(IDI_PREV);
+	prevHover = GraphicsUtils::loadIcon(IDI_PREV_HOVER);
+	prevDisabled = GraphicsUtils::makeGrayscaleIcon(prev);
+
+	open = GraphicsUtils::loadIcon(IDI_OPEN_EXTERNAL);
+	openHover = GraphicsUtils::loadIcon(IDI_OPEN_EXTERNAL_HOVER);
+	openDisabled = GraphicsUtils::makeGrayscaleIcon(open);
+
+	stop = GraphicsUtils::loadIcon(IDI_STOP);
+	stopHover = GraphicsUtils::loadIcon(IDI_STOP_HOVER);
+	stopToggled = GraphicsUtils::loadIcon(IDI_STOP_TOGGLED);
+
+	play = GraphicsUtils::loadIcon(IDI_PLAY);
+	playHover = GraphicsUtils::loadIcon(IDI_PLAY_HOVER);
+	playDisabled = GraphicsUtils::makeGrayscaleIcon(play);
+	playToggled = GraphicsUtils::loadIcon(IDI_PLAY_TOGGLED);
+
+	pause = GraphicsUtils::loadIcon(IDI_PAUSE);
+	pauseHover = GraphicsUtils::loadIcon(IDI_PAUSE_HOVER);
+	pauseDisabled = GraphicsUtils::makeGrayscaleIcon(pause);
+	pauseToggled = GraphicsUtils::loadIcon(IDI_PAUSE_TOGGLED);
+
+	fit = GraphicsUtils::loadIcon(IDI_FIT);
+	fitHover = GraphicsUtils::loadIcon(IDI_FIT_HOVER);
+	fitDisabled = GraphicsUtils::makeGrayscaleIcon(fit);
+
+	next = GraphicsUtils::loadIcon(IDI_NEXT);
+	nextHover = GraphicsUtils::loadIcon(IDI_NEXT_HOVER);
+	nextDisabled = GraphicsUtils::makeGrayscaleIcon(next);
 }
 
-Player::Resources::~Resources()
+Player::Icons::~Icons()
 {
-	if (--refCount) // Destroying icons only if this is the last player destroying
-		return;
-	DestroyIcon(hIPlay);
-	DestroyIcon(hIPlayHover);
-	DestroyIcon(hIPlayActive);
-	DestroyIcon(hIPause);
-	DestroyIcon(hIPauseHover);
-	DestroyIcon(hIPauseActive);
-	DestroyIcon(hIPrev);
-	DestroyIcon(hIPrevHover);
-	DestroyIcon(hIPrevDisabled);
-	DestroyIcon(hINext);
-	DestroyIcon(hINextHover);
-	DestroyIcon(hIOpenExternal);
-	DestroyIcon(hIOpenExternalHover);
-	DestroyIcon(hIStop);
-	DestroyIcon(hIStopHover);
-	DestroyIcon(hIStopActive);
-	DestroyIcon(hIFit);
-	DestroyIcon(hIFitHover);
+	DestroyIcon(prev);	DestroyIcon(prevHover);		DestroyIcon(prevDisabled);
+	DestroyIcon(open);	DestroyIcon(openHover);		DestroyIcon(openDisabled);
+	DestroyIcon(stop);	DestroyIcon(stopHover);		DestroyIcon(stopToggled);
+	DestroyIcon(play);	DestroyIcon(playHover);		DestroyIcon(playDisabled);	DestroyIcon(playToggled);
+	DestroyIcon(pause);	DestroyIcon(pauseHover);	DestroyIcon(pauseDisabled);	DestroyIcon(pauseToggled);
+	DestroyIcon(fit);	DestroyIcon(fitHover);		DestroyIcon(fitDisabled);
+	DestroyIcon(next);	DestroyIcon(nextHover);		DestroyIcon(nextDisabled);
 }
 
 Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, const AppState& appState, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles) :
 	m_appState(appState),
 	m_timer(timer),
 	m_wallpaperManager(wallpaperManager),
-	btnPrev(pParent,			xPlayer,		yPlayer,	20,		20, resources.hIPrev,			resources.hIPrevHover,			"Previous"),
-	btnOpenExternal(pParent,	xPlayer + 30,	yPlayer,	20,		20, resources.hIOpenExternal,	resources.hIOpenExternalHover,	"Source image"),
-	btnStop(pParent,			xPlayer + 60,	yPlayer,	20,		20, resources.hIStop,			resources.hIStopHover,			"Stop"),
-	btnPlay(pParent,			xPlayer + 90,	yPlayer,	20,		20, resources.hIPlay,			resources.hIPlayHover,			"Play"),
-	btnPause(pParent,			xPlayer + 120,	yPlayer,	20,		20, resources.hIPause,			resources.hIPauseHover,			"Pause"),
-	btnFit(pParent,				xPlayer + 150,	yPlayer,	20,		20, resources.hIFit,			resources.hIFitHover,			"Fit/fill"),
-	btnNext(pParent,			xPlayer + 180,	yPlayer,	20,		20, resources.hINext,			resources.hINextHover,			"Next"),
-	stDelayRemained(pParent, "",			xTimer,			yTimer,		widthTimer,	heightTimer, additionalStyles)
+	m_icons(resources.get()),
+	btnPrev(pParent,	xPlayer,		yPlayer,	20,	20, m_icons.prev,	m_icons.prevHover,	m_icons.prevDisabled,	nullptr,				"Previous"),
+	btnOpen(pParent,	xPlayer + 30,	yPlayer,	20,	20, m_icons.open,	m_icons.openHover,	m_icons.openDisabled,	nullptr,				"Source image"),
+	btnStop(pParent,	xPlayer + 60,	yPlayer,	20,	20, m_icons.stop,	m_icons.stopHover,	nullptr,				m_icons.stopToggled,	"Stop"),
+	btnPlay(pParent,	xPlayer + 90,	yPlayer,	20,	20, m_icons.play,	m_icons.playHover,	m_icons.playDisabled,	m_icons.playToggled,	"Play"),
+	btnPause(pParent,	xPlayer + 120,	yPlayer,	20,	20, m_icons.pause,	m_icons.pauseHover,	m_icons.pauseDisabled,	m_icons.pauseToggled,	"Pause"),
+	btnFit(pParent,		xPlayer + 150,	yPlayer,	20,	20, m_icons.fit,	m_icons.fitHover,	m_icons.fitDisabled,	nullptr,				"Fit/fill"),
+	btnNext(pParent,	xPlayer + 180,	yPlayer,	20,	20, m_icons.next,	m_icons.nextHover,	m_icons.nextDisabled,	nullptr,				"Next"),
+	stRemainingTime(pParent, "", xTimer, yTimer, widthTimer, heightTimer, additionalStyles)
 {	
-	pPlayers.push_back(this);
+	s_players.push_back(this);
 	redrawPlayers();
 }
 
 Player::~Player()
 {
-	auto it = std::find(pPlayers.begin(), pPlayers.end(), this);
-	if (it != pPlayers.end())
-		pPlayers.erase(it);
+	auto it = std::find(s_players.begin(), s_players.end(), this);
+	if (it != s_players.end())
+		s_players.erase(it);
 }
 
 bool Player::click(WPARAM wParam)
@@ -97,7 +88,7 @@ bool Player::click(WPARAM wParam)
 		m_wallpaperManager.previousWallpaper();
 		return true;
 	}
-	if (btnOpenExternal.isClicked(wParam))
+	if (btnOpen.isClicked(wParam))
 	{
 		m_wallpaperManager.openCurrentWallpaperExternally();
 		return true;
@@ -132,117 +123,67 @@ bool Player::click(WPARAM wParam)
 	return false;
 }
 
-bool Player::draw(LPDRAWITEMSTRUCT pDIS) const
+bool Player::draw(LPDRAWITEMSTRUCT drawItem) const
 {	
-	if (pDIS->hwndItem == btnPrev.hWnd())
-	{
-		if (!m_wallpaperManager.hasPrevious())
-		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPrevDisabled, 0, 0, 0, nullptr, DI_NORMAL);
-			return true;
-		}
-		return btnPrev.draw(pDIS, IWindow::Resources::mainBkBrush);
-	}
-	if (pDIS->hwndItem == btnOpenExternal.hWnd())
-	{
-		// TODO: gray out if there is no wallpaper in manager
-		if (!m_wallpaperManager.hasCurrent())
-		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, resources.hIOpenExternal, 0, 0, 0, nullptr, DI_NORMAL);
-			return true;
-		}
-		return btnOpenExternal.draw(pDIS, IWindow::Resources::mainBkBrush);
-	}
-	if (pDIS->hwndItem == btnStop.hWnd())
-	{
-		if (m_timer.getStatus() == Timer::Status::stopped)
-		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, resources.hIStopActive, 0, 0, 0, nullptr, DI_NORMAL);
-			return true;
-		}
-		return btnStop.draw(pDIS, IWindow::Resources::mainBkBrush);
-	}
-	if (pDIS->hwndItem == btnPlay.hWnd())
-	{
-		if (m_timer.getStatus() == Timer::Status::playing)
-		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPlayActive, 0, 0, 0, nullptr, DI_NORMAL);
-			return true;
-		}
-		return btnPlay.draw(pDIS, IWindow::Resources::mainBkBrush);
-	}
-	if (pDIS->hwndItem == btnPause.hWnd())
-	{
-		if (m_timer.getStatus() == Timer::Status::paused)
-		{
-			FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
-			DrawIconEx(pDIS->hDC, 0, 0, resources.hIPauseActive, 0, 0, 0, nullptr, DI_NORMAL);
-			return true;
-		}
-		return btnPause.draw(pDIS, IWindow::Resources::mainBkBrush);
-	}
-	if (btnFit.draw(pDIS, IWindow::Resources::mainBkBrush))
-		return true;
-	if (btnNext.draw(pDIS, IWindow::Resources::mainBkBrush))
-		return true;
-	return false;
+	return btnPrev	.draw(drawItem, m_wallpaperManager.canPrevious())
+		|| btnOpen	.draw(drawItem, m_wallpaperManager.canOpen())
+		|| btnStop	.draw(drawItem, m_wallpaperManager.canStop(),	m_timer.isStopped())
+		|| btnPlay	.draw(drawItem, m_wallpaperManager.canPlay(),	m_timer.isPlaying())
+		|| btnPause	.draw(drawItem, m_wallpaperManager.canPause(),	m_timer.isPaused())
+		|| btnFit	.draw(drawItem, m_wallpaperManager.canFit())
+		|| btnNext	.draw(drawItem, m_wallpaperManager.canNext());
 }
 
 void Player::updateTimer()
 {
-	if (pPlayers.empty())
+	if (s_players.empty())
 		return;
 
-	const AppState& appState = pPlayers[0]->m_appState;
-	const Timer& timer = pPlayers[0]->m_timer;
+	const AppState& appState = s_players[0]->m_appState;
+	const Timer& timer = s_players[0]->m_timer;
 	char text[16]{};
 
 	if (appState.isExiting())
 		sprintf_s(text, 16, "Exiting...");
 
-	else if (appState.isLoading() || appState.isStarting())
+	else if (appState.isLoading())
 		sprintf_s(text, 16, "Loading...");
 
 	else if (appState.isNoWallpapers())
 		sprintf_s(text, 16, "No wallpapers.");
 
-	else if (timer.getStatus() == Timer::Status::stopped)
+	else if (timer.isStopped())
 		sprintf_s(text, 16, "Stopped.");
 
 	else if (appState.isRunning())
 	{
-		const uint32_t remainingSeconds = (timer.getRemainingTime() + 999) / 1000;
+		const std::uint32_t remainingSeconds = (timer.getRemainingTime() + 999) / 1000;
 
-		const uint16_t hours = static_cast<uint16_t>(remainingSeconds / 3600);
-		const uint8_t minutes = static_cast<uint8_t>((remainingSeconds / 60) % 60);
-		const uint8_t seconds = static_cast<uint8_t>(remainingSeconds % 60);
+		const std::uint16_t hours = static_cast<std::uint16_t>(remainingSeconds / 3600);
+		const std::uint8_t minutes = static_cast<std::uint8_t>((remainingSeconds / 60) % 60);
+		const std::uint8_t seconds = static_cast<std::uint8_t>(remainingSeconds % 60);
 
 		sprintf_s(text, 16, "%u:%02u:%02u", hours, minutes, seconds);
 	}
 
-	for (auto pPlayer : pPlayers)
+	for (auto pPlayer : s_players)
 	{
-		pPlayer->stDelayRemained.setText(text);
-		InvalidateRect(pPlayer->stDelayRemained.hWnd(), nullptr, FALSE);
+		pPlayer->stRemainingTime.setText(text);
+		InvalidateRect(pPlayer->stRemainingTime.hWnd(), nullptr, FALSE);
 	}
 }
 
 void Player::redrawPlayers()
 {
 	updateTimer();
-	for (auto pPlayer : pPlayers)
+	for (auto pPlayer : s_players)
 	{
 		InvalidateRect(pPlayer->btnPrev.hWnd(), nullptr, FALSE);
-		InvalidateRect(pPlayer->btnOpenExternal.hWnd(), nullptr, FALSE);
+		InvalidateRect(pPlayer->btnOpen.hWnd(), nullptr, FALSE);
 		InvalidateRect(pPlayer->btnStop.hWnd(), nullptr, FALSE);
 		InvalidateRect(pPlayer->btnPlay.hWnd(), nullptr, FALSE);
 		InvalidateRect(pPlayer->btnPause.hWnd(), nullptr, FALSE);
 		InvalidateRect(pPlayer->btnFit.hWnd(), nullptr, FALSE);
 		InvalidateRect(pPlayer->btnNext.hWnd(), nullptr, FALSE);
-		InvalidateRect(pPlayer->stDelayRemained.hWnd(), nullptr, FALSE);
 	}
 }

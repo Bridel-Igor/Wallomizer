@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
 #include <vector>
 
 #include "IconButton.h"
 #include "Static.h"
+#include "SharedResources.h"
 
 class AppState;
 class Timer;
@@ -13,29 +13,26 @@ class WallpaperManager;
 class Player
 {
 private:
-	/// Class manages resources (de)allocation for all player resources.
-	class Resources
+	struct Icons
 	{
-	public:
-		Resources();
-		~Resources();
-		
-		static HICON	hIPlay,			hIPlayHover,		hIPlayActive,
-						hIPause,		hIPauseHover,		hIPauseActive,
-						hIPrev,			hIPrevHover,		hIPrevDisabled,
-						hINext,			hINextHover,
-						hIOpenExternal, hIOpenExternalHover,
-						hIStop,			hIStopHover,		hIStopActive,
-						hIFit,			hIFitHover;
-	private:
-		static std::uint8_t refCount;
-	}resources;
+		Icons();
+		~Icons();
+
+		HICON	prev = nullptr,		prevHover = nullptr,	prevDisabled = nullptr,
+				open = nullptr,		openHover = nullptr,	openDisabled = nullptr,
+				stop = nullptr,		stopHover = nullptr,	stopToggled = nullptr,
+				play = nullptr,		playHover = nullptr,	playDisabled = nullptr,		playToggled = nullptr,
+				pause = nullptr,	pauseHover = nullptr,	pauseDisabled = nullptr,	pauseToggled = nullptr,
+				fit = nullptr,		fitHover = nullptr,		fitDisabled = nullptr,
+				next = nullptr,		nextHover = nullptr,	nextDisabled = nullptr;
+	};
 
 public:
-	Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, const AppState& appState, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles = 0UL);
+	Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, 
+		const AppState& appState, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles = 0UL);
 	~Player();
 	bool click(WPARAM wParam);
-	bool draw(LPDRAWITEMSTRUCT pDIS) const;
+	bool draw(LPDRAWITEMSTRUCT drawItem) const;
 	static void updateTimer();
 	static void redrawPlayers();
 	
@@ -44,8 +41,10 @@ private:
 	Timer& m_timer;
 	WallpaperManager& m_wallpaperManager;
 
-	IconButton btnPrev, btnOpenExternal, btnStop, btnPlay, btnPause, btnFit, btnNext;
-	Static stDelayRemained;
+	SharedResources<Icons> resources;
+	const Icons& m_icons;
+	IconButton btnPrev, btnOpen, btnStop, btnPlay, btnPause, btnFit, btnNext;
+	Static stRemainingTime;
 
-	static std::vector<Player*> pPlayers;
+	static std::vector<Player*> s_players;
 };

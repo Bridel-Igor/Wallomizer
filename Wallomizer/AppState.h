@@ -25,14 +25,14 @@ public:
 			m_appState(appState)
 		{
 			m_appState.m_loadingCount.fetch_add(1, std::memory_order_relaxed);
-			Player::updateTimer();
+			Player::redrawPlayers();
 		}
 
 	public:
 		~LoadingGuard() noexcept
 		{
 			m_appState.m_loadingCount.fetch_sub(1, std::memory_order_relaxed);
-			Player::updateTimer();
+			Player::redrawPlayers();
 		}
 
 	private:
@@ -44,13 +44,12 @@ public:
 	bool isFirstLaunch() const noexcept	{ return m_firstLaunch; }
 
 	LoadingGuard loadingGuard()		{ return LoadingGuard(*this); }
-	bool isLoading() const noexcept	{ return m_loadingCount.load(std::memory_order_relaxed) != 0; }
+	bool isLoading() const noexcept	{ return m_loadingCount.load(std::memory_order_relaxed) != 0 || getState() == State::starting; }
 
 	void running() noexcept			{ setState(State::running); }
 	void noWallpapers() noexcept	{ setState(State::noWallpapers); }
 	void exiting() noexcept			{ setState(State::exiting); }
 
-	bool isStarting() const noexcept		{ return getState() == State::starting; }
 	bool isRunning() const noexcept			{ return getState() == State::running; }
 	bool isNoWallpapers() const noexcept	{ return getState() == State::noWallpapers; }
 	bool isExiting() const noexcept			{ return getState() == State::exiting; }
@@ -60,7 +59,7 @@ private:
 	void setState(State state) noexcept
 	{
 		m_state.store(state, std::memory_order_relaxed);
-		Player::updateTimer();
+		Player::redrawPlayers();
 	}
 
 	std::atomic<State> m_state = State::starting;

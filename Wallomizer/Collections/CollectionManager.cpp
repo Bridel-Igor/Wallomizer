@@ -118,7 +118,7 @@ bool CollectionManager::loadSettings()
 
 	recountWallpapers();
 
-	if (m_timer.getStatus() == Timer::Status::playing)
+	if (m_timer.isPlaying())
 		m_timer.cancel();
 
 	return true;
