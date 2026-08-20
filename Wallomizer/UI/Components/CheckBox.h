@@ -1,8 +1,7 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "IHoverable.h"
+#include "SharedResources.h"
 
 /// Custom-drawn check box component.
 /// Derives from IHoverable and maintains its checked state.
@@ -13,17 +12,16 @@
 class CheckBox : public IHoverable
 {
 private:
-	/// Class manages resources (de)allocation for all CheckBox resources.
-	class Resources
+	/// Contains icons used by CheckBox instances.
+	struct Icons
 	{
-	public:
-		Resources();
-		~Resources();
+		Icons();
+		~Icons();
 
-		static HICON hICheckBox, hICheckBoxChecked, hICheckBoxHover, hICheckBoxCheckedHover;
-	private:
-		static std::uint16_t refCount;
-	}resources;
+		HICON checkBox = nullptr, checkBoxChecked = nullptr, 
+			checkBoxHover = nullptr, checkBoxCheckedHover = nullptr;
+	};
+
 public:
 	/// Constructs a CheckBox component.
 	/// 
@@ -57,9 +55,13 @@ public:
 	/// 
 	/// @return True if this component was drawn, false otherwise.
 	/// If true is returned, the WM_DRAWITEM handler must return TRUE.
-	bool draw(LPDRAWITEMSTRUCT pDIS, HBRUSH bkgrnd);
+	bool draw(LPDRAWITEMSTRUCT drawItem, HBRUSH bkgrnd);
 
 private:
+	/// Shared resources for all CheckBox instances.
+	SharedResources<Icons> m_resources;
+	const Icons& m_icons;
+
 	/// Holds the current state of check box.
 	bool m_checked;
 };
