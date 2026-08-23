@@ -21,7 +21,10 @@ int App::run()
 {
 	while (!m_appState.isExiting())
 	{
-		if (m_appState.isNoWallpapers() || m_timer.isStopped())
+		if (m_appState.isNoWallpapers() 
+			|| m_appState.isFileError() 
+			|| m_appState.isNoInternet() 
+			|| m_timer.isStopped())
 		{
 			Player::redrawPlayers();
 			Sleep(100);

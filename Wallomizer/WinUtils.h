@@ -45,6 +45,9 @@ public:
 	/// The operation runs asynchronously in a detached thread.
 	void openInFolderAsync(std::filesystem::path sourcePath) const;
 
+	/// Returns true if the file or directory has the hidden or system attribute.
+	bool isHiddenOrSystem(const std::filesystem::path& path) const noexcept;
+
 private:
 	bool createShortcut(const std::filesystem::path& target, const std::filesystem::path& link, const std::filesystem::path& workingDirectory) const;
 	bool setDesktopWallpaper(const wchar_t* path) const;

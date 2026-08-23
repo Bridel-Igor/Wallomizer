@@ -267,6 +267,14 @@ void WinUtils::openInFolderAsync(std::filesystem::path sourcePath) const
 	).detach();
 }
 
+bool WinUtils::isHiddenOrSystem(const std::filesystem::path& path) const noexcept
+{
+	const DWORD attributes = GetFileAttributesW(path.c_str());
+
+	return attributes != INVALID_FILE_ATTRIBUTES
+		&& (attributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM));
+}
+
 bool WinUtils::setDesktopWallpaper(const wchar_t* path) const
 {
 	return SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, const_cast<wchar_t*>(path), SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);

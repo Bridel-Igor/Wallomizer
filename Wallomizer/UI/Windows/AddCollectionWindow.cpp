@@ -43,7 +43,7 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 		if (btnAddLocalCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			auto collection = std::make_unique<LocalCollection>(m_collectionManager);
+			auto collection = std::make_unique<LocalCollection>(m_winUtils, m_collectionManager);
 			SetLocalCollectionWindow setLocalCollectionWindow(this, m_winUtils, *collection);
 			setLocalCollectionWindow.windowLoop();
 			if (setLocalCollectionWindow.isOk() && collection->isValid())

@@ -78,7 +78,7 @@ bool CollectionManager::loadSettings()
 			switch (collectionType)
 			{
 			case CollectionType::local:
-				collection = std::make_unique<LocalCollection>(*this);
+				collection = std::make_unique<LocalCollection>(m_winUtils, *this);
 				break;
 
 			case CollectionType::user:

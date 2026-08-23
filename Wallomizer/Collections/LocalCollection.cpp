@@ -1,20 +1,24 @@
 #include "LocalCollection.h"
 
-#include <filesystem>
-
 #include "CollectionManager.h"
 #include "WinUtils.h"
 #include "Wallpaper.h"
 #include "BinaryIO.h"
 
-bool isImage(std::filesystem::path path)
+namespace
 {
-	const char* extensions[] = { ".jpg", ".jpeg", ".bmp", ".dib", ".png", ".jfif", ".jpe", ".gif", ".tif", ".tiff",
-								".wdp", ".heic", ".heif", ".heics", ".heifs", ".avci", ".avcs", ".avif", ".avifs" };
-	for (auto extension : extensions)
-		if (path.extension().compare((std::filesystem::path)extension) == 0)
-			return true;
-	return false;
+	bool isImage(const std::filesystem::path& path)
+	{
+		static constexpr wchar_t extensions[][7] =
+		{ L".jpg", L".jpeg", L".bmp", L".dib", L".png", L".jfif", L".jpe", L".gif", L".tif", L".tiff",
+		L".wdp", L".heic", L".heif", L".heics", L".heifs", L".avci", L".avcs", L".avif", L".avifs", L".webp" };
+
+		const auto extension = path.extension().wstring();
+		for (const auto& supported : extensions)
+			if (extension == supported)
+				return true;
+		return false;
+	}
 }
 
 bool LocalCollection::saveSettings(BinaryWriter& file) const
@@ -58,54 +62,77 @@ bool LocalCollection::loadSettings(BinaryReader& file, std::uint16_t fileVersion
 
 void LocalCollection::update()
 {
-	m_wallpaperCount = 0;
-	if (!m_isEnabled)
-		return;
-
-	if (m_isRecursive)
-	{
-		for (auto& path : std::filesystem::recursive_directory_iterator(m_path))
-			if (isImage(path))
-				m_wallpaperCount++;
-	}
-	else
-	{
-		for (auto& path : std::filesystem::directory_iterator(m_path))
-			if (isImage(path))
-				m_wallpaperCount++;
-	}
-}
-
-std::wstring LocalCollection::getCollectionName() const
-{
-	std::wstring name = L" Local: ";
-	name += m_path;
-	return name;
+	getWallpaper();
 }
 
 Wallpaper LocalCollection::getWallpaper(std::size_t index)
 {
-	if (m_path.empty() || m_wallpaperCount == 0)
-		return Wallpaper::getEmptyWallpaper();
+	Wallpaper wallpaper = Wallpaper::getEmptyWallpaper();
+	m_wallpaperCount = 0;
+	if (m_path.empty() || !m_isEnabled)
+		return wallpaper;
 
-	std::size_t current = 0;
+	std::error_code ec;
 	if (m_isRecursive)
 	{
-		for (auto& path : std::filesystem::recursive_directory_iterator(m_path))
-			if (isImage(path) && current++ == index)
-				return Wallpaper(m_type, path.path().generic_wstring());
+		for (auto it = std::filesystem::recursive_directory_iterator(m_path, std::filesystem::directory_options::skip_permission_denied, ec);
+			it != std::filesystem::recursive_directory_iterator();
+			it.increment(ec))
+		{
+			if (ec)
+			{
+				ec.clear();
+				continue;
+			}
+
+			const auto& entry = *it;
+
+			if (entry.is_directory(ec))
+			{
+				if (ec)
+				{
+					ec.clear();
+					continue;
+				}
+
+				if (m_winUtils.isHiddenOrSystem(entry.path()))
+				{
+					it.disable_recursion_pending();
+					continue;
+				}
+			}
+
+			if (isImage(entry))
+			{
+				if (m_wallpaperCount == index)
+					wallpaper = Wallpaper(m_type, entry.path().generic_wstring());
+				m_wallpaperCount++;
+			}
+		}
 	}
 	else
 	{
-		for (auto& path : std::filesystem::directory_iterator(m_path))
-			if (isImage(path) && current++ == index)
-				return Wallpaper(m_type, path.path().generic_wstring());
+		for (auto& path : std::filesystem::directory_iterator(m_path, std::filesystem::directory_options::skip_permission_denied, ec))
+		{
+			if (ec)
+			{
+				ec.clear();
+				continue;
+			}
+			if (isImage(path))
+			{
+				if (m_wallpaperCount == index)
+					wallpaper = Wallpaper(m_type, path.path().generic_wstring());
+				m_wallpaperCount++;
+			}
+		}
 	}
 
-	return Wallpaper::getEmptyWallpaper();
+	m_collectionManager.recountWallpapers();
+	return wallpaper;
 }
 
-bool LocalCollection::loadWallpaper(std::filesystem::path sourcePath, const WinUtils& winUtils)
+bool LocalCollection::loadWallpaper(const std::filesystem::path& sourcePath, const WinUtils& winUtils)
 {
 	std::error_code ec;
 	std::filesystem::path loadedPath = winUtils.getRoamingDir() / L"Loaded wallpaper.dat";
@@ -114,14 +141,14 @@ bool LocalCollection::loadWallpaper(std::filesystem::path sourcePath, const WinU
 	if (ec)
 	{
 		std::error_code ignore;
-		std::filesystem::remove(loadedPath);
+		std::filesystem::remove(loadedPath, ignore);
 		return false;
 	}
 
 	return true;
 }
 
-void LocalCollection::openWallpaperExternal(std::filesystem::path sourcePath, const WinUtils& winUtils)
+void LocalCollection::openWallpaperExternal(const std::filesystem::path& sourcePath, const WinUtils& winUtils)
 {
 	winUtils.openInFolderAsync(sourcePath);
 }
