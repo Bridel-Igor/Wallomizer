@@ -23,22 +23,27 @@ int App::run()
 	{
 		if (m_appState.isNoWallpapers() || m_timer.isStopped())
 		{
+			Player::redrawPlayers();
 			Sleep(100);
 			continue;
 		}
-		m_appState.running();
+		m_appState.setRunning();
 
 		std::thread loaderThread(&WallpaperManager::loadImage, &m_wallpaperManager);
 		m_timer.run();
-		{
-			AppState::LoadingGuard loading = m_appState.loadingGuard();
-			loaderThread.join();
-		}
+		
+		m_appState.setLoading(true);
+		Player::redrawPlayers();
 
+		loaderThread.join();
+
+		m_appState.setLoading(false);
+		Player::redrawPlayers();
+		
 		if (m_appState.isExiting() || m_timer.isStopped())
 			continue;
 
-		m_wallpaperManager.setLoadedImage();
+		m_wallpaperManager.applyLoadedImage();
 	}
 
 	m_ui.requestQuit();
@@ -47,7 +52,7 @@ int App::run()
 
 void App::requestExit()
 {
-	m_appState.exiting();
+	m_appState.setExiting();
 	m_wallpaperManager.saveSession();
 	m_timer.cancel();
 }

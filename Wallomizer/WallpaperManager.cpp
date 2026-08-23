@@ -14,19 +14,19 @@ WallpaperManager::WallpaperManager(AppState& appState, const WinUtils& winUtils,
 	m_settings(settings),
 	m_collectionManager(collectionManager),
 	m_timer(timer),
-	pathOfLoaded(m_winUtils.getRoamingDir() / L"Loaded wallpaper.dat"),
-	pathOfCurrent(m_winUtils.getRoamingDir() / L"Current wallpaper.jpg"),
+	m_pathOfLoaded(m_winUtils.getRoamingDir() / L"Loaded wallpaper.dat"),
+	m_pathOfCurrent(m_winUtils.getRoamingDir() / L"Current wallpaper.jpg"),
 	m_nextWallpaper(Wallpaper::getEmptyWallpaper())
 {
 	loadSession();
-	if (m_collectionManager.getCollectionCount() == 0 || m_timer.isStopped())
-		stop();
+	onCollectionsChanged();
 }
+
+// Session
 
 bool WallpaperManager::saveSession()
 {
 	std::lock_guard<std::mutex> sessionFileLock(m_sessionFileAccess);
-	AppState::LoadingGuard loading = m_appState.loadingGuard();
 	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
 
 	const Timer::State timerState = m_timer.getState();
@@ -43,104 +43,177 @@ bool WallpaperManager::saveSession()
 bool WallpaperManager::loadSession()
 {
 	std::lock_guard<std::mutex> sessionFileLock(m_sessionFileAccess);
-	AppState::LoadingGuard loading = m_appState.loadingGuard();
 	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"Session.dat";
 
-	Timer::Status status;
-	std::uint32_t timePassed;
+	Timer::State timerState{};
 	CollectionType type;
 	std::wstring path;
 
 	BinaryReader file(filePath);
 	if (!file.isOpen()
-		|| !file.read(status)
-		|| !file.read(timePassed)
+		|| !file.read(timerState.status)
+		|| !file.read(timerState.timePassed)
 		|| !file.read(type)
 		|| !file.read(path))
 		return false;
 
-	m_timer.setState({ status, timePassed });
-	Wallpaper loadedWallpaper(type, path);
+	m_timer.setState(timerState);
 
-	std::lock_guard<std::mutex> imageLock(m_imageModification);
 	m_wallpaperList.clear();
-	m_wallpaperList.push_back(std::move(loadedWallpaper));
+	if (type != CollectionType::none)
+		m_wallpaperList.emplace_back(type, path);
 	return true;
 }
 
-// Player buttons
+void WallpaperManager::clear()
+{
+	m_timer.stop();
+	m_winUtils.updateDesktopBackground(false);
+
+	removeLoadedFile();
+	removeCurrentFile();
+
+	m_wallpaperList.clear();
+	m_nextWallpaper = Wallpaper::getEmptyWallpaper();
+	m_isLoadedImageReady = false;
+
+	saveSession();
+}
+
+// Lifecycle
+
+void WallpaperManager::loadImage()
+{
+	m_isLoadedImageReady = false;
+	Player::redrawPlayers();
+
+	std::unique_lock lock(m_imageModification);
+
+	if (!removeLoadedFile())
+	{
+		clear();
+		return;
+	}
+
+	if (m_nextWallpaper.isValid())
+		m_timer.cancel();
+	else
+		m_nextWallpaper = std::move(m_collectionManager.getRandomWallpaper());
+
+	m_isLoadedImageReady = m_nextWallpaper.loadWallpaper(m_winUtils);
+
+	// failed to load. Going to the next cycle to load the new one. 
+	if (!m_isLoadedImageReady)
+	{
+		removeLoadedFile();
+		m_nextWallpaper = Wallpaper::getEmptyWallpaper();
+		m_timer.cancelKeepTime();
+	}
+
+	lock.unlock();
+	Player::redrawPlayers();
+}
+
+void WallpaperManager::applyLoadedImage()
+{
+	std::lock_guard lock(m_imageModification);
+
+	if (!hasLoadedFile()
+		|| !m_isLoadedImageReady
+		|| !m_nextWallpaper.isValid())
+		return;
+
+	m_isLoadedImageReady = false;
+	Player::redrawPlayers();
+
+	if (!makeLoadedFileCurrent())
+	{
+		clear();
+		return;
+	}
+
+	m_wallpaperList.push_back(m_nextWallpaper);
+	m_nextWallpaper = Wallpaper::getEmptyWallpaper();
+	if (m_wallpaperList.size() > m_settings.getData().prevCount + 1)
+		m_wallpaperList.pop_front();
+
+	m_winUtils.updateDesktopBackground(true);
+	saveSession();
+}
+
+void WallpaperManager::onCollectionsChanged()
+{
+	std::lock_guard lock(m_imageModification);
+
+	if (m_appState.isNoWallpapers())
+	{
+		clear();
+		return;
+	}
+
+	if (!m_appState.isStarting())
+		m_timer.cancelKeepTime();
+
+	m_nextWallpaper = Wallpaper::getEmptyWallpaper();
+	m_isLoadedImageReady = false;
+	removeLoadedFile();
+	Player::redrawPlayers();
+}
+
+// Controls
 
 void WallpaperManager::previousWallpaper()
 {
-	if (!canPrevious())
+	std::unique_lock lock(m_imageModification, std::try_to_lock);
+	if (!lock.owns_lock() || !canPrevious())
 		return;
 
-	std::lock_guard<std::mutex> lock(m_imageModification);
-	AppState::LoadingGuard loading = m_appState.loadingGuard();
-
 	m_wallpaperList.pop_back();
-	m_wallpaperList.back().loadWallpaper(m_winUtils);
-	m_settingPrevious = true;
+	m_nextWallpaper = std::move(m_wallpaperList.back());
+	m_wallpaperList.pop_back();
+	removeLoadedFile();
+	m_isLoadedImageReady = false;
 	m_timer.cancel();
 }
 
 void WallpaperManager::openCurrentWallpaperExternally()
 {
-	if (!canOpen())
+	std::unique_lock lock(m_imageModification, std::try_to_lock);
+	if (!lock.owns_lock() || !canOpen())
 		return;
 
-	std::lock_guard<std::mutex> lock(m_imageModification);
-	if (!m_wallpaperList.empty())
-		m_wallpaperList.back().openExternally(m_winUtils);
+	m_wallpaperList.back().openExternally(m_winUtils);
 }
 
 void WallpaperManager::stop()
 {
-	if (!canStop())
+	std::unique_lock lock(m_imageModification, std::try_to_lock);
+	if (!lock.owns_lock() || !canStop())
 		return;
 
-	m_winUtils.updateDesktopBackground(false);
-	m_timer.stop();
-	Player::redrawPlayers();
-
-	std::lock_guard<std::mutex> lock(m_imageModification);
-
-	std::filesystem::remove(pathOfLoaded);
-	std::filesystem::remove(pathOfCurrent);
-
-	m_wallpaperList.clear();
-	m_nextWallpaper = Wallpaper::getEmptyWallpaper();
-
-	saveSession();
+	clear();
 }
 
 void WallpaperManager::play()
 {
-	if (!canPlay())
+	std::unique_lock lock(m_imageModification, std::try_to_lock);
+	if (!lock.owns_lock() || !canPlay())
 		return;
-
-	if (m_collectionManager.getCollectionCount() == 0)
-	{
-		stop();
-		return;
-	}
 
 	m_timer.play();
 	if (m_wallpaperList.empty())
 		m_timer.cancel();
 	m_winUtils.updateDesktopBackground(true);
+
+	saveSession();
 }
 
 void WallpaperManager::pause()
 {
-	if (!canPause())
+	std::unique_lock lock(m_imageModification, std::try_to_lock);
+	if (!lock.owns_lock() || !canPause())
 		return;
 
-	if (m_collectionManager.getCollectionCount() == 0)
-	{
-		stop();
-		return;
-	}
 	m_timer.pause();
 	m_winUtils.updateDesktopBackground(true);
 	saveSession();
@@ -148,7 +221,8 @@ void WallpaperManager::pause()
 
 void WallpaperManager::fit()
 {
-	if (!canFit())
+	std::unique_lock lock(m_imageModification, std::try_to_lock);
+	if (!lock.owns_lock() || !canFit())
 		return;
 
 	m_winUtils.flipWallpaperStyle();
@@ -156,92 +230,115 @@ void WallpaperManager::fit()
 
 void WallpaperManager::nextWallpaper()
 {
-	if (!canNext())
+	std::unique_lock lock(m_imageModification, std::try_to_lock);
+	if (!lock.owns_lock() || !canNext())
 		return;
 
 	m_timer.cancel();
 }
 
-// End of player buttons
-
-void WallpaperManager::loadImage()
-{
-	std::lock_guard<std::mutex> lock(m_imageModification);
-	if (!std::filesystem::exists(pathOfLoaded))
-	{
-		m_nextWallpaper = std::move(m_collectionManager.getRandomWallpaper());
-		m_nextWallpaper.loadWallpaper(m_winUtils);
-	}
-}
-
-void WallpaperManager::setLoadedImage()
-{
-	std::lock_guard<std::mutex> lock(m_imageModification);
-	AppState::LoadingGuard loading = m_appState.loadingGuard();
-	if (!std::filesystem::exists(pathOfLoaded))
-	{
-		m_timer.cancel();
-		return;
-	}
-
-	std::error_code ec;
-	std::filesystem::remove(pathOfCurrent, ec);
-	if (ec)
-		return;
-	std::filesystem::rename(pathOfLoaded, pathOfCurrent, ec);
-	if (ec)
-		return;
-
-	if (!m_settingPrevious)
-	{
-		m_wallpaperList.push_back(m_nextWallpaper);
-		if (m_wallpaperList.size() > m_settings.getData().prevCount + 1)
-			m_wallpaperList.pop_front();
-	}
-	m_settingPrevious = false;
-
-	m_winUtils.updateDesktopBackground(true);
-	Player::redrawPlayers();
-	saveSession();
-}
-
-void WallpaperManager::deleteLoadedImage()
-{
-	std::lock_guard<std::mutex> lock(m_imageModification);
-	std::filesystem::remove(pathOfLoaded);
-}
+// Checks
 
 bool WallpaperManager::canPrevious() const noexcept
 {
-	return !m_appState.isLoading() && !m_timer.isStopped() && hasPrevious();
+	return !m_appState.isLoading() 
+		&& !m_timer.isStopped() 
+		&& hasPrevious() 
+		&& m_isLoadedImageReady;
 }
 
 bool WallpaperManager::canOpen() const noexcept
 {
-	return !m_appState.isLoading() && !m_timer.isStopped() && hasCurrent();
+	return !m_appState.isLoading() 
+		&& !m_timer.isStopped() 
+		&& hasCurrent();
 }
 
 bool WallpaperManager::canStop() const noexcept
 {
-	return !m_timer.isStopped();
+	return !m_timer.isStopped() 
+		&& m_isLoadedImageReady
+		&& !m_appState.isLoading();
 }
 
 bool WallpaperManager::canPlay() const noexcept
 {
-	return !m_appState.isLoading() && !m_timer.isPlaying() && !m_appState.isNoWallpapers();
+	return !m_appState.isLoading() 
+		&& !m_timer.isPlaying() 
+		&& !m_appState.isNoWallpapers();
 }
 
 bool WallpaperManager::canPause() const noexcept
 {
-	return !m_appState.isLoading() && m_timer.isPlaying() && !m_appState.isNoWallpapers();
+	return !m_appState.isLoading() 
+		&& m_timer.isPlaying() 
+		&& !m_appState.isNoWallpapers();
 }
 
 bool WallpaperManager::canFit() const noexcept
 {
-	return !m_appState.isLoading() && hasCurrent() && !m_timer.isStopped();
+	return !m_appState.isLoading() 
+		&& hasCurrent() 
+		&& !m_timer.isStopped();
 }
 
 bool WallpaperManager::canNext() const noexcept
 {
-	return !m_appState.isLoading() && !m_appState.isNoWallpapers() && !m_timer.isStopped();
+	return !m_appState.isLoading() 
+		&& !m_appState.isNoWallpapers() 
+		&& !m_timer.isStopped() 
+		&& m_isLoadedImageReady;
+}
+
+// Files
+
+bool WallpaperManager::removeLoadedFile() noexcept
+{
+	std::error_code ec;
+	std::filesystem::remove(m_pathOfLoaded, ec);
+	if (ec)
+	{
+		m_appState.setFileError(true);
+		return false;
+	}
+	return true;
+}
+
+bool WallpaperManager::removeCurrentFile() noexcept
+{
+	std::error_code ec;
+	std::filesystem::remove(m_pathOfCurrent, ec);
+	if (ec)
+	{
+		m_appState.setFileError(true);
+		return false;
+	}
+	return true;
+}
+
+bool WallpaperManager::makeLoadedFileCurrent() noexcept
+{
+	if (!removeCurrentFile())
+		return false;
+
+	std::error_code ec;
+	std::filesystem::rename(m_pathOfLoaded, m_pathOfCurrent, ec);
+	if (ec)
+	{
+		m_appState.setFileError(true);
+		return false;
+	}
+	return true;
+}
+
+bool WallpaperManager::hasLoadedFile() const noexcept
+{
+	std::error_code ec;
+	const bool result = std::filesystem::exists(m_pathOfLoaded, ec);
+	if (ec)
+	{
+		m_appState.setFileError(true);
+		return false;
+	}
+	return result;
 }

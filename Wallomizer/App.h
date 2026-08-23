@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "InstanceGuard.h"
 #include "AppState.h"
 #include "WinUtils.h"
@@ -22,10 +21,9 @@ public:
 	App(App&&) = delete;
 	App& operator=(App&&) = delete;
 
-	/// Runs the complete application lifecycle.
+	// Lifecycle
 	int run();
 	void requestExit();
-
 
 	AppState& getAppState()						noexcept { return m_appState; }
 	const WinUtils& getWinUtils() const			noexcept { return m_winUtils; }

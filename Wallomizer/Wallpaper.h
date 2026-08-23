@@ -23,6 +23,7 @@ public:
 
 	CollectionType getType() const noexcept { return m_type; }
 	const std::wstring& getPath() const noexcept { return m_path; }
+	bool isValid() const noexcept;
 
 	bool loadWallpaper(const WinUtils& winUtils) const;
 	void openExternally(const WinUtils& winUtils) const;

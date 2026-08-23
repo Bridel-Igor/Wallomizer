@@ -1,70 +1,54 @@
 #pragma once
 
+#include <cstdint>
 #include <atomic>
-
-#include "Player.h"
 
 class AppState
 {
 private:
-	enum class State
+	enum class State : std::uint8_t
 	{
 		starting,
 		running,
-		noWallpapers,
 		exiting
 	};
 
 public:
-	class LoadingGuard
-	{
-		friend class AppState;
+	AppState() = default;
+	AppState(const AppState&) = delete;
+	AppState& operator=(const AppState&) = delete;
+	AppState(AppState&&) = delete;
+	AppState& operator=(AppState&&) = delete;
 
-	private:
-		explicit LoadingGuard(AppState& appState) noexcept :
-			m_appState(appState)
-		{
-			m_appState.m_loadingCount.fetch_add(1, std::memory_order_relaxed);
-			Player::redrawPlayers();
-		}
-
-	public:
-		~LoadingGuard() noexcept
-		{
-			m_appState.m_loadingCount.fetch_sub(1, std::memory_order_relaxed);
-			Player::redrawPlayers();
-		}
-
-	private:
-		AppState& m_appState;
-	};
-
-public:
-	void firstLaunch() noexcept			{ m_firstLaunch=true; }
+	void setFirstLaunch() noexcept		{ m_firstLaunch = true; }
 	bool isFirstLaunch() const noexcept	{ return m_firstLaunch; }
 
-	LoadingGuard loadingGuard()		{ return LoadingGuard(*this); }
-	bool isLoading() const noexcept	{ return m_loadingCount.load(std::memory_order_relaxed) != 0 || getState() == State::starting; }
+	void setRunning() noexcept			{ m_state.store(State::running, std::memory_order_relaxed); }
+	void setExiting() noexcept			{ m_state.store(State::exiting, std::memory_order_relaxed); }
+	bool isStarting() const noexcept	{ return m_state.load(std::memory_order_relaxed) == State::starting; }
+	bool isRunning() const noexcept		{ return m_state.load(std::memory_order_relaxed) == State::running; }
+	bool isExiting() const noexcept		{ return m_state.load(std::memory_order_relaxed) == State::exiting; }
 
-	void running() noexcept			{ setState(State::running); }
-	void noWallpapers() noexcept	{ setState(State::noWallpapers); }
-	void exiting() noexcept			{ setState(State::exiting); }
+	void setLoading(bool value)	noexcept		{ m_loading.store(value, std::memory_order_relaxed); }
+	bool isLoading() const noexcept				{ return m_loading.load(std::memory_order_relaxed); }
 
-	bool isRunning() const noexcept			{ return getState() == State::running; }
-	bool isNoWallpapers() const noexcept	{ return getState() == State::noWallpapers; }
-	bool isExiting() const noexcept			{ return getState() == State::exiting; }
+	void setNoWallpapers(bool value) noexcept	{ m_noWallpapers.store(value, std::memory_order_relaxed); }
+	bool isNoWallpapers() const noexcept		{ return m_noWallpapers.load(std::memory_order_relaxed); }
+
+	void setNoInternet(bool value) noexcept		{ m_noInternet.store(value, std::memory_order_relaxed); }
+	bool isNoInternet() const noexcept			{ return m_noInternet.load(std::memory_order_relaxed); }
+
+	void setFileError(bool value) noexcept		{ m_filesystemError.store(value, std::memory_order_relaxed); }
+	bool isFileError() const noexcept			{ return m_filesystemError.load(std::memory_order_relaxed); }
 
 private:
-	State getState() const noexcept { return m_state.load(std::memory_order_relaxed); }
-	void setState(State state) noexcept
-	{
-		m_state.store(state, std::memory_order_relaxed);
-		Player::redrawPlayers();
-	}
-
-	std::atomic<State> m_state = State::starting;
-	std::atomic_uint m_loadingCount = 0;
-
-	// being set and read in the same thread.
+	// main thread only
 	bool m_firstLaunch = false;
+
+	// accessed by many threads
+	std::atomic<State> m_state = State::starting;
+	std::atomic_bool m_loading = false;
+	std::atomic_bool m_noWallpapers = false;
+	std::atomic_bool m_noInternet = false;
+	std::atomic_bool m_filesystemError = false;
 };

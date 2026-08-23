@@ -22,7 +22,7 @@ CollectionManager::CollectionManager(AppState& appState, const WinUtils& winUtil
 	m_randomGenerator(static_cast<std::mt19937::result_type>(time(nullptr)))
 {
 	if (!loadSettings())
-		m_appState.firstLaunch();
+		m_appState.setFirstLaunch();
 	recountWallpapers();
 }
 
@@ -48,8 +48,6 @@ bool CollectionManager::saveSettings() const
 
 bool CollectionManager::loadSettings()
 {
-	AppState::LoadingGuard loading = m_appState.loadingGuard();
-
 	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"CollectionManager.dat";
 
 	BinaryReader file(filePath);
@@ -131,10 +129,7 @@ void CollectionManager::recountWallpapers()
 	for (std::size_t i = 0; i < m_collections.size(); i++)
 		m_wallpaperCount += m_collections[i]->isEnabled() * static_cast<std::uint32_t>(m_collections[i]->getWallpaperCount());
 
-	if (m_wallpaperCount == 0)
-		m_appState.noWallpapers();
-	else
-		m_appState.running();
+	m_appState.setNoWallpapers(m_wallpaperCount == 0);
 }
 
 void CollectionManager::addCollection(std::unique_ptr<BaseCollection> collection)
@@ -144,7 +139,7 @@ void CollectionManager::addCollection(std::unique_ptr<BaseCollection> collection
 	m_collections.push_back(std::move(collection));
 	saveSettings();
 	recountWallpapers();
-	m_wallpaperManager.deleteLoadedImage();
+	m_wallpaperManager.onCollectionsChanged();
 	if (m_collections.size() == 1)
 		m_wallpaperManager.play();
 }
@@ -154,10 +149,9 @@ void CollectionManager::eraseCollection(std::size_t index)
 	if (index >= m_collections.size())
 		return;
 	m_collections.erase(m_collections.begin() + index);
-	recountWallpapers();
 	saveSettings();
-	if (m_collections.empty())
-		m_wallpaperManager.stop();
+	recountWallpapers();
+	m_wallpaperManager.onCollectionsChanged();
 }
 
 void CollectionManager::enableCollection(std::size_t index, bool enabled)
@@ -166,9 +160,18 @@ void CollectionManager::enableCollection(std::size_t index, bool enabled)
 		return;
 	m_collections.at(index)->enableCollection(enabled);
 	m_collections.at(index)->update();
-	recountWallpapers();
 	saveSettings();
-	m_wallpaperManager.deleteLoadedImage();
+	recountWallpapers();
+	m_wallpaperManager.onCollectionsChanged();
+	if (enabled)
+	{
+		std::size_t enabledCount = 0;
+		for (const auto& collection : m_collections)
+			if (collection->isEnabled())
+				enabledCount++;
+		if (enabledCount == 1)
+			m_wallpaperManager.play();
+	}
 }
 
 Wallpaper CollectionManager::getWallpaper(std::size_t index) const

@@ -36,11 +36,12 @@ public:
 	Timer& operator=(Timer&&) = delete;
 
 	void run();
+	void cancel() noexcept;
+	void cancelKeepTime() noexcept;
 
 	void play() noexcept { m_status.store(Status::playing, std::memory_order_relaxed); }
 	void pause() noexcept { m_status.store(Status::paused, std::memory_order_relaxed); }
 	void stop() noexcept { m_status.store(Status::stopped, std::memory_order_relaxed); cancel(); }
-	void cancel() noexcept { m_cancel.store(true, std::memory_order_relaxed); }
 
 	bool isStopped() const noexcept { return m_status.load(std::memory_order_relaxed) == Status::stopped; }
 	bool isPaused() const noexcept { return m_status.load(std::memory_order_relaxed) == Status::paused; }
@@ -52,5 +53,6 @@ private:
 
 	std::atomic<Status> m_status = Status::stopped;
 	std::atomic_bool m_cancel = false;
+	std::atomic_bool m_keepTime = true;
 	std::atomic<std::uint32_t> m_timePassed = 0;
 };

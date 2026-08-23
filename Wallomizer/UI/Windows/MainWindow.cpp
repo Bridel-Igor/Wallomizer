@@ -75,6 +75,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					{
 						m_app.getCollectionManager().saveSettings();
 						m_app.getCollectionManager().recountWallpapers();
+						m_app.getWallpaperManager().onCollectionsChanged();
 					}
 					break;
 				}
@@ -86,6 +87,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					{
 						m_app.getCollectionManager().saveSettings();
 						m_app.getCollectionManager().recountWallpapers();
+						m_app.getWallpaperManager().onCollectionsChanged();
 					}
 					break;
 				}
@@ -97,6 +99,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					{
 						m_app.getCollectionManager().saveSettings();
 						m_app.getCollectionManager().recountWallpapers();
+						m_app.getWallpaperManager().onCollectionsChanged();
 					}
 					break;
 				}

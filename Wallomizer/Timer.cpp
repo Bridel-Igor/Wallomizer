@@ -23,7 +23,9 @@ void Timer::setState(State state) noexcept
 void Timer::run()
 {
 	constexpr std::chrono::milliseconds tick = std::chrono::milliseconds(100);
-	m_timePassed = 0;
+	if (!m_keepTime.exchange(false, std::memory_order_relaxed))
+		m_timePassed.store(0, std::memory_order_relaxed);
+
 	while (m_timePassed.load(std::memory_order_relaxed) < m_settings.getData().delay)
 	{
 		if (m_cancel.exchange(false, std::memory_order_relaxed))
@@ -35,6 +37,17 @@ void Timer::run()
 			m_timePassed.fetch_add(static_cast<std::uint32_t>(tick.count()), std::memory_order_relaxed);
 		}
 	}
+}
+
+void Timer::cancel() noexcept
+{
+	m_cancel.store(true, std::memory_order_relaxed);
+}
+
+void Timer::cancelKeepTime() noexcept
+{
+	m_keepTime.store(true, std::memory_order_relaxed);
+	m_cancel.store(true, std::memory_order_relaxed);
 }
 
 std::uint32_t Timer::getRemainingTime() const noexcept

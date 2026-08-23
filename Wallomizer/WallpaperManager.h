@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <list>
 #include <mutex>
 #include <filesystem>
@@ -21,10 +22,12 @@ public:
 	WallpaperManager(WallpaperManager&&) = delete;
 	WallpaperManager& operator=(WallpaperManager&&) = delete;
 
-	bool saveSession();
-	bool loadSession();
-
-	// Player functions
+	// Lifecycle
+	void loadImage();
+	void applyLoadedImage();
+	void onCollectionsChanged();
+	
+	// Controls
 	void previousWallpaper();
 	void openCurrentWallpaperExternally();
 	void stop();
@@ -32,14 +35,8 @@ public:
 	void pause();
 	void fit();
 	void nextWallpaper();
-
-	bool hasCurrent() const { return !m_wallpaperList.empty(); }
-	bool hasPrevious() const { return m_wallpaperList.size() > 1; }
-
-	void loadImage();
-	void setLoadedImage();
-	void deleteLoadedImage();
-
+	
+	// Checks
 	bool canPrevious() const noexcept;
 	bool canOpen() const noexcept;
 	bool canStop() const noexcept;
@@ -47,21 +44,36 @@ public:
 	bool canPause() const noexcept;
 	bool canFit() const noexcept;
 	bool canNext() const noexcept;
+	
+	// Session
+	bool saveSession();
 
 private:
+	bool loadSession();
+	void clear();
+	
+	// Files
+	bool removeLoadedFile() noexcept;
+	bool removeCurrentFile() noexcept;
+	bool makeLoadedFileCurrent() noexcept;
+	bool hasLoadedFile() const noexcept;
+	
+	bool hasCurrent() const noexcept { return !m_wallpaperList.empty() && m_wallpaperList.back().isValid(); }
+	bool hasPrevious() const noexcept { return m_wallpaperList.size() > 1; }
+
 	AppState& m_appState;
 	const WinUtils& m_winUtils;
 	const Settings& m_settings;
 	const CollectionManager& m_collectionManager;
 	Timer& m_timer;
 
-	std::mutex m_sessionFileAccess;
-
-	const std::filesystem::path pathOfLoaded;
-	const std::filesystem::path pathOfCurrent;
-	mutable std::mutex m_imageModification;
+	const std::filesystem::path m_pathOfLoaded;
+	const std::filesystem::path m_pathOfCurrent;
 
 	std::list<Wallpaper> m_wallpaperList;
 	Wallpaper m_nextWallpaper;
-	bool m_settingPrevious = false;
+	std::atomic_bool m_isLoadedImageReady = false;
+
+	std::mutex m_imageModification;
+	std::mutex m_sessionFileAccess;
 };

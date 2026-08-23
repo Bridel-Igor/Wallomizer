@@ -42,3 +42,19 @@ void Wallpaper::openExternally(const WinUtils& winUtils) const
 		break;
 	}
 }
+
+bool Wallpaper::isValid() const noexcept
+{
+	switch (m_type)
+	{
+	case CollectionType::search:	
+		return true;
+
+	case CollectionType::local:
+	case CollectionType::user:
+		return !m_path.empty();
+
+	default:
+		return false;
+	}
+}

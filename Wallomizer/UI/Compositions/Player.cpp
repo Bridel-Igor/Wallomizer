@@ -149,6 +149,12 @@ void Player::updateTimer()
 	else if (appState.isLoading())
 		sprintf_s(text, 16, "Loading...");
 
+	else if (appState.isFileError())
+		sprintf_s(text, 16, "File error.");
+
+	else if (appState.isNoInternet())
+		sprintf_s(text, 16, "No connection.");
+
 	else if (appState.isNoWallpapers())
 		sprintf_s(text, 16, "No wallpapers.");
 
