@@ -4,6 +4,7 @@
 #include <atomic>
 
 class Settings;
+class IUI;
 
 class Timer
 {
@@ -35,7 +36,7 @@ public:
 	Timer(Timer&&) = delete;
 	Timer& operator=(Timer&&) = delete;
 
-	void run();
+	void run(const IUI& ui);
 	void cancel() noexcept;
 	void cancelKeepTime() noexcept;
 

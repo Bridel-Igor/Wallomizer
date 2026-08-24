@@ -12,6 +12,8 @@
 #include <utility>
 
 class IWindow;
+struct HWND__;
+using HWND = HWND__*;
 
 /// Owns the lifetime of a window running in a dedicated UI thread.
 ///
@@ -73,6 +75,7 @@ public:
 						[this](auto&&... args)
 						{
 							m_window.emplace(std::forward<decltype(args)>(args)...);
+							m_hwnd.store(m_window->hWnd(), std::memory_order_release);
 						},
 						std::move(arguments)
 					);
@@ -83,8 +86,9 @@ public:
 					m_window->windowLoop();
 
 					// Destroying the window.
+					m_hwnd.store(nullptr, std::memory_order_release);
 					m_window.reset();
-					m_finished = true;
+					m_finished.store(true, std::memory_order_release);
 				}
 				catch (...)
 				{
@@ -137,6 +141,12 @@ public:
 		join();
 	}
 
+	/// Returns the native window handle, or nullptr if the window is not running.
+	HWND getHandle() const noexcept
+	{
+		return m_hwnd.load(std::memory_order_acquire);
+	}
+
 private:
 	/// Reclaims the worker thread and propagates an exception produced by it.
 	void join()
@@ -151,6 +161,7 @@ private:
 private:
 	/// The window object itself. It is constructed, and destroyed by the worker thread.
 	std::optional<T> m_window;
+	std::atomic<HWND> m_hwnd = nullptr;
 
 	/// Owns the thread in which the window lives.
 	/// Needs to be joined even after the window has been destroyed.

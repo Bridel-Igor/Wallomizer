@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IUI.h"
 #include "UIThreadedWindow.h"
 #include "TrayIcon.h"
 #include "TrayWindow.h"
@@ -12,7 +13,7 @@ class App;
 /// The tray icon is created when the UI is initialized and remains alive for
 /// the entire application lifetime. Other windows are created on demand and
 /// run in their own UI threads.
-class UI
+class UI : public IUI
 {
 public:
 	/// Initializes the UI and starts the tray icon.
@@ -30,6 +31,12 @@ public:
 
 	/// Handles the Windows session-end notification.
 	void queryEndSession();
+
+	/// Requests the main window to refresh the collection list asynchronously.
+	void requestCollectionListUpdate() const override;
+
+	/// Requests all open player windows to refresh their player controls asynchronously.
+	void requestPlayerUpdate(bool timerOnly = false) const override;
 
 private:
 	App& m_app;

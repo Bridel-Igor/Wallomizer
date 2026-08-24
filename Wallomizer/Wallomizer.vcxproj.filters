@@ -294,6 +294,12 @@
     <ClInclude Include="UI\SharedResources.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="UI\UIMessage.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\IUI.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="UI\Icons\Play_toggled.ico">

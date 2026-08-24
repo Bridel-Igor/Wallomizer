@@ -6,19 +6,19 @@
 #include "WinUtils.h"
 #include "Settings.h"
 #include "WallpaperManager.h"
-#include "Timer.h"
+#include "IUI.h"
 #include "UserCollection.h"
 #include "LocalCollection.h"
 #include "SearchCollection.h"
 #include "BinaryIO.h"
 #include "Player.h"
 
-CollectionManager::CollectionManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager, Timer& timer) :
+CollectionManager::CollectionManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager, const IUI& ui) :
 	m_appState(appState),
 	m_winUtils(winUtils),
 	m_settings(settings),
 	m_wallpaperManager(wallpaperManager),
-	m_timer(timer),
+	m_ui(ui),
 	m_randomGenerator(static_cast<std::mt19937::result_type>(time(nullptr)))
 {
 	if (!loadSettings())
@@ -57,7 +57,6 @@ bool CollectionManager::loadSettings()
 		return false;
 
 	m_collections.clear();
-	recountWallpapers();
 
 	switch (fileVersion)
 	{
@@ -114,11 +113,6 @@ bool CollectionManager::loadSettings()
 	if (fileVersion != FILE_VERSION)
 		saveSettings();
 
-	recountWallpapers();
-
-	if (m_timer.isPlaying())
-		m_timer.cancel();
-
 	return true;
 }
 
@@ -130,6 +124,7 @@ void CollectionManager::recountWallpapers()
 		m_wallpaperCount += m_collections[i]->isEnabled() * static_cast<std::uint32_t>(m_collections[i]->getWallpaperCount());
 
 	m_appState.setNoWallpapers(m_wallpaperCount == 0);
+	m_ui.requestCollectionListUpdate();
 }
 
 void CollectionManager::addCollection(std::unique_ptr<BaseCollection> collection)

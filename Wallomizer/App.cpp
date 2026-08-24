@@ -2,18 +2,15 @@
 
 #include <thread>
 
-#include "TrayWindow.h"
-#include "UIThreadedWindow.h"
-
 App::App() :
 	m_instanceGuard("Wallomizer"),
 	m_appState(),
 	m_winUtils(),
 	m_settings(m_winUtils.getRoamingDir()),
 	m_timer(m_settings),
-	m_collectionManager(m_appState, m_winUtils, m_settings, m_wallpaperManager, m_timer),
-	m_wallpaperManager(m_appState, m_winUtils, m_settings, m_collectionManager, m_timer),
-	m_ui(*this)
+	m_ui(*this),
+	m_collectionManager(m_appState, m_winUtils, m_settings, m_wallpaperManager, m_ui),
+	m_wallpaperManager(m_appState, m_winUtils, m_settings, m_collectionManager, m_timer, m_ui)
 {
 }
 
@@ -26,22 +23,22 @@ int App::run()
 			|| m_appState.isNoInternet() 
 			|| m_timer.isStopped())
 		{
-			Player::redrawPlayers();
+			m_ui.requestPlayerUpdate();
 			Sleep(100);
 			continue;
 		}
 		m_appState.setRunning();
 
 		std::thread loaderThread(&WallpaperManager::loadImage, &m_wallpaperManager);
-		m_timer.run();
+		m_timer.run(m_ui);
 		
 		m_appState.setLoading(true);
-		Player::redrawPlayers();
+		m_ui.requestPlayerUpdate();
 
 		loaderThread.join();
 
 		m_appState.setLoading(false);
-		Player::redrawPlayers();
+		m_ui.requestPlayerUpdate();
 		
 		if (m_appState.isExiting() || m_timer.isStopped())
 			continue;

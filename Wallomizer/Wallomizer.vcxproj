@@ -212,10 +212,12 @@
     <ClInclude Include="UI\Components\Panel.h" />
     <ClInclude Include="UI\GraphicsUtils.h" />
     <ClInclude Include="UI\Interfaces\IWindow.h" />
+    <ClInclude Include="UI\IUI.h" />
     <ClInclude Include="UI\SharedResources.h" />
     <ClInclude Include="UI\TrayIcon.h" />
     <ClInclude Include="UI\UI.h" />
     <ClInclude Include="UI\UIColor.h" />
+    <ClInclude Include="UI\UIMessage.h" />
     <ClInclude Include="UI\UIThreadedWindow.h" />
     <ClInclude Include="UI\Windows\AddCollectionWindow.h" />
     <ClInclude Include="UI\Windows\AspRatPickerWindow.h" />

@@ -12,11 +12,12 @@ class WinUtils;
 class Settings;
 class CollectionManager;
 class Timer;
+class IUI;
 
 class WallpaperManager
 {
 public:
-	WallpaperManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, const CollectionManager& collectionManager, Timer& timer);
+	WallpaperManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, const CollectionManager& collectionManager, Timer& timer, const IUI& ui);
 	WallpaperManager(const WallpaperManager&) = delete;
 	WallpaperManager& operator=(const WallpaperManager&) = delete;
 	WallpaperManager(WallpaperManager&&) = delete;
@@ -66,6 +67,7 @@ private:
 	const Settings& m_settings;
 	const CollectionManager& m_collectionManager;
 	Timer& m_timer;
+	const IUI& m_ui;
 
 	const std::filesystem::path m_pathOfLoaded;
 	const std::filesystem::path m_pathOfCurrent;

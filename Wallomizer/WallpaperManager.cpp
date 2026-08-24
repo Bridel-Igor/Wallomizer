@@ -5,15 +5,16 @@
 #include "Settings.h"
 #include "CollectionManager.h"
 #include "Timer.h"
-#include "Player.h"
+#include "IUI.h"
 #include "BinaryIO.h"
 
-WallpaperManager::WallpaperManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, const CollectionManager& collectionManager, Timer& timer) :
+WallpaperManager::WallpaperManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, const CollectionManager& collectionManager, Timer& timer, const IUI& ui) :
 	m_appState(appState),
 	m_winUtils(winUtils),
 	m_settings(settings),
 	m_collectionManager(collectionManager),
 	m_timer(timer),
+	m_ui(ui),
 	m_pathOfLoaded(m_winUtils.getRoamingDir() / L"Loaded wallpaper.dat"),
 	m_pathOfCurrent(m_winUtils.getRoamingDir() / L"Current wallpaper.jpg"),
 	m_nextWallpaper(Wallpaper::getEmptyWallpaper())
@@ -85,9 +86,9 @@ void WallpaperManager::clear()
 void WallpaperManager::loadImage()
 {
 	m_isLoadedImageReady = false;
-	Player::redrawPlayers();
+	m_ui.requestPlayerUpdate();
 
-	std::unique_lock lock(m_imageModification);
+	std::lock_guard lock(m_imageModification);
 
 	if (!removeLoadedFile())
 	{
@@ -110,8 +111,7 @@ void WallpaperManager::loadImage()
 		m_timer.cancelKeepTime();
 	}
 
-	lock.unlock();
-	Player::redrawPlayers();
+	m_ui.requestPlayerUpdate();
 }
 
 void WallpaperManager::applyLoadedImage()
@@ -124,7 +124,7 @@ void WallpaperManager::applyLoadedImage()
 		return;
 
 	m_isLoadedImageReady = false;
-	Player::redrawPlayers();
+	m_ui.requestPlayerUpdate();
 
 	if (!makeLoadedFileCurrent())
 	{
@@ -157,7 +157,7 @@ void WallpaperManager::onCollectionsChanged()
 	m_nextWallpaper = Wallpaper::getEmptyWallpaper();
 	m_isLoadedImageReady = false;
 	removeLoadedFile();
-	Player::redrawPlayers();
+	m_ui.requestPlayerUpdate();
 }
 
 // Controls
@@ -174,6 +174,7 @@ void WallpaperManager::previousWallpaper()
 	removeLoadedFile();
 	m_isLoadedImageReady = false;
 	m_timer.cancel();
+	m_ui.requestPlayerUpdate();
 }
 
 void WallpaperManager::openCurrentWallpaperExternally()
@@ -192,6 +193,7 @@ void WallpaperManager::stop()
 		return;
 
 	clear();
+	m_ui.requestPlayerUpdate();
 }
 
 void WallpaperManager::play()
@@ -206,6 +208,7 @@ void WallpaperManager::play()
 	m_winUtils.updateDesktopBackground(true);
 
 	saveSession();
+	m_ui.requestPlayerUpdate();
 }
 
 void WallpaperManager::pause()
@@ -217,6 +220,7 @@ void WallpaperManager::pause()
 	m_timer.pause();
 	m_winUtils.updateDesktopBackground(true);
 	saveSession();
+	m_ui.requestPlayerUpdate();
 }
 
 void WallpaperManager::fit()
@@ -235,6 +239,7 @@ void WallpaperManager::nextWallpaper()
 		return;
 
 	m_timer.cancel();
+	m_ui.requestPlayerUpdate();
 }
 
 // Checks

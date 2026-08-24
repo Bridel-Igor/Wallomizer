@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include "IconButton.h"
 #include "Static.h"
 #include "SharedResources.h"
@@ -30,13 +28,14 @@ private:
 public:
 	Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yTimer, int widthTimer, int heightTimer, 
 		const AppState& appState, Timer& timer, WallpaperManager& wallpaperManager, DWORD additionalStyles = 0UL);
-	~Player();
+
 	bool click(WPARAM wParam);
 	bool draw(LPDRAWITEMSTRUCT drawItem) const;
-	static void updateTimer();
-	static void redrawPlayers();
+	void updateTimer();
+	void refreshPlayer();
 	
 private:
+
 	const AppState& m_appState;
 	Timer& m_timer;
 	WallpaperManager& m_wallpaperManager;
@@ -45,6 +44,4 @@ private:
 	const Icons& m_icons;
 	IconButton btnPrev, btnOpen, btnStop, btnPlay, btnPause, btnFit, btnNext;
 	Static stRemainingTime;
-
-	static std::vector<Player*> s_players;
 };

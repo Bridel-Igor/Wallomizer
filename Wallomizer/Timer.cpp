@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include "Settings.h"
-#include "Player.h"
+#include "IUI.h"
 
 Timer::State Timer::getState() const noexcept
 {
@@ -20,7 +20,7 @@ void Timer::setState(State state) noexcept
 	m_timePassed.store(state.timePassed, std::memory_order_relaxed);
 }
 
-void Timer::run()
+void Timer::run(const IUI& ui)
 {
 	constexpr std::chrono::milliseconds tick = std::chrono::milliseconds(100);
 	if (!m_keepTime.exchange(false, std::memory_order_relaxed))
@@ -33,8 +33,8 @@ void Timer::run()
 		std::this_thread::sleep_for(tick);
 		if (m_status == Status::playing)
 		{
-			Player::updateTimer();
 			m_timePassed.fetch_add(static_cast<std::uint32_t>(tick.count()), std::memory_order_relaxed);
+			ui.requestPlayerUpdate(true);
 		}
 	}
 }

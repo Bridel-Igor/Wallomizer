@@ -3,6 +3,7 @@
 #include <Windows.h>
 
 #include "App.h"
+#include "UIMessage.h"
 
 TrayWindow::TrayWindow(App& app, POINT pt) :
 	IWindow(nullptr, "Wallomizer", "Tray Window Class", WS_POPUP | WS_BORDER, WS_EX_TOOLWINDOW, 
@@ -52,6 +53,15 @@ LRESULT TrayWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 		break;
+	}
+
+	case UIMessage::REFRESH_PLAYER:
+	{
+		if (wParam)
+			player.updateTimer();
+		else
+			player.refreshPlayer();
+		return 0;
 	}
 	}
 	

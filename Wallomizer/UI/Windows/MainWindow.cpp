@@ -13,6 +13,7 @@
 #include "SetUserCollectionWindow.h"
 #include "SetSearchCollectionWindow.h"
 #include "UIColor.h"
+#include "UIMessage.h"
 
 MainWindow::MainWindow(App& app) :
 	IWindow(nullptr, "Wallomizer", "Main Window Class", WS_CAPTION | WS_SYSMENU, 0, 100, 100, width, height),
@@ -56,7 +57,7 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			SettingsWindow settingsWindow(this, m_app.getWinUtils(), m_app.getSettings());
 			settingsWindow.windowLoop();
-			Player::redrawPlayers();
+			m_app.getUI().requestPlayerUpdate();
 			return 0;
 		}
 		int i = 0;
@@ -211,6 +212,21 @@ LRESULT MainWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return (LRESULT)bkBrush;
 		}
 		break;
+	}
+
+	case UIMessage::REFRESH_TABLE:
+	{
+		updateCollectionItems();
+		return 0;
+	}
+
+	case UIMessage::REFRESH_PLAYER:
+	{
+		if (wParam)
+			player.updateTimer();
+		else
+			player.refreshPlayer();
+		return 0;
 	}
 	}
 

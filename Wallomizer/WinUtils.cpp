@@ -272,7 +272,7 @@ bool WinUtils::isHiddenOrSystem(const std::filesystem::path& path) const noexcep
 	const DWORD attributes = GetFileAttributesW(path.c_str());
 
 	return attributes != INVALID_FILE_ATTRIBUTES
-		&& (attributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM));
+		&& (attributes & (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_REPARSE_POINT));
 }
 
 bool WinUtils::setDesktopWallpaper(const wchar_t* path) const

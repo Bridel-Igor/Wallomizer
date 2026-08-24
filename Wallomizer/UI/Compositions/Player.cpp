@@ -10,8 +10,6 @@
 #include "AppState.h"
 #include "GraphicsUtils.h"
 
-std::vector<Player*> Player::s_players;
-
 Player::Icons::Icons()
 {
 	prev = GraphicsUtils::loadIcon(IDI_PREV);
@@ -70,15 +68,7 @@ Player::Player(IComponent* pParent, int xPlayer, int yPlayer, int xTimer, int yT
 	btnNext(pParent,	xPlayer + 180,	yPlayer,	20,	20, m_icons.next,	m_icons.nextHover,	m_icons.nextDisabled,	nullptr,				"Next"),
 	stRemainingTime(pParent, "", xTimer, yTimer, widthTimer, heightTimer, additionalStyles)
 {	
-	s_players.push_back(this);
-	redrawPlayers();
-}
-
-Player::~Player()
-{
-	auto it = std::find(s_players.begin(), s_players.end(), this);
-	if (it != s_players.end())
-		s_players.erase(it);
+	refreshPlayer();
 }
 
 bool Player::click(WPARAM wParam)
@@ -101,13 +91,11 @@ bool Player::click(WPARAM wParam)
 	if (btnPlay.isClicked(wParam))
 	{
 		m_wallpaperManager.play();
-		redrawPlayers();
 		return true;
 	}
 	if (btnPause.isClicked(wParam))
 	{
 		m_wallpaperManager.pause();
-		redrawPlayers();
 		return true;
 	}
 	if (btnFit.isClicked(wParam))
@@ -136,34 +124,29 @@ bool Player::draw(LPDRAWITEMSTRUCT drawItem) const
 
 void Player::updateTimer()
 {
-	if (s_players.empty())
-		return;
-
-	const AppState& appState = s_players[0]->m_appState;
-	const Timer& timer = s_players[0]->m_timer;
 	char text[16]{};
 
-	if (appState.isExiting())
+	if (m_appState.isExiting())
 		sprintf_s(text, 16, "Exiting...");
 
-	else if (appState.isLoading())
+	else if (m_appState.isLoading())
 		sprintf_s(text, 16, "Loading...");
 
-	else if (appState.isFileError())
+	else if (m_appState.isFileError())
 		sprintf_s(text, 16, "File error.");
 
-	else if (appState.isNoInternet())
+	else if (m_appState.isNoInternet())
 		sprintf_s(text, 16, "No connection.");
 
-	else if (appState.isNoWallpapers())
+	else if (m_appState.isNoWallpapers())
 		sprintf_s(text, 16, "No wallpapers.");
 
-	else if (timer.isStopped())
+	else if (m_timer.isStopped())
 		sprintf_s(text, 16, "Stopped.");
 
-	else if (appState.isRunning())
+	else if (m_appState.isRunning())
 	{
-		const std::uint32_t remainingSeconds = (timer.getRemainingTime() + 999) / 1000;
+		const std::uint32_t remainingSeconds = (m_timer.getRemainingTime() + 999) / 1000;
 
 		const std::uint16_t hours = static_cast<std::uint16_t>(remainingSeconds / 3600);
 		const std::uint8_t minutes = static_cast<std::uint8_t>((remainingSeconds / 60) % 60);
@@ -172,24 +155,19 @@ void Player::updateTimer()
 		sprintf_s(text, 16, "%u:%02u:%02u", hours, minutes, seconds);
 	}
 
-	for (auto pPlayer : s_players)
-	{
-		pPlayer->stRemainingTime.setText(text);
-		InvalidateRect(pPlayer->stRemainingTime.hWnd(), nullptr, FALSE);
-	}
+	stRemainingTime.setText(text);
+	InvalidateRect(stRemainingTime.hWnd(), nullptr, FALSE);
 }
 
-void Player::redrawPlayers()
+void Player::refreshPlayer()
 {
 	updateTimer();
-	for (auto pPlayer : s_players)
-	{
-		InvalidateRect(pPlayer->btnPrev.hWnd(), nullptr, FALSE);
-		InvalidateRect(pPlayer->btnOpen.hWnd(), nullptr, FALSE);
-		InvalidateRect(pPlayer->btnStop.hWnd(), nullptr, FALSE);
-		InvalidateRect(pPlayer->btnPlay.hWnd(), nullptr, FALSE);
-		InvalidateRect(pPlayer->btnPause.hWnd(), nullptr, FALSE);
-		InvalidateRect(pPlayer->btnFit.hWnd(), nullptr, FALSE);
-		InvalidateRect(pPlayer->btnNext.hWnd(), nullptr, FALSE);
-	}
+
+	InvalidateRect(btnPrev.hWnd(), nullptr, FALSE);
+	InvalidateRect(btnOpen.hWnd(), nullptr, FALSE);
+	InvalidateRect(btnStop.hWnd(), nullptr, FALSE);
+	InvalidateRect(btnPlay.hWnd(), nullptr, FALSE);
+	InvalidateRect(btnPause.hWnd(), nullptr, FALSE);
+	InvalidateRect(btnFit.hWnd(), nullptr, FALSE);
+	InvalidateRect(btnNext.hWnd(), nullptr, FALSE);
 }

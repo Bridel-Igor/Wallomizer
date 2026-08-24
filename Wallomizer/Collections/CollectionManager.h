@@ -10,14 +10,14 @@ class AppState;
 class WinUtils;
 class Settings;
 class WallpaperManager;
-class Timer;
+class IUI;
 class Wallpaper;
 class BaseCollection;
 
 class CollectionManager
 {
 public:
-	CollectionManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager, Timer& timer);
+	CollectionManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager, const IUI& ui);
 	CollectionManager(const CollectionManager&) = delete;
 	CollectionManager& operator=(const CollectionManager&) = delete;
 	CollectionManager(CollectionManager&&) = delete;
@@ -46,7 +46,7 @@ private:
 	const WinUtils& m_winUtils;
 	const Settings& m_settings;
 	WallpaperManager& m_wallpaperManager;
-	Timer& m_timer;
+	const IUI& m_ui;
 
 	std::vector<std::unique_ptr<BaseCollection>> m_collections;
 	std::size_t m_wallpaperCount = 0;
