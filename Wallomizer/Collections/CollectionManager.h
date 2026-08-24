@@ -50,5 +50,7 @@ private:
 
 	std::vector<std::unique_ptr<BaseCollection>> m_collections;
 	std::size_t m_wallpaperCount = 0;
-	mutable std::mt19937 m_randomGenerator;
+
+	mutable std::minstd_rand m_randomGenerator;
+	mutable std::size_t m_lastRandomIndex = std::numeric_limits<std::size_t>::max();
 };

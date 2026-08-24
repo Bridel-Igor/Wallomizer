@@ -19,7 +19,7 @@ CollectionManager::CollectionManager(AppState& appState, const WinUtils& winUtil
 	m_settings(settings),
 	m_wallpaperManager(wallpaperManager),
 	m_ui(ui),
-	m_randomGenerator(static_cast<std::mt19937::result_type>(time(nullptr)))
+	m_randomGenerator(static_cast<std::minstd_rand::result_type>(time(nullptr)))
 {
 	if (!loadSettings())
 		m_appState.setFirstLaunch();
@@ -118,13 +118,19 @@ bool CollectionManager::loadSettings()
 
 void CollectionManager::recountWallpapers()
 {
+	const std::size_t prevWallpaperCount = m_wallpaperCount;
 	m_wallpaperCount = 0;
-
+	
 	for (std::size_t i = 0; i < m_collections.size(); i++)
 		m_wallpaperCount += m_collections[i]->isEnabled() * static_cast<std::uint32_t>(m_collections[i]->getWallpaperCount());
 
 	m_appState.setNoWallpapers(m_wallpaperCount == 0);
-	m_ui.requestCollectionListUpdate();
+
+	if (prevWallpaperCount != m_wallpaperCount)
+	{
+		m_ui.requestCollectionListUpdate();
+		m_lastRandomIndex = std::numeric_limits<std::size_t>::max();
+	}
 }
 
 void CollectionManager::addCollection(std::unique_ptr<BaseCollection> collection)
@@ -186,7 +192,16 @@ Wallpaper CollectionManager::getWallpaper(std::size_t index) const
 Wallpaper CollectionManager::getRandomWallpaper() const
 {
 	if (m_wallpaperCount == 0)
-		return Wallpaper(CollectionType::none, L"");
-	std::uniform_int_distribution<std::size_t> uniformIntDistribution(0, m_wallpaperCount - 1);
-	return getWallpaper(uniformIntDistribution(m_randomGenerator));
+		return Wallpaper::getEmptyWallpaper();
+
+	std::size_t index = 0;
+	std::uniform_int_distribution<std::size_t> distribution(0, m_wallpaperCount - 1);
+	do
+	{
+		index = distribution(m_randomGenerator);
+	} while (m_wallpaperCount>1 && index == m_lastRandomIndex);
+
+	m_lastRandomIndex = index;
+
+	return getWallpaper(index);
 }
