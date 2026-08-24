@@ -1,5 +1,7 @@
 #include "LocalCollection.h"
 
+#include <cwchar>
+
 #include "CollectionManager.h"
 #include "WinUtils.h"
 #include "Wallpaper.h"
@@ -13,9 +15,10 @@ namespace
 		{ L".jpg", L".jpeg", L".bmp", L".dib", L".png", L".jfif", L".jpe", L".gif", L".tif", L".tiff",
 		L".wdp", L".heic", L".heif", L".heics", L".heifs", L".avci", L".avcs", L".avif", L".avifs", L".webp" };
 
-		const auto extension = path.extension().wstring();
+		auto extension = path.extension().wstring();
+
 		for (const auto& supported : extensions)
-			if (extension == supported)
+			if (_wcsicmp(extension.c_str(), supported) == 0)
 				return true;
 		return false;
 	}
