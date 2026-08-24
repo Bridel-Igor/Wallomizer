@@ -206,6 +206,7 @@
     <ClInclude Include="AppState.h" />
     <ClInclude Include="BinaryIO.h" />
     <ClInclude Include="Collections\CollectionTypes.h" />
+    <ClInclude Include="Exceptions.h" />
     <ClInclude Include="InstanceGuard.h" />
     <ClInclude Include="Collections\CategoriesAndPurity.h" />
     <ClInclude Include="UI\Components\ColorPickerButton.h" />

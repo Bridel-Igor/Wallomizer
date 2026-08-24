@@ -157,7 +157,8 @@ void WallpaperManager::onCollectionsChanged()
 	m_nextWallpaper = Wallpaper::getEmptyWallpaper();
 	m_isLoadedImageReady = false;
 	removeLoadedFile();
-	m_ui.requestPlayerUpdate();
+	if (!m_appState.isStarting())
+		m_ui.requestPlayerUpdate();
 }
 
 // Controls

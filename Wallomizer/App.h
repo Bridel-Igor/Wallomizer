@@ -29,9 +29,9 @@ public:
 	const WinUtils& getWinUtils() const			noexcept { return m_winUtils; }
 	Settings& getSettings()						noexcept { return m_settings; }
 	Timer& getTimer()							noexcept { return m_timer; }
-	UI& getUI()									noexcept { return m_ui; }
 	CollectionManager& getCollectionManager()	noexcept { return m_collectionManager; }
 	WallpaperManager& getWallpaperManager()		noexcept { return m_wallpaperManager; }
+	UI& getUI()									noexcept { return m_ui; }
 
 private:
 	const InstanceGuard m_instanceGuard;
@@ -39,7 +39,7 @@ private:
 	const WinUtils m_winUtils;
 	Settings m_settings;
 	Timer m_timer;
-	UI m_ui;
 	CollectionManager m_collectionManager;
 	WallpaperManager m_wallpaperManager;
+	UI m_ui;
 };

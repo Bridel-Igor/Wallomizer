@@ -6,26 +6,36 @@
 #include <vector>
 #include <random>
 
+#include "BaseCollection.h"
+
 class AppState;
 class WinUtils;
 class Settings;
 class WallpaperManager;
 class IUI;
 class Wallpaper;
-class BaseCollection;
 
 class CollectionManager
 {
+private:
+	enum class LoadResult : std::uint8_t
+	{
+		success,
+		failed,
+		noFile,
+		needsUpdate
+	};
+
 public:
 	CollectionManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager, const IUI& ui);
 	CollectionManager(const CollectionManager&) = delete;
 	CollectionManager& operator=(const CollectionManager&) = delete;
 	CollectionManager(CollectionManager&&) = delete;
 	CollectionManager& operator=(CollectionManager&&) = delete;
-	~CollectionManager();
+	~CollectionManager() = default;
 
 	bool saveSettings() const;
-	bool loadSettings();
+	LoadResult loadSettings();
 	void recountWallpapers();
 	void addCollection(std::unique_ptr<BaseCollection> collection);
 	void eraseCollection(std::size_t index);

@@ -1,6 +1,7 @@
 #include <Windows.h>
 
 #include "App.h"
+#include "Exceptions.h"
 
 /// Application entry point.
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
@@ -8,6 +9,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
     try
 	{
 		return App{}.run();	
+	}
+	catch (const StartupCancelled&)
+	{
+		return 0;
 	}
 	catch (const std::exception& e)
 	{

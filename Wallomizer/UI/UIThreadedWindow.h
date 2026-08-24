@@ -108,6 +108,27 @@ public:
 		);
 	}
 
+	~UIThreadedWindow() noexcept
+	{
+		if (!m_thread.joinable())
+			return;
+
+		try
+		{
+			if (m_ready.valid())
+				m_ready.wait();
+
+			if (m_window)
+				m_window->requestQuit();
+
+			m_thread.join();
+		}
+		catch (...)
+		{
+			std::terminate();
+		}
+	}
+
 	/// Waits until the window has been successfully constructed.
 	/// Throws if window construction failed or when called before start().
 	void waitUntilReady()

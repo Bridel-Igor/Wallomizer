@@ -8,9 +8,9 @@ App::App() :
 	m_winUtils(),
 	m_settings(m_winUtils.getRoamingDir()),
 	m_timer(m_settings),
-	m_ui(*this),
 	m_collectionManager(m_appState, m_winUtils, m_settings, m_wallpaperManager, m_ui),
-	m_wallpaperManager(m_appState, m_winUtils, m_settings, m_collectionManager, m_timer, m_ui)
+	m_wallpaperManager(m_appState, m_winUtils, m_settings, m_collectionManager, m_timer, m_ui),
+	m_ui(*this)
 {
 }
 

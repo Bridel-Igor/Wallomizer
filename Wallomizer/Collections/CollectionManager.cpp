@@ -1,6 +1,7 @@
 #include "CollectionManager.h"
 
 #include <ctime>
+#include <Windows.h>
 
 #include "AppState.h"
 #include "WinUtils.h"
@@ -11,7 +12,7 @@
 #include "LocalCollection.h"
 #include "SearchCollection.h"
 #include "BinaryIO.h"
-#include "Player.h"
+#include "Exceptions.h"
 
 CollectionManager::CollectionManager(AppState& appState, const WinUtils& winUtils, const Settings& settings, WallpaperManager& wallpaperManager, const IUI& ui) :
 	m_appState(appState),
@@ -21,16 +22,44 @@ CollectionManager::CollectionManager(AppState& appState, const WinUtils& winUtil
 	m_ui(ui),
 	m_randomGenerator(static_cast<std::minstd_rand::result_type>(time(nullptr)))
 {
-	if (!loadSettings())
+	switch (loadSettings())
+	{
+	case LoadResult::success:
+		break;
+
+	case LoadResult::failed:
+	{
+		const int result = MessageBoxW(nullptr,
+			L"The collection list file is corrupted or incompatible with this version of Wallomizer.\n\n"
+			L"Reset the collection list and continue?",
+			L"Wallomizer", MB_OKCANCEL | MB_ICONWARNING);
+
+		if (result == IDCANCEL)
+			throw StartupCancelled{};
+
+		m_collections.clear();
+		saveSettings();
 		m_appState.setFirstLaunch();
+		break;
+	}
+
+	case LoadResult::noFile:
+		m_collections.clear();
+		saveSettings();
+		m_appState.setFirstLaunch();
+		break;
+
+	case LoadResult::needsUpdate:
+		saveSettings();
+		break;
+	}
+
 	recountWallpapers();
 }
 
-CollectionManager::~CollectionManager() = default;
-
 bool CollectionManager::saveSettings() const
 {
-	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"CollectionManager.dat";
+	const std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"CollectionManager.dat";
 	const std::uint32_t collectionsCount = static_cast<std::uint32_t>(m_collections.size());
 
 	BinaryWriter file(filePath);
@@ -46,15 +75,18 @@ bool CollectionManager::saveSettings() const
 	return true;
 }
 
-bool CollectionManager::loadSettings()
+CollectionManager::LoadResult CollectionManager::loadSettings()
 {
-	std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"CollectionManager.dat";
+	const std::filesystem::path filePath = m_winUtils.getRoamingDir() / L"CollectionManager.dat";
 
+	if(!std::filesystem::exists(filePath))
+		return LoadResult::noFile;
+
+	std::uint16_t fileVersion = 0;
 	BinaryReader file(filePath);
-	std::uint16_t fileVersion;
 	if (!file.isOpen()
 		|| !file.read(fileVersion))
-		return false;
+		return LoadResult::failed;
 
 	m_collections.clear();
 
@@ -65,13 +97,13 @@ bool CollectionManager::loadSettings()
 	{
 		std::uint32_t collectionCount;
 		if (!file.read(collectionCount))
-			return false;
+			return LoadResult::failed;
 
 		for (std::uint32_t i = 0; i < collectionCount; i++)
 		{
 			CollectionType collectionType;
 			if (!file.read(collectionType))
-				return false;
+				return LoadResult::failed;
 
 			std::unique_ptr<BaseCollection> collection;
 			switch (collectionType)
@@ -89,7 +121,7 @@ bool CollectionManager::loadSettings()
 				break;
 
 			default:
-				return false;
+				return LoadResult::failed;
 			}
 
 			if (collection->loadSettings(file, fileVersion))
@@ -98,22 +130,20 @@ bool CollectionManager::loadSettings()
 				m_collections.push_back(std::move(collection));
 			}
 			else
-				return false;
-
+				return LoadResult::failed;
 		}
 		break;
 	}
 	default:
 	{
-		MessageBox(nullptr, "Incompatible collection list file. Collection list was reset.", "Wallomizer", MB_OK | MB_ICONEXCLAMATION);
-		break;
+		return LoadResult::failed;
 	}
 	}
 
 	if (fileVersion != FILE_VERSION)
-		saveSettings();
+		return LoadResult::needsUpdate;
 
-	return true;
+	return LoadResult::success;
 }
 
 void CollectionManager::recountWallpapers()
@@ -128,8 +158,9 @@ void CollectionManager::recountWallpapers()
 
 	if (prevWallpaperCount != m_wallpaperCount)
 	{
-		m_ui.requestCollectionListUpdate();
 		m_lastRandomIndex = std::numeric_limits<std::size_t>::max();
+		if (!m_appState.isStarting())
+			m_ui.requestCollectionListUpdate();
 	}
 }
 

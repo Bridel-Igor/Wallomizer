@@ -300,6 +300,9 @@
     <ClInclude Include="UI\IUI.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="Exceptions.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="UI\Icons\Play_toggled.ico">
