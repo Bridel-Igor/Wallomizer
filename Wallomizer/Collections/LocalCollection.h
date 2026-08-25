@@ -10,7 +10,7 @@ class WinUtils;
 class LocalCollection : public BaseCollection
 {
 public:
-	LocalCollection(const WinUtils& winUtils, CollectionManager& collectionManager) :
+	LocalCollection(CollectionManager& collectionManager, const WinUtils& winUtils) :
 		BaseCollection(CollectionType::local),
 		m_winUtils(winUtils),
 		m_collectionManager(collectionManager)

@@ -109,15 +109,15 @@ CollectionManager::LoadResult CollectionManager::loadSettings()
 			switch (collectionType)
 			{
 			case CollectionType::local:
-				collection = std::make_unique<LocalCollection>(m_winUtils, *this);
+				collection = std::make_unique<LocalCollection>(*this, m_winUtils);
 				break;
 
 			case CollectionType::user:
-				collection = std::make_unique<UserCollection>(m_settings);
+				collection = std::make_unique<UserCollection>(*this, m_settings);
 				break;
 
 			case CollectionType::search:
-				collection = std::make_unique<SearchCollection>(m_settings, *this);
+				collection = std::make_unique<SearchCollection>(*this, m_settings);
 				break;
 
 			default:

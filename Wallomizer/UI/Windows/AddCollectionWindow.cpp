@@ -32,7 +32,7 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 		if (btnAddUserCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			auto collection = std::make_unique<UserCollection>(m_settings);
+			auto collection = std::make_unique<UserCollection>(m_collectionManager, m_settings);
 			SetUserCollectionWindow setUserCollectionWindow(this, m_settings, *collection);
 			setUserCollectionWindow.windowLoop();
 			if (setUserCollectionWindow.isOk() && collection->isValid())
@@ -43,7 +43,7 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 		if (btnAddLocalCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			auto collection = std::make_unique<LocalCollection>(m_winUtils, m_collectionManager);
+			auto collection = std::make_unique<LocalCollection>(m_collectionManager, m_winUtils);
 			SetLocalCollectionWindow setLocalCollectionWindow(this, m_winUtils, *collection);
 			setLocalCollectionWindow.windowLoop();
 			if (setLocalCollectionWindow.isOk() && collection->isValid())
@@ -54,7 +54,7 @@ LRESULT AddCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARA
 		if (btnAddSearchCollection.isClicked(wParam))
 		{
 			ShowWindow(hWnd(), SW_HIDE);
-			auto collection = std::make_unique<SearchCollection>(m_settings, m_collectionManager);
+			auto collection = std::make_unique<SearchCollection>(m_collectionManager, m_settings);
 			SetSearchCollectionWindow setSearchCollectionWindow(this, *collection);
 			setSearchCollectionWindow.windowLoop();
 			if (setSearchCollectionWindow.isOk() && collection->isValid())

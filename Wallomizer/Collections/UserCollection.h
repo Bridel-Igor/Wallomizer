@@ -7,6 +7,7 @@
 
 class WinUtils;
 class Settings;
+class CollectionManager;
 
 class UserCollection : public BaseCollection
 {
@@ -27,9 +28,10 @@ private:
 	};
 
 public:
-	UserCollection(const Settings& settings) :
+	UserCollection(CollectionManager& collectionManager, const Settings& settings) :
 		BaseCollection(CollectionType::user),
-		m_settings(settings)
+		m_settings(settings),
+		m_collectionManager(collectionManager)
 	{}
 	~UserCollection() = default;
 
@@ -51,5 +53,7 @@ private:
 	std::wstring getURL() const;
 
 	const Settings& m_settings;
+	CollectionManager& m_collectionManager;
+
 	static constexpr std::size_t s_perPage = 24;
 };

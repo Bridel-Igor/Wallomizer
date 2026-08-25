@@ -151,7 +151,8 @@ Wallpaper SearchCollection::getWallpaper(std::size_t index)
 	if (!internet.parse("path", path, true))
 		return Wallpaper::getEmptyWallpaper();
 
-	parseMeta(internet);
+	if (parseMeta(internet))
+		m_collectionManager.recountWallpapers();
 
 	return Wallpaper(CollectionType::search, path);
 }

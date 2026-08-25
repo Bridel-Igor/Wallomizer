@@ -5,6 +5,7 @@
 
 #include "WinUtils.h"
 #include "Settings.h"
+#include "CollectionManager.h"
 #include "Wallpaper.h"
 #include "Internet.h"
 #include "BinaryIO.h"
@@ -128,7 +129,10 @@ Wallpaper UserCollection::getWallpaper(std::size_t index)
 		return Wallpaper::getEmptyWallpaper();
 
 	if (internet.parse("meta"))
+	{
 		internet.parse("total", m_wallpaperCount, true);
+		m_collectionManager.recountWallpapers();
+	}
 
 	return Wallpaper(CollectionType::user, path);
 }
