@@ -2,8 +2,6 @@
 
 #include <CommCtrl.h>
 
-#include "IWindow.h"
-
 IconButton::IconButton(IComponent* pParent, int x, int y, int width, int height, 
     HICON hIcon, HICON hIconHovered, HICON hIconDisabled, HICON hIconToggled,
     std::string_view toolTip, DWORD additionalStyles, DWORD additionalExStyles) :
@@ -53,7 +51,7 @@ bool IconButton::draw(LPDRAWITEMSTRUCT pDIS, bool enabled, bool toggled, HBRUSH 
 {
 	if (pDIS->hwndItem != m_hWnd)
 		return false;
-	FillRect(pDIS->hDC, &pDIS->rcItem, bkgrnd ? bkgrnd : IWindow::Resources::mainBkBrush);
+	FillRect(pDIS->hDC, &pDIS->rcItem, bkgrnd ? bkgrnd : resources().mainBkBrush);
 
     HICON hIcon = m_hIcon;
     if (toggled && m_hIconToggled)

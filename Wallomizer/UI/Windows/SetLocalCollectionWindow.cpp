@@ -59,7 +59,7 @@ LRESULT SetLocalCollectionWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, 
 	case WM_DRAWITEM:
 	{
 		LPDRAWITEMSTRUCT drawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
-		if (cbRecursive.draw(drawItem, resources.mainBkBrush))
+		if (cbRecursive.draw(drawItem, resources().mainBkBrush))
 			return TRUE;
 		break;
 	}

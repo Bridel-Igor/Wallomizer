@@ -7,11 +7,28 @@
 /// Provides a window handle and access to the parent component.
 class IComponent
 {
+protected:
+	class Resources
+	{
+	public:
+		Resources() noexcept;
+		~Resources() noexcept;
+
+		Resources(const Resources&) = delete;
+		Resources& operator=(const Resources&) = delete;
+
+		HFONT mainFont;
+		HFONT titleFont;
+		HBRUSH mainBkBrush;
+	};
+
 public:
+	static const Resources& resources() noexcept;
+
 	IComponent() = delete;
 	IComponent(const IComponent&) = delete;
-	IComponent(IComponent&&) = delete;
 	IComponent& operator=(const IComponent&) = delete;
+	IComponent(IComponent&&) = delete;
 	IComponent& operator=(IComponent&&) = delete;
 	
 	/// @return The WinAPI window handle.

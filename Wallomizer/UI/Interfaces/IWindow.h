@@ -4,7 +4,6 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-#include <cstdint>
 #include <string>
 #include <vector>
 #include <Windows.h>
@@ -14,25 +13,9 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 class IHoverable;
 
 /// Generic window component.
-/// Manages shared window resources and dispatches WinAPI messages to derived classes.
+/// Dispatches WinAPI messages to derived classes.
 class IWindow : public IComponent
 {
-public:
-	/// Manages shared resources used by application windows.
-	class Resources
-	{
-	public:
-		Resources() noexcept;
-		~Resources() noexcept;
-
-		static HFONT mainFont;
-		static HFONT titleFont;
-		static HBRUSH mainBkBrush;
-
-	private:
-		static std::uint16_t refCount;
-	}resources;
-
 public:
 	/// Constructs a window with the specified class, style and geometry.
 	///

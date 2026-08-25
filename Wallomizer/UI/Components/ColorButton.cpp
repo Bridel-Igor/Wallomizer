@@ -1,7 +1,6 @@
 #include "ColorButton.h"
 
 #include "resource.h"
-#include "IWindow.h"
 #include "UIColor.h"
 #include "GraphicsUtils.h"
 
@@ -54,17 +53,17 @@ bool ColorButton::draw(LPDRAWITEMSTRUCT drawItem)
 	if (drawItem->hwndItem != m_hWnd)
 		return false;
 
-	const Resources& resources = m_resources.get();
+	const Resources& cbResources = m_resources.get();
 
-	FillRect(drawItem->hDC, &drawItem->rcItem, IWindow::Resources::mainBkBrush);
-	SelectObject(drawItem->hDC, resources.penNull);
+	FillRect(drawItem->hDC, &drawItem->rcItem, resources().mainBkBrush);
+	SelectObject(drawItem->hDC, cbResources.penNull);
 	SelectObject(drawItem->hDC, m_brush);
 	RoundRect(drawItem->hDC, drawItem->rcItem.left, drawItem->rcItem.top, drawItem->rcItem.right, drawItem->rcItem.bottom, 5, 5);
 	if (m_empty)
-		DrawIconEx(drawItem->hDC, 0, 0, resources.iconEmptyColor, 0, 0, 0, nullptr, DI_NORMAL);
+		DrawIconEx(drawItem->hDC, 0, 0, cbResources.iconEmptyColor, 0, 0, 0, nullptr, DI_NORMAL);
 	if ((m_hovering && !m_checked) || m_checked)
 	{
-		SelectObject(drawItem->hDC, m_useWhiteCheck ? resources.penCheckedWhite : resources.penCheckedBlack);
+		SelectObject(drawItem->hDC, m_useWhiteCheck ? cbResources.penCheckedWhite : cbResources.penCheckedBlack);
 
 		MoveToEx(drawItem->hDC, drawItem->rcItem.left + 1, drawItem->rcItem.top + 1, nullptr);
 		LineTo(drawItem->hDC, drawItem->rcItem.left + 1, drawItem->rcItem.bottom - 1);
@@ -75,14 +74,14 @@ bool ColorButton::draw(LPDRAWITEMSTRUCT drawItem)
 		RECT tmp = { 0 };
 		tmp.left = drawItem->rcItem.left, tmp.right = tmp.left + 1;
 		tmp.top = drawItem->rcItem.bottom, tmp.bottom = tmp.top - 1;
-		FillRect(drawItem->hDC, &tmp, IWindow::Resources::mainBkBrush);
+		FillRect(drawItem->hDC, &tmp, resources().mainBkBrush);
 		tmp.left = drawItem->rcItem.right, tmp.right = tmp.left - 1;
 		tmp.top = drawItem->rcItem.bottom, tmp.bottom = tmp.top - 1;
-		FillRect(drawItem->hDC, &tmp, IWindow::Resources::mainBkBrush);
+		FillRect(drawItem->hDC, &tmp, resources().mainBkBrush);
 	}
 	if (m_checked)
 		DrawIconEx(drawItem->hDC, (drawItem->rcItem.right - 20) / 2, (drawItem->rcItem.bottom - 20) / 2,
-					m_useWhiteCheck ? resources.iconCheckWhite : resources.iconCheckBlack,
+					m_useWhiteCheck ? cbResources.iconCheckWhite : cbResources.iconCheckBlack,
 					0, 0, 0, nullptr, DI_NORMAL);
 
 	return true;

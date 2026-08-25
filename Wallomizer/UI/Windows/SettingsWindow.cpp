@@ -49,9 +49,9 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 	{
 	case WM_SHOWWINDOW:
 	{
-		stApplication.setFont(resources.titleFont);
-		stSlideshow.setFont(resources.titleFont);
-		stWallhaven.setFont(resources.titleFont);
+		stApplication.setFont(resources().titleFont);
+		stSlideshow.setFont(resources().titleFont);
+		stWallhaven.setFont(resources().titleFont);
 		break;
 	}
 
@@ -159,7 +159,7 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 	case WM_DRAWITEM:
 	{
 		LPDRAWITEMSTRUCT drawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
-		if (cbStartup.draw(drawItem, resources.mainBkBrush))
+		if (cbStartup.draw(drawItem, resources().mainBkBrush))
 			return TRUE;
 		if (cpbBckColor.draw(drawItem))
 			return TRUE;
@@ -174,7 +174,7 @@ LRESULT SettingsWindow::HandleMessage(HWND, UINT uMsg, WPARAM wParam, LPARAM lPa
 		else
 			SetTextColor(hdcStatic, UIColor::staticText);
 		SetBkMode(hdcStatic, TRANSPARENT);
-		return (LRESULT)resources.mainBkBrush;
+		return (LRESULT)resources().mainBkBrush;
 	}
 
 	case WM_CTLCOLOREDIT:

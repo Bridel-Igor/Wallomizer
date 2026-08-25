@@ -2,7 +2,6 @@
 
 #include <Commdlg.h>
 
-#include "IWindow.h"
 #include "UIColor.h"
 
 ColorPickerButton::ColorPickerButton(IComponent* pParent, COLORREF color, int x, int y, int width, int height) :
@@ -26,7 +25,7 @@ bool ColorPickerButton::draw(LPDRAWITEMSTRUCT pDIS) const
 	if (pDIS->hwndItem != m_hWnd)
 		return false;
 
-	FillRect(pDIS->hDC, &pDIS->rcItem, IWindow::Resources::mainBkBrush);
+	FillRect(pDIS->hDC, &pDIS->rcItem, resources().mainBkBrush);
 	HBRUSH oldBrush = static_cast<HBRUSH>(SelectObject(pDIS->hDC, m_brush));
 	RoundRect(pDIS->hDC, pDIS->rcItem.left, pDIS->rcItem.top, pDIS->rcItem.right, pDIS->rcItem.bottom, 5, 5);
 	SelectObject(pDIS->hDC, oldBrush);
@@ -46,10 +45,10 @@ bool ColorPickerButton::draw(LPDRAWITEMSTRUCT pDIS) const
 		RECT tmp{};
 		tmp.left = pDIS->rcItem.left, tmp.right = tmp.left + 1;
 		tmp.top = pDIS->rcItem.bottom, tmp.bottom = tmp.top - 1;
-		FillRect(pDIS->hDC, &tmp, IWindow::Resources::mainBkBrush);
+		FillRect(pDIS->hDC, &tmp, resources().mainBkBrush);
 		tmp.left = pDIS->rcItem.right, tmp.right = tmp.left - 1;
 		tmp.top = pDIS->rcItem.bottom, tmp.bottom = tmp.top - 1;
-		FillRect(pDIS->hDC, &tmp, IWindow::Resources::mainBkBrush);
+		FillRect(pDIS->hDC, &tmp, resources().mainBkBrush);
 	}
 
 	return true;

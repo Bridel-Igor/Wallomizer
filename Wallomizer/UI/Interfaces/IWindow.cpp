@@ -7,30 +7,6 @@
 #include "UIColor.h"
 #include "resource.h"
 
-HFONT IWindow::Resources::mainFont;
-HFONT IWindow::Resources::titleFont;
-HBRUSH IWindow::Resources::mainBkBrush;
-
-std::uint16_t IWindow::Resources::refCount = 0;
-
-IWindow::Resources::Resources() noexcept
-{
-	if (refCount++) // Loading resources only if this is the first created window
-		return;
-	mainFont = CreateFontA(15, 0, 0, 0, FW_REGULAR, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, FF_DONTCARE, "Arial");
-	titleFont = CreateFontA(15, 0, 0, 0, FW_SEMIBOLD, FALSE, TRUE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY, FF_DONTCARE, "Arial");
-	mainBkBrush = CreateSolidBrush(UIColor::windowBk);
-}
-
-IWindow::Resources::~Resources() noexcept
-{
-	if (--refCount) // Destroying resources only if this is the last window destroyed
-		return;
-	DeleteObject(mainBkBrush);
-	DeleteObject(mainFont);
-	DeleteObject(titleFont);
-}
-
 IWindow::IWindow(IWindow* pOwner, LPCSTR sWindowName, std::string className, DWORD dwStyle, DWORD dwExStyle,
 		int x, int y, int nWidth, int nHeight) :
 	IComponent(nullptr),
@@ -167,7 +143,7 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	{
 	case WM_INITIALIZE_WINDOW:
 	{
-		EnumChildWindows(pThis->hWnd(), SetChildFont, reinterpret_cast<LPARAM>(pThis->resources.mainFont));
+		EnumChildWindows(pThis->hWnd(), SetChildFont, reinterpret_cast<LPARAM>(resources().mainFont));
 		if (pThis->m_pOwner)
 		{
 			EnableWindow(pThis->m_pOwner->hWnd(), FALSE);
@@ -211,7 +187,7 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
-		FillRect(hdc, &ps.rcPaint, Resources::mainBkBrush);
+		FillRect(hdc, &ps.rcPaint, resources().mainBkBrush);
 		EndPaint(hWnd, &ps);
 	}
 	return 0;
@@ -230,7 +206,7 @@ LRESULT CALLBACK IWindow::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		HDC hdcStatic = (HDC)wParam;
 		SetTextColor(hdcStatic, UIColor::staticText);
 		SetBkColor(hdcStatic, UIColor::windowBk);
-		return reinterpret_cast<LRESULT>(Resources::mainBkBrush);
+		return reinterpret_cast<LRESULT>(resources().mainBkBrush);
 	}
 
 	case WM_CTLCOLORBTN:

@@ -4,7 +4,6 @@
 
 #include "resource.h"
 #include "BaseCollection.h"
-#include "IWindow.h"
 #include "UIColor.h"
 #include "GraphicsUtils.h"
 
@@ -35,8 +34,8 @@ CollectionItem::CollectionItem(IComponent* pParent, int _x, int _y, int _width)
 	btnSettings(pParent,	0, 0, 0, height, m_resources.get().iconOptions, m_resources.get().iconOptionsHover),
 	btnDelete(pParent,		0, 0, 0, height, m_resources.get().iconDelete, m_resources.get().iconDeleteHover)
 {
-	stName.setFont(IWindow::Resources::mainFont);
-	stNumber.setFont(IWindow::Resources::mainFont);
+	stName.setFont(stName.resources().mainFont);
+	stNumber.setFont(stNumber.resources().mainFont);
 	purity.enable(false);
 }
 
